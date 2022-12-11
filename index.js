@@ -2,7 +2,6 @@
 const helpers = require('./helpers');
 const config = require('./config')
 const express = require('express')
-const fs = require('mz/fs');
 const bodyParser = require('body-parser');
 
 // CONFIG 
@@ -73,7 +72,7 @@ app.get('/photos', (req, res) => {
     "date": "2022-12-11T17:27:58.396Z",
     "base64": image64 data
   } */
-  
+
 app.post('/photo', (req,res) => {
 
   if(helpers.isPhotoInDB(req.body)){

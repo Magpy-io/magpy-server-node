@@ -1,8 +1,12 @@
+// IMPORTS
 const { 
-    v1: uuidv1,
-    v4: uuidv4,
+  v4: uuidv4,
   } = require('uuid');
 const fs = require('mz/fs');
+const config = require('./config')
+
+//CONFIG
+const DBFile = config.DBFile
 
 function sendResponse(res, ok, status, data){
   let jsonResponse = {
@@ -60,7 +64,7 @@ function addPhotoToDisk(res, data, filePath){
 
 function addPhotoToDB(photo, serverFilePath){
 
-  fs.readFile('photos.json', 'utf8', function readFileCallback(err, data){
+  fs.readFile(DBFile, 'utf8', function readFileCallback(err, data){
     if (err){
         console.log(err);
     } else {
@@ -77,7 +81,7 @@ function addPhotoToDB(photo, serverFilePath){
     obj = JSON.parse(data); //now it an object
     obj.photos.push(newEntry); //add some data
     json = JSON.stringify(obj); //convert it back to json
-    fs.writeFile('photos.json', json, 'utf8'); // write it back 
+    fs.writeFile(DBFile, json, 'utf8'); // write it back 
   }});
 
 }
@@ -91,7 +95,7 @@ function areEqual(p, photo){
 
 function isPhotoInDB(photo){
 
-  data = fs.readFileSync('photos.json', 'utf8');
+  data = fs.readFileSync(DBFile, 'utf8');
   obj = JSON.parse(data); 
   isInDB = obj.photos.some((p)=>areEqual(p, photo))
 
@@ -99,13 +103,13 @@ function isPhotoInDB(photo){
 }
 
 function numberPhotosFromDB(){
-  data = fs.readFileSync('photos.json', 'utf8');
+  data = fs.readFileSync(DBFile, 'utf8');
   obj = JSON.parse(data); 
   return obj.photos.length
 }
 
 function getPhotosFromDB(number, offset){
-  data = fs.readFileSync('photos.json', 'utf8');
+  data = fs.readFileSync(DBFile, 'utf8');
   obj = JSON.parse(data); 
 
   return {
@@ -115,7 +119,7 @@ function getPhotosFromDB(number, offset){
 }
 
 function getAllPhotosFromDB(){
-  data = fs.readFileSync('photos.json', 'utf8');
+  data = fs.readFileSync(DBFile, 'utf8');
   obj = JSON.parse(data); 
 
   return obj.photos
