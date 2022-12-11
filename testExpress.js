@@ -1,13 +1,14 @@
 const helpers = require('./helpers');
+const config = require('./config')
 const express = require('express')
 const fs = require('mz/fs');
 const bodyParser = require('body-parser');
 
 const app = express()
-const host = '192.168.0.21';
-const port = 8000
+const host = config.host;
+const port = config.port
+const rootPath = config.rootPath
 
-const rootPath = '/home/chaimaa/Ants/Photos/'
 const idToPathArray = [['1', 'image1.jpg'], ['2', 'image2.jpg']];
 const idToPath = new Map(idToPathArray)
 
