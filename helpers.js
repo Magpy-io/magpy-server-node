@@ -75,6 +75,7 @@ function addPhotoToDB(photo, serverFilePath){
       width: photo.width,
       height: photo.height,
       date: photo.date,
+      clientPath: photo.path,
       syncDate: new Date(Date.now()).toJSON(),
       serverPath: serverFilePath
     }

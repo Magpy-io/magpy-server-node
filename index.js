@@ -25,6 +25,8 @@ app.listen(port, host, () => {
 
 // GET /numberPhotos : return the number of photos in the server. 
 app.get('/numberPhotos', (req, res) => {
+
+  console.log(`[GET numberPhotos]`)
   const nb = helpers.numberPhotosFromDB()
   helpers.sendResponse(res, true, 200, {
     number: nb
@@ -36,6 +38,8 @@ app.get('/photos/:number/:offset', (req, res) => {
   
   const number = req.params["number"] ?? 10
   const offset = req.params["offset"] ?? 0
+
+  console.log(`[GET photos] number:${number} offset:${offset}`)
   const {dbPhotos, endReached} = helpers.getPhotosFromDB(number, offset)
   const photos = helpers.getPhotosFromDisk(dbPhotos)
   const jsonResponse = {
@@ -49,6 +53,7 @@ app.get('/photos/:number/:offset', (req, res) => {
 // GET /photos : returns all photos in server. 
 app.get('/photos', (req, res) => {
   
+  console.log(`[GET photos]`)
   const dbPhotos = helpers.getAllPhotosFromDB()
   const photos = helpers.getPhotosFromDisk(dbPhotos)
   const jsonResponse = {
@@ -74,6 +79,8 @@ app.get('/photos', (req, res) => {
   } */
 
 app.post('/photo', (req,res) => {
+
+  console.log(`[POST photo]`)
 
   if(helpers.isPhotoInDB(req.body)){
     const msg = "Photo already added to server."
