@@ -4,6 +4,15 @@ const {
   } = require('uuid');
 const fs = require('mz/fs');
 
+function sendResponse(res, ok, status, data){
+  let jsonResponse = {
+      ok: ok,
+      data: data,      
+  }
+
+  res.status(status).json(jsonResponse)
+}
+
 function sendSuccessfulResponse(res, msg, status=200){
     let jsonResponse = {
         ok: true,
@@ -88,12 +97,20 @@ function addPhotoToDB(photo){
     return isInDB
   }
 
+  function numberPhotosFromDB(){
+    data = fs.readFileSync('photos.json', 'utf8');
+    obj = JSON.parse(data); 
+    return obj.photos.length
+  }
+
 module.exports = {
-    sendSuccessfulResponse,
-    sendFailedResponse,
-    splitImageName,
-    serverImageName,
-    addPhotoToDisk,
-    addPhotoToDB,
-    isPhotoInDB
+  sendResponse,
+  sendSuccessfulResponse,
+  sendFailedResponse,
+  splitImageName,
+  serverImageName,
+  addPhotoToDisk,
+  addPhotoToDB,
+  isPhotoInDB,
+  numberPhotosFromDB
 };

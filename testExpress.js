@@ -46,8 +46,11 @@ app.get('/photo/:id', (req, res) => {
     .catch(err => console.error(err));
 })
 
-app.get('/photos', (req, res) => {
-    res.json({photos : Array.from(idToPath.keys())})
+app.get('/numberPhotos', (req, res) => {
+    const nb = helpers.numberPhotosFromDB()
+    helpers.sendResponse(res, true, 200, {
+      number: nb
+    })
   })  
 
 app.listen(port, host, () => {
