@@ -13,14 +13,13 @@ const str = JSON.stringify(obj);
 fs.writeFile(DBFile, str, "utf8");
 console.log("Database cleared.");
 
-fs.readdir(config.rootPath, (err, files) => {
+fs.readdir(config.photosDirPath, (err, files) => {
   if (err) throw err;
 
   for (const file of files) {
-    fs.unlink(path.join(config.rootPath, file), (err) => {
+    fs.unlink(path.join(config.photosDirPath, file), (err) => {
       if (err) throw err;
     });
   }
 });
-
-console.log(config.rootPath + " directory cleared.");
+console.log(config.photosDirPath + " directory cleared.");
