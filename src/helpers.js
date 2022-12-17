@@ -1,10 +1,8 @@
 // IMPORTS
 const { v4: uuidv4 } = require("uuid");
 const fs = require("mz/fs");
-const config = require("./config");
 
-//CONFIG
-const DBFile = config.DBFile;
+const { DBFile, rootPath } = require(global.__srcdir + "/config/config");
 
 function sendResponse(res, ok, status, data) {
   let jsonResponse = {
@@ -44,8 +42,9 @@ function serverImageName(imageName) {
   return serverFileName;
 }
 
-function addPhotoToDisk(res, data, filePath) {
-  let buff = Buffer.from(data, "base64");
+function addPhotoToDisk(res, data) {
+  const filePath = rootPath + serverImageName(data.name);
+  let buff = Buffer.from(data.image64, "base64");
   fs.writeFile(filePath, buff, (err) => {
     if (err) {
       sendFailedResponse(res, err);
@@ -58,7 +57,8 @@ function addPhotoToDisk(res, data, filePath) {
   });
 }
 
-function addPhotoToDB(photo, serverFilePath) {
+function addPhotoToDB(photo) {
+  const filePath = rootPath + serverImageName(photo.name);
   fs.readFile(DBFile, "utf8", function readFileCallback(err, data) {
     if (err) {
       console.log(err);
@@ -72,10 +72,10 @@ function addPhotoToDB(photo, serverFilePath) {
         date: photo.date,
         clientPath: photo.path,
         syncDate: new Date(Date.now()).toJSON(),
-        serverPath: serverFilePath,
+        serverPath: filePath,
         hash: hashString(photo.image64),
       };
-      obj = JSON.parse(data); //now it an object
+      obj = JSON.parse(data); //now its an object
       obj.photos.push(newEntry); //add some data
       json = JSON.stringify(obj); //convert it back to json
       fs.writeFile(DBFile, json, "utf8"); // write it back
