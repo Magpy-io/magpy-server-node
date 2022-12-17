@@ -1,12 +1,16 @@
 const helpers = require(global.__srcdir + "/helpers");
 
+const databaseFunctions = require(global.__srcdir + "/db/databaseFunctions");
+
+const diskManager = require(global.__srcdir + "/modules/diskManager");
+
 // get photos : returns all photos in server.
 const endpoint = "/photos";
 const callback = (req, res) => {
   console.log(`[GET photos]`);
 
-  const dbPhotos = helpers.getAllPhotosFromDB();
-  const photos = helpers.getPhotosFromDisk(dbPhotos);
+  const dbPhotos = databaseFunctions.getAllPhotosFromDB();
+  const photos = diskManager.getPhotosFromDisk(dbPhotos);
   const jsonResponse = {
     number: photos.length,
     photos: photos,

@@ -1,11 +1,13 @@
 const helpers = require(global.__srcdir + "/helpers");
 
+const databaseFunctions = require(global.__srcdir + "/db/databaseFunctions");
+
 // get photos exist : returns whether or not a list of photos exist in the server
 const endpoint = "/photosExist";
 const callback = (req, res) => {
   console.log(`[GET photosExist]`);
 
-  const hashes = helpers.findPhotos(req.body.photosExistData);
+  const hashes = databaseFunctions.findPhotosDB(req.body.photosExistData);
 
   const photosExist = hashes.map((hash, index) => {
     return {
