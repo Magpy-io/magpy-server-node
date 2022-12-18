@@ -1,4 +1,4 @@
-const helpers = require(global.__srcdir + "/helpers");
+const responseFormatter = require(global.__srcdir + "/api/responseFormatter");
 
 const databaseFunctions = require(global.__srcdir + "/db/databaseFunctions");
 
@@ -7,16 +7,20 @@ const endpoint = "/photoExists";
 const callback = (req, res) => {
   console.log(`[GET photoExists]`);
 
-  const hash = databaseFunctions.findPhotoDB(req.body.fileSize, req.body.name);
+  databaseFunctions.findPhotoDB(
+    req.body.fileSize,
+    req.body.name,
+    function (hash) {
+      const jsonResponse = {
+        name: req.body.name,
+        fileSize: req.body.fileSize,
+        exists: Boolean(hash),
+        hash: hash ?? "",
+      };
 
-  const jsonResponse = {
-    name: req.body.name,
-    fileSize: req.body.fileSize,
-    exists: Boolean(hash),
-    hash: hash ?? "",
-  };
-
-  helpers.sendResponse(res, true, 200, jsonResponse);
+      responseFormatter.sendResponse(res, true, 200, jsonResponse);
+    }
+  );
 };
 
 module.exports = { endpoint: endpoint, callback: callback, method: "get" };

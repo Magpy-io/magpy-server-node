@@ -1,4 +1,4 @@
-const helpers = require(global.__srcdir + "/helpers");
+const responseFormatter = require(global.__srcdir + "/api/responseFormatter");
 
 const databaseFunctions = require(global.__srcdir + "/db/databaseFunctions");
 
@@ -9,14 +9,15 @@ const endpoint = "/photos";
 const callback = (req, res) => {
   console.log(`[GET photos]`);
 
-  const dbPhotos = databaseFunctions.getAllPhotosFromDB();
-  const photos = diskManager.getPhotosFromDisk(dbPhotos);
-  const jsonResponse = {
-    number: photos.length,
-    photos: photos,
-  };
+  databaseFunctions.getAllPhotosFromDB(function (dbPhotos) {
+    const photos = diskManager.getPhotosFromDisk(dbPhotos);
+    const jsonResponse = {
+      number: photos.length,
+      photos: photos,
+    };
 
-  helpers.sendResponse(res, true, 200, jsonResponse);
+    responseFormatter.sendResponse(res, true, 200, jsonResponse);
+  });
 };
 
 module.exports = { endpoint: endpoint, callback: callback, method: "get" };

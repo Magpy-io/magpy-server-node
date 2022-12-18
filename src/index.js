@@ -7,7 +7,9 @@ const bodyParser = require("body-parser");
 
 const { host, port } = require(global.__srcdir + "/config/config");
 const loadEndpoints = require(global.__srcdir + "/api/endpointsLoader");
+const { initDB } = require(global.__srcdir + "/db/databaseFunctions");
 
+initDB();
 // Create app
 const app = express();
 

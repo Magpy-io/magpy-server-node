@@ -3,12 +3,12 @@ global.__srcdir = __dirname;
 
 // IMPORTS
 
-const { DBFile, rootPath } = require(global.__srcdir + "/config/config");
-const databaseFunctions = require(global.__srcdir + "/db/databaseFunctions");
-const diskManager = require(global.__srcdir + "/modules/diskManager");
+const { rootPath } = require(global.__srcdir + "/config/config");
+const { clearDB } = require(global.__srcdir + "/db/databaseFunctions");
+const { clearImagesDisk } = require(global.__srcdir + "/modules/diskManager");
 
-databaseFunctions.clearDB();
+clearDB();
 console.log("Database cleared.");
 
-diskManager.clearImagesDisk();
+clearImagesDisk();
 console.log(rootPath + " directory cleared.");

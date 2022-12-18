@@ -1,113 +1,138 @@
 // IMPORTS
-const { v4: uuidv4 } = require("uuid");
 const fs = require("mz/fs");
+const sqlite3 = require("sqlite3").verbose();
 
-const { DBFile } = require(global.__srcdir + "/config/config");
-//const helpers = require(global.__srcdir + "/db/helpersDb");
+const { sqliteDbFile, hashLen } = require(global.__srcdir + "/config/config");
+const sqlQueries = require(global.__srcdir + "/db/sqlQueries");
+
+function initDB() {
+  let db = new sqlite3.Database(sqliteDbFile);
+
+  db.all(sqlQueries.checkTableImagesExistsQuery(), function (err, rows) {
+    if (err) console.log(err);
+    if (rows.length != 1) {
+      db.run(sqlQueries.createTableImagesQuery(hashLen), function (err) {
+        if (err) console.log(err);
+      });
+    }
+  });
+  db.close();
+}
 
 function addPhotoToDB(photo) {
-  fs.readFile(DBFile, "utf8", (err, data) => {
-    if (err) {
-      console.log(err);
-      return;
+  let db = new sqlite3.Database(sqliteDbFile);
+
+  db.run(
+    sqlQueries.insertImageQuery(),
+    [
+      photo.name,
+      photo.fileSize,
+      photo.width,
+      photo.height,
+      photo.date,
+      photo.path,
+      photo.syncDate,
+      photo.serverFilePath,
+      photo.hash,
+    ],
+    function (err) {
+      if (err) console.log(err);
     }
-    newEntry = {
-      id: uuidv4(),
-      name: photo.name,
-      fileSize: photo.fileSize,
-      width: photo.width,
-      height: photo.height,
-      date: photo.date,
-      clientPath: photo.path,
-      syncDate: photo.syncDate,
-      serverPath: photo.serverFilePath,
-      hash: photo.hash,
-    };
-    obj = JSON.parse(data); //now its an object
-    obj.photos.push(newEntry); //add some data
-    json = JSON.stringify(obj); //convert it back to json
-    fs.writeFile(DBFile, json, "utf8"); // write it back
-  });
-}
-
-function areEqual(p, photo) {
-  return p.name === photo.name && p.fileSize === photo.fileSize;
-}
-
-function isPhotoInDB(photo) {
-  data = fs.readFileSync(DBFile, "utf8");
-  obj = JSON.parse(data);
-  isInDB = obj.photos.some((p) => areEqual(p, photo));
-
-  return isInDB;
-}
-
-function numberPhotosFromDB() {
-  data = fs.readFileSync(DBFile, "utf8");
-  obj = JSON.parse(data);
-  return obj.photos.length;
-}
-
-function getPhotosFromDB(number, offset) {
-  data = fs.readFileSync(DBFile, "utf8");
-  obj = JSON.parse(data);
-
-  return {
-    dbPhotos: obj.photos.slice(offset, number + offset),
-    endReached: obj.photos.length <= number + offset,
-  };
-}
-
-function getAllPhotosFromDB() {
-  data = fs.readFileSync(DBFile, "utf8");
-  obj = JSON.parse(data);
-
-  return obj.photos;
-}
-
-function findPhotoDB(fileSize, photoName) {
-  data = fs.readFileSync(DBFile, "utf8");
-  obj = JSON.parse(data);
-
-  photoFound = obj.photos.find(
-    (e) => e.fileSize == fileSize && e.name == photoName
   );
 
-  if (!photoFound) {
-    return;
-  }
-  return photoFound.hash;
+  db.close();
 }
 
-function findPhotosDB(photosExistsData) {
-  data = fs.readFileSync(DBFile, "utf8");
-  obj = JSON.parse(data);
-
-  photosFound = obj.photos.filter((photo) =>
-    photosExistsData.some(
-      (photoData) =>
-        photoData.fileSize == photo.fileSize && photoData.name == photo.name
-    )
-  );
-
-  return photosExistsData.map((photoData) => {
-    let photoFound = photosFound.find(
-      (photo) =>
-        photo.name == photoData.name && photo.fileSize == photoData.fileSize
-    );
-    if (!photoFound) {
-      return;
+function isPhotoInDB(photo, callback) {
+  let db = new sqlite3.Database(sqliteDbFile);
+  db.get(
+    sqlQueries.selectByNameAndSizeQuery(photo.name, photo.fileSize),
+    function (err, row) {
+      if (err) console.log(err);
+      callback(Boolean(row));
     }
-    return photoFound.hash;
+  );
+  db.close();
+}
+
+function numberPhotosFromDB(callback) {
+  let db = new sqlite3.Database(sqliteDbFile);
+  db.all(sqlQueries.selectAllIdsQuery(), function (err, rows) {
+    if (err) console.log(err);
+    callback(rows.length);
   });
+  db.close();
+}
+
+function getPhotosFromDB(number, offset, callback) {
+  let db = new sqlite3.Database(sqliteDbFile);
+  db.all(
+    sqlQueries.selectPhotosOffsetCountQuery(number, offset),
+    function (err, rows) {
+      if (err) console.log(err);
+      numberPhotosFromDB(function (nbPhotos) {
+        callback(rows, nbPhotos <= number + offset);
+      });
+    }
+  );
+  db.close();
+}
+
+function getAllPhotosFromDB(callback) {
+  let db = new sqlite3.Database(sqliteDbFile);
+  db.all(sqlQueries.selectAllPhotosQuery(), function (err, rows) {
+    if (err) console.log(err);
+    callback(rows);
+  });
+  db.close();
+}
+
+function findPhotoDB(fileSize, photoName, callback) {
+  let db = new sqlite3.Database(sqliteDbFile);
+  db.get(
+    sqlQueries.selectByNameAndSizeQuery(photoName, fileSize),
+    function (err, row) {
+      if (err) console.log(err);
+      if (!row) {
+        callback();
+      } else {
+        callback(row.hash);
+      }
+    }
+  );
+  db.close();
+}
+
+function findPhotosDB(photosExistsData, callback) {
+  let db = new sqlite3.Database(sqliteDbFile);
+  const photosExist = [];
+  db.serialize(() => {
+    photosExistsData.forEach((photoData, index) => {
+      db.get(
+        sqlQueries.selectByNameAndSizeQuery(photoData.name, photoData.fileSize),
+        function (err, row) {
+          if (err) console.log(err);
+          if (!row) {
+            photosExist.push(undefined);
+          } else {
+            photosExist.push(row.hash);
+          }
+          if (index == photosExistsData.length - 1) {
+            callback(photosExist);
+          }
+        }
+      );
+    });
+  });
+  db.close();
 }
 
 function clearDB() {
-  const obj = {
-    photos: [],
-  };
-  const str = JSON.stringify(obj);
-  fs.writeFile(DBFile, str, "utf8");
+  let db = new sqlite3.Database(sqliteDbFile);
+  db.run(sqlQueries.dropTableImagesQuery(), function (err) {
+    if (err) console.log(err);
+  });
+  db.close();
 }
 
 module.exports = {
@@ -119,4 +144,5 @@ module.exports = {
   findPhotoDB,
   findPhotosDB,
   clearDB,
+  initDB,
 };

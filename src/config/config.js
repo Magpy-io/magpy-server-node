@@ -1,11 +1,13 @@
 const host = "192.168.0.12";
 const port = 8000;
 const rootPath = "/home/issam/Documents/Images/";
-const DBFile = global.__srcdir + "/db/database.json";
+const sqliteDbFile = __srcdir + "/db/database.db";
+const hashLen = 32;
 
 module.exports = {
   host,
   port,
   rootPath,
-  DBFile,
+  hashLen,
+  sqliteDbFile,
 };

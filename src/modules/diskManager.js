@@ -2,7 +2,7 @@
 const fs = require("mz/fs");
 const path = require("node:path");
 
-const { DBFile, rootPath } = require(global.__srcdir + "/config/config");
+const { rootPath } = require(global.__srcdir + "/config/config");
 
 function splitImageName(fullName) {
   const nameSplited = fullName.split(".");

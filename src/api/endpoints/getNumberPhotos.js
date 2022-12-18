@@ -1,4 +1,4 @@
-const helpers = require(global.__srcdir + "/helpers");
+const responseFormatter = require(global.__srcdir + "/api/responseFormatter");
 
 const databaseFunctions = require(global.__srcdir + "/db/databaseFunctions");
 
@@ -7,12 +7,13 @@ const endpoint = "/numberPhotos";
 const callback = (req, res) => {
   console.log(`[GET numberPhotos]`);
 
-  const nb = databaseFunctions.numberPhotosFromDB();
-  const jsonResponse = {
-    number: nb,
-  };
+  databaseFunctions.numberPhotosFromDB(function (nb) {
+    const jsonResponse = {
+      number: nb,
+    };
 
-  helpers.sendResponse(res, true, 200, jsonResponse);
+    responseFormatter.sendResponse(res, true, 200, jsonResponse);
+  });
 };
 
 module.exports = { endpoint: endpoint, callback: callback, method: "get" };
