@@ -8,11 +8,14 @@ const createTableImagesQuery = (hashLen) =>
     fileSize int,
     width int,
     height int, 
-    date varchar(32), 
+    date DATETIME, 
     clientPath varchar(255), 
-    syncDate varchar(32), 
+    syncDate DATETIME, 
     serverPath varchar(255), 
-    hash varchar(${hashLen}));`;
+    hash varchar(${hashLen}));
+    
+    CREATE INDEX index_date ON Images (date);
+    `;
 
 const dropTableImagesQuery = () => `DROP TABLE IF EXISTS Images;`;
 
@@ -26,9 +29,15 @@ const selectByNameAndSizeQuery = (name, size) =>
 const selectAllIdsQuery = () => `SELECT id FROM Images`;
 
 const selectPhotosOffsetCountQuery = (offset, count) =>
-  `SELECT * FROM Images LIMIT ${count}, ${offset};`;
+  `SELECT * FROM Images ORDER BY date DESC LIMIT ${count}, ${offset};`;
 
 const selectPhotoByIdQuery = (id) => `SELECT * FROM Images WHERE id='${id}'`;
+
+const selectNextPhotoByDateQuery = (date) =>
+  `SELECT * FROM Images WHERE date<'${date}' ORDER BY date DESC LIMIT 2`;
+
+const selectPreviousPhotoByDateQuery = (date) =>
+  `SELECT * FROM Images WHERE date>'${date}' ORDER BY date LIMIT 2`;
 
 module.exports = {
   checkTableImagesExistsQuery,
@@ -39,4 +48,6 @@ module.exports = {
   selectAllIdsQuery,
   selectPhotosOffsetCountQuery,
   selectPhotoByIdQuery,
+  selectNextPhotoByDateQuery,
+  selectPreviousPhotoByDateQuery,
 };

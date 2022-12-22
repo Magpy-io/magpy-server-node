@@ -31,9 +31,9 @@ function addPhotoToDB(photo) {
       photo.fileSize,
       photo.width,
       photo.height,
-      photo.date,
+      new Date(photo.date).toISOString(),
       photo.path,
-      photo.syncDate,
+      new Date(photo.syncDate).toISOString(),
       photo.serverFilePath,
       photo.hash,
     ],
@@ -85,6 +85,40 @@ function getPhotoFromDB(id, callback) {
   db.get(sqlQueries.selectPhotoByIdQuery(id), function (err, row) {
     if (err) console.log(err);
     callback(row);
+  });
+  db.close();
+}
+
+function getNextPhotoFromDB(id, callback) {
+  let db = new sqlite3.Database(sqliteDbFile);
+
+  db.get(sqlQueries.selectPhotoByIdQuery(id), (err, photoId) => {
+    if (err) console.log(err);
+
+    db.all(
+      sqlQueries.selectNextPhotoByDateQuery(photoId.date),
+      function (err, rows) {
+        if (err) console.log(err);
+
+        callback(rows[0], rows.length <= 1);
+      }
+    );
+  });
+  db.close();
+}
+
+function getPreviousPhotoFromDB(id, callback) {
+  let db = new sqlite3.Database(sqliteDbFile);
+
+  db.get(sqlQueries.selectPhotoByIdQuery(id), (err, photoId) => {
+    if (err) console.log(err);
+    db.all(
+      sqlQueries.selectPreviousPhotoByDateQuery(photoId.date),
+      function (err, rows) {
+        if (err) console.log(err);
+        callback(rows[0], rows.length <= 1);
+      }
+    );
   });
   db.close();
 }
@@ -143,6 +177,8 @@ module.exports = {
   numberPhotosFromDB,
   getPhotosFromDB,
   getPhotoFromDB,
+  getNextPhotoFromDB,
+  getPreviousPhotoFromDB,
   findPhotoDB,
   findPhotosDB,
   clearDB,

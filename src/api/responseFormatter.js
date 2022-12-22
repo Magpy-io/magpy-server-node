@@ -27,8 +27,26 @@ function sendFailedResponse(res, msg, status = 500) {
   res.status(status).json(jsonResponse);
 }
 
+function createPhotoObject(dbPhoto, image64) {
+  return {
+    id: dbPhoto.id,
+    meta: {
+      name: dbPhoto.name,
+      fileSize: dbPhoto.fileSize,
+      width: dbPhoto.width,
+      height: dbPhoto.height,
+      date: dbPhoto.date,
+      syncDate: dbPhoto.syncDate,
+      serverPath: dbPhoto.serverPath,
+      clientPath: dbPhoto.clientPath,
+    },
+    image64: image64,
+  };
+}
+
 module.exports = {
   sendResponse,
   sendSuccessfulResponse,
   sendFailedResponse,
+  createPhotoObject,
 };

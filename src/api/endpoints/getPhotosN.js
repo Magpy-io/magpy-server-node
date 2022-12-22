@@ -7,8 +7,8 @@ const diskManager = require(global.__srcdir + "/modules/diskManager");
 // get photos with pagination params : returns "number" photos starting from "offset".
 const endpoint = "/photos/:number/:offset";
 const callback = (req, res) => {
-  const number = req.params["number"] ?? 10;
-  const offset = req.params["offset"] ?? 0;
+  const number = Number(req.params["number"]) ?? 10;
+  const offset = Number(req.params["offset"]) ?? 0;
   console.log(`[GET photos] number: ${number} offset: ${offset}`);
 
   databaseFunctions.getPhotosFromDB(
@@ -18,20 +18,7 @@ const callback = (req, res) => {
       const photos = dbPhotos.map((dbPhoto) => {
         const image64 = diskManager.getCroppedPhotoFromDisk(dbPhoto.serverPath);
 
-        return {
-          id: dbPhoto.id,
-          meta: {
-            name: dbPhoto.name,
-            fileSize: dbPhoto.fileSize,
-            width: dbPhoto.width,
-            height: dbPhoto.height,
-            date: dbPhoto.date,
-            syncDate: dbPhoto.syncDate,
-            serverPath: dbPhoto.serverPath,
-            clientPath: dbPhoto.clientPath,
-          },
-          image64: image64,
-        };
+        return responseFormatter.createPhotoObject(dbPhoto, image64);
       });
 
       const jsonResponse = {
