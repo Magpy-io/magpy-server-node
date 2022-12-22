@@ -1,5 +1,6 @@
 // IMPORTS
 const fs = require("mz/fs");
+const { v4: uuid } = require("uuid");
 const sqlite3 = require("sqlite3").verbose();
 
 const { sqliteDbFile, hashLen } = require(global.__srcdir + "/config/config");
@@ -25,6 +26,7 @@ function addPhotoToDB(photo) {
   db.run(
     sqlQueries.insertImageQuery(),
     [
+      uuid(),
       photo.name,
       photo.fileSize,
       photo.width,
@@ -78,11 +80,11 @@ function getPhotosFromDB(number, offset, callback) {
   db.close();
 }
 
-function getAllPhotosFromDB(callback) {
+function getPhotoFromDB(id, callback) {
   let db = new sqlite3.Database(sqliteDbFile);
-  db.all(sqlQueries.selectAllPhotosQuery(), function (err, rows) {
+  db.get(sqlQueries.selectPhotoByIdQuery(id), function (err, row) {
     if (err) console.log(err);
-    callback(rows);
+    callback(row);
   });
   db.close();
 }
@@ -140,7 +142,7 @@ module.exports = {
   isPhotoInDB,
   numberPhotosFromDB,
   getPhotosFromDB,
-  getAllPhotosFromDB,
+  getPhotoFromDB,
   findPhotoDB,
   findPhotosDB,
   clearDB,

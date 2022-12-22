@@ -3,6 +3,7 @@ const checkTableImagesExistsQuery = () =>
 
 const createTableImagesQuery = (hashLen) =>
   `CREATE TABLE Images( 
+    id varchar(36) PRIMARY KEY,
     name varchar(255) NOT NULL, 
     fileSize int,
     width int,
@@ -16,18 +17,18 @@ const createTableImagesQuery = (hashLen) =>
 const dropTableImagesQuery = () => `DROP TABLE IF EXISTS Images;`;
 
 const insertImageQuery =
-  () => `INSERT INTO Images (name, fileSize, width, height, date, clientPath, syncDate, serverPath, hash)
-VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?);`;
+  () => `INSERT INTO Images (id, name, fileSize, width, height, date, clientPath, syncDate, serverPath, hash)
+VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
 
 const selectByNameAndSizeQuery = (name, size) =>
   `SELECT * FROM Images WHERE name='${name}' AND fileSize=${size};`;
 
-const selectAllIdsQuery = () => `SELECT _rowid_ FROM Images`;
+const selectAllIdsQuery = () => `SELECT id FROM Images`;
 
 const selectPhotosOffsetCountQuery = (offset, count) =>
   `SELECT * FROM Images LIMIT ${count}, ${offset};`;
 
-const selectAllPhotosQuery = () => `SELECT * FROM Images`;
+const selectPhotoByIdQuery = (id) => `SELECT * FROM Images WHERE id='${id}'`;
 
 module.exports = {
   checkTableImagesExistsQuery,
@@ -37,5 +38,5 @@ module.exports = {
   selectByNameAndSizeQuery,
   selectAllIdsQuery,
   selectPhotosOffsetCountQuery,
-  selectAllPhotosQuery,
+  selectPhotoByIdQuery,
 };

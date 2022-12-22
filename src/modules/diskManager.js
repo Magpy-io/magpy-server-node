@@ -23,23 +23,8 @@ function addPhotoToDisk(data) {
   fs.writeFileSync(data.serverFilePath, buff);
 }
 
-function getPhotosFromDisk(dbPhotos) {
-  return dbPhotos.map((dbPhoto) => {
-    let data = fs.readFileSync(dbPhoto.serverPath, { encoding: "base64" });
-    let json = {
-      meta: {
-        name: dbPhoto.name,
-        fileSize: dbPhoto.fileSize,
-        width: dbPhoto.width,
-        height: dbPhoto.height,
-        date: dbPhoto.date,
-        syncDate: dbPhoto.syncDate,
-        serverPath: dbPhoto.serverPath,
-      },
-      image64: `${data.toString("base64")}`,
-    };
-    return json;
-  });
+function getPhotosFromDisk(path) {
+  return fs.readFileSync(path, { encoding: "base64" }).toString("base64");
 }
 
 function clearImagesDisk() {
