@@ -4,6 +4,7 @@ const { rootPath, hashLen } = require(global.__srcdir + "/config/config");
 const databaseFunctions = require(global.__srcdir + "/db/databaseFunctions");
 const { hashString } = require(global.__srcdir + "/modules/hashing");
 const diskManager = require(global.__srcdir + "/modules/diskManager");
+const diskFilesNaming = require(global.__srcdir + "/modules/diskFilesNaming");
 
 // post photo : adds a photo to the server
 const endpoint = "/photo";
@@ -18,13 +19,14 @@ const callback = (req, res) => {
       let photo = req.body;
       photo.syncDate = new Date(Date.now()).toJSON();
       photo.serverFilePath =
-        rootPath + diskManager.createServerImageName(photo);
+        rootPath + diskFilesNaming.createServerImageName(photo);
       photo.hash = hashString(photo.image64, hashLen);
       databaseFunctions.addPhotoToDB(photo);
-      diskManager.addPhotoToDisk(photo);
-      const message = "File written successfully";
-      responseFormatter.sendSuccessfulResponse(res, message);
-      console.log(message);
+      diskManager.addPhotoToDisk(photo.image64, photo.serverFilePath);
+      responseFormatter.sendSuccessfulResponse(
+        res,
+        "File written successfully"
+      );
     }
   });
 };

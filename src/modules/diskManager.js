@@ -1,29 +1,29 @@
 // IMPORTS
 const fs = require("mz/fs");
 const path = require("node:path");
+const sharp = require("sharp");
 
 const { rootPath } = require(global.__srcdir + "/config/config");
 
-function splitImageName(fullName) {
-  const nameSplited = fullName.split(".");
-  const format = nameSplited.pop();
-  const name = nameSplited.join();
-  return { name: name, format: format };
+const { createServerImageCroppedName } = require(global.__srcdir +
+  "/modules/diskFilesNaming");
+
+function addPhotoToDisk(data, path) {
+  let buff = Buffer.from(data, "base64");
+
+  sharp(buff)
+    .resize({ width: 150, height: 150 })
+    .jpeg({ quality: 70 })
+    .toBuffer()
+    .then((data) => {
+      fs.writeFileSync(path, buff);
+      fs.writeFileSync(createServerImageCroppedName(path), data);
+
+      console.log("File written successfully to " + path);
+    });
 }
 
-function createServerImageName(photo) {
-  const { name, format } = splitImageName(photo.name);
-  const date = photo.syncDate;
-  const serverFileName = `Ants_${name}_${date}.${format}`;
-  return serverFileName;
-}
-
-function addPhotoToDisk(data) {
-  let buff = Buffer.from(data.image64, "base64");
-  fs.writeFileSync(data.serverFilePath, buff);
-}
-
-function getPhotosFromDisk(path) {
+function getPhotoFromDisk(path) {
   return fs.readFileSync(path, { encoding: "base64" }).toString("base64");
 }
 
@@ -41,7 +41,6 @@ function clearImagesDisk() {
 
 module.exports = {
   addPhotoToDisk,
-  getPhotosFromDisk,
-  createServerImageName,
+  getPhotoFromDisk,
   clearImagesDisk,
 };
