@@ -20,7 +20,7 @@ const callback = (req, res) => {
       return;
     }
 
-    const image64 = diskManager.getPhotosFromDisk(dbPhoto.serverPath);
+    const image64 = diskManager.getFullPhotoFromDisk(dbPhoto.serverPath);
 
     const jsonResponse = {
       id: dbPhoto.id,
@@ -32,6 +32,7 @@ const callback = (req, res) => {
         date: dbPhoto.date,
         syncDate: dbPhoto.syncDate,
         serverPath: dbPhoto.serverPath,
+        clientPath: dbPhoto.clientPath,
       },
       image64: image64,
     };

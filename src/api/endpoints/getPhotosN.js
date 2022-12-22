@@ -16,7 +16,7 @@ const callback = (req, res) => {
     offset,
     function (dbPhotos, endReached) {
       const photos = dbPhotos.map((dbPhoto) => {
-        const image64 = diskManager.getPhotoFromDisk(dbPhoto.serverPath);
+        const image64 = diskManager.getCroppedPhotoFromDisk(dbPhoto.serverPath);
 
         return {
           id: dbPhoto.id,
@@ -28,6 +28,7 @@ const callback = (req, res) => {
             date: dbPhoto.date,
             syncDate: dbPhoto.syncDate,
             serverPath: dbPhoto.serverPath,
+            clientPath: dbPhoto.clientPath,
           },
           image64: image64,
         };

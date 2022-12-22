@@ -23,8 +23,14 @@ function addPhotoToDisk(data, path) {
     });
 }
 
-function getPhotoFromDisk(path) {
+function getFullPhotoFromDisk(path) {
   return fs.readFileSync(path, { encoding: "base64" }).toString("base64");
+}
+
+function getCroppedPhotoFromDisk(path) {
+  return fs
+    .readFileSync(createServerImageCroppedName(path), { encoding: "base64" })
+    .toString("base64");
 }
 
 function clearImagesDisk() {
@@ -41,6 +47,7 @@ function clearImagesDisk() {
 
 module.exports = {
   addPhotoToDisk,
-  getPhotoFromDisk,
+  getFullPhotoFromDisk,
   clearImagesDisk,
+  getCroppedPhotoFromDisk,
 };
