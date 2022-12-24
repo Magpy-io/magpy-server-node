@@ -8,9 +8,9 @@ const { checkReqBodyAttributeMissing } = require(global.__srcdir +
   "/modules/checkAttibutesMissing");
 
 // get photos : returns all photos in server.
-const endpoint = "/photo";
+const endpoint = "/photoDelete";
 const callback = (req, res) => {
-  console.log("[GET photo]");
+  console.log("[DELETE photo]");
 
   console.log("Checking request parameters.");
   if (checkReqBodyAttributeMissing(req, "id", "string")) {
@@ -23,7 +23,7 @@ const callback = (req, res) => {
 
   const id = req.body.id;
 
-  console.log(`Getting photo with id = ${id} from db.`);
+  console.log(`Getting photo with id = ${id} from db to get it's path.`);
   databaseFunctions
     .getPhotoByIdFromDB(id)
     .then((dbPhoto) => {
@@ -37,16 +37,21 @@ const callback = (req, res) => {
         );
       } else {
         console.log("Photo found in db.");
-        console.log("Retrieving photo from disk.");
+        console.log("Removing photo from disk.");
         diskManager
-          .getFullPhotoFromDisk(dbPhoto.serverPath)
-          .then((image64) => {
-            console.log("Photo retrieved.");
-            const jsonResponse = {
-              photo: responseFormatter.createPhotoObject(dbPhoto, image64),
-            };
-            console.log("Sending response data.");
-            responseFormatter.sendResponse(res, jsonResponse);
+          .removePhotoFromDisk(dbPhoto.serverPath)
+          .then(() => {
+            console.log("Photo removed from disk.");
+            console.log("Removing photo from db.");
+            return databaseFunctions.deletePhotoByIdFromDB(id);
+          })
+          .then(() => {
+            console.log("Photo removed from db.");
+            console.log("Sending response message.");
+            responseFormatter.sendSuccessfulMessage(
+              res,
+              "Photo removed from server."
+            );
           })
           .catch((err) => {
             console.error(err);
@@ -60,4 +65,4 @@ const callback = (req, res) => {
     });
 };
 
-module.exports = { endpoint: endpoint, callback: callback, method: "get" };
+module.exports = { endpoint: endpoint, callback: callback, method: "delete" };

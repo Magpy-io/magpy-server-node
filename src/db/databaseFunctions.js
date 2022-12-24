@@ -106,6 +106,19 @@ function getPhotoByIdFromDB(id) {
     });
 }
 
+function deletePhotoByIdFromDB(id) {
+  let db = new sqlite3.Database(sqliteDbFile);
+  return runPromisified
+    .bind(db)(sqlQueries.deletePhotoByIdQuery(id))
+    .finally(() => {
+      db.close();
+    })
+    .catch((err) => {
+      console.error(err);
+      throw err;
+    });
+}
+
 function getNextPhotoFromDB(id) {
   let db = new sqlite3.Database(sqliteDbFile);
 
@@ -220,6 +233,7 @@ module.exports = {
   numberPhotosFromDB,
   getPhotosFromDB,
   getPhotoByIdFromDB,
+  deletePhotoByIdFromDB,
   getNextPhotoFromDB,
   getPreviousPhotoFromDB,
   getPhotoByClientPathFromDB,

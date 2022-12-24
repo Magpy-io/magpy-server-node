@@ -34,6 +34,8 @@ const selectPhotosOffsetCountQuery = (offset, count) =>
 
 const selectPhotoByIdQuery = (id) => `SELECT * FROM Images WHERE id='${id}'`;
 
+const deletePhotoByIdQuery = (id) => `DELETE FROM Images WHERE id='${id}'`;
+
 const selectNextPhotoByDateQuery = (date) =>
   `SELECT * FROM Images WHERE date<'${date}' ORDER BY date DESC LIMIT 2`;
 
@@ -49,6 +51,7 @@ module.exports = {
   selectAllIdsQuery,
   selectPhotosOffsetCountQuery,
   selectPhotoByIdQuery,
+  deletePhotoByIdQuery,
   selectNextPhotoByDateQuery,
   selectPreviousPhotoByDateQuery,
 };

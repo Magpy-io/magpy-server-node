@@ -26,6 +26,20 @@ function addPhotoToDisk(data, path) {
     });
 }
 
+function removePhotoFromDisk(path) {
+  const removeFullPhotoPromise = fs.unlink(path);
+  const removeCroppedPhotoPromise = fs.unlink(
+    createServerImageCroppedName(path)
+  );
+
+  return Promise.all([removeFullPhotoPromise, removeCroppedPhotoPromise]).catch(
+    (err) => {
+      console.error(err);
+      throw err;
+    }
+  );
+}
+
 function getFullPhotoFromDisk(path) {
   return fs
     .readFile(path, { encoding: "base64" })
@@ -72,4 +86,5 @@ module.exports = {
   getFullPhotoFromDisk,
   getCroppedPhotoFromDisk,
   clearImagesDisk,
+  removePhotoFromDisk,
 };
