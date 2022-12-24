@@ -8,7 +8,7 @@ const { checkReqBodyAttributeMissing } = require(global.__srcdir +
   "/modules/checkAttibutesMissing");
 
 // get photos with pagination params : returns "number" photos starting from "offset".
-const endpoint = "/photos";
+const endpoint = "/photosGet";
 const callback = (req, res) => {
   console.log("[GET photos]");
 

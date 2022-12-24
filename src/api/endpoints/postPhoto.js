@@ -10,7 +10,7 @@ const { checkReqBodyAttributeMissing } = require(global.__srcdir +
   "/modules/checkAttibutesMissing");
 
 // post photo : adds a photo to the server
-const endpoint = "/photo";
+const endpoint = "/photoAdd";
 const callback = (req, res) => {
   console.log(`[POST photo]`);
 
