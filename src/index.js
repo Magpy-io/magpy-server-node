@@ -9,17 +9,21 @@ const { host, port } = require(global.__srcdir + "/config/config");
 const loadEndpoints = require(global.__srcdir + "/api/endpointsLoader");
 const { initDB } = require(global.__srcdir + "/db/databaseFunctions");
 
-initDB();
-// Create app
-const app = express();
+initDB()
+  .then(() => {
+    console.log("Database initialized.");
 
-// Use bodyParser to automatically parse request bodies to json
-app.use(bodyParser.json({ limit: "50mb" }));
+    const app = express();
 
-// Load all endpoints present in src/api/endpoints
-loadEndpoints(app);
+    app.use(bodyParser.json({ limit: "50mb" }));
 
-// Listen to requests
-app.listen(port, host, () => {
-  console.log(`Server is running on http://${host}:${port}`);
-});
+    loadEndpoints(app);
+    console.log("Endpoints loaded");
+
+    app.listen(port, host, () => {
+      console.log(`Server is running on http://${host}:${port}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Error initializing database");
+  });

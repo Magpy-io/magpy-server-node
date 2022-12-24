@@ -1,30 +1,51 @@
 // IMPORTS
 
-function sendResponse(res, ok, status, data) {
+function sendResponse(res, data, status = 200) {
   let jsonResponse = {
-    ok: ok,
+    ok: true,
     data: data,
   };
 
-  res.status(status).json(jsonResponse);
+  return res.status(status).json(jsonResponse);
 }
 
-function sendSuccessfulResponse(res, msg, status = 200) {
+function sendSuccessfulMessage(res, msg, status = 200) {
   let jsonResponse = {
     ok: true,
     message: msg,
   };
 
-  res.status(status).json(jsonResponse);
+  return res.status(status).json(jsonResponse);
 }
 
-function sendFailedResponse(res, msg, status = 500) {
+function sendFailedMessage(
+  res,
+  msg = "Bad request",
+  code = "BAD_REQUEST",
+  status = 400
+) {
   let jsonResponse = {
     ok: false,
     message: msg,
+    code: code,
   };
 
-  res.status(status).json(jsonResponse);
+  return res.status(status).json(jsonResponse);
+}
+
+function sendErrorMessage(
+  res,
+  msg = "Server internal error",
+  code = "SERVER_ERROR",
+  status = 500
+) {
+  let jsonResponse = {
+    ok: false,
+    message: msg,
+    code: code,
+  };
+
+  return res.status(status).json(jsonResponse);
 }
 
 function createPhotoObject(dbPhoto, image64) {
@@ -46,7 +67,8 @@ function createPhotoObject(dbPhoto, image64) {
 
 module.exports = {
   sendResponse,
-  sendSuccessfulResponse,
-  sendFailedResponse,
+  sendSuccessfulMessage,
+  sendFailedMessage,
+  sendErrorMessage,
   createPhotoObject,
 };

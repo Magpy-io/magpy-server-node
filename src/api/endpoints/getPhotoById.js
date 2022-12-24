@@ -4,30 +4,60 @@ const databaseFunctions = require(global.__srcdir + "/db/databaseFunctions");
 
 const diskManager = require(global.__srcdir + "/modules/diskManager");
 
+const { checkReqBodyAttributeMissing } = require(global.__srcdir +
+  "/modules/checkAttibutesMissing");
+
 // get photos : returns all photos in server.
-const endpoint = "/photo/:id";
+const endpoint = "/photo";
 const callback = (req, res) => {
-  const id = req.params["id"] ?? "";
-  console.log(`[GET photo] id: ${id}`);
+  console.log("[GET photo]");
 
-  databaseFunctions.getPhotoFromDB(id, function (dbPhoto) {
-    if (!dbPhoto) {
-      responseFormatter.sendFailedResponse(
-        res,
-        `Photo with id: ${id} not found`,
-        404
-      );
-      return;
-    }
+  console.log("Checking request parameters.");
+  if (checkReqBodyAttributeMissing(req, "id", "string")) {
+    console.log("Bad request parameters");
+    console.log("Sending response message");
+    responseFormatter.sendFailedMessage(res);
+    return;
+  }
+  console.log("Request parameters ok.");
 
-    const image64 = diskManager.getFullPhotoFromDisk(dbPhoto.serverPath);
+  const id = req.body.id;
 
-    const jsonResponse = {
-      photo: responseFormatter.createPhotoObject(dbPhoto, image64),
-    };
-
-    responseFormatter.sendResponse(res, true, 200, jsonResponse);
-  });
+  console.log(`Getting photo with id =${id} from db.`);
+  databaseFunctions
+    .getPhotoByIdFromDB(id)
+    .then((dbPhoto) => {
+      if (!dbPhoto) {
+        console.log("Photo not found in db.");
+        console.log("Sending response message.");
+        responseFormatter.sendFailedMessage(
+          res,
+          `Photo with id: ${id} not found`,
+          "ID_NOT_FOUND"
+        );
+      } else {
+        console.log("Photo found in db.");
+        console.log("Retrieving photo from disk.");
+        diskManager
+          .getFullPhotoFromDisk(dbPhoto.serverPath)
+          .then((image64) => {
+            console.log("Photo retrieved.");
+            const jsonResponse = {
+              photo: responseFormatter.createPhotoObject(dbPhoto, image64),
+            };
+            console.log("Sending response data.");
+            responseFormatter.sendResponse(res, jsonResponse);
+          })
+          .catch((err) => {
+            console.error(err);
+            responseFormatter.sendErrorMessage(res);
+          });
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      responseFormatter.sendErrorMessage(res);
+    });
 };
 
 module.exports = { endpoint: endpoint, callback: callback, method: "get" };

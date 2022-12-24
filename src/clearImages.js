@@ -7,8 +7,18 @@ const { rootPath } = require(global.__srcdir + "/config/config");
 const { clearDB } = require(global.__srcdir + "/db/databaseFunctions");
 const { clearImagesDisk } = require(global.__srcdir + "/modules/diskManager");
 
-clearDB();
-console.log("Database cleared.");
+clearDB()
+  .then(() => {
+    console.log("Database cleared.");
+  })
+  .catch((err) => {
+    console.error("Error clearing database");
+  });
 
-clearImagesDisk();
-console.log(rootPath + " directory cleared.");
+clearImagesDisk()
+  .then(() => {
+    console.log(rootPath + " directory cleared.");
+  })
+  .catch((err) => {
+    console.error("Error clearing directory " + rootPath);
+  });

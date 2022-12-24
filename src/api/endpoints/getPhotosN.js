@@ -4,32 +4,65 @@ const databaseFunctions = require(global.__srcdir + "/db/databaseFunctions");
 
 const diskManager = require(global.__srcdir + "/modules/diskManager");
 
+const { checkReqBodyAttributeMissing } = require(global.__srcdir +
+  "/modules/checkAttibutesMissing");
+
 // get photos with pagination params : returns "number" photos starting from "offset".
-const endpoint = "/photos/:number/:offset";
+const endpoint = "/photos";
 const callback = (req, res) => {
-  const number = Number(req.params["number"]) ?? 10;
-  const offset = Number(req.params["offset"]) ?? 0;
-  console.log(`[GET photos] number: ${number} offset: ${offset}`);
+  console.log("[GET photos]");
 
-  databaseFunctions.getPhotosFromDB(
-    number,
-    offset,
-    function (dbPhotos, endReached) {
-      const photos = dbPhotos.map((dbPhoto) => {
-        const image64 = diskManager.getCroppedPhotoFromDisk(dbPhoto.serverPath);
+  console.log("Checking request parameters.");
+  if (
+    checkReqBodyAttributeMissing(req, "number", "number") ||
+    checkReqBodyAttributeMissing(req, "offset", "number")
+  ) {
+    console.log("Bad request parameters");
+    console.log("Sending response message");
+    responseFormatter.sendFailedMessage(res);
+    return;
+  }
+  console.log("Request parameters ok.");
 
-        return responseFormatter.createPhotoObject(dbPhoto, image64);
-      });
+  const number = req.body.number;
+  const offset = req.body.offset;
 
+  console.log(`Getting ${number} photos with offset ${offset} from db.`);
+  const photosFromDbPromise = databaseFunctions.getPhotosFromDB(number, offset);
+
+  const endReachedPromise = photosFromDbPromise.then(({ endReached }) => {
+    return endReached;
+  });
+
+  const photosWithImage64 = photosFromDbPromise.then(({ photos }) => {
+    console.log(`Got ${photos?.length} photos.`);
+    console.log("Retrieving cropped photos from disk.");
+    const photosPromises = photos.map((photo) => {
+      return diskManager
+        .getCroppedPhotoFromDisk(photo.serverPath)
+        .then((image64) => {
+          return responseFormatter.createPhotoObject(photo, image64);
+        });
+    });
+
+    return Promise.all(photosPromises);
+  });
+
+  Promise.all([photosWithImage64, endReachedPromise])
+    .then(([photos, endReached]) => {
       const jsonResponse = {
         endReached: endReached,
         number: photos.length,
         photos: photos,
       };
 
-      responseFormatter.sendResponse(res, true, 200, jsonResponse);
-    }
-  );
+      console.log("Sending response data.");
+      responseFormatter.sendResponse(res, jsonResponse);
+    })
+    .catch((err) => {
+      console.error(err);
+      responseFormatter.sendErrorMessage(res);
+    });
 };
 
 module.exports = { endpoint: endpoint, callback: callback, method: "get" };

@@ -4,30 +4,69 @@ const databaseFunctions = require(global.__srcdir + "/db/databaseFunctions");
 
 const diskManager = require(global.__srcdir + "/modules/diskManager");
 
-// get photos : returns all photos in server.
-const endpoint = "/photoPrevious/:id";
+const { checkReqBodyAttributeMissing } = require(global.__srcdir +
+  "/modules/checkAttibutesMissing");
+
+// get Previous photo : returns photo chronologically before photo with id 'id'
+const endpoint = "/photoPrevious";
 const callback = (req, res) => {
-  const id = req.params["id"] ?? "";
-  console.log(`[GET photoPrevious] id: ${id}`);
+  console.log("[GET photoPrevious]");
 
-  databaseFunctions.getPreviousPhotoFromDB(id, function (dbPhoto, isLast) {
-    if (!dbPhoto) {
-      responseFormatter.sendFailedResponse(
-        res,
-        `Photo with id: ${id} not found`,
-        404
-      );
-      return;
-    }
+  console.log("Checking request parameters.");
+  if (checkReqBodyAttributeMissing(req, "id", "string")) {
+    console.log("Bad request parameters");
+    console.log("Sending response message");
+    responseFormatter.sendFailedMessage(res);
+    return;
+  }
+  console.log("Request parameters ok.");
 
-    const image64 = diskManager.getFullPhotoFromDisk(dbPhoto.serverPath);
-    const jsonResponse = {
-      endReached: isLast,
-      photo: responseFormatter.createPhotoObject(dbPhoto, image64),
-    };
+  const id = req.body.id;
 
-    responseFormatter.sendResponse(res, true, 200, jsonResponse);
-  });
+  console.log(`Getting photo before photo with id=${id} from db.`);
+  databaseFunctions
+    .getPreviousPhotoFromDB(id)
+    .then(({ idFound, photoIdIsLast, photoNext, endReached }) => {
+      if (!idFound) {
+        console.log(`Photo with id=${id} not found in db.`);
+        console.log("Sending response message");
+        responseFormatter.sendFailedMessage(
+          res,
+          `Photo with id: ${id} not found`,
+          "ID_NOT_FOUND"
+        );
+      } else if (photoIdIsLast) {
+        console.log(`Photo with id=${id} is first in db.`);
+        console.log("Sending response message");
+        responseFormatter.sendFailedMessage(
+          res,
+          `Photo with id: ${id} is first photo`,
+          "PHOTO_IS_LAST"
+        );
+      } else {
+        console.log("Photo found.");
+        console.log("Retrieving photo from disk.");
+        diskManager
+          .getFullPhotoFromDisk(photoNext.serverPath)
+          .then((image64) => {
+            console.log("Photo retrieved.");
+            const jsonResponse = {
+              endReached: endReached,
+              photo: responseFormatter.createPhotoObject(photoNext, image64),
+            };
+            console.log("Sending response data.");
+            responseFormatter.sendResponse(res, jsonResponse);
+          })
+          .catch((err) => {
+            console.error(err);
+            responseFormatter.sendErrorMessage(res);
+          });
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      responseFormatter.sendErrorMessage(res);
+    });
 };
 
 module.exports = { endpoint: endpoint, callback: callback, method: "get" };

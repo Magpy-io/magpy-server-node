@@ -1,5 +1,5 @@
 // IMPORTS
-const fs = require("mz/fs");
+const fs = require("fs").promises;
 const path = require("node:path");
 const sharp = require("sharp");
 
@@ -11,43 +11,65 @@ const { createServerImageCroppedName } = require(global.__srcdir +
 function addPhotoToDisk(data, path) {
   let buff = Buffer.from(data, "base64");
 
-  sharp(buff)
+  return sharp(buff)
     .resize({ width: 150, height: 150 })
     .jpeg({ quality: 70 })
     .toBuffer()
     .then((data) => {
-      fs.writeFileSync(path, buff);
-      fs.writeFileSync(createServerImageCroppedName(path), data);
-
-      console.log("File written successfully to " + path);
+      const file1 = fs.writeFile(path, buff);
+      const file2 = fs.writeFile(createServerImageCroppedName(path), data);
+      return Promise.all([file1, file2]);
+    })
+    .catch((err) => {
+      console.error(err);
+      throw err;
     });
 }
 
 function getFullPhotoFromDisk(path) {
-  return fs.readFileSync(path, { encoding: "base64" }).toString("base64");
+  return fs
+    .readFile(path, { encoding: "base64" })
+    .then((result) => {
+      return result.toString("base64");
+    })
+    .catch((err) => {
+      console.error(err);
+      throw err;
+    });
 }
 
 function getCroppedPhotoFromDisk(path) {
   return fs
-    .readFileSync(createServerImageCroppedName(path), { encoding: "base64" })
-    .toString("base64");
+    .readFile(createServerImageCroppedName(path), { encoding: "base64" })
+    .then((result) => {
+      return result.toString("base64");
+    })
+    .catch((err) => {
+      console.error(err);
+      throw err;
+    });
 }
 
 function clearImagesDisk() {
-  fs.readdir(rootPath, (err, files) => {
-    if (err) throw err;
-
-    for (const file of files) {
-      fs.unlink(path.join(rootPath, file), (err) => {
-        if (err) throw err;
+  return fs
+    .readdir(rootPath)
+    .then((files) => {
+      return files.map((file) => {
+        return fs.unlink(path.join(rootPath, file));
       });
-    }
-  });
+    })
+    .then((filesUnlinkPromises) => {
+      return Promise.all(filesUnlinkPromises);
+    })
+    .catch((err) => {
+      console.error(err);
+      throw err;
+    });
 }
 
 module.exports = {
   addPhotoToDisk,
   getFullPhotoFromDisk,
-  clearImagesDisk,
   getCroppedPhotoFromDisk,
+  clearImagesDisk,
 };

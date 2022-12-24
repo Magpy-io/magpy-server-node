@@ -15,6 +15,7 @@ const createTableImagesQuery = (hashLen) =>
     hash varchar(${hashLen}));
     
     CREATE INDEX index_date ON Images (date);
+    CREATE INDEX index_path ON Images (clientPath);
     `;
 
 const dropTableImagesQuery = () => `DROP TABLE IF EXISTS Images;`;
@@ -23,8 +24,8 @@ const insertImageQuery =
   () => `INSERT INTO Images (id, name, fileSize, width, height, date, clientPath, syncDate, serverPath, hash)
 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?);`;
 
-const selectByNameAndSizeQuery = (name, size) =>
-  `SELECT * FROM Images WHERE name='${name}' AND fileSize=${size};`;
+const selectByClientPathQuery = (clientPath) =>
+  `SELECT * FROM Images WHERE clientPath='${clientPath}';`;
 
 const selectAllIdsQuery = () => `SELECT id FROM Images`;
 
@@ -44,7 +45,7 @@ module.exports = {
   createTableImagesQuery,
   dropTableImagesQuery,
   insertImageQuery,
-  selectByNameAndSizeQuery,
+  selectByClientPathQuery,
   selectAllIdsQuery,
   selectPhotosOffsetCountQuery,
   selectPhotoByIdQuery,
