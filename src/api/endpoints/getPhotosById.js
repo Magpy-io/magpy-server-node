@@ -8,15 +8,12 @@ const { checkReqBodyAttributeMissing } = require(global.__srcdir +
   "/modules/checkAttibutesMissing");
 
 // get photos with pagination params : returns "number" photos starting from "offset".
-const endpoint = "/photosGetNb";
+const endpoint = "/photosGetId";
 const callback = (req, res) => {
-  console.log("[GET photos]");
+  console.log("[GET photos by Id]");
 
   console.log("Checking request parameters.");
-  if (
-    checkReqBodyAttributeMissing(req, "number", "number") ||
-    checkReqBodyAttributeMissing(req, "offset", "number")
-  ) {
+  if (checkReqBodyAttributeMissing(req, "ids", "Array string")) {
     console.log("Bad request parameters");
     console.log("Sending response message");
     responseFormatter.sendFailedMessage(res);
@@ -24,35 +21,35 @@ const callback = (req, res) => {
   }
   console.log("Request parameters ok.");
 
-  const number = req.body.number;
-  const offset = req.body.offset;
+  const ids = req.body.ids;
 
-  console.log(`Getting ${number} photos with offset ${offset} from db.`);
-  const photosFromDbPromise = databaseFunctions.getPhotosFromDB(number, offset);
+  console.log(`Getting ${ids.length} photos from db.`);
 
-  const endReachedPromise = photosFromDbPromise.then(({ endReached }) => {
-    return endReached;
-  });
+  databaseFunctions
+    .getPhotosByIdFromDB(ids)
+    .then((photos) => {
+      console.log("Received response from db.");
+      console.log("Retrieving cropped photos from disk.");
+      const photosPromises = photos.map((photo) => {
+        if (!photo) return photo;
+        return diskManager
+          .getCroppedPhotoFromDisk(photo.serverPath)
+          .then((image64) => {
+            return responseFormatter.createPhotoObject(photo, image64);
+          });
+      });
 
-  const photosWithImage64 = photosFromDbPromise.then(({ photos }) => {
-    console.log(`Got ${photos?.length} photos.`);
-    console.log("Retrieving cropped photos from disk.");
-    const photosPromises = photos.map((photo) => {
-      return diskManager
-        .getCroppedPhotoFromDisk(photo.serverPath)
-        .then((image64) => {
-          return responseFormatter.createPhotoObject(photo, image64);
-        });
-    });
-
-    return Promise.all(photosPromises);
-  });
-
-  Promise.all([photosWithImage64, endReachedPromise])
-    .then(([photos, endReached]) => {
+      return Promise.all(photosPromises);
+    })
+    .then((photos) => {
       console.log("Photos retrieved from disk.");
+      photos = photos.map((photo) => {
+        return {
+          photo: photo,
+          exists: Boolean(photo),
+        };
+      });
       const jsonResponse = {
-        endReached: endReached,
         number: photos.length,
         photos: photos,
       };

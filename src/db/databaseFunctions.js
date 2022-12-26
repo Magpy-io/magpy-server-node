@@ -193,6 +193,26 @@ function getPhotoByClientPathFromDB(photoPath) {
     });
 }
 
+function getPhotosByIdFromDB(ids) {
+  let db = new sqlite3.Database(sqliteDbFile);
+
+  const photosFoundPromise = ids.map((id) => {
+    return getPromisified.bind(db)(sqlQueries.selectPhotoByIdQuery(id));
+  });
+
+  return Promise.all(photosFoundPromise)
+    .then((photosFound) => {
+      return photosFound;
+    })
+    .finally(() => {
+      db.close();
+    })
+    .catch((err) => {
+      console.error(err);
+      throw err;
+    });
+}
+
 function getPhotosByClientPathFromDB(photosPaths) {
   let db = new sqlite3.Database(sqliteDbFile);
 
@@ -240,4 +260,5 @@ module.exports = {
   getPhotosByClientPathFromDB,
   clearDB,
   initDB,
+  getPhotosByIdFromDB,
 };

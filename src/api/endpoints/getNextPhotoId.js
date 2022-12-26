@@ -69,4 +69,4 @@ const callback = (req, res) => {
     });
 };
 
-module.exports = { endpoint: endpoint, callback: callback, method: "get" };
+module.exports = { endpoint: endpoint, callback: callback, method: "post" };

@@ -8,7 +8,7 @@ const { checkReqBodyAttributeMissing } = require(global.__srcdir +
   "/modules/checkAttibutesMissing");
 
 // get photos : returns all photos in server.
-const endpoint = "/photoGet";
+const endpoint = "/photoGetId";
 const callback = (req, res) => {
   console.log("[GET photo]");
 
@@ -60,4 +60,4 @@ const callback = (req, res) => {
     });
 };
 
-module.exports = { endpoint: endpoint, callback: callback, method: "get" };
+module.exports = { endpoint: endpoint, callback: callback, method: "post" };

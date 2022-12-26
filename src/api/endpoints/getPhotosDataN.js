@@ -7,10 +7,10 @@ const diskManager = require(global.__srcdir + "/modules/diskManager");
 const { checkReqBodyAttributeMissing } = require(global.__srcdir +
   "/modules/checkAttibutesMissing");
 
-// get photos with pagination params : returns "number" photos starting from "offset".
-const endpoint = "/photosGetNb";
+// get photos data with pagination params : returns "number" photo's data starting from "offset".
+const endpoint = "/photosDataGetNb";
 const callback = (req, res) => {
-  console.log("[GET photos]");
+  console.log("[GET photos data]");
 
   console.log("Checking request parameters.");
   if (
@@ -28,29 +28,11 @@ const callback = (req, res) => {
   const offset = req.body.offset;
 
   console.log(`Getting ${number} photos with offset ${offset} from db.`);
-  const photosFromDbPromise = databaseFunctions.getPhotosFromDB(number, offset);
 
-  const endReachedPromise = photosFromDbPromise.then(({ endReached }) => {
-    return endReached;
-  });
-
-  const photosWithImage64 = photosFromDbPromise.then(({ photos }) => {
-    console.log(`Got ${photos?.length} photos.`);
-    console.log("Retrieving cropped photos from disk.");
-    const photosPromises = photos.map((photo) => {
-      return diskManager
-        .getCroppedPhotoFromDisk(photo.serverPath)
-        .then((image64) => {
-          return responseFormatter.createPhotoObject(photo, image64);
-        });
-    });
-
-    return Promise.all(photosPromises);
-  });
-
-  Promise.all([photosWithImage64, endReachedPromise])
-    .then(([photos, endReached]) => {
-      console.log("Photos retrieved from disk.");
+  databaseFunctions
+    .getPhotosFromDB(number, offset)
+    .then(({ photos, endReached }) => {
+      console.log(`Got ${photos?.length} photos.`);
       const jsonResponse = {
         endReached: endReached,
         number: photos.length,
