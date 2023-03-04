@@ -51,6 +51,8 @@ const callback = (req, res) => {
             console.log("Adding photo to disk.");
             return diskManager.addPhotoToDisk(
               photo.image64,
+              photo.width,
+              photo.height,
               photo.serverFilePath
             );
           })

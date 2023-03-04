@@ -8,11 +8,16 @@ const { rootPath } = require(global.__srcdir + "/config/config");
 const { createServerImageCroppedName } = require(global.__srcdir +
   "/modules/diskFilesNaming");
 
-function addPhotoToDisk(data, path) {
-  let buff = Buffer.from(data, "base64");
+function addPhotoToDisk(data, photoWidth, photoHeight, path) {
+  const MAX_PIXELS_IN_IMAGE = 40000;
 
+  const factor = Math.sqrt((photoWidth * photoHeight) / MAX_PIXELS_IN_IMAGE);
+  const newWidth = Math.round(photoWidth / factor);
+  const newHeight = Math.round(photoHeight / factor);
+
+  let buff = Buffer.from(data, "base64");
   return sharp(buff)
-    .resize({ width: 150, height: 150 })
+    .resize({ width: newWidth, height: newHeight })
     .jpeg({ quality: 70 })
     .toBuffer()
     .then((data) => {
