@@ -44,9 +44,11 @@ const callback = (req, res) => {
           rootPath + diskFilesNaming.createServerImageName(photo);
         photo.hash = hashString(photo.image64, hashLen);
         console.log("Adding photo to db.");
+        let id = "";
         databaseFunctions
           .addPhotoToDB(photo)
-          .then(() => {
+          .then((id_db) => {
+            id = id_db;
             console.log("Photo added successfully to db.");
             console.log("Adding photo to disk.");
             return diskManager.addPhotoToDisk(
@@ -57,12 +59,15 @@ const callback = (req, res) => {
             );
           })
           .then(() => {
+            return databaseFunctions.getPhotoByIdFromDB(id);
+          })
+          .then((dbPhoto) => {
+            const jsonResponse = {
+              photo: responseFormatter.createPhotoObject(dbPhoto, ""),
+            };
             console.log("Photo added to disk.");
             console.log("Sending response message.");
-            return responseFormatter.sendSuccessfulMessage(
-              res,
-              "Photo added to server successfully."
-            );
+            return responseFormatter.sendResponse(res, jsonResponse);
           })
           .catch((err) => {
             console.error(err);

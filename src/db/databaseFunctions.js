@@ -34,10 +34,10 @@ function initDB() {
 
 function addPhotoToDB(photo) {
   let db = new sqlite3.Database(sqliteDbFile);
-
+  let id = uuid();
   return runPromisified
     .bind(db)(sqlQueries.insertImageQuery(), [
-      uuid(),
+      id,
       photo.name,
       photo.fileSize,
       photo.width,
@@ -48,6 +48,9 @@ function addPhotoToDB(photo) {
       photo.serverFilePath,
       photo.hash,
     ])
+    .then(() => {
+      return id;
+    })
     .finally(() => {
       db.close();
     })
