@@ -26,4 +26,5 @@ initDB()
   })
   .catch((err) => {
     console.error("Error initializing database");
+    console.log(err);
   });

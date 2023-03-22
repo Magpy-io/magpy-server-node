@@ -42,6 +42,9 @@ const selectNextPhotoByDateQuery = (date) =>
 const selectPreviousPhotoByDateQuery = (date) =>
   `SELECT * FROM Images WHERE date>'${date}' ORDER BY date LIMIT 2`;
 
+const updatePhotoHashByIdQuery = (id, hash) =>
+  `UPDATE Images SET hash = '${hash}' WHERE id='${id}';`;
+
 module.exports = {
   checkTableImagesExistsQuery,
   createTableImagesQuery,
@@ -54,4 +57,5 @@ module.exports = {
   deletePhotoByIdQuery,
   selectNextPhotoByDateQuery,
   selectPreviousPhotoByDateQuery,
+  updatePhotoHashByIdQuery,
 };
