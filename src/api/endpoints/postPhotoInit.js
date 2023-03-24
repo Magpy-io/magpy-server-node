@@ -38,7 +38,7 @@ const callback = (req, res) => {
         );
       } else {
         console.log("Photo does not exist in server.");
-        console.log("Creating syncDate, photoPath and the photo hash.");
+        console.log("Creating syncDate and photoPath.");
         const photo = req.body;
         const image64Len = photo.image64Len;
         delete photo.image64Len;

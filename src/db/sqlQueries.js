@@ -45,6 +45,9 @@ const selectPreviousPhotoByDateQuery = (date) =>
 const updatePhotoHashByIdQuery = (id, hash) =>
   `UPDATE Images SET hash = '${hash}' WHERE id='${id}';`;
 
+const updatePhotoClientPathByIdQuery = (id, path) =>
+  `UPDATE Images SET clientPath = '${path}' WHERE id='${id}';`;
+
 module.exports = {
   checkTableImagesExistsQuery,
   createTableImagesQuery,
@@ -58,4 +61,5 @@ module.exports = {
   selectNextPhotoByDateQuery,
   selectPreviousPhotoByDateQuery,
   updatePhotoHashByIdQuery,
+  updatePhotoClientPathByIdQuery,
 };

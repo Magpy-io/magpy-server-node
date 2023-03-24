@@ -251,6 +251,19 @@ function updatePhotoHashById(id, hash) {
     });
 }
 
+function updatePhotoClientPathById(id, path) {
+  let db = new sqlite3.Database(sqliteDbFile);
+  return getPromisified
+    .bind(db)(sqlQueries.updatePhotoClientPathByIdQuery(id, path))
+    .finally(() => {
+      db.close();
+    })
+    .catch((err) => {
+      console.error(err);
+      throw err;
+    });
+}
+
 function clearDB() {
   let db = new sqlite3.Database(sqliteDbFile);
   return runPromisified
@@ -278,4 +291,5 @@ module.exports = {
   initDB,
   getPhotosByIdFromDB,
   updatePhotoHashById,
+  updatePhotoClientPathById,
 };
