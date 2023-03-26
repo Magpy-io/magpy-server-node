@@ -32,9 +32,15 @@ function initDB() {
     });
 }
 
-function addPhotoToDB(photo) {
+function addPhotoToDB(photo, id_p = "") {
   let db = new sqlite3.Database(sqliteDbFile);
-  let id = uuid();
+
+  let id = id_p;
+
+  if (!id) {
+    id = uuid();
+  }
+
   return runPromisified
     .bind(db)(sqlQueries.insertImageQuery(), [
       id,

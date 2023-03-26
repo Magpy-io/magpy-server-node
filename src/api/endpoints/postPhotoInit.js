@@ -1,6 +1,7 @@
 const responseFormatter = require(global.__srcdir + "/api/responseFormatter");
 
-const { rootPath, hashLen } = require(global.__srcdir + "/config/config");
+const { rootPath, hashLen, postPhotoPartTimeout } = require(global.__srcdir +
+  "/config/config");
 const databaseFunctions = require(global.__srcdir + "/db/databaseFunctions");
 const { hashString } = require(global.__srcdir + "/modules/hashing");
 const diskManager = require(global.__srcdir + "/modules/diskManager");
@@ -10,6 +11,7 @@ const waitingFiles = require(global.__srcdir + "/modules/waitingFiles");
 
 const { checkReqBodyAttributeMissing } = require(global.__srcdir +
   "/modules/checkAttibutesMissing");
+const { v4: uuid } = require("uuid");
 
 // add photo : initializes the transfer of a photo to the server
 const endpoint = "/photoAddInit";
@@ -45,46 +47,25 @@ const callback = (req, res) => {
         photo.syncDate = new Date(Date.now()).toJSON();
         photo.serverFilePath =
           rootPath + diskFilesNaming.createServerImageName(photo);
-        photo.hash = "";
-        console.log("Adding photo to db.");
-        let id = "";
-        return databaseFunctions
-          .addPhotoToDB(photo)
-          .then((id_db) => {
-            id = id_db;
-            console.log("Photo added successfully to db.");
-            waitingFiles.FilesWaiting[id] = {
-              current: 0,
-              serverFilePath: photo.serverFilePath,
-              image64Len: image64Len,
-              dataParts: {},
-              timeout: setTimeout(() => {
-                console.log(`Photo transfer for id ${id} timed out.`);
-                console.log(`Deleting pending transfer for id ${id}`);
-                delete waitingFiles.FilesWaiting[id];
+        const id = uuid();
+        waitingFiles.FilesWaiting[id] = {
+          current: 0,
+          image64Len: image64Len,
+          dataParts: {},
+          timeout: setTimeout(() => {
+            console.log(`Photo transfer for id ${id} timed out.`);
+            console.log(`Deleting pending transfer for id ${id}`);
+            delete waitingFiles.FilesWaiting[id];
 
-                console.log(`Deleting photo with id ${id} from database`);
-                databaseFunctions.deletePhotoByIdFromDB(id).catch((err) => {
-                  console.log(err);
-                });
-              }, 10000),
-            };
-          })
-          .then(() => {
-            return databaseFunctions.getPhotoByIdFromDB(id);
-          })
-          .then((dbPhoto) => {
-            const jsonResponse = {
-              photo: responseFormatter.createPhotoObject(dbPhoto, ""),
-            };
-            console.log("Photo added to disk.");
-            console.log("Sending response message.");
-            return responseFormatter.sendResponse(res, jsonResponse);
-          })
-          .catch((err) => {
-            console.error(err);
-            responseFormatter.sendErrorMessage(res);
-          });
+            console.log(`Deleting photo with id ${id} from database`);
+            databaseFunctions.deletePhotoByIdFromDB(id).catch((err) => {
+              console.log(err);
+            });
+          }, postPhotoPartTimeout),
+          photo: photo,
+        };
+        console.log("Sending response message.");
+        return responseFormatter.sendResponse(res, { id: id });
       }
     })
     .catch((err) => {
