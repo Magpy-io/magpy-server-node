@@ -7,10 +7,13 @@ const diskManager = require(global.__srcdir + "/modules/diskManager");
 const { checkReqBodyAttributeMissing } = require(global.__srcdir +
   "/modules/checkAttibutesMissing");
 
-// get photos : returns all photos in server.
-const endpoint = "/photoGetId";
+const { getNumberOfParts, getPartN } = require(global.__srcdir +
+  "/modules/stringHelper");
+
+// get photo part by id : returns a part of a photo by id.
+const endpoint = "/photoPartGetId";
 const callback = (req, res) => {
-  console.log("[GET photo]");
+  console.log("[GET photo part by id]");
 
   console.log("Checking request parameters.");
   if (checkReqBodyAttributeMissing(req, "id", "string")) {
@@ -22,6 +25,10 @@ const callback = (req, res) => {
   console.log("Request parameters ok.");
 
   const id = req.body.id;
+  let partNumber = 0;
+  if (!checkReqBodyAttributeMissing(req, "part", "number")) {
+    partNumber = req.body.part;
+  }
 
   console.log(`Getting photo with id = ${id} from db.`);
   databaseFunctions
@@ -42,11 +49,29 @@ const callback = (req, res) => {
           .getFullPhotoFromDisk(dbPhoto.serverPath)
           .then((image64) => {
             console.log("Photo retrieved.");
-            const jsonResponse = {
-              photo: responseFormatter.createPhotoObject(dbPhoto, image64),
-            };
+
             console.log("Sending response data.");
-            responseFormatter.sendResponse(res, jsonResponse);
+
+            const totalNbOfParts = getNumberOfParts(image64);
+
+            if (partNumber < totalNbOfParts) {
+              const part = getPartN(image64, partNumber);
+              const jsonResponse = {
+                photo: responseFormatter.createPhotoObject(dbPhoto, part),
+                totalNbOfParts: totalNbOfParts,
+              };
+              responseFormatter.sendResponse(res, jsonResponse);
+            } else {
+              console.log(
+                `Part number ${partNumber} exceeds maximum number of parts ${totalNbOfParts}`
+              );
+              console.log("Sending response message.");
+              responseFormatter.sendFailedMessage(
+                res,
+                `Part number ${partNumber} exceeds maximum number of parts ${totalNbOfParts}`,
+                "INVALID_PART_NUMBER"
+              );
+            }
           })
           .catch((err) => {
             console.error(err);

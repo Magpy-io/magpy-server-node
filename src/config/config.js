@@ -3,7 +3,8 @@ const port = 8000;
 const rootPath = "/home/issam/Documents/Images/";
 const sqliteDbFile = __srcdir + "/db/database.db";
 const hashLen = 32;
-const postPhotoPartTimeout = 60000;
+const postPhotoPartTimeout = 100; //in ms
+const getPhotoPartSize = 10; //char in base64
 
 module.exports = {
   host,
@@ -12,4 +13,5 @@ module.exports = {
   hashLen,
   sqliteDbFile,
   postPhotoPartTimeout,
+  getPhotoPartSize,
 };
