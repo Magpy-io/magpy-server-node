@@ -8,27 +8,40 @@ const { rootPath } = require(global.__srcdir + "/config/config");
 const { createServerImageCroppedName } = require(global.__srcdir +
   "/modules/diskFilesNaming");
 
-function addPhotoToDisk(data, photoWidth, photoHeight, path) {
+async function addPhotoToDisk(data, photoWidth, photoHeight, path) {
   const MAX_PIXELS_IN_IMAGE = 40000;
+  const MAX_PIXELS_IN_IMAGE_BIGGER = 200000;
 
   const factor = Math.sqrt((photoWidth * photoHeight) / MAX_PIXELS_IN_IMAGE);
   const newWidth = Math.round(photoWidth / factor);
   const newHeight = Math.round(photoHeight / factor);
 
+  const factor2 = Math.sqrt(
+    (photoWidth * photoHeight) / MAX_PIXELS_IN_IMAGE_BIGGER
+  );
+  const newWidth2 = Math.round(photoWidth / factor2);
+  const newHeight2 = Math.round(photoHeight / factor2);
+
   let buff = Buffer.from(data, "base64");
-  return sharp(buff)
+  const data1 = await sharp(buff)
     .resize({ width: newWidth, height: newHeight })
     .jpeg({ quality: 70 })
     .toBuffer()
-    .then((data) => {
-      const file1 = fs.writeFile(path, buff);
-      const file2 = fs.writeFile(createServerImageCroppedName(path), data);
-      return Promise.all([file1, file2]);
-    })
     .catch((err) => {
       console.error(err);
       throw err;
     });
+  const data2 = await sharp(buff)
+    .resize({ width: newWidth2, height: newHeight2 })
+    .jpeg({ quality: 70 })
+    .toBuffer()
+    .catch((err) => {
+      console.error(err);
+      throw err;
+    });
+  const file1 = await fs.writeFile(path, data2);
+  const file2 = await fs.writeFile(createServerImageCroppedName(path), data1);
+  return [file1, file2];
 }
 
 function removePhotoFromDisk(path) {
