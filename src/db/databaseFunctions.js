@@ -11,28 +11,26 @@ const getPromisified = util.promisify(db.get);
 const allPromisified = util.promisify(db.all);
 db.close();
 
-function initDB() {
+async function initDB() {
   let db = new sqlite3.Database(sqliteDbFile);
-
-  return allPromisified
-    .bind(db)(sqlQueries.checkTableImagesExistsQuery())
-    .then((rows) => {
-      if (rows.length != 1) {
-        return runPromisified.bind(db)(
-          sqlQueries.createTableImagesQuery(hashLen)
-        );
-      }
-    })
-    .finally(() => {
-      db.close();
-    })
-    .catch((err) => {
-      console.error(err);
-      throw err;
-    });
+  try {
+    const rows = await allPromisified.bind(db)(
+      sqlQueries.checkTableImagesExistsQuery()
+    );
+    if (rows.length != 1) {
+      return runPromisified.bind(db)(
+        sqlQueries.createTableImagesQuery(hashLen)
+      );
+    }
+  } catch (err) {
+    console.error(err);
+    throw err;
+  } finally {
+    db.close();
+  }
 }
 
-function addPhotoToDB(photo, id_p = "") {
+async function addPhotoToDB(photo, id_p = "") {
   let db = new sqlite3.Database(sqliteDbFile);
 
   let id = id_p;
@@ -40,9 +38,8 @@ function addPhotoToDB(photo, id_p = "") {
   if (!id) {
     id = uuid();
   }
-
-  return runPromisified
-    .bind(db)(sqlQueries.insertImageQuery(), [
+  try {
+    await runPromisified.bind(db)(sqlQueries.insertImageQuery(), [
       id,
       photo.name,
       photo.fileSize,
@@ -53,234 +50,207 @@ function addPhotoToDB(photo, id_p = "") {
       new Date(photo.syncDate).toISOString(),
       photo.serverFilePath,
       photo.hash,
-    ])
-    .then(() => {
-      return id;
-    })
-    .finally(() => {
-      db.close();
-    })
-    .catch((err) => {
-      console.error(err);
-      throw err;
-    });
+    ]);
+    return id;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  } finally {
+    db.close();
+  }
 }
 
-function numberPhotosFromDB() {
+async function numberPhotosFromDB() {
   let db = new sqlite3.Database(sqliteDbFile);
-  return allPromisified
-    .bind(db)(sqlQueries.selectAllIdsQuery())
-    .then((rows) => {
-      return rows.length;
-    })
-    .finally(() => {
-      db.close();
-    });
+  try {
+    const rows = await allPromisified.bind(db)(sqlQueries.selectAllIdsQuery());
+    return rows.length;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  } finally {
+    db.close();
+  }
 }
 
-function getPhotosFromDB(number, offset) {
-  const numberPhotosDbPromise = numberPhotosFromDB();
+async function getPhotosFromDB(number, offset) {
+  const nbPhotos = await numberPhotosFromDB();
 
   let db = new sqlite3.Database(sqliteDbFile);
-  const photosPromise = allPromisified.bind(db)(
-    sqlQueries.selectPhotosOffsetCountQuery(number, offset)
-  );
 
-  return Promise.all([photosPromise, numberPhotosDbPromise])
-    .then(([rows, nbPhotos]) => {
-      return { photos: rows, endReached: nbPhotos <= number + offset };
-    })
-    .finally(() => {
-      db.close();
-    })
-    .catch((err) => {
-      console.error(err);
-      throw err;
-    });
+  try {
+    const rows = await allPromisified.bind(db)(
+      sqlQueries.selectPhotosOffsetCountQuery(number, offset)
+    );
+    return { photos: rows, endReached: nbPhotos <= number + offset };
+  } catch (err) {
+    console.error(err);
+    throw err;
+  } finally {
+    db.close();
+  }
 }
 
-function getPhotoByIdFromDB(id) {
+async function getPhotoByIdFromDB(id) {
   let db = new sqlite3.Database(sqliteDbFile);
-  return getPromisified
-    .bind(db)(sqlQueries.selectPhotoByIdQuery(id))
-    .then((row) => {
-      return row;
-    })
-    .finally(() => {
-      db.close();
-    })
-    .catch((err) => {
-      console.error(err);
-      throw err;
-    });
+  try {
+    return await getPromisified.bind(db)(sqlQueries.selectPhotoByIdQuery(id));
+  } catch (err) {
+    console.error(err);
+    throw err;
+  } finally {
+    db.close();
+  }
 }
 
-function deletePhotoByIdFromDB(id) {
+async function deletePhotoByIdFromDB(id) {
   let db = new sqlite3.Database(sqliteDbFile);
-  return runPromisified
-    .bind(db)(sqlQueries.deletePhotoByIdQuery(id))
-    .finally(() => {
-      db.close();
-    })
-    .catch((err) => {
-      console.error(err);
-      throw err;
-    });
+  try {
+    return runPromisified.bind(db)(sqlQueries.deletePhotoByIdQuery(id));
+  } catch (err) {
+    console.error(err);
+    throw err;
+  } finally {
+    db.close();
+  }
 }
 
-function getNextPhotoFromDB(id) {
+async function getNextPhotoFromDB(id) {
   let db = new sqlite3.Database(sqliteDbFile);
-
-  return getPromisified
-    .bind(db)(sqlQueries.selectPhotoByIdQuery(id))
-    .then((photo) => {
-      if (photo) {
-        return allPromisified.bind(db)(
-          sqlQueries.selectNextPhotoByDateQuery(photo.date)
-        );
-      }
-    })
-    .then((rows) => {
-      return {
-        idFound: rows instanceof Array,
-        photoIdIsLast: rows?.length == 0,
-        photoNext: rows ? rows[0] : undefined,
-        endReached: rows?.length <= 1,
-      };
-    })
-    .finally(() => {
-      db.close();
-    })
-    .catch((err) => {
-      console.error(err);
-      throw err;
-    });
+  try {
+    const photo = await getPromisified.bind(db)(
+      sqlQueries.selectPhotoByIdQuery(id)
+    );
+    let rows;
+    if (photo) {
+      rows = await allPromisified.bind(db)(
+        sqlQueries.selectNextPhotoByDateQuery(photo.date)
+      );
+    }
+    return {
+      idFound: rows !== undefined,
+      photoIdIsLast: rows?.length == 0,
+      photoNext: rows ? rows[0] : undefined,
+      endReached: rows?.length <= 1,
+    };
+  } catch (err) {
+    console.error(err);
+    throw err;
+  } finally {
+    db.close();
+  }
 }
 
-function getPreviousPhotoFromDB(id) {
+async function getPreviousPhotoFromDB(id) {
   let db = new sqlite3.Database(sqliteDbFile);
-
-  return getPromisified
-    .bind(db)(sqlQueries.selectPhotoByIdQuery(id))
-    .then((photo) => {
-      if (photo) {
-        return allPromisified.bind(db)(
-          sqlQueries.selectPreviousPhotoByDateQuery(photo.date)
-        );
-      }
-    })
-    .then((rows) => {
-      return {
-        idFound: rows instanceof Array,
-        photoIdIsLast: rows?.length == 0,
-        photoNext: rows ? rows[0] : undefined,
-        endReached: rows?.length <= 1,
-      };
-    })
-    .finally(() => {
-      db.close();
-    })
-    .catch((err) => {
-      console.error(err);
-      throw err;
-    });
+  try {
+    const photo = await getPromisified.bind(db)(
+      sqlQueries.selectPhotoByIdQuery(id)
+    );
+    let rows;
+    if (photo) {
+      rows = await allPromisified.bind(db)(
+        sqlQueries.selectPreviousPhotoByDateQuery(photo.date)
+      );
+    }
+    return {
+      idFound: rows !== undefined,
+      photoIdIsLast: rows?.length == 0,
+      photoNext: rows ? rows[0] : undefined,
+      endReached: rows?.length <= 1,
+    };
+  } catch (err) {
+    console.error(err);
+    throw err;
+  } finally {
+    db.close();
+  }
 }
 
-function getPhotoByClientPathFromDB(photoPath) {
+async function getPhotoByClientPathFromDB(photoPath) {
   let db = new sqlite3.Database(sqliteDbFile);
-  return getPromisified
-    .bind(db)(sqlQueries.selectByClientPathQuery(photoPath))
-    .then((row) => {
-      return row;
-    })
-    .finally(() => {
-      db.close();
-    })
-    .catch((err) => {
-      console.error(err);
-      throw err;
-    });
-}
-
-function getPhotosByIdFromDB(ids) {
-  let db = new sqlite3.Database(sqliteDbFile);
-
-  const photosFoundPromise = ids.map((id) => {
-    return getPromisified.bind(db)(sqlQueries.selectPhotoByIdQuery(id));
-  });
-
-  return Promise.all(photosFoundPromise)
-    .then((photosFound) => {
-      return photosFound;
-    })
-    .finally(() => {
-      db.close();
-    })
-    .catch((err) => {
-      console.error(err);
-      throw err;
-    });
-}
-
-function getPhotosByClientPathFromDB(photosPaths) {
-  let db = new sqlite3.Database(sqliteDbFile);
-
-  const photosFoundPromise = photosPaths.map((photoPath) => {
-    return getPromisified.bind(db)(
+  try {
+    return await getPromisified.bind(db)(
       sqlQueries.selectByClientPathQuery(photoPath)
     );
-  });
-
-  return Promise.all(photosFoundPromise)
-    .then((photosFound) => {
-      return photosFound;
-    })
-    .finally(() => {
-      db.close();
-    })
-    .catch((err) => {
-      console.error(err);
-      throw err;
-    });
+  } catch (err) {
+    console.error(err);
+    throw err;
+  } finally {
+    db.close();
+  }
 }
 
-function updatePhotoHashById(id, hash) {
+async function getPhotosByIdFromDB(ids) {
   let db = new sqlite3.Database(sqliteDbFile);
-  return getPromisified
-    .bind(db)(sqlQueries.updatePhotoHashByIdQuery(id, hash))
-    .finally(() => {
-      db.close();
-    })
-    .catch((err) => {
-      console.error(err);
-      throw err;
+  try {
+    const photosFoundPromise = ids.map((id) => {
+      return getPromisified.bind(db)(sqlQueries.selectPhotoByIdQuery(id));
     });
+    return await Promise.all(photosFoundPromise);
+  } catch (err) {
+    console.error(err);
+    throw err;
+  } finally {
+    db.close();
+  }
 }
 
-function updatePhotoClientPathById(id, path) {
+async function getPhotosByClientPathFromDB(photosPaths) {
   let db = new sqlite3.Database(sqliteDbFile);
-  return getPromisified
-    .bind(db)(sqlQueries.updatePhotoClientPathByIdQuery(id, path))
-    .finally(() => {
-      db.close();
-    })
-    .catch((err) => {
-      console.error(err);
-      throw err;
+  try {
+    const photosFoundPromise = photosPaths.map((photoPath) => {
+      return getPromisified.bind(db)(
+        sqlQueries.selectByClientPathQuery(photoPath)
+      );
     });
+    return await Promise.all(photosFoundPromise);
+  } catch (err) {
+    console.error(err);
+    throw err;
+  } finally {
+    db.close();
+  }
 }
 
-function clearDB() {
+async function updatePhotoHashById(id, hash) {
   let db = new sqlite3.Database(sqliteDbFile);
-  return runPromisified
-    .bind(db)(sqlQueries.dropTableImagesQuery())
-    .finally(() => {
-      db.close();
-    })
-    .catch((err) => {
-      console.error(err);
-      throw err;
-    });
+  try {
+    return await getPromisified.bind(db)(
+      sqlQueries.updatePhotoHashByIdQuery(id, hash)
+    );
+  } catch (err) {
+    console.error(err);
+    throw err;
+  } finally {
+    db.close();
+  }
+}
+
+async function updatePhotoClientPathById(id, path) {
+  let db = new sqlite3.Database(sqliteDbFile);
+  try {
+    return await getPromisified.bind(db)(
+      sqlQueries.updatePhotoClientPathByIdQuery(id, path)
+    );
+  } catch (err) {
+    console.error(err);
+    throw err;
+  } finally {
+    db.close();
+  }
+}
+
+async function clearDB() {
+  let db = new sqlite3.Database(sqliteDbFile);
+  try {
+    return await runPromisified.bind(db)(sqlQueries.dropTableImagesQuery());
+  } catch (err) {
+    console.error(err);
+    throw err;
+  } finally {
+    db.close();
+  }
 }
 
 module.exports = {

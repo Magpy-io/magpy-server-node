@@ -44,59 +44,49 @@ async function addPhotoToDisk(data, photoWidth, photoHeight, path) {
   return [file1, file2];
 }
 
-function removePhotoFromDisk(path) {
-  const removeFullPhotoPromise = fs.unlink(path);
-  const removeCroppedPhotoPromise = fs.unlink(
-    createServerImageCroppedName(path)
-  );
-
-  return Promise.all([removeFullPhotoPromise, removeCroppedPhotoPromise]).catch(
-    (err) => {
-      console.error(err);
-      throw err;
-    }
-  );
+async function removePhotoFromDisk(path) {
+  try {
+    await fs.unlink(path);
+    await fs.unlink(createServerImageCroppedName(path));
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
 }
 
-function getFullPhotoFromDisk(path) {
-  return fs
-    .readFile(path, { encoding: "base64" })
-    .then((result) => {
-      return result.toString("base64");
-    })
-    .catch((err) => {
-      console.error(err);
-      throw err;
-    });
+async function getFullPhotoFromDisk(path) {
+  try {
+    const result = await fs.readFile(path, { encoding: "base64" });
+    return result.toString("base64");
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
 }
 
-function getCroppedPhotoFromDisk(path) {
-  return fs
-    .readFile(createServerImageCroppedName(path), { encoding: "base64" })
-    .then((result) => {
-      return result.toString("base64");
-    })
-    .catch((err) => {
-      console.error(err);
-      throw err;
+async function getCroppedPhotoFromDisk(path) {
+  try {
+    const result = await fs.readFile(createServerImageCroppedName(path), {
+      encoding: "base64",
     });
+    return result.toString("base64");
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
 }
 
-function clearImagesDisk() {
-  return fs
-    .readdir(rootPath)
-    .then((files) => {
-      return files.map((file) => {
-        return fs.unlink(path.join(rootPath, file));
-      });
-    })
-    .then((filesUnlinkPromises) => {
-      return Promise.all(filesUnlinkPromises);
-    })
-    .catch((err) => {
-      console.error(err);
-      throw err;
+async function clearImagesDisk() {
+  try {
+    const files = await fs.readdir(rootPath);
+    const filesUnlinkedPromises = files.map((file) => {
+      return fs.unlink(path.join(rootPath, file));
     });
+    await Promise.all(filesUnlinkedPromises);
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
 }
 
 module.exports = {

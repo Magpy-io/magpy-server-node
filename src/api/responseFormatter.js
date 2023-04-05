@@ -1,24 +1,24 @@
 // IMPORTS
 
-function sendResponse(res, data, status = 200) {
+async function sendResponse(res, data, status = 200) {
   let jsonResponse = {
     ok: true,
     data: data,
   };
 
-  return res.status(status).json(jsonResponse);
+  return await res.status(status).json(jsonResponse);
 }
 
-function sendSuccessfulMessage(res, msg, status = 200) {
+async function sendSuccessfulMessage(res, msg, status = 200) {
   let jsonResponse = {
     ok: true,
     message: msg,
   };
 
-  return res.status(status).json(jsonResponse);
+  return await res.status(status).json(jsonResponse);
 }
 
-function sendFailedMessage(
+async function sendFailedMessage(
   res,
   msg = "Bad request",
   code = "BAD_REQUEST",
@@ -30,10 +30,10 @@ function sendFailedMessage(
     code: code,
   };
 
-  return res.status(status).json(jsonResponse);
+  return await res.status(status).json(jsonResponse);
 }
 
-function sendErrorMessage(
+async function sendErrorMessage(
   res,
   msg = "Server internal error",
   code = "SERVER_ERROR",
@@ -45,7 +45,7 @@ function sendErrorMessage(
     code: code,
   };
 
-  return res.status(status).json(jsonResponse);
+  return await res.status(status).json(jsonResponse);
 }
 
 function createPhotoObject(dbPhoto, image64) {
