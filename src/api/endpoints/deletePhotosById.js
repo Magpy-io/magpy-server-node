@@ -7,23 +7,27 @@ const diskManager = require(global.__srcdir + "/modules/diskManager");
 const { checkReqBodyAttributeMissing } = require(global.__srcdir +
   "/modules/checkAttibutesMissing");
 
-// delete photos : deletes photos from server by id
-const endpoint = "/photosDelete";
+// deletePhotosById: deletes photos from server by id
+const endpoint = "/deletePhotosById";
 const callback = async (req, res) => {
-  console.log("[delete photos by id]");
+  console.log("[deletePhotosById]");
 
   console.log("Checking request parameters.");
   if (checkReqBodyAttributeMissing(req, "ids", "Array string")) {
     console.log("Bad request parameters");
     console.log("Sending response message");
-    await responseFormatter.sendFailedMessage(res);
+    responseFormatter.sendFailedMessage(res);
     return;
   }
   console.log("Request parameters ok.");
 
+  console.log(`ids len: ${req.body.ids.length}`);
+
+  const ids = req.body.ids;
+
   try {
     const removedIds = [];
-    for (const id of req.body.ids) {
+    for (const id of ids) {
       const dbPhoto = await databaseFunctions.getPhotoByIdFromDB(id);
       if (dbPhoto) {
         await databaseFunctions.deletePhotoByIdFromDB(id);
@@ -32,12 +36,12 @@ const callback = async (req, res) => {
       }
     }
 
-    console.log("Photos removed from db.");
+    console.log("Photos removed from db and disk.");
     console.log("Sending response message.");
     responseFormatter.sendResponse(res, { deletedIds: removedIds });
   } catch (err) {
     console.error(err);
-    await responseFormatter.sendErrorMessage(res);
+    responseFormatter.sendErrorMessage(res);
   }
 };
 

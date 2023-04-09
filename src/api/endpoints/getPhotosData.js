@@ -7,10 +7,10 @@ const diskManager = require(global.__srcdir + "/modules/diskManager");
 const { checkReqBodyAttributeMissing } = require(global.__srcdir +
   "/modules/checkAttibutesMissing");
 
-// get photos data with pagination params : returns "number" photo's data starting from "offset".
-const endpoint = "/photosDataGetNb";
-const callback = (req, res) => {
-  console.log("[GET photos data]");
+// getPhotosData : returns "number" photo's data starting from "offset".
+const endpoint = "/getPhotosData";
+const callback = async (req, res) => {
+  console.log("[getPhotosData]");
 
   console.log("Checking request parameters.");
   if (
@@ -24,28 +24,30 @@ const callback = (req, res) => {
   }
   console.log("Request parameters ok.");
 
+  console.log(`number: ${req.body.number}, offset: ${req.body.offset}`);
+
   const number = req.body.number;
   const offset = req.body.offset;
 
-  console.log(`Getting ${number} photos with offset ${offset} from db.`);
+  try {
+    console.log(`Getting ${number} photos with offset ${offset} from db.`);
+    const { photos, endReached } = await databaseFunctions.getPhotosFromDB(
+      number,
+      offset
+    );
+    console.log(`Got ${photos?.length} photos.`);
+    const jsonResponse = {
+      endReached: endReached,
+      number: photos.length,
+      photos: photos,
+    };
 
-  databaseFunctions
-    .getPhotosFromDB(number, offset)
-    .then(({ photos, endReached }) => {
-      console.log(`Got ${photos?.length} photos.`);
-      const jsonResponse = {
-        endReached: endReached,
-        number: photos.length,
-        photos: photos,
-      };
-
-      console.log("Sending response data.");
-      responseFormatter.sendResponse(res, jsonResponse);
-    })
-    .catch((err) => {
-      console.error(err);
-      responseFormatter.sendErrorMessage(res);
-    });
+    console.log("Sending response data.");
+    responseFormatter.sendResponse(res, jsonResponse);
+  } catch (err) {
+    console.error(err);
+    responseFormatter.sendErrorMessage(res);
+  }
 };
 
 module.exports = { endpoint: endpoint, callback: callback, method: "post" };

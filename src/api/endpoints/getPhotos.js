@@ -7,13 +7,16 @@ const diskManager = require(global.__srcdir + "/modules/diskManager");
 const { checkReqBodyAttributeMissing } = require(global.__srcdir +
   "/modules/checkAttibutesMissing");
 
-// getPhotosById : returns array of photos by their ids.
-const endpoint = "/getPhotosById";
+// getPhotos : returns "number" photos starting from "offset".
+const endpoint = "/getPhotos";
 const callback = async (req, res) => {
-  console.log("[getPhotosById]");
+  console.log("[getPhotos]");
 
   console.log("Checking request parameters.");
-  if (checkReqBodyAttributeMissing(req, "ids", "Array string")) {
+  if (
+    checkReqBodyAttributeMissing(req, "number", "number") ||
+    checkReqBodyAttributeMissing(req, "offset", "number")
+  ) {
     console.log("Bad request parameters");
     console.log("Sending response message");
     responseFormatter.sendFailedMessage(res);
@@ -21,33 +24,36 @@ const callback = async (req, res) => {
   }
   console.log("Request parameters ok.");
 
-  console.log(`ids len: ${req.body.ids.length}`);
+  console.log(`number: ${req.body.number}, offset: ${req.body.offset}`);
 
-  const ids = req.body.ids;
+  const number = req.body.number;
+  const offset = req.body.offset;
 
   try {
-    console.log(`Getting ${ids.length} photos from db.`);
-    const photos = await databaseFunctions.getPhotosByIdFromDB(ids);
-    console.log("Received response from db.");
+    console.log(`Getting ${number} photos with offset ${offset} from db.`);
+    const { photos, endReached } = await databaseFunctions.getPhotosFromDB(
+      number,
+      offset
+    );
+
+    console.log(`Got ${photos?.length} photos.`);
     console.log("Retrieving cropped photos from disk.");
+
     const images64Promises = photos.map((photo) => {
-      if (!photo) return false;
       return diskManager.getCroppedPhotoFromDisk(photo.serverPath);
     });
+
     const images64 = await Promise.all(images64Promises);
-    console.log("Photos retrieved from disk.");
-    const photosResponse = images64.map((image64, index) => {
-      if (!image64) return { id: ids[index], exists: false };
-      const photoWithImage64 = responseFormatter.createPhotoObject(
-        photos[index],
-        image64
-      );
-      return { id: ids[index], exists: true, photo: photoWithImage64 };
+
+    const photosWithImage64 = photos.map((photo, index) => {
+      return responseFormatter.createPhotoObject(photo, images64[index]);
     });
 
+    console.log("Photos retrieved from disk.");
     const jsonResponse = {
-      number: photosResponse.length,
-      photos: photosResponse,
+      endReached: endReached,
+      number: photosWithImage64.length,
+      photos: photosWithImage64,
     };
 
     console.log("Sending response data.");

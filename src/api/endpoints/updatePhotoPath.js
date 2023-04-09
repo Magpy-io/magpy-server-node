@@ -9,10 +9,11 @@ const diskFilesNaming = require(global.__srcdir + "/modules/diskFilesNaming");
 const { checkReqBodyAttributeMissing } = require(global.__srcdir +
   "/modules/checkAttibutesMissing");
 
-// update photo path : updates the path of a photo in db
-const endpoint = "/photoUpdatePath";
-const callback = (req, res) => {
-  console.log(`[UPDATE photo path]`);
+// updatePhotoPath : updates the path of a photo in db
+const endpoint = "/updatePhotoPath";
+const callback = async (req, res) => {
+  console.log(`[updatePhotoPath]`);
+
   console.log("Checking request parameters.");
   if (checkBodyParamsMissing(req)) {
     console.log("Bad request parameters");
@@ -22,42 +23,38 @@ const callback = (req, res) => {
   }
   console.log("Request parameters ok.");
 
-  console.log(`Searching in db for photo with id: ${req.body.id}`);
-  databaseFunctions
-    .getPhotoByIdFromDB(req.body.id)
-    .then((exists) => {
-      if (!exists) {
-        console.log("Photo does not exist in server.");
-        console.log("Sending response message.");
-        return responseFormatter.sendFailedMessage(
-          res,
-          `Photo with id ${req.body.id} not found in server`,
-          "ID_NOT_FOUND"
-        );
-      } else {
-        console.log("Photo found");
-        console.log("Updating path in db");
+  console.log(`id: ${req.body.id}, newPath: ${req.body.path}`);
 
-        return databaseFunctions
-          .updatePhotoClientPathById(req.body.id, req.body.path)
-          .then(() => {
-            console.log("Photo updated successfully.");
-            console.log("Sending response message.");
-            responseFormatter.sendSuccessfulMessage(
-              res,
-              `Photo with id ${req.body.id} successfully updated with new path`
-            );
-          })
-          .catch((err) => {
-            console.error(err);
-            responseFormatter.sendErrorMessage(res);
-          });
-      }
-    })
-    .catch((err) => {
-      console.error(err);
-      responseFormatter.sendErrorMessage(res);
-    });
+  const id = req.body.id;
+  const path = req.body.path;
+
+  try {
+    console.log(`Searching in db for photo with id: ${id}`);
+    const exists = await databaseFunctions.getPhotoByIdFromDB(id);
+    if (!exists) {
+      console.log("Photo does not exist in server.");
+      console.log("Sending response message.");
+      responseFormatter.sendFailedMessage(
+        res,
+        `Photo with id ${id} not found in server`,
+        "ID_NOT_FOUND"
+      );
+    } else {
+      console.log("Photo found");
+      console.log("Updating path in db");
+      await databaseFunctions.updatePhotoClientPathById(id, path);
+
+      console.log("Photo updated successfully.");
+      console.log("Sending response message.");
+      responseFormatter.sendSuccessfulMessage(
+        res,
+        `Photo with id ${id} successfully updated with new path`
+      );
+    }
+  } catch (err) {
+    console.error(err);
+    responseFormatter.sendErrorMessage(res);
+  }
 };
 
 function checkBodyParamsMissing(req) {

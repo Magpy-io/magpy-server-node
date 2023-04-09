@@ -38,20 +38,34 @@ async function addPhotoToDB(photo, id_p = "") {
   if (!id) {
     id = uuid();
   }
+
+  const dbPhoto = {
+    id: id,
+    name: photo.name,
+    fileSize: photo.fileSize,
+    width: photo.width,
+    height: photo.height,
+    date: new Date(photo.date).toISOString(),
+    clientPath: photo.path,
+    syncDate: new Date(photo.syncDate).toISOString(),
+    serverPath: photo.serverPath,
+    hash: photo.hash,
+  };
+
   try {
     await runPromisified.bind(db)(sqlQueries.insertImageQuery(), [
-      id,
-      photo.name,
-      photo.fileSize,
-      photo.width,
-      photo.height,
-      new Date(photo.date).toISOString(),
-      photo.path,
-      new Date(photo.syncDate).toISOString(),
-      photo.serverFilePath,
-      photo.hash,
+      dbPhoto.id,
+      dbPhoto.name,
+      dbPhoto.fileSize,
+      dbPhoto.width,
+      dbPhoto.height,
+      dbPhoto.date,
+      dbPhoto.clientPath,
+      dbPhoto.syncDate,
+      dbPhoto.serverPath,
+      dbPhoto.hash,
     ]);
-    return id;
+    return dbPhoto;
   } catch (err) {
     console.error(err);
     throw err;
