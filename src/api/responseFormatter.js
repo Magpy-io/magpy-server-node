@@ -27,7 +27,7 @@ async function sendFailedMessage(
   let jsonResponse = {
     ok: false,
     message: msg,
-    code: code,
+    errorCode: code,
   };
 
   return await res.status(status).json(jsonResponse);
@@ -42,7 +42,7 @@ async function sendErrorMessage(
   let jsonResponse = {
     ok: false,
     message: msg,
-    code: code,
+    errorCode: code,
   };
 
   return await res.status(status).json(jsonResponse);

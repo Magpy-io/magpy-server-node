@@ -21,7 +21,9 @@ const callback = async (req, res) => {
   }
   console.log("Request parameters ok.");
 
-  console.log(`paths len: ${req.body.paths.length}`);
+  console.log(
+    `paths len: ${req.body.paths.length}, type: ${req.body.photoType}`
+  );
 
   const paths = req.body.paths;
   const photoType = req.body.photoType;

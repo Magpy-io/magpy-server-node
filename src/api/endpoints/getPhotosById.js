@@ -23,7 +23,7 @@ const callback = async (req, res) => {
   }
   console.log("Request parameters ok.");
 
-  console.log(`ids len: ${req.body.ids.length}`);
+  console.log(`ids len: ${req.body.ids.length}, type: ${req.body.photoType}`);
 
   const ids = req.body.ids;
   const photoType = req.body.photoType;

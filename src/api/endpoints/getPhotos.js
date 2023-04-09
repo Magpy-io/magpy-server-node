@@ -23,7 +23,9 @@ const callback = async (req, res) => {
   }
   console.log("Request parameters ok.");
 
-  console.log(`number: ${req.body.number}, offset: ${req.body.offset}`);
+  console.log(
+    `number: ${req.body.number}, offset: ${req.body.offset}, type: ${req.body.photoType}`
+  );
 
   const number = req.body.number;
   const offset = req.body.offset;
