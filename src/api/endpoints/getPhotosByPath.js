@@ -4,15 +4,13 @@ const databaseFunctions = require(global.__srcdir + "/db/databaseFunctions");
 
 const consts = require(global.__srcdir + "/modules/consts");
 
-const diskManager = require(global.__srcdir + "/modules/diskManager");
-
 const { checkReqBodyAttributeMissing } = require(global.__srcdir +
   "/modules/checkAttibutesMissing");
 
-// getPhotosById : returns array of photos by their ids.
-const endpoint = "/getPhotosById";
+// getPhotosByPath : returns array of photos by their paths.
+const endpoint = "/getPhotosByPath";
 const callback = async (req, res) => {
-  console.log("[getPhotosById]");
+  console.log(`[getPhotosByPath]`);
 
   console.log("Checking request parameters.");
   if (checkBodyParamsMissing(req)) {
@@ -23,14 +21,14 @@ const callback = async (req, res) => {
   }
   console.log("Request parameters ok.");
 
-  console.log(`ids len: ${req.body.ids.length}`);
+  console.log(`paths len: ${req.body.paths.length}`);
 
-  const ids = req.body.ids;
+  const paths = req.body.paths;
   const photoType = req.body.photoType;
 
   try {
-    console.log(`Getting ${ids.length} photos from db.`);
-    const photos = await databaseFunctions.getPhotosByIdFromDB(ids);
+    console.log("Getting photos from db with paths from request.");
+    const photos = await databaseFunctions.getPhotosByClientPathFromDB(paths);
     console.log("Received response from db.");
 
     let images64Promises;
@@ -61,13 +59,13 @@ const callback = async (req, res) => {
     console.log("Photos retrieved from disk if needed");
 
     const photosResponse = photos.map((photo, index) => {
-      if (!photo) return { id: ids[index], exists: false };
+      if (!photo) return { path: paths[index], exists: false };
 
       const photoWithImage64 = responseFormatter.createPhotoObject(
         photo,
         images64[index]
       );
-      return { id: ids[index], exists: true, photo: photoWithImage64 };
+      return { path: paths[index], exists: true, photo: photoWithImage64 };
     });
 
     const jsonResponse = {
@@ -84,7 +82,7 @@ const callback = async (req, res) => {
 };
 
 function checkBodyParamsMissing(req) {
-  if (checkReqBodyAttributeMissing(req, "ids", "Array string")) return true;
+  if (checkReqBodyAttributeMissing(req, "paths", "Array string")) return true;
   if (checkReqBodyAttributeMissing(req, "photoType", "string")) return true;
   if (!consts.PHOTO_TYPES.includes(req.body.photoType)) return true;
 

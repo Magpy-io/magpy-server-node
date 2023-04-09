@@ -1,10 +1,6 @@
 const responseFormatter = require(global.__srcdir + "/api/responseFormatter");
 
-const { rootPath, hashLen } = require(global.__srcdir + "/config/config");
 const databaseFunctions = require(global.__srcdir + "/db/databaseFunctions");
-const { hashString } = require(global.__srcdir + "/modules/hashing");
-const diskManager = require(global.__srcdir + "/modules/diskManager");
-const diskFilesNaming = require(global.__srcdir + "/modules/diskFilesNaming");
 
 const { checkReqBodyAttributeMissing } = require(global.__srcdir +
   "/modules/checkAttibutesMissing");

@@ -46,7 +46,7 @@ const callback = async (req, res) => {
     } else {
       console.log("Photo found in db.");
       console.log("Retrieving photo from disk.");
-      const image64 = await diskManager.getFullPhotoFromDisk(
+      const image64 = await diskManager.getOriginalPhotoFromDisk(
         dbPhoto.serverPath
       );
       console.log("Photo retrieved.");

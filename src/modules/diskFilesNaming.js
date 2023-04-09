@@ -14,12 +14,18 @@ function createServerImageName(photo) {
   return serverFileName;
 }
 
-function createServerImageCroppedName(fullImagePath) {
+function createServerImageThumbnailName(fullImagePath) {
   const { name, format } = splitImageName(fullImagePath);
-  return name + "_cropped" + "." + format;
+  return name + "_thumbnail" + "." + format;
+}
+
+function createServerImageCompressedName(fullImagePath) {
+  const { name, format } = splitImageName(fullImagePath);
+  return name + "_compressed" + "." + format;
 }
 
 module.exports = {
   createServerImageName,
-  createServerImageCroppedName,
+  createServerImageThumbnailName,
+  createServerImageCompressedName,
 };

@@ -5,8 +5,10 @@ const sharp = require("sharp");
 
 const { rootPath } = require(global.__srcdir + "/config/config");
 
-const { createServerImageCroppedName } = require(global.__srcdir +
-  "/modules/diskFilesNaming");
+const {
+  createServerImageThumbnailName,
+  createServerImageCompressedName,
+} = require(global.__srcdir + "/modules/diskFilesNaming");
 
 async function addPhotoToDisk(data, photoWidth, photoHeight, path) {
   const MAX_PIXELS_IN_IMAGE = 40000;
@@ -23,6 +25,7 @@ async function addPhotoToDisk(data, photoWidth, photoHeight, path) {
   const newHeight2 = Math.round(photoHeight / factor2);
 
   let buff = Buffer.from(data, "base64");
+
   const data1 = await sharp(buff)
     .resize({ width: newWidth, height: newHeight })
     .jpeg({ quality: 70 })
@@ -39,22 +42,27 @@ async function addPhotoToDisk(data, photoWidth, photoHeight, path) {
       console.error(err);
       throw err;
     });
-  const file1 = await fs.writeFile(path, data2);
-  const file2 = await fs.writeFile(createServerImageCroppedName(path), data1);
-  return [file1, file2];
+  const file1 = await fs.writeFile(path, buff);
+  const file2 = await fs.writeFile(
+    createServerImageCompressedName(path),
+    data2
+  );
+  const file3 = await fs.writeFile(createServerImageThumbnailName(path), data1);
+  return [file1, file2, file3];
 }
 
 async function removePhotoFromDisk(path) {
   try {
     await fs.unlink(path);
-    await fs.unlink(createServerImageCroppedName(path));
+    await fs.unlink(createServerImageThumbnailName(path));
+    await fs.unlink(createServerImageCompressedName(path));
   } catch (err) {
     console.error(err);
     throw err;
   }
 }
 
-async function getFullPhotoFromDisk(path) {
+async function getOriginalPhotoFromDisk(path) {
   try {
     const result = await fs.readFile(path, { encoding: "base64" });
     return result.toString("base64");
@@ -64,9 +72,21 @@ async function getFullPhotoFromDisk(path) {
   }
 }
 
-async function getCroppedPhotoFromDisk(path) {
+async function getThumbnailPhotoFromDisk(path) {
   try {
-    const result = await fs.readFile(createServerImageCroppedName(path), {
+    const result = await fs.readFile(createServerImageThumbnailName(path), {
+      encoding: "base64",
+    });
+    return result.toString("base64");
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
+
+async function getCompressedPhotoFromDisk(path) {
+  try {
+    const result = await fs.readFile(createServerImageCompressedName(path), {
       encoding: "base64",
     });
     return result.toString("base64");
@@ -91,8 +111,9 @@ async function clearImagesDisk() {
 
 module.exports = {
   addPhotoToDisk,
-  getFullPhotoFromDisk,
-  getCroppedPhotoFromDisk,
+  getThumbnailPhotoFromDisk,
+  getCompressedPhotoFromDisk,
+  getOriginalPhotoFromDisk,
   clearImagesDisk,
   removePhotoFromDisk,
 };
