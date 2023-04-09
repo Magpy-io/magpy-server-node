@@ -10,7 +10,7 @@ const { checkReqBodyAttributeMissing } = require(global.__srcdir +
 // getPhotosByPath : returns array of photos by their paths.
 const endpoint = "/getPhotosByPath";
 const callback = async (req, res) => {
-  console.log(`[getPhotosByPath]`);
+  console.log(`\n[getPhotosByPath]`);
 
   console.log("Checking request parameters.");
   if (checkBodyParamsMissing(req)) {

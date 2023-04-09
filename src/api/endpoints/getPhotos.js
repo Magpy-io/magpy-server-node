@@ -12,7 +12,7 @@ const { checkReqBodyAttributeMissing } = require(global.__srcdir +
 // getPhotos : returns "number" photos starting from "offset".
 const endpoint = "/getPhotos";
 const callback = async (req, res) => {
-  console.log("[getPhotos]");
+  console.log("\n[getPhotos]");
 
   console.log("Checking request parameters.");
   if (checkBodyParamsMissing(req)) {

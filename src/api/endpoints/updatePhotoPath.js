@@ -8,7 +8,7 @@ const { checkReqBodyAttributeMissing } = require(global.__srcdir +
 // updatePhotoPath : updates the path of a photo in db
 const endpoint = "/updatePhotoPath";
 const callback = async (req, res) => {
-  console.log(`[updatePhotoPath]`);
+  console.log(`\n[updatePhotoPath]`);
 
   console.log("Checking request parameters.");
   if (checkBodyParamsMissing(req)) {

@@ -10,7 +10,7 @@ const { checkReqBodyAttributeMissing } = require(global.__srcdir +
 // deletePhotosById: deletes photos from server by id
 const endpoint = "/deletePhotosById";
 const callback = async (req, res) => {
-  console.log("[deletePhotosById]");
+  console.log("\n[deletePhotosById]");
 
   console.log("Checking request parameters.");
   if (checkReqBodyAttributeMissing(req, "ids", "Array string")) {

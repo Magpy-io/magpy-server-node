@@ -15,7 +15,7 @@ const { checkReqBodyAttributeMissing } = require(global.__srcdir +
 // addPhotoPart : adds a part of a photo to the server
 const endpoint = "/addPhotoPart";
 const callback = async (req, res) => {
-  console.log(`[addPhotoPart]`);
+  console.log(`\n[addPhotoPart]`);
 
   console.log("Checking request parameters.");
   if (checkBodyParamsMissing(req)) {

@@ -5,7 +5,7 @@ const databaseFunctions = require(global.__srcdir + "/db/databaseFunctions");
 // getNumberPhotos : return the number of photos in the server.
 const endpoint = "/getNumberPhotos";
 const callback = async (req, res) => {
-  console.log(`[getNumberPhotos]`);
+  console.log(`\n[getNumberPhotos]`);
 
   try {
     console.log("Getting number of photos in db.");

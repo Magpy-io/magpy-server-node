@@ -17,7 +17,7 @@ const { v4: uuid } = require("uuid");
 // addPhotoInit : initializes the transfer of a photo to the server
 const endpoint = "/addPhotoInit";
 const callback = async (req, res) => {
-  console.log(`[addPhotoInit]`);
+  console.log(`\n[addPhotoInit]`);
 
   console.log("Checking request parameters.");
   if (checkBodyParamsMissing(req)) {

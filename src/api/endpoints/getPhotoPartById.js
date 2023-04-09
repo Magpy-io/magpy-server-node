@@ -13,7 +13,7 @@ const { getNumberOfParts, getPartN } = require(global.__srcdir +
 // getPhotoPartById : returns a part of a photo by id.
 const endpoint = "/getPhotoPartById";
 const callback = async (req, res) => {
-  console.log("[getPhotoPartById]");
+  console.log("\n[getPhotoPartById]");
 
   console.log("Checking request parameters.");
   if (checkReqBodyAttributeMissing(req, "id", "string")) {
