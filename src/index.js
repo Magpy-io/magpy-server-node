@@ -5,9 +5,10 @@ global.__srcdir = __dirname;
 const express = require("express");
 const bodyParser = require("body-parser");
 
-const { port } = require(global.__srcdir + "/config/config");
+const { port, serverMdnsName } = require(global.__srcdir + "/config/config");
 const loadEndpoints = require(global.__srcdir + "/api/endpointsLoader");
 const { initDB } = require(global.__srcdir + "/db/databaseFunctions");
+const mdns = require("mdns");
 
 initDB()
   .then(() => {
@@ -23,6 +24,11 @@ initDB()
     app.listen(port, () => {
       console.log(`Server is listening on port ${port}`);
     });
+
+    const advert = mdns.createAdvertisement(mdns.tcp("http"), port, {
+      name: serverMdnsName,
+    });
+    advert.start();
   })
   .catch((err) => {
     console.error("Error initializing database");
