@@ -10,27 +10,29 @@ import loadEndpoints from "@src/api/endpointsLoader";
 import { initDB } from "@src/db/databaseFunctions";
 import mdns from "mdns";
 
-initDB()
-  .then(() => {
-    console.log("Database initialized.");
+main().catch((err) => {
+  console.log("error in main");
+  console.log(err);
+});
 
-    const app = express();
+async function main() {
+  await initDB();
 
-    app.use(bodyParser.json({ limit: "50mb" }));
+  console.log("Database initialized.");
 
-    loadEndpoints(app);
-    console.log("Endpoints loaded");
+  const app = express();
 
-    app.listen(port, () => {
-      console.log(`Server is listening on port ${port}`);
-    });
+  app.use(bodyParser.json({ limit: "50mb" }));
 
-    const advert = mdns.createAdvertisement(mdns.tcp("http"), port, {
-      name: serverMdnsName,
-    });
-    advert.start();
-  })
-  .catch((err: any) => {
-    console.error("Error initializing database");
-    console.log(err);
+  loadEndpoints(app);
+  console.log("Endpoints loaded");
+
+  app.listen(port, () => {
+    console.log(`Server is listening on port ${port}`);
   });
+
+  const advert = mdns.createAdvertisement(mdns.tcp("http"), port, {
+    name: serverMdnsName,
+  });
+  advert.start();
+}
