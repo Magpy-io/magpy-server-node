@@ -1,17 +1,14 @@
-// Set src dir absolute path
-global.__srcdir = __dirname;
-
 // Setting up module-alias
 require("module-alias/register");
 
 // IMPORTS
-const express = require("express");
-const bodyParser = require("body-parser");
+import express from "express";
+import bodyParser from "body-parser";
 
-const { port, serverMdnsName } = require(global.__srcdir + "/config/config");
-const loadEndpoints = require(global.__srcdir + "/api/endpointsLoader");
-const { initDB } = require(global.__srcdir + "/db/databaseFunctions");
-const mdns = require("mdns");
+import { port, serverMdnsName } from "@src/config/config";
+import loadEndpoints from "@src/api/endpointsLoader";
+import { initDB } from "@src/db/databaseFunctions";
+import mdns from "mdns";
 
 initDB()
   .then(() => {
@@ -33,7 +30,7 @@ initDB()
     });
     advert.start();
   })
-  .catch((err) => {
+  .catch((err: any) => {
     console.error("Error initializing database");
     console.log(err);
   });

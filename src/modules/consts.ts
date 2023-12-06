@@ -10,7 +10,7 @@ const PHOTO_TYPES = [
   PHOTO_TYPE_ORIGINAL,
 ];
 
-module.exports = {
+export default {
   PHOTO_TYPE_DATA,
   PHOTO_TYPE_THUMBNAIL,
   PHOTO_TYPE_COMPRESSED,
