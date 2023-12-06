@@ -1,6 +1,4 @@
-// IMPORTS
-
-function splitImageName(fullName) {
+function splitImageName(fullName: string) {
   const nameSplited = fullName.split(".");
   const format = nameSplited.pop();
   const name = nameSplited.join();
@@ -14,17 +12,17 @@ function createServerImageName(photo) {
   return serverFileName;
 }
 
-function createServerImageThumbnailName(fullImagePath) {
+function createServerImageThumbnailName(fullImagePath: string) {
   const { name, format } = splitImageName(fullImagePath);
   return name + "_thumbnail" + "." + format;
 }
 
-function createServerImageCompressedName(fullImagePath) {
+function createServerImageCompressedName(fullImagePath: string) {
   const { name, format } = splitImageName(fullImagePath);
   return name + "_compressed" + "." + format;
 }
 
-module.exports = {
+export default {
   createServerImageName,
   createServerImageThumbnailName,
   createServerImageCompressedName,

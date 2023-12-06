@@ -1,7 +1,8 @@
 // IMPORTS
-const fs = require("fs").promises;
-const path = require("node:path");
-const sharp = require("sharp");
+import { promises as fs } from "fs";
+
+import path from "node:path";
+import sharp from "sharp";
 
 const { rootPath } = require(global.__srcdir + "/config/config");
 
