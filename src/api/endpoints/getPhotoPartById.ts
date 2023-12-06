@@ -1,14 +1,10 @@
-const responseFormatter = require(global.__srcdir + "/api/responseFormatter");
+import { Request, Response } from "express";
+import responseFormatter from "@src/api/responseFormatter";
+import { getPhotoByIdFromDB } from "@src/db/databaseFunctions";
+import { getOriginalPhotoFromDisk } from "@src/modules/diskManager";
 
-const databaseFunctions = require(global.__srcdir + "/db/databaseFunctions");
-
-const diskManager = require(global.__srcdir + "/modules/diskManager");
-
-const { checkReqBodyAttributeMissing } = require(global.__srcdir +
-  "/modules/checkAttibutesMissing");
-
-const { getNumberOfParts, getPartN } = require(global.__srcdir +
-  "/modules/stringHelper");
+import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
+import { getNumberOfParts, getPartN } from "@src/modules/stringHelper";
 
 // getPhotoPartById : returns a part of a photo by id.
 const endpoint = "/getPhotoPartById";
@@ -34,7 +30,7 @@ const callback = async (req, res) => {
 
   try {
     console.log(`Getting photo with id = ${id} from db.`);
-    const dbPhoto = await databaseFunctions.getPhotoByIdFromDB(id);
+    const dbPhoto = await getPhotoByIdFromDB(id);
     if (!dbPhoto) {
       console.log("Photo not found in db.");
       console.log("Sending response message.");
@@ -46,9 +42,7 @@ const callback = async (req, res) => {
     } else {
       console.log("Photo found in db.");
       console.log("Retrieving photo from disk.");
-      const image64 = await diskManager.getOriginalPhotoFromDisk(
-        dbPhoto.serverPath
-      );
+      const image64 = await getOriginalPhotoFromDisk(dbPhoto.serverPath);
       console.log("Photo retrieved.");
       console.log("Sending response data.");
 
@@ -80,4 +74,4 @@ const callback = async (req, res) => {
   }
 };
 
-module.exports = { endpoint: endpoint, callback: callback, method: "post" };
+export default { endpoint: endpoint, callback: callback, method: "post" };

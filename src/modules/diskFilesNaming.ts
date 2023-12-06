@@ -22,7 +22,7 @@ function createServerImageCompressedName(fullImagePath: string) {
   return name + "_compressed" + "." + format;
 }
 
-export default {
+export {
   createServerImageName,
   createServerImageThumbnailName,
   createServerImageCompressedName,

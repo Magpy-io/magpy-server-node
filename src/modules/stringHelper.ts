@@ -1,4 +1,4 @@
-const { getPhotoPartSize } = require(global.__srcdir + "/config/config");
+import { getPhotoPartSize } from "@src/config/config";
 
 function getNumberOfParts(image64) {
   const len = image64.length;
@@ -19,4 +19,4 @@ function getPartN(image64, n) {
   return image64.substring(n * getPhotoPartSize, (n + 1) * getPhotoPartSize);
 }
 
-module.exports = { getNumberOfParts, getPartN };
+export { getNumberOfParts, getPartN };

@@ -60,6 +60,4 @@ function hashString(s, hashLen = 32) {
   return ret;
 }
 
-module.exports = {
-  hashString,
-};
+export { hashString };

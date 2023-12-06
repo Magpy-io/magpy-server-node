@@ -1,16 +1,15 @@
-const responseFormatter = require(global.__srcdir + "/api/responseFormatter");
+import { Request, Response } from "express";
 
-const { rootPath, hashLen, postPhotoPartTimeout } = require(global.__srcdir +
-  "/config/config");
-const databaseFunctions = require(global.__srcdir + "/db/databaseFunctions");
-const { hashString } = require(global.__srcdir + "/modules/hashing");
-const diskManager = require(global.__srcdir + "/modules/diskManager");
-const diskFilesNaming = require(global.__srcdir + "/modules/diskFilesNaming");
-
-const waitingFiles = require(global.__srcdir + "/modules/waitingFiles");
-
-const { checkReqBodyAttributeMissing } = require(global.__srcdir +
-  "/modules/checkAttibutesMissing");
+import responseFormatter from "@src/api/responseFormatter";
+import {
+  getPhotoByClientPathFromDB,
+  addPhotoToDB,
+} from "@src/db/databaseFunctions";
+import waitingFiles from "@src/modules/waitingFiles";
+import { addPhotoToDisk } from "@src/modules/diskManager";
+import { hashString } from "@src/modules/hashing";
+import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
+import { hashLen, postPhotoPartTimeout } from "@src/config/config";
 
 // addPhotoPart : adds a part of a photo to the server
 const endpoint = "/addPhotoPart";
@@ -91,7 +90,7 @@ const callback = async (req, res) => {
           const hash = hashString(image64, hashLen);
           photoWaiting.photo.hash = hash;
 
-          const exists = await databaseFunctions.getPhotoByClientPathFromDB(
+          const exists = await getPhotoByClientPathFromDB(
             photoWaiting.photo.path
           );
 
@@ -109,14 +108,14 @@ const callback = async (req, res) => {
               "PHOTO_EXISTS"
             );
           } else {
-            const dbPhoto = await databaseFunctions.addPhotoToDB(
+            const dbPhoto = await addPhotoToDB(
               photoWaiting.photo,
               partReceived.id
             );
 
             console.log("Photo added successfully to db.");
             console.log("Adding photo to disk.");
-            await diskManager.addPhotoToDisk(
+            await addPhotoToDisk(
               image64,
               dbPhoto.width,
               dbPhoto.height,
@@ -191,4 +190,4 @@ function joinParts(parts) {
   return ret;
 }
 
-module.exports = { endpoint: endpoint, callback: callback, method: "post" };
+export default { endpoint: endpoint, callback: callback, method: "post" };

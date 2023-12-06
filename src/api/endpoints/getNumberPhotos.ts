@@ -1,6 +1,6 @@
-const responseFormatter = require(global.__srcdir + "/api/responseFormatter");
-
-const databaseFunctions = require(global.__srcdir + "/db/databaseFunctions");
+import { Request, Response } from "express";
+import responseFormatter from "@src/api/responseFormatter";
+import { numberPhotosFromDB } from "@src/db/databaseFunctions";
 
 // getNumberPhotos : return the number of photos in the server.
 const endpoint = "/getNumberPhotos";
@@ -9,7 +9,7 @@ const callback = async (req, res) => {
 
   try {
     console.log("Getting number of photos in db.");
-    const nb = await databaseFunctions.numberPhotosFromDB();
+    const nb = await numberPhotosFromDB();
     console.log(`Number of photos found in db: ${nb}.`);
     const jsonResponse = {
       number: nb,
@@ -22,4 +22,4 @@ const callback = async (req, res) => {
   }
 };
 
-module.exports = { endpoint: endpoint, callback: callback, method: "post" };
+export default { endpoint: endpoint, callback: callback, method: "post" };

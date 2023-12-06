@@ -1,17 +1,18 @@
-const responseFormatter = require(global.__srcdir + "/api/responseFormatter");
-
-const { rootPath, hashLen } = require(global.__srcdir + "/config/config");
-const databaseFunctions = require(global.__srcdir + "/db/databaseFunctions");
-const { hashString } = require(global.__srcdir + "/modules/hashing");
-const diskManager = require(global.__srcdir + "/modules/diskManager");
-const diskFilesNaming = require(global.__srcdir + "/modules/diskFilesNaming");
-
-const { checkReqBodyAttributeMissing } = require(global.__srcdir +
-  "/modules/checkAttibutesMissing");
+import { Request, Response } from "express";
+import responseFormatter from "@src/api/responseFormatter";
+import {
+  addPhotoToDB,
+  getPhotoByClientPathFromDB,
+} from "@src/db/databaseFunctions";
+import { addPhotoToDisk } from "@src/modules/diskManager";
+import { createServerImageName } from "@src/modules/diskFilesNaming";
+import { hashString } from "@src/modules/hashing";
+import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
+import { rootPath, hashLen } from "@src/config/config";
 
 // addPhoto : adds a photo to the server
 const endpoint = "/addPhoto";
-const callback = async (req, res) => {
+const callback = async (req: Request, res: Response) => {
   console.log(`\n[addPhoto]`);
 
   console.log("Checking request parameters.");
@@ -29,9 +30,7 @@ const callback = async (req, res) => {
 
   try {
     console.log(`Searching in db for photo with path: ${photo.path}`);
-    const exists = await databaseFunctions.getPhotoByClientPathFromDB(
-      photo.path
-    );
+    const exists = await getPhotoByClientPathFromDB(photo.path);
     if (exists) {
       console.log("Photo exists in server.");
       console.log("Sending response message.");
@@ -44,15 +43,14 @@ const callback = async (req, res) => {
       console.log("Photo does not exist in server.");
       console.log("Creating syncDate, photoPath and the photo hash.");
       photo.syncDate = new Date(Date.now()).toJSON();
-      photo.serverPath =
-        rootPath + diskFilesNaming.createServerImageName(photo);
+      photo.serverPath = rootPath + createServerImageName(photo);
       photo.hash = hashString(photo.image64, hashLen);
       console.log("Adding photo to db.");
-      const dbPhoto = await databaseFunctions.addPhotoToDB(photo);
+      const dbPhoto = await addPhotoToDB(photo);
 
       console.log("Photo added successfully to db.");
       console.log("Adding photo to disk.");
-      await diskManager.addPhotoToDisk(
+      await addPhotoToDisk(
         photo.image64,
         photo.width,
         photo.height,
@@ -72,7 +70,7 @@ const callback = async (req, res) => {
   }
 };
 
-function checkBodyParamsMissing(req) {
+function checkBodyParamsMissing(req: Request) {
   if (checkReqBodyAttributeMissing(req, "name", "string")) return true;
   if (checkReqBodyAttributeMissing(req, "fileSize", "number")) return true;
   if (checkReqBodyAttributeMissing(req, "width", "number")) return true;
@@ -84,4 +82,4 @@ function checkBodyParamsMissing(req) {
   return false;
 }
 
-module.exports = { endpoint: endpoint, callback: callback, method: "post" };
+export default { endpoint: endpoint, callback: callback, method: "post" };

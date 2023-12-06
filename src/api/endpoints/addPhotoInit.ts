@@ -1,18 +1,11 @@
-const responseFormatter = require(global.__srcdir + "/api/responseFormatter");
-
-const { rootPath, hashLen, postPhotoPartTimeout } = require(global.__srcdir +
-  "/config/config");
-const databaseFunctions = require(global.__srcdir + "/db/databaseFunctions");
-const { hashString } = require(global.__srcdir + "/modules/hashing");
-const diskManager = require(global.__srcdir + "/modules/diskManager");
-const diskFilesNaming = require(global.__srcdir + "/modules/diskFilesNaming");
-
-const waitingFiles = require(global.__srcdir + "/modules/waitingFiles");
-
-const { checkReqBodyAttributeMissing } = require(global.__srcdir +
-  "/modules/checkAttibutesMissing");
-
-const { v4: uuid } = require("uuid");
+import { Request, Response } from "express";
+import responseFormatter from "@src/api/responseFormatter";
+import waitingFiles from "@src/modules/waitingFiles";
+import { getPhotoByClientPathFromDB } from "@src/db/databaseFunctions";
+import { createServerImageName } from "@src/modules/diskFilesNaming";
+import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
+import { v4 as uuid } from "uuid";
+import { rootPath, postPhotoPartTimeout } from "@src/config/config";
 
 // addPhotoInit : initializes the transfer of a photo to the server
 const endpoint = "/addPhotoInit";
@@ -34,9 +27,7 @@ const callback = async (req, res) => {
 
   try {
     console.log(`Searching in db for photo with path: ${photo.path}`);
-    const exists = await databaseFunctions.getPhotoByClientPathFromDB(
-      photo.path
-    );
+    const exists = await getPhotoByClientPathFromDB(photo.path);
     if (exists) {
       console.log("Photo exists in server.");
       console.log("Sending response message.");
@@ -51,8 +42,7 @@ const callback = async (req, res) => {
       const image64Len = photo.image64Len;
       delete photo.image64Len;
       photo.syncDate = new Date(Date.now()).toJSON();
-      photo.serverPath =
-        rootPath + diskFilesNaming.createServerImageName(photo);
+      photo.serverPath = rootPath + createServerImageName(photo);
       const id = uuid();
       waitingFiles.FilesWaiting[id] = {
         received: 0,
@@ -86,4 +76,4 @@ function checkBodyParamsMissing(req) {
   return false;
 }
 
-module.exports = { endpoint: endpoint, callback: callback, method: "post" };
+export default { endpoint: endpoint, callback: callback, method: "post" };

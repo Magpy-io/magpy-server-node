@@ -1,9 +1,11 @@
-const responseFormatter = require(global.__srcdir + "/api/responseFormatter");
+import { Request, Response } from "express";
+import responseFormatter from "@src/api/responseFormatter";
+import {
+  getPhotoByIdFromDB,
+  updatePhotoClientPathById,
+} from "@src/db/databaseFunctions";
 
-const databaseFunctions = require(global.__srcdir + "/db/databaseFunctions");
-
-const { checkReqBodyAttributeMissing } = require(global.__srcdir +
-  "/modules/checkAttibutesMissing");
+import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 
 // updatePhotoPath : updates the path of a photo in db
 const endpoint = "/updatePhotoPath";
@@ -26,7 +28,7 @@ const callback = async (req, res) => {
 
   try {
     console.log(`Searching in db for photo with id: ${id}`);
-    const exists = await databaseFunctions.getPhotoByIdFromDB(id);
+    const exists = await getPhotoByIdFromDB(id);
     if (!exists) {
       console.log("Photo does not exist in server.");
       console.log("Sending response message.");
@@ -38,7 +40,7 @@ const callback = async (req, res) => {
     } else {
       console.log("Photo found");
       console.log("Updating path in db");
-      await databaseFunctions.updatePhotoClientPathById(id, path);
+      await updatePhotoClientPathById(id, path);
 
       console.log("Photo updated successfully.");
       console.log("Sending response message.");
@@ -60,4 +62,4 @@ function checkBodyParamsMissing(req) {
   return false;
 }
 
-module.exports = { endpoint: endpoint, callback: callback, method: "post" };
+export default { endpoint: endpoint, callback: callback, method: "post" };

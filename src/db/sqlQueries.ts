@@ -48,7 +48,7 @@ const updatePhotoHashByIdQuery = (id, hash) =>
 const updatePhotoClientPathByIdQuery = (id, path) =>
   `UPDATE Images SET clientPath = '${path}' WHERE id='${id}';`;
 
-module.exports = {
+export default {
   checkTableImagesExistsQuery,
   createTableImagesQuery,
   dropTableImagesQuery,

@@ -1,5 +1,3 @@
 const FilesWaiting = {};
 
-module.exports = {
-  FilesWaiting,
-};
+export default { FilesWaiting };

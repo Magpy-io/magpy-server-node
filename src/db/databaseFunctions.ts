@@ -1,9 +1,10 @@
 // IMPORTS
-const { v4: uuid } = require("uuid");
-const sqlite3 = require("sqlite3").verbose();
-const util = require("util");
-const { sqliteDbFile, hashLen } = require(global.__srcdir + "/config/config");
-const sqlQueries = require(global.__srcdir + "/db/sqlQueries");
+import { v4 as uuid } from "uuid";
+import { verbose } from "sqlite3";
+const sqlite3 = verbose();
+import util from "util";
+import { sqliteDbFile, hashLen } from "@src/config/config";
+import sqlQueries from "@src/db/sqlQueries";
 
 let db = new sqlite3.Database(sqliteDbFile);
 const runPromisified = util.promisify(db.run);
@@ -13,6 +14,7 @@ db.close();
 
 async function initDB() {
   let db = new sqlite3.Database(sqliteDbFile);
+
   try {
     const rows = await allPromisified.bind(db)(
       sqlQueries.checkTableImagesExistsQuery()
@@ -267,7 +269,7 @@ async function clearDB() {
   }
 }
 
-module.exports = {
+export {
   addPhotoToDB,
   numberPhotosFromDB,
   getPhotosFromDB,

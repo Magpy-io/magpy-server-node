@@ -1,11 +1,11 @@
-const responseFormatter = require(global.__srcdir + "/api/responseFormatter");
-
-const databaseFunctions = require(global.__srcdir + "/db/databaseFunctions");
-
-const diskManager = require(global.__srcdir + "/modules/diskManager");
-
-const { checkReqBodyAttributeMissing } = require(global.__srcdir +
-  "/modules/checkAttibutesMissing");
+import { Request, Response } from "express";
+import responseFormatter from "@src/api/responseFormatter";
+import {
+  getPhotoByIdFromDB,
+  deletePhotoByIdFromDB,
+} from "@src/db/databaseFunctions";
+import { removePhotoFromDisk } from "@src/modules/diskManager";
+import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 
 // deletePhotosById: deletes photos from server by id
 const endpoint = "/deletePhotosById";
@@ -28,10 +28,10 @@ const callback = async (req, res) => {
   try {
     const removedIds = [];
     for (const id of ids) {
-      const dbPhoto = await databaseFunctions.getPhotoByIdFromDB(id);
+      const dbPhoto = await getPhotoByIdFromDB(id);
       if (dbPhoto) {
-        await databaseFunctions.deletePhotoByIdFromDB(id);
-        await diskManager.removePhotoFromDisk(dbPhoto.serverPath);
+        await deletePhotoByIdFromDB(id);
+        await removePhotoFromDisk(dbPhoto.serverPath);
         removedIds.push(id);
       }
     }
@@ -45,4 +45,4 @@ const callback = async (req, res) => {
   }
 };
 
-module.exports = { endpoint: endpoint, callback: callback, method: "post" };
+export default { endpoint: endpoint, callback: callback, method: "post" };

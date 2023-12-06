@@ -1,13 +1,14 @@
-const responseFormatter = require(global.__srcdir + "/api/responseFormatter");
+import { Request, Response } from "express";
+import responseFormatter from "@src/api/responseFormatter";
+import { getPhotosByIdFromDB } from "@src/db/databaseFunctions";
+import consts from "@src/modules/consts";
+import {
+  getOriginalPhotoFromDisk,
+  getThumbnailPhotoFromDisk,
+  getCompressedPhotoFromDisk,
+} from "@src/modules/diskManager";
 
-const databaseFunctions = require(global.__srcdir + "/db/databaseFunctions");
-
-const consts = require(global.__srcdir + "/modules/consts");
-
-const diskManager = require(global.__srcdir + "/modules/diskManager");
-
-const { checkReqBodyAttributeMissing } = require(global.__srcdir +
-  "/modules/checkAttibutesMissing");
+import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 
 // getPhotosById : returns array of photos by their ids.
 const endpoint = "/getPhotosById";
@@ -30,7 +31,7 @@ const callback = async (req, res) => {
 
   try {
     console.log(`Getting ${ids.length} photos from db.`);
-    const photos = await databaseFunctions.getPhotosByIdFromDB(ids);
+    const photos = await getPhotosByIdFromDB(ids);
     console.log("Received response from db.");
 
     let images64Promises;
@@ -40,20 +41,20 @@ const callback = async (req, res) => {
       console.log("Retrieving thumbnail photos from disk.");
       images64Promises = photos.map((photo) => {
         if (!photo) return false;
-        return diskManager.getThumbnailPhotoFromDisk(photo.serverPath);
+        return getThumbnailPhotoFromDisk(photo.serverPath);
       });
     } else if (photoType == consts.PHOTO_TYPE_COMPRESSED) {
       console.log("Retrieving compressed photos from disk.");
       images64Promises = photos.map((photo) => {
         if (!photo) return false;
-        return diskManager.getCompressedPhotoFromDisk(photo.serverPath);
+        return getCompressedPhotoFromDisk(photo.serverPath);
       });
     } else {
       //PHOTO_TYPE_ORIGINAL
       console.log("Retrieving original photos from disk.");
       images64Promises = photos.map((photo) => {
         if (!photo) return false;
-        return diskManager.getOriginalPhotoFromDisk(photo.serverPath);
+        return getOriginalPhotoFromDisk(photo.serverPath);
       });
     }
     const images64 = await Promise.all(images64Promises);
@@ -91,4 +92,4 @@ function checkBodyParamsMissing(req) {
   return false;
 }
 
-module.exports = { endpoint: endpoint, callback: callback, method: "post" };
+export default { endpoint: endpoint, callback: callback, method: "post" };

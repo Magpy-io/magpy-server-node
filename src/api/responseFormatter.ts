@@ -65,7 +65,7 @@ function createPhotoObject(dbPhoto, image64) {
   };
 }
 
-module.exports = {
+export default {
   sendResponse,
   sendSuccessfulMessage,
   sendFailedMessage,

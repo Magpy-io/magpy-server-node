@@ -1,17 +1,22 @@
 // IMPORTS
 import { promises as fs } from "fs";
-
+import { Buffer } from "buffer";
 import path from "node:path";
 import sharp from "sharp";
 
-const { rootPath } = require(global.__srcdir + "/config/config");
+import { rootPath } from "@src/config/config";
 
-const {
+import {
   createServerImageThumbnailName,
   createServerImageCompressedName,
-} = require(global.__srcdir + "/modules/diskFilesNaming");
+} from "@src/modules/diskFilesNaming";
 
-async function addPhotoToDisk(data, photoWidth, photoHeight, path) {
+async function addPhotoToDisk(
+  data,
+  photoWidth: number,
+  photoHeight: number,
+  path: string
+) {
   const MAX_PIXELS_IN_IMAGE = 40000;
   const MAX_PIXELS_IN_IMAGE_BIGGER = 200000;
 
@@ -52,7 +57,7 @@ async function addPhotoToDisk(data, photoWidth, photoHeight, path) {
   return [file1, file2, file3];
 }
 
-async function removePhotoFromDisk(path) {
+async function removePhotoFromDisk(path: string) {
   try {
     await fs.unlink(path);
     await fs.unlink(createServerImageThumbnailName(path));
@@ -63,7 +68,7 @@ async function removePhotoFromDisk(path) {
   }
 }
 
-async function getOriginalPhotoFromDisk(path) {
+async function getOriginalPhotoFromDisk(path: string) {
   try {
     const result = await fs.readFile(path, { encoding: "base64" });
     return result.toString("base64");
@@ -73,7 +78,7 @@ async function getOriginalPhotoFromDisk(path) {
   }
 }
 
-async function getThumbnailPhotoFromDisk(path) {
+async function getThumbnailPhotoFromDisk(path: string) {
   try {
     const result = await fs.readFile(createServerImageThumbnailName(path), {
       encoding: "base64",
@@ -110,7 +115,7 @@ async function clearImagesDisk() {
   }
 }
 
-module.exports = {
+export {
   addPhotoToDisk,
   getThumbnailPhotoFromDisk,
   getCompressedPhotoFromDisk,
