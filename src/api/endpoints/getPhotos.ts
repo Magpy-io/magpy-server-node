@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
 import consts from "@src/modules/consts";
-import { getPhotosFromDB } from "@src/db/databaseFunctions";
+import { getPhotosFromDB, numberPhotosFromDB } from "@src/db/databaseFunctions";
 import {
   getThumbnailPhotoFromDisk,
   getCompressedPhotoFromDisk,
@@ -11,7 +11,7 @@ import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing
 
 // getPhotos : returns "number" photos starting from "offset".
 const endpoint = "/getPhotos";
-const callback = async (req, res) => {
+const callback = async (req: Request, res: Response) => {
   console.log("\n[getPhotos]");
 
   console.log("Checking request parameters.");
@@ -27,9 +27,9 @@ const callback = async (req, res) => {
     `number: ${req.body.number}, offset: ${req.body.offset}, type: ${req.body.photoType}`
   );
 
-  const number = req.body.number;
-  const offset = req.body.offset;
-  const photoType = req.body.photoType;
+  const requestParameters: RequestType = req.body;
+
+  const { number, offset, photoType } = requestParameters;
 
   try {
     console.log(`Getting ${number} photos with offset ${offset} from db.`);
@@ -80,7 +80,7 @@ const callback = async (req, res) => {
   }
 };
 
-function checkBodyParamsMissing(req) {
+function checkBodyParamsMissing(req: Request) {
   if (checkReqBodyAttributeMissing(req, "number", "number")) return true;
   if (checkReqBodyAttributeMissing(req, "offset", "number")) return true;
   if (checkReqBodyAttributeMissing(req, "photoType", "string")) return true;
@@ -88,5 +88,11 @@ function checkBodyParamsMissing(req) {
 
   return false;
 }
+
+type RequestType = {
+  number: number;
+  offset: number;
+  photoType: string;
+};
 
 export default { endpoint: endpoint, callback: callback, method: "post" };

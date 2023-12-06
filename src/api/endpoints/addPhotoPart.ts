@@ -5,7 +5,7 @@ import {
   getPhotoByClientPathFromDB,
   addPhotoToDB,
 } from "@src/db/databaseFunctions";
-import waitingFiles from "@src/modules/waitingFiles";
+import FilesWaiting from "@src/modules/waitingFiles";
 import { addPhotoToDisk } from "@src/modules/diskManager";
 import { hashString } from "@src/modules/hashing";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
@@ -13,7 +13,7 @@ import { hashLen, postPhotoPartTimeout } from "@src/config/config";
 
 // addPhotoPart : adds a part of a photo to the server
 const endpoint = "/addPhotoPart";
-const callback = async (req, res) => {
+const callback = async (req: Request, res: Response) => {
   console.log(`\n[addPhotoPart]`);
 
   console.log("Checking request parameters.");
@@ -26,7 +26,7 @@ const callback = async (req, res) => {
 
   console.log(`id: ${req.body.id}, part number: ${req.body.partNumber}`);
 
-  const partReceived = req.body;
+  const partReceived: RequestType = req.body;
 
   if (partReceived.partSize != partReceived.photoPart.length) {
     console.log("Bad request parameters");
@@ -41,11 +41,14 @@ const callback = async (req, res) => {
   console.log("Request parameters ok.");
 
   try {
-    if (partReceived.id in waitingFiles.FilesWaiting) {
+    if (FilesWaiting.has(partReceived.id)) {
       console.log(`Photo transfer for id ${partReceived.id} found.`);
-      const photoWaiting = waitingFiles.FilesWaiting[partReceived.id];
+      const photoWaiting = FilesWaiting.get(partReceived.id);
       photoWaiting.received += partReceived.partSize;
-      photoWaiting.dataParts[partReceived.partNumber] = partReceived.photoPart;
+      photoWaiting.dataParts.set(
+        partReceived.partNumber,
+        partReceived.photoPart
+      );
 
       if (photoWaiting.received < photoWaiting.image64Len) {
         console.log("Photo part added.");
@@ -55,7 +58,7 @@ const callback = async (req, res) => {
         photoWaiting.timeout = setTimeout(() => {
           console.log(`Photo transfer for id ${partReceived.id} timed out.`);
           console.log(`Deleting pending transfer for id ${partReceived.id}`);
-          delete waitingFiles.FilesWaiting[partReceived.id];
+          FilesWaiting.delete(partReceived.id);
         }, postPhotoPartTimeout);
 
         console.log("Sending response message.");
@@ -70,7 +73,7 @@ const callback = async (req, res) => {
 
         console.log(`Deleting pending transfer for id ${partReceived.id}`);
         clearTimeout(photoWaiting.timeout);
-        delete waitingFiles.FilesWaiting[partReceived.id];
+        FilesWaiting.delete(partReceived.id);
 
         console.log("Sending response message.");
         return responseFormatter.sendFailedMessage(
@@ -91,7 +94,7 @@ const callback = async (req, res) => {
           photoWaiting.photo.hash = hash;
 
           const exists = await getPhotoByClientPathFromDB(
-            photoWaiting.photo.path
+            photoWaiting.photo.clientPath
           );
 
           if (exists) {
@@ -99,7 +102,7 @@ const callback = async (req, res) => {
 
             console.log(`Deleting pending transfer for id ${partReceived.id}`);
             clearTimeout(photoWaiting.timeout);
-            delete waitingFiles.FilesWaiting[partReceived.id];
+            FilesWaiting.delete(partReceived.id);
 
             console.log("Sending response message.");
             responseFormatter.sendFailedMessage(
@@ -108,10 +111,8 @@ const callback = async (req, res) => {
               "PHOTO_EXISTS"
             );
           } else {
-            const dbPhoto = await addPhotoToDB(
-              photoWaiting.photo,
-              partReceived.id
-            );
+            photoWaiting.photo.id = partReceived.id;
+            const dbPhoto = await addPhotoToDB(photoWaiting.photo);
 
             console.log("Photo added successfully to db.");
             console.log("Adding photo to disk.");
@@ -125,7 +126,7 @@ const callback = async (req, res) => {
             console.log("Photo added to disk.");
 
             console.log(`Deleting pending transfer for id ${partReceived.id}`);
-            delete waitingFiles.FilesWaiting[partReceived.id];
+            FilesWaiting.delete(partReceived.id);
 
             const jsonResponse = {
               photo: responseFormatter.createPhotoObject(dbPhoto, ""),
@@ -136,7 +137,7 @@ const callback = async (req, res) => {
         } else {
           console.log(`Deleting pending transfer for id ${partReceived.id}`);
           clearTimeout(photoWaiting.timeout);
-          delete waitingFiles.FilesWaiting[partReceived.id];
+          FilesWaiting.delete(partReceived.id);
 
           console.log("Sending response message.");
           return responseFormatter.sendFailedMessage(
@@ -161,7 +162,7 @@ const callback = async (req, res) => {
   }
 };
 
-function checkBodyParamsMissing(req) {
+function checkBodyParamsMissing(req: Request) {
   if (checkReqBodyAttributeMissing(req, "id", "string")) return true;
   if (checkReqBodyAttributeMissing(req, "partNumber", "number")) return true;
   if (checkReqBodyAttributeMissing(req, "partSize", "number")) return true;
@@ -169,23 +170,30 @@ function checkBodyParamsMissing(req) {
   return false;
 }
 
-function arePartsValid(parts) {
-  const totalNumberOfParts = Object.keys(parts).length;
+type RequestType = {
+  id: string;
+  partNumber: number;
+  partSize: number;
+  photoPart: string;
+};
+
+function arePartsValid(parts: Map<number, string>) {
+  const totalNumberOfParts = parts.size;
 
   for (let i = 0; i < totalNumberOfParts; i++) {
-    if (!(i.toString() in parts)) {
+    if (!parts.has(i)) {
       return false;
     }
   }
   return true;
 }
 
-function joinParts(parts) {
-  const totalNumberOfParts = Object.keys(parts).length;
+function joinParts(parts: Map<number, string>) {
+  const totalNumberOfParts = parts.size;
 
   let ret = "";
   for (let i = 0; i < totalNumberOfParts; i++) {
-    ret = ret.concat(parts[i]);
+    ret = ret.concat(parts.get(i));
   }
   return ret;
 }

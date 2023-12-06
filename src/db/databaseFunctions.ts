@@ -5,6 +5,7 @@ const sqlite3 = verbose();
 import util from "util";
 import { sqliteDbFile, hashLen } from "@src/config/config";
 import sqlQueries from "@src/db/sqlQueries";
+import { Photo } from "@src/types/photoType";
 
 let db = new sqlite3.Database(sqliteDbFile);
 const runPromisified = util.promisify(db.run);
@@ -32,23 +33,21 @@ async function initDB() {
   }
 }
 
-async function addPhotoToDB(photo, id_p = "") {
+async function addPhotoToDB(photo: Photo): Promise<Photo> {
   let db = new sqlite3.Database(sqliteDbFile);
 
-  let id = id_p;
-
-  if (!id) {
-    id = uuid();
+  if (!photo.id) {
+    photo.id = uuid();
   }
 
-  const dbPhoto = {
-    id: id,
+  const dbPhoto: Photo = {
+    id: photo.id,
     name: photo.name,
     fileSize: photo.fileSize,
     width: photo.width,
     height: photo.height,
     date: new Date(photo.date).toISOString(),
-    clientPath: photo.path,
+    clientPath: photo.clientPath,
     syncDate: new Date(photo.syncDate).toISOString(),
     serverPath: photo.serverPath,
     hash: photo.hash,
@@ -76,7 +75,7 @@ async function addPhotoToDB(photo, id_p = "") {
   }
 }
 
-async function numberPhotosFromDB() {
+async function numberPhotosFromDB(): Promise<number> {
   let db = new sqlite3.Database(sqliteDbFile);
   try {
     const rows = await allPromisified.bind(db)(sqlQueries.selectAllIdsQuery());
@@ -89,7 +88,10 @@ async function numberPhotosFromDB() {
   }
 }
 
-async function getPhotosFromDB(number, offset) {
+async function getPhotosFromDB(
+  number: number,
+  offset: number
+): Promise<{ photos: Photo[]; endReached: boolean }> {
   const nbPhotos = await numberPhotosFromDB();
 
   let db = new sqlite3.Database(sqliteDbFile);
@@ -107,7 +109,7 @@ async function getPhotosFromDB(number, offset) {
   }
 }
 
-async function getPhotoByIdFromDB(id) {
+async function getPhotoByIdFromDB(id: string): Promise<Photo | undefined> {
   let db = new sqlite3.Database(sqliteDbFile);
   try {
     return await getPromisified.bind(db)(sqlQueries.selectPhotoByIdQuery(id));
@@ -119,7 +121,7 @@ async function getPhotoByIdFromDB(id) {
   }
 }
 
-async function deletePhotoByIdFromDB(id) {
+async function deletePhotoByIdFromDB(id: string) {
   let db = new sqlite3.Database(sqliteDbFile);
   try {
     return runPromisified.bind(db)(sqlQueries.deletePhotoByIdQuery(id));
@@ -131,7 +133,12 @@ async function deletePhotoByIdFromDB(id) {
   }
 }
 
-async function getNextPhotoFromDB(id) {
+async function getNextPhotoFromDB(id: string): Promise<{
+  idFound: boolean;
+  photoIdIsLast: boolean;
+  photoNext: Photo | undefined;
+  endReached: boolean;
+}> {
   let db = new sqlite3.Database(sqliteDbFile);
   try {
     const photo = await getPromisified.bind(db)(
@@ -157,7 +164,12 @@ async function getNextPhotoFromDB(id) {
   }
 }
 
-async function getPreviousPhotoFromDB(id) {
+async function getPreviousPhotoFromDB(id: string): Promise<{
+  idFound: boolean;
+  photoIdIsLast: boolean;
+  photoNext: Photo | undefined;
+  endReached: boolean;
+}> {
   let db = new sqlite3.Database(sqliteDbFile);
   try {
     const photo = await getPromisified.bind(db)(
@@ -183,7 +195,9 @@ async function getPreviousPhotoFromDB(id) {
   }
 }
 
-async function getPhotoByClientPathFromDB(photoPath) {
+async function getPhotoByClientPathFromDB(
+  photoPath: string
+): Promise<Photo | undefined> {
   let db = new sqlite3.Database(sqliteDbFile);
   try {
     return await getPromisified.bind(db)(
@@ -197,7 +211,9 @@ async function getPhotoByClientPathFromDB(photoPath) {
   }
 }
 
-async function getPhotosByIdFromDB(ids) {
+async function getPhotosByIdFromDB(
+  ids: string[]
+): Promise<Array<Photo | undefined>> {
   let db = new sqlite3.Database(sqliteDbFile);
   try {
     const photosFoundPromise = ids.map((id) => {
@@ -212,7 +228,9 @@ async function getPhotosByIdFromDB(ids) {
   }
 }
 
-async function getPhotosByClientPathFromDB(photosPaths) {
+async function getPhotosByClientPathFromDB(
+  photosPaths: string[]
+): Promise<Array<Photo | undefined>> {
   let db = new sqlite3.Database(sqliteDbFile);
   try {
     const photosFoundPromise = photosPaths.map((photoPath) => {
@@ -229,7 +247,7 @@ async function getPhotosByClientPathFromDB(photosPaths) {
   }
 }
 
-async function updatePhotoHashById(id, hash) {
+async function updatePhotoHashById(id: string, hash: string) {
   let db = new sqlite3.Database(sqliteDbFile);
   try {
     return await getPromisified.bind(db)(
@@ -243,7 +261,7 @@ async function updatePhotoHashById(id, hash) {
   }
 }
 
-async function updatePhotoClientPathById(id, path) {
+async function updatePhotoClientPathById(id: string, path: string) {
   let db = new sqlite3.Database(sqliteDbFile);
   try {
     return await getPromisified.bind(db)(

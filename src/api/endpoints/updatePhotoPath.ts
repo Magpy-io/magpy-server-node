@@ -9,7 +9,7 @@ import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing
 
 // updatePhotoPath : updates the path of a photo in db
 const endpoint = "/updatePhotoPath";
-const callback = async (req, res) => {
+const callback = async (req: Request, res: Response) => {
   console.log(`\n[updatePhotoPath]`);
 
   console.log("Checking request parameters.");
@@ -23,8 +23,7 @@ const callback = async (req, res) => {
 
   console.log(`id: ${req.body.id}, newPath: ${req.body.path}`);
 
-  const id = req.body.id;
-  const path = req.body.path;
+  const { id, path }: RequestType = req.body;
 
   try {
     console.log(`Searching in db for photo with id: ${id}`);
@@ -55,11 +54,16 @@ const callback = async (req, res) => {
   }
 };
 
-function checkBodyParamsMissing(req) {
+function checkBodyParamsMissing(req: Request) {
   if (checkReqBodyAttributeMissing(req, "id", "string")) return true;
   if (checkReqBodyAttributeMissing(req, "path", "string")) return true;
 
   return false;
 }
+
+type RequestType = {
+  id: string;
+  path: string;
+};
 
 export default { endpoint: endpoint, callback: callback, method: "post" };

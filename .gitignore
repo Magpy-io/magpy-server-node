@@ -1,5 +1,5 @@
 node_modules
-src/db/database.db
+db/database.db
 dist
 yarn-error.log
 yarn.lock

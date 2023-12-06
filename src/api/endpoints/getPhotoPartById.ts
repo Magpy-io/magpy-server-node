@@ -8,7 +8,7 @@ import { getNumberOfParts, getPartN } from "@src/modules/stringHelper";
 
 // getPhotoPartById : returns a part of a photo by id.
 const endpoint = "/getPhotoPartById";
-const callback = async (req, res) => {
+const callback = async (req: Request, res: Response) => {
   console.log("\n[getPhotoPartById]");
 
   console.log("Checking request parameters.");
@@ -20,7 +20,7 @@ const callback = async (req, res) => {
   }
   console.log("Request parameters ok.");
 
-  const id = req.body.id;
+  const id: string = req.body.id;
   let partNumber = 0;
   if (!checkReqBodyAttributeMissing(req, "part", "number")) {
     partNumber = req.body.part;

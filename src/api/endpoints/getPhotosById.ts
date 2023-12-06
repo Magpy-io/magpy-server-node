@@ -12,7 +12,7 @@ import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing
 
 // getPhotosById : returns array of photos by their ids.
 const endpoint = "/getPhotosById";
-const callback = async (req, res) => {
+const callback = async (req: Request, res: Response) => {
   console.log("\n[getPhotosById]");
 
   console.log("Checking request parameters.");
@@ -26,8 +26,7 @@ const callback = async (req, res) => {
 
   console.log(`ids len: ${req.body.ids.length}, type: ${req.body.photoType}`);
 
-  const ids = req.body.ids;
-  const photoType = req.body.photoType;
+  const { ids, photoType }: RequestType = req.body;
 
   try {
     console.log(`Getting ${ids.length} photos from db.`);
@@ -40,20 +39,20 @@ const callback = async (req, res) => {
     } else if (photoType == consts.PHOTO_TYPE_THUMBNAIL) {
       console.log("Retrieving thumbnail photos from disk.");
       images64Promises = photos.map((photo) => {
-        if (!photo) return false;
+        if (!photo) return "";
         return getThumbnailPhotoFromDisk(photo.serverPath);
       });
     } else if (photoType == consts.PHOTO_TYPE_COMPRESSED) {
       console.log("Retrieving compressed photos from disk.");
       images64Promises = photos.map((photo) => {
-        if (!photo) return false;
+        if (!photo) return "";
         return getCompressedPhotoFromDisk(photo.serverPath);
       });
     } else {
       //PHOTO_TYPE_ORIGINAL
       console.log("Retrieving original photos from disk.");
       images64Promises = photos.map((photo) => {
-        if (!photo) return false;
+        if (!photo) return "";
         return getOriginalPhotoFromDisk(photo.serverPath);
       });
     }
@@ -84,12 +83,17 @@ const callback = async (req, res) => {
   }
 };
 
-function checkBodyParamsMissing(req) {
+function checkBodyParamsMissing(req: Request) {
   if (checkReqBodyAttributeMissing(req, "ids", "Array string")) return true;
   if (checkReqBodyAttributeMissing(req, "photoType", "string")) return true;
   if (!consts.PHOTO_TYPES.includes(req.body.photoType)) return true;
 
   return false;
 }
+
+type RequestType = {
+  ids: string[];
+  photoType: string;
+};
 
 export default { endpoint: endpoint, callback: callback, method: "post" };

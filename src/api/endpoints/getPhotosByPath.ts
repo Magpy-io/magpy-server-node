@@ -11,7 +11,7 @@ import {
 
 // getPhotosByPath : returns array of photos by their paths.
 const endpoint = "/getPhotosByPath";
-const callback = async (req, res) => {
+const callback = async (req: Request, res: Response) => {
   console.log(`\n[getPhotosByPath]`);
 
   console.log("Checking request parameters.");
@@ -27,8 +27,7 @@ const callback = async (req, res) => {
     `paths len: ${req.body.paths.length}, type: ${req.body.photoType}`
   );
 
-  const paths = req.body.paths;
-  const photoType = req.body.photoType;
+  const { paths, photoType }: RequestType = req.body;
 
   try {
     console.log("Getting photos from db with paths from request.");
@@ -41,20 +40,20 @@ const callback = async (req, res) => {
     } else if (photoType == consts.PHOTO_TYPE_THUMBNAIL) {
       console.log("Retrieving thumbnail photos from disk.");
       images64Promises = photos.map((photo) => {
-        if (!photo) return false;
+        if (!photo) return "";
         return getThumbnailPhotoFromDisk(photo.serverPath);
       });
     } else if (photoType == consts.PHOTO_TYPE_COMPRESSED) {
       console.log("Retrieving compressed photos from disk.");
       images64Promises = photos.map((photo) => {
-        if (!photo) return false;
+        if (!photo) return "";
         return getCompressedPhotoFromDisk(photo.serverPath);
       });
     } else {
       //PHOTO_TYPE_ORIGINAL
       console.log("Retrieving original photos from disk.");
       images64Promises = photos.map((photo) => {
-        if (!photo) return false;
+        if (!photo) return "";
         return getOriginalPhotoFromDisk(photo.serverPath);
       });
     }
@@ -85,12 +84,17 @@ const callback = async (req, res) => {
   }
 };
 
-function checkBodyParamsMissing(req) {
+function checkBodyParamsMissing(req: Request) {
   if (checkReqBodyAttributeMissing(req, "paths", "Array string")) return true;
   if (checkReqBodyAttributeMissing(req, "photoType", "string")) return true;
   if (!consts.PHOTO_TYPES.includes(req.body.photoType)) return true;
 
   return false;
 }
+
+type RequestType = {
+  paths: string[];
+  photoType: string;
+};
 
 export default { endpoint: endpoint, callback: callback, method: "post" };

@@ -1,4 +1,4 @@
-function charToBase64(s) {
+function charToBase64(s: string) {
   let n = s.charCodeAt(0);
 
   if (n == 43) {
@@ -19,7 +19,7 @@ function charToBase64(s) {
   }
 }
 
-function base64ToChar(n) {
+function base64ToChar(n: number) {
   if (n < 0 || n > 63) {
     throw `invalid number: n must be in range [0, 63], n=${n}`;
   }
@@ -39,7 +39,7 @@ function base64ToChar(n) {
   return String.fromCharCode(c);
 }
 
-function hashString(s, hashLen = 32) {
+function hashString(s: string, hashLen = 32) {
   let n = s.length;
   if (n % hashLen !== 0) {
     let paddingLen = hashLen - (n % hashLen);
@@ -47,7 +47,7 @@ function hashString(s, hashLen = 32) {
     s = s + padding;
   }
   let nbRows = s.length / hashLen;
-  ret = "";
+  let ret = "";
   for (let i = 0; i < hashLen; i++) {
     let c = 0;
 

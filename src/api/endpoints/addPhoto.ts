@@ -9,6 +9,7 @@ import { createServerImageName } from "@src/modules/diskFilesNaming";
 import { hashString } from "@src/modules/hashing";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import { rootPath, hashLen } from "@src/config/config";
+import { Photo } from "@src/types/photoType";
 
 // addPhoto : adds a photo to the server
 const endpoint = "/addPhoto";
@@ -26,11 +27,24 @@ const callback = async (req: Request, res: Response) => {
 
   console.log(`path: ${req.body.path}`);
 
-  const photo = req.body;
+  const requestPhoto: RequestType = req.body;
+
+  const photo: Photo = {
+    id: "",
+    name: requestPhoto.name,
+    fileSize: requestPhoto.fileSize,
+    width: requestPhoto.width,
+    height: requestPhoto.height,
+    date: requestPhoto.date,
+    syncDate: "",
+    clientPath: requestPhoto.path,
+    serverPath: "",
+    hash: "",
+  };
 
   try {
-    console.log(`Searching in db for photo with path: ${photo.path}`);
-    const exists = await getPhotoByClientPathFromDB(photo.path);
+    console.log(`Searching in db for photo with path: ${requestPhoto.path}`);
+    const exists = await getPhotoByClientPathFromDB(requestPhoto.path);
     if (exists) {
       console.log("Photo exists in server.");
       console.log("Sending response message.");
@@ -44,17 +58,17 @@ const callback = async (req: Request, res: Response) => {
       console.log("Creating syncDate, photoPath and the photo hash.");
       photo.syncDate = new Date(Date.now()).toJSON();
       photo.serverPath = rootPath + createServerImageName(photo);
-      photo.hash = hashString(photo.image64, hashLen);
+      photo.hash = hashString(requestPhoto.image64, hashLen);
       console.log("Adding photo to db.");
       const dbPhoto = await addPhotoToDB(photo);
 
       console.log("Photo added successfully to db.");
       console.log("Adding photo to disk.");
       await addPhotoToDisk(
-        photo.image64,
-        photo.width,
-        photo.height,
-        photo.serverPath
+        requestPhoto.image64,
+        requestPhoto.width,
+        requestPhoto.height,
+        dbPhoto.serverPath
       );
       console.log("Photo added to disk.");
 
@@ -81,5 +95,15 @@ function checkBodyParamsMissing(req: Request) {
 
   return false;
 }
+
+type RequestType = {
+  name: string;
+  fileSize: number;
+  width: number;
+  height: number;
+  path: string;
+  date: string;
+  image64: string;
+};
 
 export default { endpoint: endpoint, callback: callback, method: "post" };

@@ -3,7 +3,6 @@ import { promises as fs } from "fs";
 import { Buffer } from "buffer";
 import path from "node:path";
 import sharp from "sharp";
-
 import { rootPath } from "@src/config/config";
 
 import {
@@ -12,7 +11,7 @@ import {
 } from "@src/modules/diskFilesNaming";
 
 async function addPhotoToDisk(
-  data,
+  data: string,
   photoWidth: number,
   photoHeight: number,
   path: string

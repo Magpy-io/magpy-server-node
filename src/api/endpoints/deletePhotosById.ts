@@ -9,7 +9,7 @@ import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing
 
 // deletePhotosById: deletes photos from server by id
 const endpoint = "/deletePhotosById";
-const callback = async (req, res) => {
+const callback = async (req: Request, res: Response) => {
   console.log("\n[deletePhotosById]");
 
   console.log("Checking request parameters.");
@@ -23,7 +23,7 @@ const callback = async (req, res) => {
 
   console.log(`ids len: ${req.body.ids.length}`);
 
-  const ids = req.body.ids;
+  const ids: string[] = req.body.ids;
 
   try {
     const removedIds = [];

@@ -4,7 +4,7 @@ import { numberPhotosFromDB } from "@src/db/databaseFunctions";
 
 // getNumberPhotos : return the number of photos in the server.
 const endpoint = "/getNumberPhotos";
-const callback = async (req, res) => {
+const callback = async (req: Request, res: Response) => {
   console.log(`\n[getNumberPhotos]`);
 
   try {

@@ -1,6 +1,8 @@
 // IMPORTS
+import { Response } from "express";
+import { Photo } from "@src/types/photoType";
 
-async function sendResponse(res, data, status = 200) {
+async function sendResponse(res: Response, data: any, status = 200) {
   let jsonResponse = {
     ok: true,
     data: data,
@@ -9,7 +11,7 @@ async function sendResponse(res, data, status = 200) {
   return await res.status(status).json(jsonResponse);
 }
 
-async function sendSuccessfulMessage(res, msg, status = 200) {
+async function sendSuccessfulMessage(res: Response, msg: string, status = 200) {
   let jsonResponse = {
     ok: true,
     message: msg,
@@ -19,7 +21,7 @@ async function sendSuccessfulMessage(res, msg, status = 200) {
 }
 
 async function sendFailedMessage(
-  res,
+  res: Response,
   msg = "Bad request",
   code = "BAD_REQUEST",
   status = 400
@@ -33,22 +35,11 @@ async function sendFailedMessage(
   return await res.status(status).json(jsonResponse);
 }
 
-async function sendErrorMessage(
-  res,
-  msg = "Server internal error",
-  code = "SERVER_ERROR",
-  status = 500
-) {
-  let jsonResponse = {
-    ok: false,
-    message: msg,
-    errorCode: code,
-  };
-
-  return await res.status(status).json(jsonResponse);
+async function sendErrorMessage(res: Response) {
+  await sendFailedMessage(res, "Server internal error", "SERVER_ERROR", 500);
 }
 
-function createPhotoObject(dbPhoto, image64) {
+function createPhotoObject(dbPhoto: Photo, image64?: string) {
   return {
     id: dbPhoto.id,
     meta: {

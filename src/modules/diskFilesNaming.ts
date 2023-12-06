@@ -1,3 +1,5 @@
+import { Photo } from "@src/types/photoType";
+
 function splitImageName(fullName: string) {
   const nameSplited = fullName.split(".");
   const format = nameSplited.pop();
@@ -5,7 +7,7 @@ function splitImageName(fullName: string) {
   return { name: name, format: format };
 }
 
-function createServerImageName(photo) {
+function createServerImageName(photo: Photo) {
   const { name, format } = splitImageName(photo.name);
   const date = photo.syncDate;
   const serverFileName = `Ants_${name}_${date}.${format}`;

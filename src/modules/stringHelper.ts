@@ -1,6 +1,6 @@
 import { getPhotoPartSize } from "@src/config/config";
 
-function getNumberOfParts(image64) {
+function getNumberOfParts(image64: string) {
   const len = image64.length;
   const numberOfParts = Math.floor(len / getPhotoPartSize);
 
@@ -10,7 +10,7 @@ function getNumberOfParts(image64) {
   return numberOfParts;
 }
 
-function getPartN(image64, n) {
+function getPartN(image64: string, n: number) {
   const nbParts = getNumberOfParts(image64);
   if (n >= nbParts) {
     throw new Error(`Maximum number of parts is ${nbParts}, got ${n}`);
