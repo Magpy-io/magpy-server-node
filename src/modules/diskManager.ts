@@ -70,7 +70,7 @@ async function removePhotoFromDisk(path: string) {
 async function getOriginalPhotoFromDisk(path: string) {
   try {
     const result = await fs.readFile(path, { encoding: "base64" });
-    return result.toString("base64");
+    return Buffer.from(result).toString("base64");
   } catch (err) {
     console.error(err);
     throw err;
@@ -82,19 +82,19 @@ async function getThumbnailPhotoFromDisk(path: string) {
     const result = await fs.readFile(createServerImageThumbnailName(path), {
       encoding: "base64",
     });
-    return result.toString("base64");
+    return Buffer.from(result).toString("base64");
   } catch (err) {
     console.error(err);
     throw err;
   }
 }
 
-async function getCompressedPhotoFromDisk(path) {
+async function getCompressedPhotoFromDisk(path: string) {
   try {
     const result = await fs.readFile(createServerImageCompressedName(path), {
       encoding: "base64",
     });
-    return result.toString("base64");
+    return Buffer.from(result).toString("base64");
   } catch (err) {
     console.error(err);
     throw err;
