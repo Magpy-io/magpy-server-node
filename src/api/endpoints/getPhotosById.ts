@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
 import { getPhotosByIdFromDB } from "@src/db/databaseFunctions";
-import consts from "@src/modules/consts";
+import { PhotoTypes, isValidPhotoType } from "@src/types/photoType";
 import {
   getOriginalPhotoFromDisk,
   getThumbnailPhotoFromDisk,
@@ -34,22 +34,22 @@ const callback = async (req: Request, res: Response) => {
     console.log("Received response from db.");
 
     let images64Promises;
-    if (photoType == consts.PHOTO_TYPE_DATA) {
+    if (photoType == "data") {
       images64Promises = photos.map((photo) => "");
-    } else if (photoType == consts.PHOTO_TYPE_THUMBNAIL) {
+    } else if (photoType == "thumbnail") {
       console.log("Retrieving thumbnail photos from disk.");
       images64Promises = photos.map((photo) => {
         if (!photo) return "";
         return getThumbnailPhotoFromDisk(photo.serverPath);
       });
-    } else if (photoType == consts.PHOTO_TYPE_COMPRESSED) {
+    } else if (photoType == "compressed") {
       console.log("Retrieving compressed photos from disk.");
       images64Promises = photos.map((photo) => {
         if (!photo) return "";
         return getCompressedPhotoFromDisk(photo.serverPath);
       });
     } else {
-      //PHOTO_TYPE_ORIGINAL
+      // Photo Type "original"
       console.log("Retrieving original photos from disk.");
       images64Promises = photos.map((photo) => {
         if (!photo) return "";
@@ -86,14 +86,14 @@ const callback = async (req: Request, res: Response) => {
 function checkBodyParamsMissing(req: Request) {
   if (checkReqBodyAttributeMissing(req, "ids", "Array string")) return true;
   if (checkReqBodyAttributeMissing(req, "photoType", "string")) return true;
-  if (!consts.PHOTO_TYPES.includes(req.body.photoType)) return true;
+  if (!isValidPhotoType(req.body.photoType)) return true;
 
   return false;
 }
 
 type RequestType = {
   ids: string[];
-  photoType: string;
+  photoType: PhotoTypes;
 };
 
 export default { endpoint: endpoint, callback: callback, method: "post" };

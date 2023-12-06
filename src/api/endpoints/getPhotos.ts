@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
-import consts from "@src/modules/consts";
-import { getPhotosFromDB, numberPhotosFromDB } from "@src/db/databaseFunctions";
+import { PhotoTypes, isValidPhotoType } from "@src/types/photoType";
+import { getPhotosFromDB } from "@src/db/databaseFunctions";
 import {
   getThumbnailPhotoFromDisk,
   getCompressedPhotoFromDisk,
@@ -39,20 +39,20 @@ const callback = async (req: Request, res: Response) => {
 
     let images64Promises;
 
-    if (photoType == consts.PHOTO_TYPE_DATA) {
+    if (photoType == "data") {
       images64Promises = photos.map((photo) => "");
-    } else if (photoType == consts.PHOTO_TYPE_THUMBNAIL) {
+    } else if (photoType == "thumbnail") {
       console.log("Retrieving thumbnail photos from disk.");
       images64Promises = photos.map((photo) => {
         return getThumbnailPhotoFromDisk(photo.serverPath);
       });
-    } else if (photoType == consts.PHOTO_TYPE_COMPRESSED) {
+    } else if (photoType == "compressed") {
       console.log("Retrieving compressed photos from disk.");
       images64Promises = photos.map((photo) => {
         return getCompressedPhotoFromDisk(photo.serverPath);
       });
     } else {
-      //PHOTO_TYPE_ORIGINAL
+      // Photo Type "original"
       console.log("Retrieving original photos from disk.");
       images64Promises = photos.map((photo) => {
         return getOriginalPhotoFromDisk(photo.serverPath);
@@ -84,7 +84,7 @@ function checkBodyParamsMissing(req: Request) {
   if (checkReqBodyAttributeMissing(req, "number", "number")) return true;
   if (checkReqBodyAttributeMissing(req, "offset", "number")) return true;
   if (checkReqBodyAttributeMissing(req, "photoType", "string")) return true;
-  if (!consts.PHOTO_TYPES.includes(req.body.photoType)) return true;
+  if (!isValidPhotoType(req.body.photoType)) return true;
 
   return false;
 }
@@ -92,7 +92,7 @@ function checkBodyParamsMissing(req: Request) {
 type RequestType = {
   number: number;
   offset: number;
-  photoType: string;
+  photoType: PhotoTypes;
 };
 
 export default { endpoint: endpoint, callback: callback, method: "post" };
