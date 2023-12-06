@@ -1,6 +1,9 @@
 // Set src dir absolute path
 global.__srcdir = __dirname;
 
+// Setting up module-alias
+require("module-alias/register");
+
 // IMPORTS
 const express = require("express");
 const bodyParser = require("body-parser");
