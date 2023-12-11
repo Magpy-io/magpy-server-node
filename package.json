@@ -6,6 +6,7 @@
     "db:reset": "rm -f ./db/database_test.db",
     "test": "yarn build && cross-env NODE_ENV=test jest ./dist/tests --verbose=true --silent --collect-coverage --testTimeout=10000 --runInBand",
     "test:v": "yarn build && cross-env NODE_ENV=test jest ./dist/tests --collect-coverage --testTimeout=10000 --runInBand",
+    "test:single": "yarn build && cross-env NODE_ENV=test jest --verbose=true --collect-coverage --testTimeout=10000 --runInBand",
     "pretest": "cross-env NODE_ENV=test yarn db:reset"
   },
   "dependencies": {
