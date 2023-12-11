@@ -26,4 +26,10 @@ async function addPhoto(
     });
 }
 
-export { addPhoto };
+async function addNPhotos(app: Express, n: number) {
+  for (let i = 0; i < n; i++) {
+    await addPhoto(app, "/path/to/image" + i.toString() + ".jpg");
+  }
+}
+
+export { addPhoto, addNPhotos };

@@ -2,13 +2,11 @@
 import express, { Express } from "express";
 import bodyParser from "body-parser";
 
-import { port, serverMdnsName } from "@src/config/config";
+import { port } from "@src/config/config";
 import loadEndpoints from "@src/api/endpointsLoader";
-import mdns from "mdns";
 
 let app: Express;
 let server: any;
-let advert: any;
 
 function initServer() {
   app = express();
@@ -25,21 +23,10 @@ function initServer() {
   return app;
 }
 
-function startMdns() {
-  advert = mdns.createAdvertisement(mdns.tcp("http"), port, {
-    name: serverMdnsName,
-  });
-  advert.start();
-}
-
 function stopServer() {
   if (server) {
     server.close();
   }
-
-  if (advert) {
-    advert.stop();
-  }
 }
 
-export { initServer, stopServer, startMdns };
+export { initServer, stopServer };
