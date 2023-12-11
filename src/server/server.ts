@@ -1,9 +1,9 @@
 // IMPORTS
 import express, { Express } from "express";
-import bodyParser from "body-parser";
 
 import { port } from "@src/config/config";
 import loadEndpoints from "@src/api/endpointsLoader";
+import jsonParsingErrorHandler from "@src/middleware/jsonParsingErrorHandler";
 
 let app: Express;
 let server: any;
@@ -11,7 +11,9 @@ let server: any;
 function initServer() {
   app = express();
 
-  app.use(bodyParser.json({ limit: "50mb" }));
+  app.use(express.json());
+
+  app.use(jsonParsingErrorHandler);
 
   loadEndpoints(app);
   console.log("Endpoints loaded");
