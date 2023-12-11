@@ -6,8 +6,8 @@ function getEndpoints() {
   fs.readdirSync(__dirname + "/endpoints").forEach(function (file: any) {
     const split = file.split(".");
 
-    //only .js files
-    if (split[split.length - 1] == "js") {
+    //only .js and .ts files
+    if (split[split.length - 1] == "ts" || split[split.length - 1] == "js") {
       endpoints.push(require("@src/api/endpoints/" + file).default);
     }
   });
@@ -16,7 +16,6 @@ function getEndpoints() {
 
 function loadEndpoints(app: any) {
   const endpoints = getEndpoints();
-
   endpoints.forEach(
     ({
       endpoint,

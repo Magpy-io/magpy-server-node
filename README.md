@@ -31,11 +31,10 @@ More information on the package main page.
 
 ## Configuration
 
-Configure the path of your photos and your IP address. Edit these lines in the file Config/config.js
+Configure the path of your photos. Edit these lines in the file Config/config.js
 
 ```
 const rootPath = "PATH";
-const host = "IP_ADDRESS";
 ```
 
 Get your IP address using the command `ifconfig`
@@ -50,4 +49,10 @@ yarn start
 
 ```
 yarn clean
+```
+
+## Testing the server
+
+```
+yarn test
 ```

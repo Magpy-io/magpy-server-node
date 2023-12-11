@@ -10,15 +10,17 @@ import {
   createServerImageCompressedName,
 } from "@src/modules/diskFilesNaming";
 
+import {
+  MAX_PIXELS_IN_IMAGE,
+  MAX_PIXELS_IN_IMAGE_BIGGER,
+} from "@src/config/config";
+
 async function addPhotoToDisk(
   data: string,
   photoWidth: number,
   photoHeight: number,
   path: string
 ) {
-  const MAX_PIXELS_IN_IMAGE = 40000;
-  const MAX_PIXELS_IN_IMAGE_BIGGER = 200000;
-
   const factor = Math.sqrt((photoWidth * photoHeight) / MAX_PIXELS_IN_IMAGE);
   const newWidth = Math.round(photoWidth / factor);
   const newHeight = Math.round(photoHeight / factor);

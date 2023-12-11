@@ -1,3 +1,6 @@
+// Setting up module-alias
+require("module-alias/register");
+
 // IMPORTS
 import { rootPath } from "@src/config/config";
 import { clearDB } from "@src/db/databaseFunctions";
