@@ -1,7 +1,7 @@
 import request from "supertest";
 import { Express } from "express";
 
-import { photoImage64 } from "./imageBase64";
+import { photoImage64 } from "@tests/helpers/imageBase64";
 
 async function addPhoto(
   app: Express,
