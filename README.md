@@ -18,6 +18,7 @@ Sudo apt install net-tools
 
 ```
 sudo npm install --global yarn
+sudo npm install
 yarn install
 ```
 
@@ -36,8 +37,6 @@ Configure the path of your photos. Edit these lines in the file Config/config.js
 ```
 const rootPath = "PATH";
 ```
-
-Get your IP address using the command `ifconfig`
 
 ## Running the server
 
