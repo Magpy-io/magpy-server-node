@@ -7,15 +7,19 @@ const serverMdnsName = "OpenCloud-server";
 const MAX_PIXELS_IN_IMAGE = 40000;
 const MAX_PIXELS_IN_IMAGE_BIGGER = 200000;
 
+const rootPathTest = "/home/issam/Documents/Images_test/";
+const rootPathDev = "/home/issam/Documents/Images/";
+const sqliteDbFileTest = "./db/database_test.db";
+const sqliteDbFileDev = "./db/database.db";
+
 let sqliteDbFileTmp = "";
 let rootPathTmp = "";
-
 if (process.env.NODE_ENV === "test") {
-  rootPathTmp = "/home/issam/Documents/Images_test/";
-  sqliteDbFileTmp = "./db/database_test.db";
+  rootPathTmp = rootPathTest;
+  sqliteDbFileTmp = sqliteDbFileTest;
 } else {
-  rootPathTmp = "/home/issam/Documents/Images/";
-  sqliteDbFileTmp = "./db/database.db";
+  rootPathTmp = rootPathDev;
+  sqliteDbFileTmp = sqliteDbFileDev;
 }
 
 const sqliteDbFile = sqliteDbFileTmp;

@@ -116,6 +116,19 @@ async function clearImagesDisk() {
   }
 }
 
+async function createFolder(dirPath: string) {
+  try {
+    await fs.access(dirPath);
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      //The directory does NOT exist
+      await fs.mkdir(dirPath, { recursive: true });
+    } else {
+      throw error;
+    }
+  }
+}
+
 export {
   addPhotoToDisk,
   getThumbnailPhotoFromDisk,
@@ -123,4 +136,5 @@ export {
   getOriginalPhotoFromDisk,
   clearImagesDisk,
   removePhotoFromDisk,
+  createFolder,
 };
