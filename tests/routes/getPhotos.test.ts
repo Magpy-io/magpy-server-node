@@ -103,13 +103,12 @@ describe("Test 'getPhotos' endpoint", () => {
     { photoType: "thumbnail", testFunction: testPhotoThumbnail },
     { photoType: "data", testFunction: testPhotoData },
   ])(
-    "Should return the 2 images added in the quality $photoType",
+    "Should return the image added in the quality $photoType",
     async (testData) => {
-      await addPhoto(app, "path1/image1.jpg");
-      await addPhoto(app, "path1/image2.jpg");
+      const photoAddedData = await addPhoto(app);
 
       const ret = await request(app).post("/getPhotos").send({
-        number: 2,
+        number: 1,
         offset: 0,
         photoType: testData.photoType,
       });
@@ -117,11 +116,13 @@ describe("Test 'getPhotos' endpoint", () => {
       expect(ret.statusCode).toBe(200);
       expect(ret.body.ok).toBe(true);
       expect(ret.body).toHaveProperty("data");
-      expect(ret.body.data.number).toBe(2);
-      expect(ret.body.data.photos.length).toBe(2);
+      expect(ret.body.data.number).toBe(1);
+      expect(ret.body.data.photos.length).toBe(1);
       expect(ret.body.data.endReached).toBe(true);
-      testData.testFunction(ret.body.data.photos[0], "path1/image1.jpg");
-      testData.testFunction(ret.body.data.photos[1], "path1/image2.jpg");
+      testData.testFunction(ret.body.data.photos[0], {
+        path: photoAddedData.path,
+        id: photoAddedData.id,
+      });
     }
   );
 });

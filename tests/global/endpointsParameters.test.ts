@@ -84,7 +84,7 @@ const dataToTestEndpointsParameters: Array<{
   },
 ];
 
-describe("Test endpoints return error when missing parameter", () => {
+describe("Test endpoints return error when invalid request", () => {
   let app: Express;
 
   beforeAll(async () => {
