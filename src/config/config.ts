@@ -25,6 +25,10 @@ if (process.env.NODE_ENV === "test") {
 const sqliteDbFile = sqliteDbFileTmp;
 const rootPath = rootPathTmp;
 
+if (process.env.NODE_ENV == "test") {
+  console.log = function () {};
+}
+
 export {
   port,
   rootPath,
