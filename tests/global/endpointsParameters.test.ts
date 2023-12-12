@@ -98,12 +98,10 @@ describe("Test endpoints return error when invalid request", () => {
   });
 
   beforeEach(async () => {
-    console.log("beforeEach");
     await initDB();
   });
 
   afterEach(async () => {
-    console.log("afterEach");
     await clearDB();
     await clearImagesDisk();
   });

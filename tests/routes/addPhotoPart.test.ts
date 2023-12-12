@@ -3,7 +3,7 @@ import request from "supertest";
 import { Express } from "express";
 import { validate } from "uuid";
 
-import { initServer, stopServer } from "@src/server/server";
+import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { initDB } from "@src/db/databaseFunctions";
 import { clearDB } from "@src/db/databaseFunctions";
 import { clearImagesDisk } from "@src/modules/diskManager";
@@ -36,6 +36,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
   afterEach(async () => {
     await clearDB();
     await clearImagesDisk();
+    clearFilesWaiting();
   });
 
   it("Should add the photo after sending all the parts of a photo", async () => {
@@ -100,6 +101,19 @@ describe("Test 'addPhotoPart' endpoint", () => {
     expect(getPhoto.image64).toBe(defaultPhoto.image64);
 
     expect(FilesWaiting.size).toBe(0);
+  });
+
+  it("Should return error PHOTO_TRANSFER_NOT_FOUND if no transfer was started and sended part", async () => {
+    let ret = await request(app).post("/addPhotoPart").send({
+      id: "id",
+      partNumber: 0,
+      partSize: imageBase64Parts.photoLenPart1,
+      photoPart: imageBase64Parts.photoImage64Part1,
+    });
+
+    expect(ret.statusCode).toBe(400);
+    expect(ret.body.ok).toBe(false);
+    expect(ret.body.errorCode).toBe("PHOTO_TRANSFER_NOT_FOUND");
   });
 
   it("Should return error PHOTO_TRANSFER_NOT_FOUND if started transfer and sended part too late", async () => {
@@ -182,6 +196,87 @@ describe("Test 'addPhotoPart' endpoint", () => {
     expect(ret.statusCode).toBe(400);
     expect(ret.body.ok).toBe(false);
     expect(ret.body.errorCode).toBe("PHOTO_SIZE_EXCEEDED");
+
+    expect(FilesWaiting.size).toBe(0);
+  });
+
+  it("Should return error BAD_REQUEST if partSize not equal to photoPart length", async () => {
+    const photo = { ...defaultPhoto };
+    delete photo.image64;
+
+    const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };
+
+    const retInit = await request(app).post("/addPhotoInit").send(requestPhoto);
+
+    if (!retInit.ok) {
+      throw "Error starting photo transfer";
+    }
+
+    const id = retInit.body.data.id;
+
+    let ret = await request(app)
+      .post("/addPhotoPart")
+      .send({
+        id: id,
+        partNumber: 0,
+        partSize: imageBase64Parts.photoLenPart1 + 1,
+        photoPart: imageBase64Parts.photoImage64Part1,
+      });
+
+    expect(ret.statusCode).toBe(400);
+    expect(ret.body.ok).toBe(false);
+    expect(ret.body.errorCode).toBe("BAD_REQUEST");
+  });
+
+  it("Should return error MISSING_PARTS if added all parts but a number is missing", async () => {
+    const photo = { ...defaultPhoto };
+    delete photo.image64;
+
+    const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };
+
+    const retInit = await request(app).post("/addPhotoInit").send(requestPhoto);
+
+    if (!retInit.ok) {
+      throw "Error starting photo transfer";
+    }
+
+    const id = retInit.body.data.id;
+    expect(FilesWaiting.size).toBe(1);
+
+    let ret = await request(app).post("/addPhotoPart").send({
+      id: id,
+      partNumber: 0,
+      partSize: imageBase64Parts.photoLenPart1,
+      photoPart: imageBase64Parts.photoImage64Part1,
+    });
+
+    expect(ret.statusCode).toBe(200);
+    expect(ret.body.ok).toBe(true);
+
+    ret = await request(app).post("/addPhotoPart").send({
+      id: id,
+      partNumber: 1,
+      partSize: imageBase64Parts.photoLenPart2,
+      photoPart: imageBase64Parts.photoImage64Part2,
+    });
+
+    expect(ret.statusCode).toBe(200);
+    expect(ret.body.ok).toBe(true);
+
+    ret = await request(app).post("/addPhotoPart").send({
+      id: id,
+      partNumber: 3,
+      partSize: imageBase64Parts.photoLenPart3,
+      photoPart: imageBase64Parts.photoImage64Part3,
+    });
+
+    expect(ret.statusCode).toBe(400);
+    expect(ret.body.ok).toBe(false);
+    expect(ret.body.errorCode).toBe("MISSING_PARTS");
+
+    const getPhoto = await getPhotoById(app, id, "original");
+
+    expect(getPhoto).toBeFalsy();
 
     expect(FilesWaiting.size).toBe(0);
   });

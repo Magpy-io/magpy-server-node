@@ -30,16 +30,19 @@ function initServer() {
   return app;
 }
 
-function stopServer() {
+function clearFilesWaiting() {
   const files = Array.from(FilesWaiting.values());
-
   files.forEach((file) => {
     clearTimeout(file.timeout);
   });
+  FilesWaiting.clear();
+}
 
+function stopServer() {
+  clearFilesWaiting();
   if (server) {
     server.close();
   }
 }
 
-export { initServer, stopServer };
+export { initServer, stopServer, clearFilesWaiting };
