@@ -15,7 +15,7 @@ import {
   testPhotoData,
 } from "@tests/helpers/functions";
 
-describe("Test 'getPhotosById' endpoint", () => {
+describe("Test 'getPhotosByPath' endpoint", () => {
   let app: Express;
 
   beforeAll(async () => {
@@ -38,14 +38,14 @@ describe("Test 'getPhotosById' endpoint", () => {
   });
 
   it.each([{ n: 0 }, { n: 1 }, { n: 2 }])(
-    "Should return $n photos all existing after adding $n photos and requesting $n photo ids",
+    "Should return $n photos all existing after adding $n photos and requesting $n photo paths",
     async (testData: { n: number }) => {
       const addedPhotosData = await addNPhotos(app, testData.n);
 
-      const ids = addedPhotosData.map((e) => e.id);
+      const paths = addedPhotosData.map((e) => e.path);
 
-      const ret = await request(app).post("/getPhotosById").send({
-        ids: ids,
+      const ret = await request(app).post("/getPhotosByPath").send({
+        paths: paths,
         photoType: "data",
       });
 
@@ -56,21 +56,21 @@ describe("Test 'getPhotosById' endpoint", () => {
       expect(ret.body.data.photos.length).toBe(testData.n);
 
       for (let i = 0; i < testData.n; i++) {
-        expect(ret.body.data.photos[i].id).toBe(ids[i]);
+        expect(ret.body.data.photos[i].path).toBe(paths[i]);
         expect(ret.body.data.photos[i].exists).toBe(true);
       }
     }
   );
 
   it.each([{ n: 0 }, { n: 1 }, { n: 2 }])(
-    "Should return $n photos all not existing after adding no photos and requesting $n photo ids",
+    "Should return $n photos all not existing after adding no photos and requesting $n photo paths",
     async (testData: { n: number }) => {
-      const ids = Array(testData.n)
+      const paths = Array(testData.n)
         .fill("")
-        .map((_, i) => "id" + i.toString());
+        .map((_, i) => "path" + i.toString());
 
-      const ret = await request(app).post("/getPhotosById").send({
-        ids: ids,
+      const ret = await request(app).post("/getPhotosByPath").send({
+        paths: paths,
         photoType: "data",
       });
 
@@ -81,7 +81,7 @@ describe("Test 'getPhotosById' endpoint", () => {
       expect(ret.body.data.photos.length).toBe(testData.n);
 
       for (let i = 0; i < testData.n; i++) {
-        expect(ret.body.data.photos[i].id).toBe(ids[i]);
+        expect(ret.body.data.photos[i].path).toBe(paths[i]);
         expect(ret.body.data.photos[i].exists).toBe(false);
       }
     }
@@ -90,10 +90,10 @@ describe("Test 'getPhotosById' endpoint", () => {
   it("Should return 2 photos, the first exists and the second does not, after adding 1 photo and requesting 2", async () => {
     const photoAddedData = await addPhoto(app);
 
-    const ids = [photoAddedData.id, "id2"];
+    const paths = [photoAddedData.path, "path2"];
 
-    const ret = await request(app).post("/getPhotosById").send({
-      ids: ids,
+    const ret = await request(app).post("/getPhotosByPath").send({
+      paths: paths,
       photoType: "data",
     });
 
@@ -103,10 +103,10 @@ describe("Test 'getPhotosById' endpoint", () => {
     expect(ret.body.data.number).toBe(2);
     expect(ret.body.data.photos.length).toBe(2);
 
-    expect(ret.body.data.photos[0].id).toBe(ids[0]);
+    expect(ret.body.data.photos[0].path).toBe(paths[0]);
     expect(ret.body.data.photos[0].exists).toBe(true);
 
-    expect(ret.body.data.photos[1].id).toBe(ids[1]);
+    expect(ret.body.data.photos[1].path).toBe(paths[1]);
     expect(ret.body.data.photos[1].exists).toBe(false);
   });
 
@@ -121,9 +121,9 @@ describe("Test 'getPhotosById' endpoint", () => {
       const photoAddedData = await addPhoto(app);
 
       const ret = await request(app)
-        .post("/getPhotosById")
+        .post("/getPhotosByPath")
         .send({
-          ids: [photoAddedData.id],
+          paths: [photoAddedData.path],
           photoType: testData.photoType,
         });
 
@@ -132,7 +132,8 @@ describe("Test 'getPhotosById' endpoint", () => {
       expect(ret.body).toHaveProperty("data");
       expect(ret.body.data.number).toBe(1);
       expect(ret.body.data.photos.length).toBe(1);
-      expect(ret.body.data.photos[0].id).toBe(photoAddedData.id);
+
+      expect(ret.body.data.photos[0].path).toBe(photoAddedData.path);
       expect(ret.body.data.photos[0].exists).toBe(true);
       testData.testFunction(ret.body.data.photos[0].photo, {
         path: photoAddedData.path,
