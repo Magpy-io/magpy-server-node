@@ -3,6 +3,7 @@ import responseFormatter from "@src/api/responseFormatter";
 import {
   getPhotoByIdFromDB,
   updatePhotoClientPathById,
+  getPhotoByClientPathFromDB,
 } from "@src/db/databaseFunctions";
 
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
@@ -38,15 +39,31 @@ const callback = async (req: Request, res: Response) => {
       );
     } else {
       console.log("Photo found");
-      console.log("Updating path in db");
-      await updatePhotoClientPathById(id, path);
 
-      console.log("Photo updated successfully.");
-      console.log("Sending response message.");
-      responseFormatter.sendSuccessfulMessage(
-        res,
-        `Photo with id ${id} successfully updated with new path`
-      );
+      console.log("Getting photos from db with new path");
+      const photo = await getPhotoByClientPathFromDB(path);
+      console.log("Received response from db.");
+
+      if (!photo) {
+        console.log("Photo path does not exist in db");
+        console.log("Updating path in db");
+        await updatePhotoClientPathById(id, path);
+
+        console.log("Photo updated successfully.");
+        console.log("Sending response message.");
+        responseFormatter.sendSuccessfulMessage(
+          res,
+          `Photo with id ${id} successfully updated with new path`
+        );
+      } else {
+        console.log("Photo path already exists in db");
+        console.log("Sending response message.");
+        responseFormatter.sendFailedMessage(
+          res,
+          `A photo already exists with path ${path}`,
+          "PATH_EXISTS"
+        );
+      }
     }
   } catch (err) {
     console.error(err);
