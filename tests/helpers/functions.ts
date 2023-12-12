@@ -29,6 +29,10 @@ async function addPhoto(
       image64: data?.image64 ?? photoImage64,
     });
 
+  if (!ret.body.ok) {
+    throw "Error adding photo";
+  }
+
   return {
     id: ret.body.data.photo.id,
     path: data?.path ?? "/path/to/image.jpg",
@@ -152,6 +156,21 @@ function testPhotoData(
   expect(photo.image64).toBe("");
 }
 
+async function checkPhotoExists(app: Express, id: string) {
+  const ret = await request(app)
+    .post("/getPhotosById")
+    .send({
+      ids: [id],
+      photoType: "data",
+    });
+
+  if (!ret.body.ok) {
+    throw "Error checking photo exists";
+  }
+
+  return ret.body.data.photos[0].exists;
+}
+
 export {
   addPhoto,
   addNPhotos,
@@ -159,4 +178,5 @@ export {
   testPhotoCompressed,
   testPhotoThumbnail,
   testPhotoData,
+  checkPhotoExists,
 };

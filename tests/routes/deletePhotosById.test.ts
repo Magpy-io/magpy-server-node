@@ -9,10 +9,7 @@ import { clearImagesDisk } from "@src/modules/diskManager";
 import {
   addNPhotos,
   addPhoto,
-  testPhotoOriginal,
-  testPhotoCompressed,
-  testPhotoThumbnail,
-  testPhotoData,
+  checkPhotoExists,
 } from "@tests/helpers/functions";
 
 describe("Test 'deletePhotosById' endpoint", () => {
@@ -52,6 +49,11 @@ describe("Test 'deletePhotosById' endpoint", () => {
       expect(ret.body).toHaveProperty("data");
       expect(ret.body.data).toHaveProperty("deletedIds");
       expect(ret.body.data.deletedIds).toEqual(ids);
+
+      for (let i = 0; i < p.n; i++) {
+        const photoExists = await checkPhotoExists(app, ids[i]);
+        expect(photoExists).toBe(false);
+      }
     }
   );
 
@@ -87,5 +89,30 @@ describe("Test 'deletePhotosById' endpoint", () => {
     expect(ret.body).toHaveProperty("data");
     expect(ret.body.data).toHaveProperty("deletedIds");
     expect(ret.body.data.deletedIds).toEqual([addedPhotoData.id]);
+
+    const photoExists = await checkPhotoExists(app, addedPhotoData.id);
+    expect(photoExists).toBe(false);
+  });
+
+  it("Should only delete 1 photo when adding 2 photos and asking the removal of one of them", async () => {
+    const addedPhotosData = await addNPhotos(app, 2);
+
+    const ids = [addedPhotosData[0].id];
+
+    const ret = await request(app).post("/deletePhotosById").send({
+      ids: ids,
+    });
+
+    expect(ret.statusCode).toBe(200);
+    expect(ret.body.ok).toBe(true);
+    expect(ret.body).toHaveProperty("data");
+    expect(ret.body.data).toHaveProperty("deletedIds");
+    expect(ret.body.data.deletedIds).toEqual([addedPhotosData[0].id]);
+
+    const photo1Exists = await checkPhotoExists(app, addedPhotosData[0].id);
+    expect(photo1Exists).toBe(false);
+
+    const photo2Exists = await checkPhotoExists(app, addedPhotosData[1].id);
+    expect(photo2Exists).toBe(true);
   });
 });
