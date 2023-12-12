@@ -10,7 +10,7 @@ async function addPhoto(
   data?: {
     path?: string;
     name?: string;
-    fileSize?: string;
+    fileSize?: number;
     width?: number;
     height?: number;
     date?: string;
@@ -55,7 +55,7 @@ function testPhotoMetaAndId(
   data?: {
     path?: string;
     name?: string;
-    fileSize?: string;
+    fileSize?: number;
     width?: number;
     height?: number;
     date?: string;
@@ -86,7 +86,7 @@ function testPhotoOriginal(
   data?: {
     path?: string;
     name?: string;
-    fileSize?: string;
+    fileSize?: number;
     width?: number;
     height?: number;
     date?: string;
@@ -104,7 +104,7 @@ function testPhotoCompressed(
   data?: {
     path?: string;
     name?: string;
-    fileSize?: string;
+    fileSize?: number;
     width?: number;
     height?: number;
     date?: string;
@@ -124,7 +124,7 @@ function testPhotoThumbnail(
   data?: {
     path?: string;
     name?: string;
-    fileSize?: string;
+    fileSize?: number;
     width?: number;
     height?: number;
     date?: string;
@@ -144,7 +144,7 @@ function testPhotoData(
   data?: {
     path?: string;
     name?: string;
-    fileSize?: string;
+    fileSize?: number;
     width?: number;
     height?: number;
     date?: string;
@@ -187,6 +187,16 @@ async function getPhotoById(app: Express, id: string, photoType?: string) {
   return ret.body.data.photos[0].photo;
 }
 
+async function getNumberPhotos(app: Express) {
+  const ret = await request(app).post("/getNumberPhotos").send({});
+
+  if (!ret.body.ok) {
+    throw "Error checking photo exists";
+  }
+
+  return ret.body.data.number;
+}
+
 export {
   addPhoto,
   addNPhotos,
@@ -196,4 +206,6 @@ export {
   testPhotoData,
   checkPhotoExists,
   getPhotoById,
+  testPhotoMetaAndId,
+  getNumberPhotos,
 };

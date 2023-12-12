@@ -117,7 +117,8 @@ describe("Test endpoints return error when invalid request", () => {
   )("Testing invalid json request for endpoint $endpoint", async (p) => {
     const ret = await request(app)
       .post("/" + p.endpoint)
-      .send("a");
+      .set("Content-Type", "application/json")
+      .send("{");
 
     expect(ret.statusCode).toBe(400);
     expect(ret.body.ok).toBe(false);
