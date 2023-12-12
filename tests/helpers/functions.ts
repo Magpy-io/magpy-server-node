@@ -5,6 +5,16 @@ import { validate } from "uuid";
 
 import { photoImage64 } from "@tests/helpers/imageBase64";
 
+const defaultPhoto = {
+  name: "image.jpg",
+  fileSize: 1000,
+  width: 1500,
+  height: 1000,
+  path: "/path/to/image.jpg",
+  date: "2022-12-11T17:05:21.396Z",
+  image64: photoImage64,
+};
+
 async function addPhoto(
   app: Express,
   data?: {
@@ -20,13 +30,13 @@ async function addPhoto(
   const ret = await request(app)
     .post("/addPhoto")
     .send({
-      name: data?.name ?? "image122.jpg",
-      fileSize: data?.fileSize ?? 1000,
-      width: data?.width ?? 1500,
-      height: data?.height ?? 1000,
-      path: data?.path ?? "/path/to/image.jpg",
-      date: data?.date ?? "2022-12-11T17:05:21.396Z",
-      image64: data?.image64 ?? photoImage64,
+      name: data?.name ?? defaultPhoto.name,
+      fileSize: data?.fileSize ?? defaultPhoto.fileSize,
+      width: data?.width ?? defaultPhoto.width,
+      height: data?.height ?? defaultPhoto.height,
+      path: data?.path ?? defaultPhoto.path,
+      date: data?.date ?? defaultPhoto.date,
+      image64: data?.image64 ?? defaultPhoto.image64,
     });
 
   if (!ret.body.ok) {
@@ -35,7 +45,7 @@ async function addPhoto(
 
   return {
     id: ret.body.data.photo.id,
-    path: data?.path ?? "/path/to/image.jpg",
+    path: data?.path ?? defaultPhoto.path,
   };
 }
 
@@ -69,12 +79,12 @@ function testPhotoMetaAndId(
     expect(photo.id).toBe(data.id);
   }
 
-  expect(photo.meta.clientPath).toBe(data?.path ?? "/path/to/image.jpg");
-  expect(photo.meta.name).toBe(data?.name ?? "image122.jpg");
-  expect(photo.meta.fileSize).toBe(data?.fileSize ?? 1000);
-  expect(photo.meta.width).toBe(data?.width ?? 1500);
-  expect(photo.meta.height).toBe(data?.height ?? 1000);
-  expect(photo.meta.date).toBe(data?.date ?? "2022-12-11T17:05:21.396Z");
+  expect(photo.meta.clientPath).toBe(data?.path ?? defaultPhoto.path);
+  expect(photo.meta.name).toBe(data?.name ?? defaultPhoto.name);
+  expect(photo.meta.fileSize).toBe(data?.fileSize ?? defaultPhoto.fileSize);
+  expect(photo.meta.width).toBe(data?.width ?? defaultPhoto.width);
+  expect(photo.meta.height).toBe(data?.height ?? defaultPhoto.height);
+  expect(photo.meta.date).toBe(data?.date ?? defaultPhoto.date);
 
   // Less than 10 seconds since photo added
   const sync = new Date(photo.meta.syncDate);
@@ -208,4 +218,5 @@ export {
   getPhotoById,
   testPhotoMetaAndId,
   getNumberPhotos,
+  defaultPhoto,
 };

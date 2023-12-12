@@ -48,7 +48,7 @@ const callback = async (req: Request, res: Response) => {
 
       const totalNbOfParts = getNumberOfParts(image64);
 
-      if (0 < partNumber && partNumber < totalNbOfParts) {
+      if (0 <= partNumber && partNumber < totalNbOfParts) {
         const part = getPartN(image64, partNumber);
         const jsonResponse = {
           photo: responseFormatter.createPhotoObject(dbPhoto, part),
