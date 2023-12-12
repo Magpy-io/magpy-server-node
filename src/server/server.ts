@@ -4,6 +4,7 @@ import express, { Express } from "express";
 import { port } from "@src/config/config";
 import loadEndpoints from "@src/api/endpointsLoader";
 import jsonParsingErrorHandler from "@src/middleware/jsonParsingErrorHandler";
+import FilesWaiting from "@src/modules/waitingFiles";
 
 let app: Express;
 let server: any;
@@ -30,6 +31,12 @@ function initServer() {
 }
 
 function stopServer() {
+  const files = Array.from(FilesWaiting.values());
+
+  files.forEach((file) => {
+    clearTimeout(file.timeout);
+  });
+
   if (server) {
     server.close();
   }

@@ -7,11 +7,11 @@ import { initDB } from "@src/db/databaseFunctions";
 import { clearDB } from "@src/db/databaseFunctions";
 import { clearImagesDisk } from "@src/modules/diskManager";
 
-import { photoImage64 } from "@tests/helpers/imageBase64";
 import {
   testPhotoMetaAndId,
   getPhotoById,
   getNumberPhotos,
+  defaultPhoto,
 } from "@tests/helpers/functions";
 
 describe("Test 'addPhoto' endpoint", () => {
@@ -37,24 +37,14 @@ describe("Test 'addPhoto' endpoint", () => {
   });
 
   it("Should add 1 photo when called", async () => {
-    const photo = {
-      name: "image122.jpg",
-      fileSize: 1000,
-      width: 1500,
-      height: 1000,
-      path: "/path/to/image.jpg",
-      date: "2022-12-11T17:05:21.396Z",
-      image64: photoImage64,
-    };
-
-    const ret = await request(app).post("/addPhoto").send(photo);
+    const ret = await request(app).post("/addPhoto").send(defaultPhoto);
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
     expect(ret.body).toHaveProperty("data");
     expect(ret.body.data).toHaveProperty("photo");
 
-    testPhotoMetaAndId(ret.body.data.photo, photo);
+    testPhotoMetaAndId(ret.body.data.photo);
 
     const getPhoto = await getPhotoById(
       app,
@@ -64,13 +54,13 @@ describe("Test 'addPhoto' endpoint", () => {
 
     expect(getPhoto).toBeTruthy();
     expect(getPhoto.id).toBe(ret.body.data.photo.id);
-    expect(getPhoto.meta.name).toBe(photo.name);
-    expect(getPhoto.meta.fileSize).toBe(photo.fileSize);
-    expect(getPhoto.meta.width).toBe(photo.width);
-    expect(getPhoto.meta.height).toBe(photo.height);
-    expect(getPhoto.meta.clientPath).toBe(photo.path);
-    expect(getPhoto.meta.date).toBe(photo.date);
-    expect(getPhoto.image64).toBe(photo.image64);
+    expect(getPhoto.meta.name).toBe(defaultPhoto.name);
+    expect(getPhoto.meta.fileSize).toBe(defaultPhoto.fileSize);
+    expect(getPhoto.meta.width).toBe(defaultPhoto.width);
+    expect(getPhoto.meta.height).toBe(defaultPhoto.height);
+    expect(getPhoto.meta.clientPath).toBe(defaultPhoto.path);
+    expect(getPhoto.meta.date).toBe(defaultPhoto.date);
+    expect(getPhoto.image64).toBe(defaultPhoto.image64);
   });
 
   it("Should return error PHOTO_EXISTS and not add photo if tried to add same path twice", async () => {
@@ -81,7 +71,7 @@ describe("Test 'addPhoto' endpoint", () => {
       height: 1000,
       path: "/path/to/image.jpg",
       date: "2022-12-11T17:05:21.396Z",
-      image64: photoImage64,
+      image64: defaultPhoto.image64,
     };
 
     const photo2 = {
@@ -91,7 +81,7 @@ describe("Test 'addPhoto' endpoint", () => {
       height: 1000,
       path: "/path/to/image.jpg",
       date: "2022-12-11T17:05:21.396Z",
-      image64: photoImage64,
+      image64: defaultPhoto.image64,
     };
 
     const ret1 = await request(app).post("/addPhoto").send(photo1);
