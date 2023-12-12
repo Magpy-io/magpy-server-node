@@ -148,68 +148,6 @@ async function deletePhotoByIdFromDB(id: string) {
   }
 }
 
-async function getNextPhotoFromDB(id: string): Promise<{
-  idFound: boolean;
-  photoIdIsLast: boolean;
-  photoNext: Photo | undefined;
-  endReached: boolean;
-}> {
-  let db = await openDb(sqliteDbFile);
-  try {
-    const photo = await getPromisified.bind(db)(
-      sqlQueries.selectPhotoByIdQuery(id)
-    );
-    let rows;
-    if (photo) {
-      rows = await allPromisified.bind(db)(
-        sqlQueries.selectNextPhotoByDateQuery(photo.date)
-      );
-    }
-    return {
-      idFound: rows !== undefined,
-      photoIdIsLast: rows?.length == 0,
-      photoNext: rows ? rows[0] : undefined,
-      endReached: rows?.length <= 1,
-    };
-  } catch (err) {
-    console.error(err);
-    throw err;
-  } finally {
-    db.close();
-  }
-}
-
-async function getPreviousPhotoFromDB(id: string): Promise<{
-  idFound: boolean;
-  photoIdIsLast: boolean;
-  photoNext: Photo | undefined;
-  endReached: boolean;
-}> {
-  let db = await openDb(sqliteDbFile);
-  try {
-    const photo = await getPromisified.bind(db)(
-      sqlQueries.selectPhotoByIdQuery(id)
-    );
-    let rows;
-    if (photo) {
-      rows = await allPromisified.bind(db)(
-        sqlQueries.selectPreviousPhotoByDateQuery(photo.date)
-      );
-    }
-    return {
-      idFound: rows !== undefined,
-      photoIdIsLast: rows?.length == 0,
-      photoNext: rows ? rows[0] : undefined,
-      endReached: rows?.length <= 1,
-    };
-  } catch (err) {
-    console.error(err);
-    throw err;
-  } finally {
-    db.close();
-  }
-}
-
 async function getPhotoByClientPathFromDB(
   photoPath: string
 ): Promise<Photo | undefined> {
@@ -262,20 +200,6 @@ async function getPhotosByClientPathFromDB(
   }
 }
 
-async function updatePhotoHashById(id: string, hash: string) {
-  let db = await openDb(sqliteDbFile);
-  try {
-    return await getPromisified.bind(db)(
-      sqlQueries.updatePhotoHashByIdQuery(id, hash)
-    );
-  } catch (err) {
-    console.error(err);
-    throw err;
-  } finally {
-    db.close();
-  }
-}
-
 async function updatePhotoClientPathById(id: string, path: string) {
   let db = await openDb(sqliteDbFile);
   try {
@@ -316,13 +240,10 @@ export {
   getPhotosFromDB,
   getPhotoByIdFromDB,
   deletePhotoByIdFromDB,
-  getNextPhotoFromDB,
-  getPreviousPhotoFromDB,
   getPhotoByClientPathFromDB,
   getPhotosByClientPathFromDB,
   clearDB,
   initDB,
   getPhotosByIdFromDB,
-  updatePhotoHashById,
   updatePhotoClientPathById,
 };

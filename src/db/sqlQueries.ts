@@ -38,15 +38,6 @@ const selectPhotoByIdQuery = (id: string) =>
 const deletePhotoByIdQuery = (id: string) =>
   `DELETE FROM Images WHERE id='${id}'`;
 
-const selectNextPhotoByDateQuery = (date: string) =>
-  `SELECT * FROM Images WHERE date<'${date}' ORDER BY date DESC LIMIT 2`;
-
-const selectPreviousPhotoByDateQuery = (date: string) =>
-  `SELECT * FROM Images WHERE date>'${date}' ORDER BY date LIMIT 2`;
-
-const updatePhotoHashByIdQuery = (id: string, hash: string) =>
-  `UPDATE Images SET hash = '${hash}' WHERE id='${id}';`;
-
 const updatePhotoClientPathByIdQuery = (id: string, path: string) =>
   `UPDATE Images SET clientPath = '${path}' WHERE id='${id}';`;
 
@@ -60,8 +51,5 @@ export default {
   selectPhotosOffsetCountQuery,
   selectPhotoByIdQuery,
   deletePhotoByIdQuery,
-  selectNextPhotoByDateQuery,
-  selectPreviousPhotoByDateQuery,
-  updatePhotoHashByIdQuery,
   updatePhotoClientPathByIdQuery,
 };
