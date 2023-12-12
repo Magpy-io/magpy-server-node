@@ -171,6 +171,22 @@ async function checkPhotoExists(app: Express, id: string) {
   return ret.body.data.photos[0].exists;
 }
 
+async function getPhotoById(app: Express, id: string, photoType?: string) {
+  const ret = await request(app)
+    .post("/getPhotosById")
+    .send({ ids: [id], photoType: photoType ?? "data" });
+
+  if (!ret.body.ok) {
+    throw "Error checking photo exists";
+  }
+
+  if (!ret.body.data.photos[0].exists) {
+    return false;
+  }
+
+  return ret.body.data.photos[0].photo;
+}
+
 export {
   addPhoto,
   addNPhotos,
@@ -179,4 +195,5 @@ export {
   testPhotoThumbnail,
   testPhotoData,
   checkPhotoExists,
+  getPhotoById,
 };
