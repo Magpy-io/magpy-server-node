@@ -79,7 +79,7 @@ const callback = async (req: Request, res: Response) => {
         return responseFormatter.sendFailedMessage(
           res,
           `Transfered data (${photoWaiting.received}) exceeds initial image size (${photoWaiting.image64Len}).`,
-          "BAD_REQUEST"
+          "PHOTO_SIZE_EXCEEDED"
         );
       } else {
         console.log("Full image received.");
@@ -143,7 +143,7 @@ const callback = async (req: Request, res: Response) => {
           return responseFormatter.sendFailedMessage(
             res,
             `Not all parts were found`,
-            "BAD_REQUEST"
+            "MISSING_PARTS"
           );
         }
       }
