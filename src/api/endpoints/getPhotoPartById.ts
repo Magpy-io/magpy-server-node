@@ -48,7 +48,7 @@ const callback = async (req: Request, res: Response) => {
 
       const totalNbOfParts = getNumberOfParts(image64);
 
-      if (partNumber < totalNbOfParts) {
+      if (0 < partNumber && partNumber < totalNbOfParts) {
         const part = getPartN(image64, partNumber);
         const jsonResponse = {
           photo: responseFormatter.createPhotoObject(dbPhoto, part),
@@ -58,12 +58,16 @@ const callback = async (req: Request, res: Response) => {
         responseFormatter.sendResponse(res, jsonResponse);
       } else {
         console.log(
-          `Part number ${partNumber} exceeds maximum number of parts ${totalNbOfParts}`
+          `Part number ${partNumber} must be between 0 and ${
+            totalNbOfParts - 1
+          } included`
         );
         console.log("Sending response message.");
         responseFormatter.sendFailedMessage(
           res,
-          `Part number ${partNumber} exceeds maximum number of parts ${totalNbOfParts}`,
+          `Part number ${partNumber} must be between 0 and ${
+            totalNbOfParts - 1
+          } included`,
           "INVALID_PART_NUMBER"
         );
       }
