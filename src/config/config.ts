@@ -12,7 +12,7 @@ const sqliteDbFileDev = "./db/database.db";
 
 const postPhotoPartTimeoutTest = 100; //in ms
 const rootPathTest = "/home/issam/Documents/Images_test/";
-const sqliteDbFileTest = "./db/database_test.db";
+const sqliteDbFileTest = ":memory:";
 
 let sqliteDbFileTmp = "";
 let rootPathTmp = "";
