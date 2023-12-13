@@ -10,7 +10,7 @@ const postPhotoPartTimeoutDev = 60000; //in ms
 const rootPathDev = "/home/issam/Documents/Images/";
 const sqliteDbFileDev = "./db/database.db";
 
-const postPhotoPartTimeoutTest = 50; //in ms
+const postPhotoPartTimeoutTest = 100; //in ms
 const rootPathTest = "/home/issam/Documents/Images_test/";
 const sqliteDbFileTest = "./db/database_test.db";
 

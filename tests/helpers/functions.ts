@@ -4,6 +4,8 @@ import { Express } from "express";
 import { validate } from "uuid";
 
 import { photoImage64 } from "@tests/helpers/imageBase64";
+import { postPhotoPartTimeout } from "@src/config/config";
+import { timeout } from "@src/modules/functions";
 
 const defaultPhoto = {
   name: "image.jpg",
@@ -207,6 +209,10 @@ async function getNumberPhotos(app: Express) {
   return ret.body.data.number;
 }
 
+async function waitForPhotoTransferToFinish() {
+  await timeout(postPhotoPartTimeout + 100);
+}
+
 export {
   addPhoto,
   addNPhotos,
@@ -218,5 +224,6 @@ export {
   getPhotoById,
   testPhotoMetaAndId,
   getNumberPhotos,
+  waitForPhotoTransferToFinish,
   defaultPhoto,
 };

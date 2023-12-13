@@ -7,9 +7,12 @@ import { initServer, stopServer } from "@src/server/server";
 import { initDB } from "@src/db/databaseFunctions";
 import { clearDB } from "@src/db/databaseFunctions";
 import { clearImagesDisk } from "@src/modules/diskManager";
-import { defaultPhoto, addPhoto } from "@tests/helpers/functions";
+import {
+  defaultPhoto,
+  addPhoto,
+  waitForPhotoTransferToFinish,
+} from "@tests/helpers/functions";
 import FilesWaiting from "@src/modules/waitingFiles";
-import { timeout } from "@src/modules/functions";
 
 describe("Test 'addPhotoInit' endpoint", () => {
   let app: Express;
@@ -50,7 +53,7 @@ describe("Test 'addPhotoInit' endpoint", () => {
 
     expect(FilesWaiting.size).toBe(1);
 
-    await timeout(100);
+    await waitForPhotoTransferToFinish();
 
     expect(FilesWaiting.size).toBe(0);
   });

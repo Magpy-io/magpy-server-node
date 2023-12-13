@@ -12,10 +12,10 @@ import {
   testPhotoMetaAndId,
   getPhotoById,
   addPhoto,
+  waitForPhotoTransferToFinish,
 } from "@tests/helpers/functions";
 import * as imageBase64Parts from "@tests/helpers/imageBase64Parts";
 import FilesWaiting from "@src/modules/waitingFiles";
-import { timeout } from "@src/modules/functions";
 
 describe("Test 'addPhotoPart' endpoint", () => {
   let app: Express;
@@ -132,7 +132,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
     const id = retInit.body.data.id;
     expect(FilesWaiting.size).toBe(1);
 
-    await timeout(100);
+    await waitForPhotoTransferToFinish();
 
     expect(FilesWaiting.size).toBe(0);
 
