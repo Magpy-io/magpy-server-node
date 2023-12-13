@@ -1,71 +1,17 @@
-import { Sequelize, DataTypes, Model } from "sequelize";
+import { Sequelize } from "sequelize";
 import { v4 as uuid } from "uuid";
 
 import { createFolder } from "@src/modules/diskManager";
-import { sqliteDbFile, hashLen } from "@src/config/config";
+import { sqliteDbFile } from "@src/config/config";
 import { Photo } from "@src/types/photoType";
+import { createImageModel } from "@src/db/Image.model";
 
 let sequelize: Sequelize = null;
 let Image: any;
 
-function createModel() {
-  return sequelize.define(
-    "Image",
-    {
-      id: {
-        type: DataTypes.UUID,
-        defaultValue: DataTypes.UUIDV4,
-        allowNull: false,
-        unique: true,
-        primaryKey: true,
-      },
-      name: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      fileSize: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      width: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      height: {
-        type: DataTypes.INTEGER,
-        allowNull: false,
-      },
-      date: {
-        type: DataTypes.DATE,
-        allowNull: false,
-      },
-      clientPath: {
-        type: DataTypes.STRING,
-        allowNull: false,
-        unique: true,
-      },
-      serverPath: {
-        type: DataTypes.STRING,
-        allowNull: false,
-      },
-      syncDate: {
-        type: DataTypes.DATE,
-        allowNull: false,
-      },
-      hash: {
-        type: DataTypes.STRING(hashLen),
-        allowNull: false,
-      },
-    },
-    {
-      indexes: [{ fields: ["date"] }, { fields: ["clientPath"] }],
-    }
-  );
-}
-
 async function openAndInitDB() {
   await openDb();
-  Image = createModel();
+  Image = createImageModel(sequelize);
   await Image.sync();
 }
 
@@ -82,7 +28,8 @@ async function openDb() {
   sequelize = new Sequelize({
     dialect: "sqlite",
     storage: sqliteDbFile,
-    logging: (msg) => console.log("Sequelize : " + msg),
+    //logging: (msg) => console.log("Sequelize : " + msg),
+    logging: false,
   });
 
   try {
@@ -106,6 +53,11 @@ async function closeDb() {
 
 async function createDbFolderIfDoesNotExist(sqliteDbFile: string) {
   const dbFileSplit = sqliteDbFile.split("/");
+
+  if (dbFileSplit.length < 2) {
+    return;
+  }
+
   dbFileSplit.pop();
   const dirPath = dbFileSplit.join("/") + "/";
   await createFolder(dirPath);
