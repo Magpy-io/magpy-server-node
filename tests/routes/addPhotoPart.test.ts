@@ -11,6 +11,7 @@ import {
   defaultPhoto,
   testPhotoMetaAndId,
   getPhotoById,
+  addPhoto,
 } from "@tests/helpers/functions";
 import * as imageBase64Parts from "@tests/helpers/imageBase64Parts";
 import FilesWaiting from "@src/modules/waitingFiles";
@@ -277,6 +278,61 @@ describe("Test 'addPhotoPart' endpoint", () => {
     const getPhoto = await getPhotoById(app, id, "original");
 
     expect(getPhoto).toBeFalsy();
+
+    expect(FilesWaiting.size).toBe(0);
+  });
+
+  it("Should return error PHOTO_EXISTS if a photo with same path was added while adding photo parts", async () => {
+    const photo = { ...defaultPhoto };
+    delete photo.image64;
+
+    const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };
+
+    const retInit = await request(app).post("/addPhotoInit").send(requestPhoto);
+
+    if (!retInit.ok) {
+      throw "Error starting photo transfer";
+    }
+
+    const id = retInit.body.data.id;
+    expect(FilesWaiting.size).toBe(1);
+
+    let ret = await request(app).post("/addPhotoPart").send({
+      id: id,
+      partNumber: 0,
+      partSize: imageBase64Parts.photoLenPart1,
+      photoPart: imageBase64Parts.photoImage64Part1,
+    });
+
+    expect(ret.statusCode).toBe(200);
+    expect(ret.body.ok).toBe(true);
+
+    ret = await request(app).post("/addPhotoPart").send({
+      id: id,
+      partNumber: 1,
+      partSize: imageBase64Parts.photoLenPart2,
+      photoPart: imageBase64Parts.photoImage64Part2,
+    });
+
+    expect(ret.statusCode).toBe(200);
+    expect(ret.body.ok).toBe(true);
+
+    const addedPhotoData = await addPhoto(app);
+
+    ret = await request(app).post("/addPhotoPart").send({
+      id: id,
+      partNumber: 2,
+      partSize: imageBase64Parts.photoLenPart3,
+      photoPart: imageBase64Parts.photoImage64Part3,
+    });
+
+    expect(ret.statusCode).toBe(400);
+    expect(ret.body.ok).toBe(false);
+    expect(ret.body.errorCode).toBe("PHOTO_EXISTS");
+
+    const getPhoto = await getPhotoById(app, addedPhotoData.id, "data");
+
+    expect(getPhoto).toBeTruthy();
 
     expect(FilesWaiting.size).toBe(0);
   });
