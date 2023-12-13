@@ -66,6 +66,7 @@ async function createDbFolderIfDoesNotExist(sqliteDbFile: string) {
 async function getPhotoByClientPathFromDB(
   photoPath: string
 ): Promise<Photo | null> {
+  assertDbOpen();
   try {
     const image: any = await Image.findOne({
       where: { clientPath: photoPath },
@@ -79,6 +80,8 @@ async function getPhotoByClientPathFromDB(
 }
 
 async function addPhotoToDB(photo: Photo): Promise<Photo> {
+  assertDbOpen();
+
   if (!photo.id) {
     photo.id = uuid();
   }
@@ -109,6 +112,7 @@ async function addPhotoToDB(photo: Photo): Promise<Photo> {
 }
 
 async function numberPhotosFromDB(): Promise<number> {
+  assertDbOpen();
   try {
     return await Image.count();
   } catch (err) {
@@ -121,6 +125,7 @@ async function getPhotosFromDB(
   number: number,
   offset: number
 ): Promise<{ photos: Photo[]; endReached: boolean }> {
+  assertDbOpen();
   const nbPhotos = await numberPhotosFromDB();
 
   try {
@@ -137,6 +142,7 @@ async function getPhotosFromDB(
 }
 
 async function getPhotoByIdFromDB(id: string): Promise<Photo | null> {
+  assertDbOpen();
   try {
     const image: any = await Image.findOne({
       where: { id: id },
@@ -150,6 +156,7 @@ async function getPhotoByIdFromDB(id: string): Promise<Photo | null> {
 }
 
 async function deletePhotoByIdFromDB(id: string) {
+  assertDbOpen();
   try {
     await Image.destroy({
       where: {
@@ -165,6 +172,7 @@ async function deletePhotoByIdFromDB(id: string) {
 async function getPhotosByClientPathFromDB(
   photosPaths: string[]
 ): Promise<Array<Photo | null>> {
+  assertDbOpen();
   try {
     const photosFoundPromise = photosPaths.map((photoPath) => {
       return getPhotoByClientPathFromDB(photoPath);
@@ -179,6 +187,7 @@ async function getPhotosByClientPathFromDB(
 async function getPhotosByIdFromDB(
   ids: string[]
 ): Promise<Array<Photo | null>> {
+  assertDbOpen();
   try {
     const photosFoundPromise = ids.map((id) => {
       return getPhotoByIdFromDB(id);
@@ -191,6 +200,7 @@ async function getPhotosByIdFromDB(
 }
 
 async function updatePhotoClientPathById(id: string, path: string) {
+  assertDbOpen();
   try {
     await Image.update({ clientPath: path }, { where: { id: id } });
   } catch (err) {
@@ -200,11 +210,20 @@ async function updatePhotoClientPathById(id: string, path: string) {
 }
 
 async function clearDB() {
+  assertDbOpen();
   try {
     await sequelize.drop();
   } catch (err) {
     console.error(err);
     throw err;
+  }
+}
+
+function assertDbOpen() {
+  if (sequelize == null) {
+    throw new Error(
+      "Trying to use DB before opening it, call openDb before any operation"
+    );
   }
 }
 
