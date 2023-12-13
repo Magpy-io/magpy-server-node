@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
-import { getPhotosByIdFromDB } from "@src/db/databaseFunctions";
+import { getPhotosByIdFromDB } from "@src/db/sequelizeDb";
 import { PhotoTypes, isValidPhotoType } from "@src/types/photoType";
 import {
   getOriginalPhotoFromDisk,

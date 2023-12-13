@@ -4,7 +4,7 @@ import {
   getPhotoByIdFromDB,
   updatePhotoClientPathById,
   getPhotoByClientPathFromDB,
-} from "@src/db/databaseFunctions";
+} from "@src/db/sequelizeDb";
 
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 

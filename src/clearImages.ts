@@ -3,18 +3,27 @@ require("module-alias/register");
 
 // IMPORTS
 import { rootPath } from "@src/config/config";
-import { clearDB } from "@src/db/databaseFunctions";
+import { clearDB, openAndInitDB, closeDb } from "@src/db/sequelizeDb";
 import { clearImagesDisk } from "@src/modules/diskManager";
 
-clearDB()
+openAndInitDB()
   .then(() => {
-    console.log("Database cleared.");
+    console.log("database openend");
+    return clearDB();
+  })
+  .then(() => {
+    console.log("database cleared");
+    return closeDb();
+  })
+  .then(() => {
+    console.log("database closed");
   })
   .catch((err: any) => {
-    console.error("Error clearing database");
-  });
-
-clearImagesDisk()
+    console.log("Error clearing database. " + err);
+  })
+  .then(() => {
+    return clearImagesDisk();
+  })
   .then(() => {
     console.log(rootPath + " directory cleared.");
   })

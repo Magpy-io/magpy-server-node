@@ -1,10 +1,7 @@
 import { Request, Response } from "express";
 
 import responseFormatter from "@src/api/responseFormatter";
-import {
-  getPhotoByClientPathFromDB,
-  addPhotoToDB,
-} from "@src/db/databaseFunctions";
+import { getPhotoByClientPathFromDB, addPhotoToDB } from "@src/db/sequelizeDb";
 import FilesWaiting from "@src/modules/waitingFiles";
 import { addPhotoToDisk } from "@src/modules/diskManager";
 import { hashString } from "@src/modules/hashing";

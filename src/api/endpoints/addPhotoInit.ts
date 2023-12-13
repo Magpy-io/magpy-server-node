@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
 import FilesWaiting from "@src/modules/waitingFiles";
-import { getPhotoByClientPathFromDB } from "@src/db/databaseFunctions";
+import { getPhotoByClientPathFromDB } from "@src/db/sequelizeDb";
 import { createServerImageName } from "@src/modules/diskFilesNaming";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import { v4 as uuid } from "uuid";

@@ -3,7 +3,7 @@ require("module-alias/register");
 
 // IMPORTS
 import { initServer } from "@src/server/server";
-import { initDB } from "@src/db/databaseFunctions";
+import { openAndInitDB } from "@src/db/sequelizeDb";
 import { startMdns } from "@src/server/mdnsSetup";
 
 main().catch((err) => {
@@ -12,7 +12,7 @@ main().catch((err) => {
 });
 
 async function main() {
-  await initDB();
+  await openAndInitDB();
   initServer();
   startMdns();
 }

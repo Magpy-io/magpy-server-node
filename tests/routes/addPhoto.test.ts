@@ -2,9 +2,8 @@ import { describe, expect, it } from "@jest/globals";
 import request from "supertest";
 import { Express } from "express";
 
-import { initServer, stopServer } from "@src/server/server";
-import { initDB } from "@src/db/databaseFunctions";
-import { clearDB } from "@src/db/databaseFunctions";
+import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
+import { openAndInitDB, clearDB } from "@src/db/sequelizeDb";
 import { clearImagesDisk } from "@src/modules/diskManager";
 
 import {
@@ -23,17 +22,16 @@ describe("Test 'addPhoto' endpoint", () => {
 
   afterAll(async () => {
     stopServer();
-    await clearDB();
-    await clearImagesDisk();
   });
 
   beforeEach(async () => {
-    await initDB();
+    await openAndInitDB();
   });
 
   afterEach(async () => {
     await clearDB();
     await clearImagesDisk();
+    await clearFilesWaiting();
   });
 
   it("Should add 1 photo when called", async () => {

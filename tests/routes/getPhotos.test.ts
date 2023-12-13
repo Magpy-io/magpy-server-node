@@ -2,9 +2,9 @@ import { describe, expect, it } from "@jest/globals";
 import request from "supertest";
 import { Express } from "express";
 
-import { initServer, stopServer } from "@src/server/server";
-import { initDB } from "@src/db/databaseFunctions";
-import { clearDB } from "@src/db/databaseFunctions";
+import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
+import { openAndInitDB } from "@src/db/sequelizeDb";
+import { clearDB } from "@src/db/sequelizeDb";
 import { clearImagesDisk } from "@src/modules/diskManager";
 import {
   addNPhotos,
@@ -24,17 +24,16 @@ describe("Test 'getPhotos' endpoint", () => {
 
   afterAll(async () => {
     stopServer();
-    await clearDB();
-    await clearImagesDisk();
   });
 
   beforeEach(async () => {
-    await initDB();
+    await openAndInitDB();
   });
 
   afterEach(async () => {
     await clearDB();
     await clearImagesDisk();
+    await clearFilesWaiting();
   });
 
   it.each([{ n: 0 }, { n: 1 }, { n: 2 }])(

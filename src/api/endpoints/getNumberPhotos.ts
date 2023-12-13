@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
-import { numberPhotosFromDB } from "@src/db/databaseFunctions";
+import { numberPhotosFromDB } from "@src/db/sequelizeDb";
 
 // getNumberPhotos : return the number of photos in the server.
 const endpoint = "/getNumberPhotos";

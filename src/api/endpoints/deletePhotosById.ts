@@ -1,9 +1,6 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
-import {
-  getPhotoByIdFromDB,
-  deletePhotoByIdFromDB,
-} from "@src/db/databaseFunctions";
+import { getPhotoByIdFromDB, deletePhotoByIdFromDB } from "@src/db/sequelizeDb";
 import { removePhotoFromDisk } from "@src/modules/diskManager";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 
