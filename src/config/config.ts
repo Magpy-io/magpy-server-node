@@ -4,6 +4,8 @@ const getPhotoPartSize = 100000; //char in base64
 const MAX_PIXELS_IN_IMAGE = 40000;
 const MAX_PIXELS_IN_IMAGE_BIGGER = 200000;
 
+const serverDataFolder = "./serverData/";
+
 const postPhotoPartTimeoutDev = 60000; //in ms
 const rootPathDev = "/home/issam/Documents/Images/";
 const sqliteDbFileDev = "./db/database.db";
@@ -41,4 +43,5 @@ export {
   getPhotoPartSize,
   MAX_PIXELS_IN_IMAGE,
   MAX_PIXELS_IN_IMAGE_BIGGER,
+  serverDataFolder,
 };

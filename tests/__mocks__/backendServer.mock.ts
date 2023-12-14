@@ -12,7 +12,7 @@ const invalidKey = "invalidKey";
 const validServerToken = "validServerToken";
 const invalidServerToken = "invalidServerToken";
 
-async function claimServer(userToken: string, serverKey: string) {
+async function registerServer(userToken: string, serverKey: string) {
   await timeout(10);
   if (userToken != validUserToken) {
     return {
