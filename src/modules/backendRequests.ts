@@ -73,6 +73,27 @@ async function getServerInfo(serverToken: string) {
   }
 }
 
-async function whoAmI(userToken: string) {}
+async function whoAmI(userToken: string) {
+  try {
+    const response = await axios.post(
+      url + "/whoAmI",
+      {},
+      {
+        headers: {
+          Authorization: `Bearer ${userToken}`,
+        },
+      }
+    );
+    return response.data;
+  } catch (err: any) {
+    const body = err?.response?.data;
+
+    if (!body?.hasOwnProperty("ok")) {
+      throw err;
+    }
+
+    return body;
+  }
+}
 
 export { registerServer, getServerInfo, getServerToken, whoAmI };
