@@ -1,15 +1,12 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
-import {
-  getServerInfo,
-  registerServer,
-  getServerToken,
-} from "@src/modules/backendRequests";
+import { registerServer, getServerToken } from "@src/modules/backendRequests";
 import { randomBytes } from "crypto";
 
-import { SaveServerData, GetServerData } from "@src/modules/serverDataManager";
-import { server } from "typescript";
+import { SaveServerData } from "@src/modules/serverDataManager";
+
+import checkServerHasValidCredentials from "@src/middleware/checkServerHasValidCredentials";
 
 // claimServer : creates server in backend and sets the requesting user as it's owner
 const endpoint = "/claimServer";
@@ -30,69 +27,13 @@ const callback = async (req: Request, res: Response) => {
   const { userToken } = requestParameters;
 
   try {
-    const serverData = await GetServerData();
-
-    if (serverData.serverToken) {
-      console.log("server token found");
-      const ret = await getServerInfo(serverData.serverToken);
-
-      if (!ret.ok) {
-        if (ret.errorCode == "AUTHORIZATION_FAILED") {
-          console.log("Invalid server token");
-        } else {
-          console.error("request to get server info failed");
-          console.error(ret);
-          responseFormatter.sendErrorMessage(res);
-          return;
-        }
-      } else {
-        console.log("server already claimed, it has valid token");
-        responseFormatter.sendFailedMessage(
-          res,
-          "Server already claimed",
-          "SERVER_ALREADY_CLAIMED"
-        );
-        return;
-      }
-    }
-
-    if (serverData.serverId && serverData.serverKey) {
-      console.log("server credentials found");
-      const ret = await getServerToken(
-        serverData.serverId,
-        serverData.serverKey
+    if (req.hasValidCredentials) {
+      console.log("server already claimed, it has valid token");
+      return responseFormatter.sendFailedMessage(
+        res,
+        "Server already claimed",
+        "SERVER_ALREADY_CLAIMED"
       );
-
-      if (!ret.ok) {
-        if (
-          ret.errorCode == "INVALID_CREDENTIALS" ||
-          ret.errorCode == "INVALID_ID_FORMAT"
-        ) {
-          console.log("invalid server credentials");
-        } else {
-          console.error("request to verify server credentials failed");
-          console.error(ret);
-          responseFormatter.sendErrorMessage(res);
-          return;
-        }
-      } else {
-        console.log("server already claimed, it has valid credentials");
-        const serverToken = ret.token;
-
-        console.log("saving server token");
-        await SaveServerData({
-          serverId: serverData.serverId,
-          serverKey: serverData.serverKey,
-          serverToken: serverToken,
-        });
-
-        responseFormatter.sendFailedMessage(
-          res,
-          "Server already claimed",
-          "SERVER_ALREADY_CLAIMED"
-        );
-        return;
-      }
     }
 
     console.log("server not claimed");
@@ -157,4 +98,9 @@ type RequestType = {
   userToken: string;
 };
 
-export default { endpoint: endpoint, callback: callback, method: "post" };
+export default {
+  endpoint: endpoint,
+  callback: callback,
+  method: "post",
+  middleWare: checkServerHasValidCredentials,
+};
