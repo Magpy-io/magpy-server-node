@@ -1,5 +1,6 @@
 const hashLen = 32;
 const getPhotoPartSize = 100000; //char in base64
+const jwtUserExp = "1d";
 
 const MAX_PIXELS_IN_IMAGE = 40000;
 const MAX_PIXELS_IN_IMAGE_BIGGER = 200000;
@@ -44,4 +45,5 @@ export {
   MAX_PIXELS_IN_IMAGE,
   MAX_PIXELS_IN_IMAGE_BIGGER,
   serverDataFolder,
+  jwtUserExp,
 };

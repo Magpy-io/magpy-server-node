@@ -29,11 +29,12 @@ const callback = async (req: Request, res: Response) => {
   try {
     if (req.hasValidCredentials) {
       console.log("server already claimed, it has valid token");
-      return responseFormatter.sendFailedMessage(
+      responseFormatter.sendFailedMessage(
         res,
         "Server already claimed",
         "SERVER_ALREADY_CLAIMED"
       );
+      return;
     }
 
     console.log("server not claimed");
