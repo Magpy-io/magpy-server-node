@@ -4,6 +4,9 @@ import request from "supertest";
 import { Express } from "express";
 import { validate } from "uuid";
 
+import mockFsVolumeReset from "@tests/helpers/mockFsVolumeReset";
+jest.mock("fs/promises");
+
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB } from "@src/db/sequelizeDb";
 import { clearDB } from "@src/db/sequelizeDb";
@@ -28,6 +31,7 @@ describe("Test 'addPhotoInit' endpoint", () => {
 
   beforeEach(async () => {
     await openAndInitDB();
+    mockFsVolumeReset();
   });
 
   afterEach(async () => {

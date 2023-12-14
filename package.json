@@ -4,9 +4,9 @@
     "build": "rimraf ./dist && tsc",
     "clean": "yarn build && node ./dist/src/clearImages.js",
     "db:reset": "rm -f ./db/database_test.db",
-    "test": "yarn build && cross-env NODE_ENV=test jest ./dist/tests --verbose=true --silent --collect-coverage --testTimeout=10000 --runInBand",
-    "test:v": "yarn build && cross-env NODE_ENV=test jest ./dist/tests --verbose=true --collect-coverage --testTimeout=10000 --runInBand",
-    "test:single": "yarn build && cross-env NODE_ENV=test jest --verbose=true --collect-coverage --testTimeout=10000 --runInBand",
+    "test": "yarn build && cross-env NODE_ENV=test jest ./dist/tests --verbose=true --silent --collect-coverage --testTimeout=10000",
+    "test:v": "yarn build && cross-env NODE_ENV=test jest ./dist/tests --verbose=true --collect-coverage --testTimeout=10000",
+    "test:single": "yarn build && cross-env NODE_ENV=test jest --verbose=true --collect-coverage --testTimeout=10000",
     "pretest": "cross-env NODE_ENV=test yarn db:reset"
   },
   "dependencies": {
@@ -44,7 +44,8 @@
     "babel-jest": "^29.7.0",
     "jest": "^29.7.0",
     "supertest": "^6.3.3",
-    "ts-jest": "^29.1.1"
+    "ts-jest": "^29.1.1",
+    "memfs": "^4.6.0"
   },
   "_moduleAliases": {
     "@src": "dist/src"

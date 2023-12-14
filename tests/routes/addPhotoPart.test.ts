@@ -2,7 +2,9 @@ import "@tests/helpers/loadEnvFile";
 import { describe, expect, it } from "@jest/globals";
 import request from "supertest";
 import { Express } from "express";
-import { validate } from "uuid";
+
+import mockFsVolumeReset from "@tests/helpers/mockFsVolumeReset";
+jest.mock("fs/promises");
 
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB } from "@src/db/sequelizeDb";
@@ -31,6 +33,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
   beforeEach(async () => {
     await openAndInitDB();
+    mockFsVolumeReset();
   });
 
   afterEach(async () => {

@@ -1,5 +1,5 @@
 // IMPORTS
-import { promises as fs } from "fs";
+import fs from "fs/promises";
 import { Buffer } from "buffer";
 import path from "node:path";
 import sharp from "sharp";
