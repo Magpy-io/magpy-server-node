@@ -2,6 +2,8 @@
 require("module-alias/register");
 
 // IMPORTS
+import config from "dotenv";
+config.config();
 import { initServer } from "@src/server/server";
 import { openAndInitDB } from "@src/db/sequelizeDb";
 import { startMdns } from "@src/server/mdnsSetup";

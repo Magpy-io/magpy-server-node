@@ -1,13 +1,15 @@
 import mdns from "mdns";
 
-import { port, serverMdnsName } from "@src/config/config";
-
 let advert: any;
 
 function startMdns() {
-  advert = mdns.createAdvertisement(mdns.tcp("http"), port, {
-    name: serverMdnsName,
-  });
+  advert = mdns.createAdvertisement(
+    mdns.tcp("http"),
+    parseInt(process.env.PORT),
+    {
+      name: process.env.SERVER_MDNS_NAME,
+    }
+  );
   advert.start();
 }
 

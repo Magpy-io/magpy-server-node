@@ -62,7 +62,7 @@ describe("Test 'getPhotoPartById' endpoint", () => {
     }
 
     const partsCombined = parts.reduce((a, b) => a + b);
-    console.info(partsCombined);
+
     expect(partsCombined).toBe(defaultPhoto.image64);
   });
 

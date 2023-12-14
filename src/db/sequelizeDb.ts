@@ -23,7 +23,9 @@ async function openDb() {
     return;
   }
 
-  await createDbFolderIfDoesNotExist(sqliteDbFile);
+  if (sqliteDbFile != ":memory:") {
+    await createDbFolderIfDoesNotExist(sqliteDbFile);
+  }
 
   sequelize = new Sequelize({
     dialect: "sqlite",
@@ -53,11 +55,6 @@ async function closeDb() {
 
 async function createDbFolderIfDoesNotExist(sqliteDbFile: string) {
   const dbFileSplit = sqliteDbFile.split("/");
-
-  if (dbFileSplit.length < 2) {
-    return;
-  }
-
   dbFileSplit.pop();
   const dirPath = dbFileSplit.join("/") + "/";
   await createFolder(dirPath);

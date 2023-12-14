@@ -1,7 +1,6 @@
 // IMPORTS
 import express, { Express } from "express";
 
-import { port } from "@src/config/config";
 import loadEndpoints from "@src/api/endpointsLoader";
 import jsonParsingErrorHandler from "@src/middleware/jsonParsingErrorHandler";
 import FilesWaiting from "@src/modules/waitingFiles";
@@ -23,8 +22,8 @@ function initServer() {
   loadEndpoints(app);
   console.log("Endpoints loaded");
 
-  server = app.listen(port, () => {
-    console.log(`Server is listening on port ${port}`);
+  server = app.listen(process.env.PORT, () => {
+    console.log(`Server is listening on port ${process.env.PORT}`);
   });
 
   return app;
