@@ -88,7 +88,7 @@ const callback = async (req: Request, res: Response) => {
 
     if (!ret1.ok) {
       console.error("request to verify server credentials failed");
-      console.error(ret);
+      console.error(ret1);
       responseFormatter.sendErrorMessage(res);
       return;
     }

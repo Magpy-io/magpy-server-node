@@ -11,7 +11,7 @@ import { openAndInitDB } from "@src/db/sequelizeDb";
 import { clearDB } from "@src/db/sequelizeDb";
 import { clearImagesDisk } from "@src/modules/diskManager";
 
-const endpointsToTest = [
+const endpointsToTestInvalidJson = [
   "addPhoto",
   "addPhotoInit",
   "addPhotoPart",
@@ -21,6 +21,8 @@ const endpointsToTest = [
   "getPhotosById",
   "getPhotosByPath",
   "updatePhotoPath",
+  "claimServer",
+  "getToken",
 ];
 
 const dataToTestEndpointsParameters: Array<{
@@ -86,6 +88,14 @@ const dataToTestEndpointsParameters: Array<{
     endpoint: "updatePhotoPath",
     defaultBody: { id: "", path: "" },
   },
+  {
+    endpoint: "claimServer",
+    defaultBody: { userToken: "" },
+  },
+  {
+    endpoint: "getToken",
+    defaultBody: { userToken: "" },
+  },
 ];
 
 describe("Test endpoints return error when invalid request", () => {
@@ -111,7 +121,7 @@ describe("Test endpoints return error when invalid request", () => {
   });
 
   it.each(
-    endpointsToTest.map((endpoint) => {
+    endpointsToTestInvalidJson.map((endpoint) => {
       return {
         endpoint,
       };

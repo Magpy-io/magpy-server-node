@@ -113,5 +113,5 @@
     }
   },
   "include": ["src/**/*.ts", "src/**/*.js", "tests/**/*.ts"],
-  "exclude": ["node_modules", "<node_internals>/**"]
+  "exclude": ["**/__mocks__/*", "node_modules", "<node_internals>/**"]
 }

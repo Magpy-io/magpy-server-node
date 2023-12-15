@@ -4,12 +4,7 @@ import responseFormatter from "@src/api/responseFormatter";
 
 import { getServerInfo, getServerToken } from "@src/modules/backendRequests";
 
-import {
-  GetServerData,
-  SaveServerData,
-  ServerData,
-} from "@src/modules/serverDataManager";
-import { isAnyArrayBuffer } from "util/types";
+import { GetServerData, SaveServerData } from "@src/modules/serverDataManager";
 
 async function checkServerHasValidCredentials(
   req: Request,
@@ -21,8 +16,6 @@ async function checkServerHasValidCredentials(
 
     if (serverData.serverToken) {
       console.log("server token found");
-
-      let serverData: ServerData;
 
       let ret: any;
       try {
