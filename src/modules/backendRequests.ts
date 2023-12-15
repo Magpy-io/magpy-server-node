@@ -2,13 +2,18 @@ import axios from "axios";
 
 const url = process.env.BACK_HOST + ":" + process.env.BACK_PORT;
 
-async function registerServer(userToken: string, serverKey: string) {
+async function registerServer(
+  userToken: string,
+  serverKey: string,
+  serverName: string,
+  serverIp: string
+) {
   try {
     const response = await axios.post(
       url + "/registerServer",
       {
-        name: "MyLocalServer",
-        ipAddress: "1.2.3.4",
+        name: serverName,
+        ipAddress: serverIp,
         serverKey: serverKey,
       },
       {

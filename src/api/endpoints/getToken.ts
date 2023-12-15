@@ -40,20 +40,43 @@ const callback = async (req: Request, res: Response) => {
       return;
     }
 
-    const retUser = await whoAmI(backendUserToken);
-
-    if (!retUser.ok) {
-      console.log("user token authorization error");
-      responseFormatter.sendFailedMessage(
-        res,
-        "User token verification failed",
-        "AUTHORIZATION_FAILED",
-        401
-      );
+    let retUser: any;
+    try {
+      retUser = await whoAmI(backendUserToken);
+    } catch (err) {
+      console.error("Error requesting backend server");
+      console.error(err);
+      responseFormatter.sendErrorBackEndServerUnreachable(res);
       return;
     }
 
-    const retServer = await getServerInfo(serverData.serverToken);
+    if (!retUser.ok) {
+      if (retUser.errorCode == "AUTHORIZATION_FAILED") {
+        console.log("user token authorization error");
+        responseFormatter.sendFailedMessage(
+          res,
+          "User token verification failed",
+          "AUTHORIZATION_FAILED",
+          401
+        );
+        return;
+      } else {
+        console.error("Error requesting backend server");
+        console.error(retUser);
+        responseFormatter.sendErrorBackEndServerUnreachable(res);
+        return;
+      }
+    }
+
+    let retServer: any;
+    try {
+      retServer = await getServerInfo(serverData.serverToken);
+    } catch (err) {
+      console.error("Error requesting backend server");
+      console.error(err);
+      responseFormatter.sendErrorBackEndServerUnreachable(res);
+      return;
+    }
 
     if (!retServer.ok) {
       console.error("request to get server info failed");

@@ -40,7 +40,21 @@ const callback = async (req: Request, res: Response) => {
     console.log("server not claimed");
 
     const keyGenerated = randomBytes(32).toString("hex");
-    const ret = await registerServer(userToken, keyGenerated);
+
+    let ret: any;
+    try {
+      ret = await registerServer(
+        userToken,
+        keyGenerated,
+        "MyServer",
+        "0.0.0.0"
+      );
+    } catch (err) {
+      console.error("Error requesting backend server");
+      console.error(err);
+      responseFormatter.sendErrorBackEndServerUnreachable(res);
+      return;
+    }
 
     if (!ret.ok) {
       if (ret.errorCode == "AUTHORIZATION_FAILED") {
@@ -63,7 +77,15 @@ const callback = async (req: Request, res: Response) => {
     const id = ret.data.server._id;
     console.log("server registered, got id: " + id);
 
-    const ret1 = await getServerToken(id, keyGenerated);
+    let ret1: any;
+    try {
+      ret1 = await getServerToken(id, keyGenerated);
+    } catch (err) {
+      console.error("Error requesting backend server");
+      console.error(err);
+      responseFormatter.sendErrorBackEndServerUnreachable(res);
+      return;
+    }
 
     if (!ret1.ok) {
       console.error("request to verify server credentials failed");

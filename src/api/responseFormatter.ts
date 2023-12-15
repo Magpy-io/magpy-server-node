@@ -39,6 +39,15 @@ async function sendErrorMessage(res: Response) {
   await sendFailedMessage(res, "Server internal error", "SERVER_ERROR", 500);
 }
 
+async function sendErrorBackEndServerUnreachable(res: Response) {
+  await sendFailedMessage(
+    res,
+    "Backend server unreachable",
+    "BACKEND_SERVER_UNREACHABLE",
+    500
+  );
+}
+
 function createPhotoObject(dbPhoto: Photo, image64?: string) {
   return {
     id: dbPhoto.id,
@@ -62,4 +71,5 @@ export default {
   sendFailedMessage,
   sendErrorMessage,
   createPhotoObject,
+  sendErrorBackEndServerUnreachable,
 };

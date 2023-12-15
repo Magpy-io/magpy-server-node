@@ -23,3 +23,5 @@ async function GetServerData(): Promise<ServerData> {
 }
 
 export { SaveServerData, GetServerData };
+
+export type { ServerData };
