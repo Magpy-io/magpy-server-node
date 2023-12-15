@@ -12,21 +12,20 @@ import checkServerHasValidCredentials from "@src/middleware/checkServerHasValidC
 const endpoint = "/claimServer";
 const callback = async (req: Request, res: Response) => {
   console.log("\n[claimServer]");
-
-  console.log("Checking request parameters.");
-  if (checkBodyParamsMissing(req)) {
-    console.log("Bad request parameters");
-    console.log("Sending response message");
-    responseFormatter.sendFailedMessage(res);
-    return;
-  }
-  console.log("Request parameters ok.");
-
-  const requestParameters: RequestType = req.body;
-
-  const { userToken } = requestParameters;
-
   try {
+    console.log("Checking request parameters.");
+    if (checkBodyParamsMissing(req)) {
+      console.log("Bad request parameters");
+      console.log("Sending response message");
+      responseFormatter.sendFailedMessage(res);
+      return;
+    }
+    console.log("Request parameters ok.");
+
+    const requestParameters: RequestType = req.body;
+
+    const { userToken } = requestParameters;
+
     if (req.hasValidCredentials) {
       console.log("server already claimed, it has valid token");
       responseFormatter.sendFailedMessage(

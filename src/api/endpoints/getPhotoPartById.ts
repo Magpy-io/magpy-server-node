@@ -10,25 +10,24 @@ import { getNumberOfParts, getPartN } from "@src/modules/stringHelper";
 const endpoint = "/getPhotoPartById";
 const callback = async (req: Request, res: Response) => {
   console.log("\n[getPhotoPartById]");
-
-  console.log("Checking request parameters.");
-  if (checkReqBodyAttributeMissing(req, "id", "string")) {
-    console.log("Bad request parameters");
-    console.log("Sending response message");
-    responseFormatter.sendFailedMessage(res);
-    return;
-  }
-  console.log("Request parameters ok.");
-
-  const id: string = req.body.id;
-  let partNumber = 0;
-  if (!checkReqBodyAttributeMissing(req, "part", "number")) {
-    partNumber = req.body.part;
-  }
-
-  console.log(`id: ${req.body.id}, partNumber: ${partNumber}`);
-
   try {
+    console.log("Checking request parameters.");
+    if (checkReqBodyAttributeMissing(req, "id", "string")) {
+      console.log("Bad request parameters");
+      console.log("Sending response message");
+      responseFormatter.sendFailedMessage(res);
+      return;
+    }
+    console.log("Request parameters ok.");
+
+    const id: string = req.body.id;
+    let partNumber = 0;
+    if (!checkReqBodyAttributeMissing(req, "part", "number")) {
+      partNumber = req.body.part;
+    }
+
+    console.log(`id: ${req.body.id}, partNumber: ${partNumber}`);
+
     console.log(`Getting photo with id = ${id} from db.`);
     const dbPhoto = await getPhotoByIdFromDB(id);
     if (!dbPhoto) {

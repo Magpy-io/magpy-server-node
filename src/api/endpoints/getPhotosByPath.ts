@@ -14,22 +14,22 @@ const endpoint = "/getPhotosByPath";
 const callback = async (req: Request, res: Response) => {
   console.log(`\n[getPhotosByPath]`);
 
-  console.log("Checking request parameters.");
-  if (checkBodyParamsMissing(req)) {
-    console.log("Bad request parameters");
-    console.log("Sending response message");
-    responseFormatter.sendFailedMessage(res);
-    return;
-  }
-  console.log("Request parameters ok.");
-
-  console.log(
-    `paths len: ${req.body.paths.length}, type: ${req.body.photoType}`
-  );
-
-  const { paths, photoType }: RequestType = req.body;
-
   try {
+    console.log("Checking request parameters.");
+    if (checkBodyParamsMissing(req)) {
+      console.log("Bad request parameters");
+      console.log("Sending response message");
+      responseFormatter.sendFailedMessage(res);
+      return;
+    }
+    console.log("Request parameters ok.");
+
+    console.log(
+      `paths len: ${req.body.paths.length}, type: ${req.body.photoType}`
+    );
+
+    const { paths, photoType }: RequestType = req.body;
+
     console.log("Getting photos from db with paths from request.");
     const photos = await getPhotosByClientPathFromDB(paths);
     console.log("Received response from db.");

@@ -8,21 +8,20 @@ import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing
 const endpoint = "/deletePhotosById";
 const callback = async (req: Request, res: Response) => {
   console.log("\n[deletePhotosById]");
-
-  console.log("Checking request parameters.");
-  if (checkReqBodyAttributeMissing(req, "ids", "Array string")) {
-    console.log("Bad request parameters");
-    console.log("Sending response message");
-    responseFormatter.sendFailedMessage(res);
-    return;
-  }
-  console.log("Request parameters ok.");
-
-  console.log(`ids len: ${req.body.ids.length}`);
-
-  const ids: string[] = req.body.ids;
-
   try {
+    console.log("Checking request parameters.");
+    if (checkReqBodyAttributeMissing(req, "ids", "Array string")) {
+      console.log("Bad request parameters");
+      console.log("Sending response message");
+      responseFormatter.sendFailedMessage(res);
+      return;
+    }
+    console.log("Request parameters ok.");
+
+    console.log(`ids len: ${req.body.ids.length}`);
+
+    const ids: string[] = req.body.ids;
+
     const removedIds = [];
     for (const id of ids) {
       const dbPhoto = await getPhotoByIdFromDB(id);

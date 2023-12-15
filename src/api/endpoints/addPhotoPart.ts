@@ -12,32 +12,31 @@ import { hashLen, postPhotoPartTimeout } from "@src/config/config";
 const endpoint = "/addPhotoPart";
 const callback = async (req: Request, res: Response) => {
   console.log(`\n[addPhotoPart]`);
-
-  console.log("Checking request parameters.");
-  if (checkBodyParamsMissing(req)) {
-    console.log("Bad request parameters");
-    console.log("Sending response message");
-    responseFormatter.sendFailedMessage(res);
-    return;
-  }
-
-  console.log(`id: ${req.body.id}, part number: ${req.body.partNumber}`);
-
-  const partReceived: RequestType = req.body;
-
-  if (partReceived.partSize != partReceived.photoPart.length) {
-    console.log("Bad request parameters");
-    console.log("Sending response message");
-    responseFormatter.sendFailedMessage(
-      res,
-      "photoPart length and partSize do not match"
-    );
-    return;
-  }
-
-  console.log("Request parameters ok.");
-
   try {
+    console.log("Checking request parameters.");
+    if (checkBodyParamsMissing(req)) {
+      console.log("Bad request parameters");
+      console.log("Sending response message");
+      responseFormatter.sendFailedMessage(res);
+      return;
+    }
+
+    console.log(`id: ${req.body.id}, part number: ${req.body.partNumber}`);
+
+    const partReceived: RequestType = req.body;
+
+    if (partReceived.partSize != partReceived.photoPart.length) {
+      console.log("Bad request parameters");
+      console.log("Sending response message");
+      responseFormatter.sendFailedMessage(
+        res,
+        "photoPart length and partSize do not match"
+      );
+      return;
+    }
+
+    console.log("Request parameters ok.");
+
     if (FilesWaiting.has(partReceived.id)) {
       console.log(`Photo transfer for id ${partReceived.id} found.`);
       const photoWaiting = FilesWaiting.get(partReceived.id);

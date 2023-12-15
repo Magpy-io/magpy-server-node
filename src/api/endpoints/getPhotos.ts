@@ -13,25 +13,24 @@ import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing
 const endpoint = "/getPhotos";
 const callback = async (req: Request, res: Response) => {
   console.log("\n[getPhotos]");
-
-  console.log("Checking request parameters.");
-  if (checkBodyParamsMissing(req)) {
-    console.log("Bad request parameters");
-    console.log("Sending response message");
-    responseFormatter.sendFailedMessage(res);
-    return;
-  }
-  console.log("Request parameters ok.");
-
-  console.log(
-    `number: ${req.body.number}, offset: ${req.body.offset}, type: ${req.body.photoType}`
-  );
-
-  const requestParameters: RequestType = req.body;
-
-  const { number, offset, photoType } = requestParameters;
-
   try {
+    console.log("Checking request parameters.");
+    if (checkBodyParamsMissing(req)) {
+      console.log("Bad request parameters");
+      console.log("Sending response message");
+      responseFormatter.sendFailedMessage(res);
+      return;
+    }
+    console.log("Request parameters ok.");
+
+    console.log(
+      `number: ${req.body.number}, offset: ${req.body.offset}, type: ${req.body.photoType}`
+    );
+
+    const requestParameters: RequestType = req.body;
+
+    const { number, offset, photoType } = requestParameters;
+
     console.log(`Getting ${number} photos with offset ${offset} from db.`);
     const { photos, endReached } = await getPhotosFromDB(number, offset);
 

@@ -13,21 +13,20 @@ import { generateUserToken } from "@src/modules/tokenManagement";
 const endpoint = "/getToken";
 const callback = async (req: Request, res: Response) => {
   console.log("\n[getToken]");
-
-  console.log("Checking request parameters.");
-  if (checkBodyParamsMissing(req)) {
-    console.log("Bad request parameters");
-    console.log("Sending response message");
-    responseFormatter.sendFailedMessage(res);
-    return;
-  }
-  console.log("Request parameters ok.");
-
-  const requestParameters: RequestType = req.body;
-
-  const backendUserToken = requestParameters.userToken;
-
   try {
+    console.log("Checking request parameters.");
+    if (checkBodyParamsMissing(req)) {
+      console.log("Bad request parameters");
+      console.log("Sending response message");
+      responseFormatter.sendFailedMessage(res);
+      return;
+    }
+    console.log("Request parameters ok.");
+
+    const requestParameters: RequestType = req.body;
+
+    const backendUserToken = requestParameters.userToken;
+
     const serverData = await GetServerData();
 
     if (!req.hasValidCredentials) {

@@ -12,34 +12,33 @@ import { Photo } from "@src/types/photoType";
 const endpoint = "/addPhoto";
 const callback = async (req: Request, res: Response) => {
   console.log(`\n[addPhoto]`);
-
-  console.log("Checking request parameters.");
-  if (checkBodyParamsMissing(req)) {
-    console.log("Bad request parameters");
-    console.log("Sending response message");
-    responseFormatter.sendFailedMessage(res);
-    return;
-  }
-  console.log("Request parameters ok.");
-
-  console.log(`path: ${req.body.path}`);
-
-  const requestPhoto: RequestType = req.body;
-
-  const photo: Photo = {
-    id: "",
-    name: requestPhoto.name,
-    fileSize: requestPhoto.fileSize,
-    width: requestPhoto.width,
-    height: requestPhoto.height,
-    date: requestPhoto.date,
-    syncDate: "",
-    clientPath: requestPhoto.path,
-    serverPath: "",
-    hash: "",
-  };
-
   try {
+    console.log("Checking request parameters.");
+    if (checkBodyParamsMissing(req)) {
+      console.log("Bad request parameters");
+      console.log("Sending response message");
+      responseFormatter.sendFailedMessage(res);
+      return;
+    }
+    console.log("Request parameters ok.");
+
+    console.log(`path: ${req.body.path}`);
+
+    const requestPhoto: RequestType = req.body;
+
+    const photo: Photo = {
+      id: "",
+      name: requestPhoto.name,
+      fileSize: requestPhoto.fileSize,
+      width: requestPhoto.width,
+      height: requestPhoto.height,
+      date: requestPhoto.date,
+      syncDate: "",
+      clientPath: requestPhoto.path,
+      serverPath: "",
+      hash: "",
+    };
+
     console.log(`Searching in db for photo with path: ${requestPhoto.path}`);
     const exists = await getPhotoByClientPathFromDB(requestPhoto.path);
     if (exists) {
