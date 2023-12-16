@@ -6,6 +6,7 @@ import { validate } from "uuid";
 import { photoImage64 } from "@tests/helpers/imageBase64";
 import { postPhotoPartTimeout } from "@src/config/config";
 import { timeout } from "@src/modules/functions";
+import { verifyUserToken } from "@src/modules/tokenManagement";
 
 const defaultPhoto = {
   name: "image.jpg",
@@ -213,6 +214,16 @@ async function waitForPhotoTransferToFinish() {
   await timeout(postPhotoPartTimeout + 100);
 }
 
+async function testReturnedToken(ret: request.Response) {
+  expect(ret.headers["authorization"]).toBeDefined();
+  const auth = ret.headers["authorization"];
+  const splited = auth.split(" ");
+  expect(splited.length).toBe(2);
+  expect(splited[0]).toBe("Bearer");
+  const tokenVerification = await verifyUserToken(splited[1]);
+  expect(tokenVerification.ok).toBe(true);
+}
+
 export {
   addPhoto,
   addNPhotos,
@@ -226,4 +237,5 @@ export {
   getNumberPhotos,
   waitForPhotoTransferToFinish,
   defaultPhoto,
+  testReturnedToken,
 };

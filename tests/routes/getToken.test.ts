@@ -14,6 +14,7 @@ import * as mockValues from "@tests/mockHelpers/backendRequestsMockValues";
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB, clearDB } from "@src/db/sequelizeDb";
 import { clearImagesDisk } from "@src/modules/diskManager";
+import { testReturnedToken } from "@tests/helpers/functions";
 
 describe("Test 'claimServer' endpoint", () => {
   let app: Express;
@@ -37,18 +38,31 @@ describe("Test 'claimServer' endpoint", () => {
     await clearFilesWaiting();
   });
 
-  it("Should return ok when claiming a non claimed server", async () => {
+  it("Should return a valid token when asking a claimed server", async () => {
+    AddServerData({
+      serverId: mockValues.serverId,
+      serverKey: mockValues.validKey,
+      serverToken: mockValues.validServerToken,
+    });
+
     const ret = await request(app)
-      .post("/claimServer")
+      .post("/getToken")
       .send({ userToken: mockValues.validUserToken });
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
+    await testReturnedToken(ret);
   });
 
-  it("Should return not ok when trying to claim a server with a non valid token", async () => {
+  it("Should return error AUTHORIZATION_FAILED when using invalid user token", async () => {
+    AddServerData({
+      serverId: mockValues.serverId,
+      serverKey: mockValues.validKey,
+      serverToken: mockValues.validServerToken,
+    });
+
     const ret = await request(app)
-      .post("/claimServer")
+      .post("/getToken")
       .send({ userToken: mockValues.invalidUserToken });
 
     expect(ret.statusCode).toBe(401);
@@ -56,33 +70,30 @@ describe("Test 'claimServer' endpoint", () => {
     expect(ret.body.errorCode).toBe("AUTHORIZATION_FAILED");
   });
 
-  it("Should return error SERVER_ALREADY_CLAIMED when claiming a server with a valid server token", async () => {
+  it("Should return error SERVER_NOT_CLAIMED when requesting a server not claimed", async () => {
+    const ret = await request(app)
+      .post("/getToken")
+      .send({ userToken: mockValues.validUserToken });
+
+    expect(ret.statusCode).toBe(400);
+    expect(ret.body.ok).toBe(false);
+    expect(ret.body.errorCode).toBe("SERVER_NOT_CLAIMED");
+  });
+
+  it("Should return error USER_NOT_ALLOWED when requesting a server not owned by user", async () => {
     AddServerData({
+      serverId: mockValues.serverId,
+      serverKey: mockValues.validKey,
       serverToken: mockValues.validServerToken,
     });
 
     const ret = await request(app)
-      .post("/claimServer")
-      .send({ userToken: mockValues.validUserToken });
+      .post("/getToken")
+      .send({ userToken: mockValues.validUserToken2 });
 
     expect(ret.statusCode).toBe(400);
     expect(ret.body.ok).toBe(false);
-    expect(ret.body.errorCode).toBe("SERVER_ALREADY_CLAIMED");
-  });
-
-  it("Should return error SERVER_ALREADY_CLAIMED when claiming a server with a valid id and key", async () => {
-    AddServerData({
-      serverId: mockValues.serverId,
-      serverKey: mockValues.validKey,
-    });
-
-    const ret = await request(app)
-      .post("/claimServer")
-      .send({ userToken: mockValues.validUserToken });
-
-    expect(ret.statusCode).toBe(400);
-    expect(ret.body.ok).toBe(false);
-    expect(ret.body.errorCode).toBe("SERVER_ALREADY_CLAIMED");
+    expect(ret.body.errorCode).toBe("USER_NOT_ALLOWED");
   });
 
   it("Should return error BACKEND_SERVER_UNREACHABLE when claiming a server but backend unreachable", async () => {
@@ -94,7 +105,7 @@ describe("Test 'claimServer' endpoint", () => {
     mockValues.failNextRequestServerUnreachable();
 
     const ret = await request(app)
-      .post("/claimServer")
+      .post("/getToken")
       .send({ userToken: mockValues.validUserToken });
 
     expect(ret.statusCode).toBe(500);
@@ -111,7 +122,7 @@ describe("Test 'claimServer' endpoint", () => {
     mockValues.failNextRequest();
 
     const ret = await request(app)
-      .post("/claimServer")
+      .post("/getToken")
       .send({ userToken: mockValues.validUserToken });
 
     expect(ret.statusCode).toBe(500);

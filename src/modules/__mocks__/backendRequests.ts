@@ -97,7 +97,10 @@ async function whoAmI(userToken: string) {
     return f;
   }
 
-  if (userToken != mockValues.validUserToken) {
+  if (
+    userToken != mockValues.validUserToken &&
+    userToken != mockValues.validUserToken2
+  ) {
     return {
       ok: false,
       errorCode: "AUTHORIZATION_FAILED",
@@ -108,7 +111,10 @@ async function whoAmI(userToken: string) {
     ok: true,
     data: {
       user: {
-        _id: mockValues.userId,
+        _id:
+          userToken == mockValues.validUserToken
+            ? mockValues.userId
+            : mockValues.userId2,
         email: "issam@gg.io",
       },
     },
