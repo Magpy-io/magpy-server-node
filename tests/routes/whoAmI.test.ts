@@ -11,13 +11,13 @@ import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB } from "@src/db/sequelizeDb";
 import { clearDB } from "@src/db/sequelizeDb";
 import { clearImagesDisk } from "@src/modules/diskManager";
-import { addNPhotos } from "@tests/helpers/functions";
+import * as mockValues from "@tests/mockHelpers/backendRequestsMockValues";
 import {
   setupServerUserToken,
   serverTokenHeader,
 } from "@tests/helpers/functions";
 
-describe("Test 'getNumberPhotos' endpoint", () => {
+describe("Test 'whoAmI' endpoint", () => {
   let app: Express;
 
   beforeAll(async () => {
@@ -40,20 +40,16 @@ describe("Test 'getNumberPhotos' endpoint", () => {
     await clearFilesWaiting();
   });
 
-  it.each([{ n: 0 }, { n: 1 }, { n: 2 }])(
-    "Should return $n after adding $n photos",
-    async (p: { n: number }) => {
-      await addNPhotos(app, p.n);
+  it("Should ok if valid user token", async () => {
+    const ret = await request(app)
+      .post("/whoAmI")
+      .set(serverTokenHeader())
+      .send({});
 
-      const ret = await request(app)
-        .post("/getNumberPhotos")
-        .set(serverTokenHeader())
-        .send({});
-
-      expect(ret.statusCode).toBe(200);
-      expect(ret.body.ok).toBe(true);
-      expect(ret.body).toHaveProperty("data");
-      expect(ret.body.data.number).toBe(p.n);
-    }
-  );
+    expect(ret.statusCode).toBe(200);
+    expect(ret.body.ok).toBe(true);
+    expect(ret.body).toHaveProperty("data");
+    expect(ret.body.data).toHaveProperty("user");
+    expect(ret.body.data.user.id).toBe(mockValues.userId);
+  });
 });

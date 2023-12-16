@@ -5,6 +5,7 @@ import { Express } from "express";
 
 import mockFsVolumeReset from "@tests/helpers/mockFsVolumeReset";
 jest.mock("fs/promises");
+jest.mock("@src/modules/backendRequests");
 
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB, clearDB } from "@src/db/sequelizeDb";
@@ -15,6 +16,10 @@ import {
   getPhotoById,
   getNumberPhotos,
   defaultPhoto,
+} from "@tests/helpers/functions";
+import {
+  setupServerUserToken,
+  serverTokenHeader,
 } from "@tests/helpers/functions";
 
 describe("Test 'addPhoto' endpoint", () => {
@@ -31,6 +36,7 @@ describe("Test 'addPhoto' endpoint", () => {
   beforeEach(async () => {
     await openAndInitDB();
     mockFsVolumeReset();
+    await setupServerUserToken(app);
   });
 
   afterEach(async () => {
@@ -40,7 +46,10 @@ describe("Test 'addPhoto' endpoint", () => {
   });
 
   it("Should add 1 photo when called", async () => {
-    const ret = await request(app).post("/addPhoto").send(defaultPhoto);
+    const ret = await request(app)
+      .post("/addPhoto")
+      .set(serverTokenHeader())
+      .send(defaultPhoto);
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
@@ -87,9 +96,15 @@ describe("Test 'addPhoto' endpoint", () => {
       image64: defaultPhoto.image64,
     };
 
-    const ret1 = await request(app).post("/addPhoto").send(photo1);
+    const ret1 = await request(app)
+      .post("/addPhoto")
+      .set(serverTokenHeader())
+      .send(photo1);
 
-    const ret2 = await request(app).post("/addPhoto").send(photo2);
+    const ret2 = await request(app)
+      .post("/addPhoto")
+      .set(serverTokenHeader())
+      .send(photo2);
 
     expect(ret1.statusCode).toBe(200);
     expect(ret1.body.ok).toBe(true);

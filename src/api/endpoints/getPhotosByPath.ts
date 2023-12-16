@@ -8,6 +8,7 @@ import {
   getCompressedPhotoFromDisk,
   getOriginalPhotoFromDisk,
 } from "@src/modules/diskManager";
+import checkUserToken from "@src/middleware/checkUserToken";
 
 // getPhotosByPath : returns array of photos by their paths.
 const endpoint = "/getPhotosByPath";
@@ -97,4 +98,9 @@ type RequestType = {
   photoType: PhotoTypes;
 };
 
-export default { endpoint: endpoint, callback: callback, method: "post" };
+export default {
+  endpoint: endpoint,
+  callback: callback,
+  method: "post",
+  middleWare: checkUserToken,
+};

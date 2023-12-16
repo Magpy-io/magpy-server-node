@@ -7,6 +7,7 @@ import { hashString } from "@src/modules/hashing";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import { rootPath, hashLen } from "@src/config/config";
 import { Photo } from "@src/types/photoType";
+import checkUserToken from "@src/middleware/checkUserToken";
 
 // addPhoto : adds a photo to the server
 const endpoint = "/addPhoto";
@@ -102,4 +103,9 @@ type RequestType = {
   image64: string;
 };
 
-export default { endpoint: endpoint, callback: callback, method: "post" };
+export default {
+  endpoint: endpoint,
+  callback: callback,
+  method: "post",
+  middleWare: checkUserToken,
+};

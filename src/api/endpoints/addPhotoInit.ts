@@ -7,6 +7,7 @@ import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing
 import { v4 as uuid } from "uuid";
 import { rootPath, postPhotoPartTimeout } from "@src/config/config";
 import { Photo } from "@src/types/photoType";
+import checkUserToken from "@src/middleware/checkUserToken";
 
 // addPhotoInit : initializes the transfer of a photo to the server
 const endpoint = "/addPhotoInit";
@@ -100,4 +101,9 @@ type RequestType = {
   image64Len: number;
 };
 
-export default { endpoint: endpoint, callback: callback, method: "post" };
+export default {
+  endpoint: endpoint,
+  callback: callback,
+  method: "post",
+  middleWare: checkUserToken,
+};

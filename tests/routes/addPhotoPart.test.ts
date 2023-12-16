@@ -5,6 +5,7 @@ import { Express } from "express";
 
 import mockFsVolumeReset from "@tests/helpers/mockFsVolumeReset";
 jest.mock("fs/promises");
+jest.mock("@src/modules/backendRequests");
 
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB } from "@src/db/sequelizeDb";
@@ -19,6 +20,10 @@ import {
 } from "@tests/helpers/functions";
 import * as imageBase64Parts from "@tests/helpers/imageBase64Parts";
 import FilesWaiting from "@src/modules/waitingFiles";
+import {
+  setupServerUserToken,
+  serverTokenHeader,
+} from "@tests/helpers/functions";
 
 describe("Test 'addPhotoPart' endpoint", () => {
   let app: Express;
@@ -34,6 +39,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
   beforeEach(async () => {
     await openAndInitDB();
     mockFsVolumeReset();
+    await setupServerUserToken(app);
   });
 
   afterEach(async () => {
@@ -48,7 +54,10 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };
 
-    const retInit = await request(app).post("/addPhotoInit").send(requestPhoto);
+    const retInit = await request(app)
+      .post("/addPhotoInit")
+      .set(serverTokenHeader())
+      .send(requestPhoto);
 
     if (!retInit.ok) {
       throw "Error starting photo transfer";
@@ -57,32 +66,41 @@ describe("Test 'addPhotoPart' endpoint", () => {
     const id = retInit.body.data.id;
     expect(FilesWaiting.size).toBe(1);
 
-    let ret = await request(app).post("/addPhotoPart").send({
-      id: id,
-      partNumber: 0,
-      partSize: imageBase64Parts.photoLenPart1,
-      photoPart: imageBase64Parts.photoImage64Part1,
-    });
+    let ret = await request(app)
+      .post("/addPhotoPart")
+      .set(serverTokenHeader())
+      .send({
+        id: id,
+        partNumber: 0,
+        partSize: imageBase64Parts.photoLenPart1,
+        photoPart: imageBase64Parts.photoImage64Part1,
+      });
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
 
-    ret = await request(app).post("/addPhotoPart").send({
-      id: id,
-      partNumber: 1,
-      partSize: imageBase64Parts.photoLenPart2,
-      photoPart: imageBase64Parts.photoImage64Part2,
-    });
+    ret = await request(app)
+      .post("/addPhotoPart")
+      .set(serverTokenHeader())
+      .send({
+        id: id,
+        partNumber: 1,
+        partSize: imageBase64Parts.photoLenPart2,
+        photoPart: imageBase64Parts.photoImage64Part2,
+      });
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
 
-    ret = await request(app).post("/addPhotoPart").send({
-      id: id,
-      partNumber: 2,
-      partSize: imageBase64Parts.photoLenPart3,
-      photoPart: imageBase64Parts.photoImage64Part3,
-    });
+    ret = await request(app)
+      .post("/addPhotoPart")
+      .set(serverTokenHeader())
+      .send({
+        id: id,
+        partNumber: 2,
+        partSize: imageBase64Parts.photoLenPart3,
+        photoPart: imageBase64Parts.photoImage64Part3,
+      });
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
@@ -107,12 +125,15 @@ describe("Test 'addPhotoPart' endpoint", () => {
   });
 
   it("Should return error PHOTO_TRANSFER_NOT_FOUND if no transfer was started and sended part", async () => {
-    let ret = await request(app).post("/addPhotoPart").send({
-      id: "id",
-      partNumber: 0,
-      partSize: imageBase64Parts.photoLenPart1,
-      photoPart: imageBase64Parts.photoImage64Part1,
-    });
+    let ret = await request(app)
+      .post("/addPhotoPart")
+      .set(serverTokenHeader())
+      .send({
+        id: "id",
+        partNumber: 0,
+        partSize: imageBase64Parts.photoLenPart1,
+        photoPart: imageBase64Parts.photoImage64Part1,
+      });
 
     expect(ret.statusCode).toBe(400);
     expect(ret.body.ok).toBe(false);
@@ -125,7 +146,10 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };
 
-    const retInit = await request(app).post("/addPhotoInit").send(requestPhoto);
+    const retInit = await request(app)
+      .post("/addPhotoInit")
+      .set(serverTokenHeader())
+      .send(requestPhoto);
 
     if (!retInit.ok) {
       throw "Error starting photo transfer";
@@ -138,12 +162,15 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     expect(FilesWaiting.size).toBe(0);
 
-    let ret = await request(app).post("/addPhotoPart").send({
-      id: id,
-      partNumber: 0,
-      partSize: imageBase64Parts.photoLenPart1,
-      photoPart: imageBase64Parts.photoImage64Part1,
-    });
+    let ret = await request(app)
+      .post("/addPhotoPart")
+      .set(serverTokenHeader())
+      .send({
+        id: id,
+        partNumber: 0,
+        partSize: imageBase64Parts.photoLenPart1,
+        photoPart: imageBase64Parts.photoImage64Part1,
+      });
 
     expect(ret.statusCode).toBe(400);
     expect(ret.body.ok).toBe(false);
@@ -160,7 +187,10 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };
 
-    const retInit = await request(app).post("/addPhotoInit").send(requestPhoto);
+    const retInit = await request(app)
+      .post("/addPhotoInit")
+      .set(serverTokenHeader())
+      .send(requestPhoto);
 
     if (!retInit.ok) {
       throw "Error starting photo transfer";
@@ -169,32 +199,41 @@ describe("Test 'addPhotoPart' endpoint", () => {
     const id = retInit.body.data.id;
     expect(FilesWaiting.size).toBe(1);
 
-    let ret = await request(app).post("/addPhotoPart").send({
-      id: id,
-      partNumber: 0,
-      partSize: imageBase64Parts.photoLenPart1,
-      photoPart: imageBase64Parts.photoImage64Part1,
-    });
+    let ret = await request(app)
+      .post("/addPhotoPart")
+      .set(serverTokenHeader())
+      .send({
+        id: id,
+        partNumber: 0,
+        partSize: imageBase64Parts.photoLenPart1,
+        photoPart: imageBase64Parts.photoImage64Part1,
+      });
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
 
-    ret = await request(app).post("/addPhotoPart").send({
-      id: id,
-      partNumber: 1,
-      partSize: imageBase64Parts.photoLenPart1,
-      photoPart: imageBase64Parts.photoImage64Part1,
-    });
+    ret = await request(app)
+      .post("/addPhotoPart")
+      .set(serverTokenHeader())
+      .send({
+        id: id,
+        partNumber: 1,
+        partSize: imageBase64Parts.photoLenPart1,
+        photoPart: imageBase64Parts.photoImage64Part1,
+      });
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
 
-    ret = await request(app).post("/addPhotoPart").send({
-      id: id,
-      partNumber: 2,
-      partSize: imageBase64Parts.photoLenPart1,
-      photoPart: imageBase64Parts.photoImage64Part1,
-    });
+    ret = await request(app)
+      .post("/addPhotoPart")
+      .set(serverTokenHeader())
+      .send({
+        id: id,
+        partNumber: 2,
+        partSize: imageBase64Parts.photoLenPart1,
+        photoPart: imageBase64Parts.photoImage64Part1,
+      });
 
     expect(ret.statusCode).toBe(400);
     expect(ret.body.ok).toBe(false);
@@ -209,7 +248,10 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };
 
-    const retInit = await request(app).post("/addPhotoInit").send(requestPhoto);
+    const retInit = await request(app)
+      .post("/addPhotoInit")
+      .set(serverTokenHeader())
+      .send(requestPhoto);
 
     if (!retInit.ok) {
       throw "Error starting photo transfer";
@@ -219,6 +261,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     let ret = await request(app)
       .post("/addPhotoPart")
+      .set(serverTokenHeader())
       .send({
         id: id,
         partNumber: 0,
@@ -237,7 +280,10 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };
 
-    const retInit = await request(app).post("/addPhotoInit").send(requestPhoto);
+    const retInit = await request(app)
+      .post("/addPhotoInit")
+      .set(serverTokenHeader())
+      .send(requestPhoto);
 
     if (!retInit.ok) {
       throw "Error starting photo transfer";
@@ -246,32 +292,41 @@ describe("Test 'addPhotoPart' endpoint", () => {
     const id = retInit.body.data.id;
     expect(FilesWaiting.size).toBe(1);
 
-    let ret = await request(app).post("/addPhotoPart").send({
-      id: id,
-      partNumber: 0,
-      partSize: imageBase64Parts.photoLenPart1,
-      photoPart: imageBase64Parts.photoImage64Part1,
-    });
+    let ret = await request(app)
+      .post("/addPhotoPart")
+      .set(serverTokenHeader())
+      .send({
+        id: id,
+        partNumber: 0,
+        partSize: imageBase64Parts.photoLenPart1,
+        photoPart: imageBase64Parts.photoImage64Part1,
+      });
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
 
-    ret = await request(app).post("/addPhotoPart").send({
-      id: id,
-      partNumber: 1,
-      partSize: imageBase64Parts.photoLenPart2,
-      photoPart: imageBase64Parts.photoImage64Part2,
-    });
+    ret = await request(app)
+      .post("/addPhotoPart")
+      .set(serverTokenHeader())
+      .send({
+        id: id,
+        partNumber: 1,
+        partSize: imageBase64Parts.photoLenPart2,
+        photoPart: imageBase64Parts.photoImage64Part2,
+      });
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
 
-    ret = await request(app).post("/addPhotoPart").send({
-      id: id,
-      partNumber: 3,
-      partSize: imageBase64Parts.photoLenPart3,
-      photoPart: imageBase64Parts.photoImage64Part3,
-    });
+    ret = await request(app)
+      .post("/addPhotoPart")
+      .set(serverTokenHeader())
+      .send({
+        id: id,
+        partNumber: 3,
+        partSize: imageBase64Parts.photoLenPart3,
+        photoPart: imageBase64Parts.photoImage64Part3,
+      });
 
     expect(ret.statusCode).toBe(400);
     expect(ret.body.ok).toBe(false);
@@ -290,7 +345,10 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };
 
-    const retInit = await request(app).post("/addPhotoInit").send(requestPhoto);
+    const retInit = await request(app)
+      .post("/addPhotoInit")
+      .set(serverTokenHeader())
+      .send(requestPhoto);
 
     if (!retInit.ok) {
       throw "Error starting photo transfer";
@@ -299,34 +357,43 @@ describe("Test 'addPhotoPart' endpoint", () => {
     const id = retInit.body.data.id;
     expect(FilesWaiting.size).toBe(1);
 
-    let ret = await request(app).post("/addPhotoPart").send({
-      id: id,
-      partNumber: 0,
-      partSize: imageBase64Parts.photoLenPart1,
-      photoPart: imageBase64Parts.photoImage64Part1,
-    });
+    let ret = await request(app)
+      .post("/addPhotoPart")
+      .set(serverTokenHeader())
+      .send({
+        id: id,
+        partNumber: 0,
+        partSize: imageBase64Parts.photoLenPart1,
+        photoPart: imageBase64Parts.photoImage64Part1,
+      });
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
 
-    ret = await request(app).post("/addPhotoPart").send({
-      id: id,
-      partNumber: 1,
-      partSize: imageBase64Parts.photoLenPart2,
-      photoPart: imageBase64Parts.photoImage64Part2,
-    });
+    ret = await request(app)
+      .post("/addPhotoPart")
+      .set(serverTokenHeader())
+      .send({
+        id: id,
+        partNumber: 1,
+        partSize: imageBase64Parts.photoLenPart2,
+        photoPart: imageBase64Parts.photoImage64Part2,
+      });
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
 
     const addedPhotoData = await addPhoto(app);
 
-    ret = await request(app).post("/addPhotoPart").send({
-      id: id,
-      partNumber: 2,
-      partSize: imageBase64Parts.photoLenPart3,
-      photoPart: imageBase64Parts.photoImage64Part3,
-    });
+    ret = await request(app)
+      .post("/addPhotoPart")
+      .set(serverTokenHeader())
+      .send({
+        id: id,
+        partNumber: 2,
+        partSize: imageBase64Parts.photoLenPart3,
+        photoPart: imageBase64Parts.photoImage64Part3,
+      });
 
     expect(ret.statusCode).toBe(400);
     expect(ret.body.ok).toBe(false);

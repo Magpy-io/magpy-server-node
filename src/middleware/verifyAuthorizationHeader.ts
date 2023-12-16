@@ -12,7 +12,7 @@ const verifyAuthorizationHeader = async (
     const bearerHeader = req.headers["authorization"];
 
     if (!bearerHeader) {
-      console.error("Error : No authorization header");
+      console.log("Error : No authorization header");
       responseFormatter.sendFailedMessage(
         res,
         "Invalid authorization",
@@ -24,7 +24,7 @@ const verifyAuthorizationHeader = async (
     const [prefix, token] = bearerHeader.split(" ");
 
     if (!prefix || prefix != "Bearer" || !token) {
-      console.error("Error : authorization header wrong format");
+      console.log("Error : authorization header wrong format");
       responseFormatter.sendFailedMessage(
         res,
         "Invalid authorization",

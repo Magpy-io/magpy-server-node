@@ -9,6 +9,7 @@ import {
 } from "@src/modules/diskManager";
 
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
+import checkUserToken from "@src/middleware/checkUserToken";
 
 // getPhotosById : returns array of photos by their ids.
 const endpoint = "/getPhotosById";
@@ -95,4 +96,9 @@ type RequestType = {
   photoType: PhotoTypes;
 };
 
-export default { endpoint: endpoint, callback: callback, method: "post" };
+export default {
+  endpoint: endpoint,
+  callback: callback,
+  method: "post",
+  middleWare: checkUserToken,
+};

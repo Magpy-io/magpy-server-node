@@ -7,6 +7,7 @@ import {
 } from "@src/db/sequelizeDb";
 
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
+import checkUserToken from "@src/middleware/checkUserToken";
 
 // updatePhotoPath : updates the path of a photo in db
 const endpoint = "/updatePhotoPath";
@@ -83,4 +84,9 @@ type RequestType = {
   path: string;
 };
 
-export default { endpoint: endpoint, callback: callback, method: "post" };
+export default {
+  endpoint: endpoint,
+  callback: callback,
+  method: "post",
+  middleWare: checkUserToken,
+};

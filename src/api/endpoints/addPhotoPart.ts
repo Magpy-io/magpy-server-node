@@ -7,6 +7,7 @@ import { addPhotoToDisk } from "@src/modules/diskManager";
 import { hashString } from "@src/modules/hashing";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import { hashLen, postPhotoPartTimeout } from "@src/config/config";
+import checkUserToken from "@src/middleware/checkUserToken";
 
 // addPhotoPart : adds a part of a photo to the server
 const endpoint = "/addPhotoPart";
@@ -194,4 +195,9 @@ function joinParts(parts: Map<number, string>) {
   return ret;
 }
 
-export default { endpoint: endpoint, callback: callback, method: "post" };
+export default {
+  endpoint: endpoint,
+  callback: callback,
+  method: "post",
+  middleWare: checkUserToken,
+};

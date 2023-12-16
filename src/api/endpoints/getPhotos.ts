@@ -8,6 +8,7 @@ import {
   getOriginalPhotoFromDisk,
 } from "@src/modules/diskManager";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
+import checkUserToken from "@src/middleware/checkUserToken";
 
 // getPhotos : returns "number" photos starting from "offset".
 const endpoint = "/getPhotos";
@@ -94,4 +95,9 @@ type RequestType = {
   photoType: PhotoTypes;
 };
 
-export default { endpoint: endpoint, callback: callback, method: "post" };
+export default {
+  endpoint: endpoint,
+  callback: callback,
+  method: "post",
+  middleWare: checkUserToken,
+};

@@ -5,6 +5,7 @@ import { Express } from "express";
 
 import mockFsVolumeReset from "@tests/helpers/mockFsVolumeReset";
 jest.mock("fs/promises");
+jest.mock("@src/modules/backendRequests");
 
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB } from "@src/db/sequelizeDb";
@@ -14,6 +15,10 @@ import {
   addNPhotos,
   addPhoto,
   checkPhotoExists,
+} from "@tests/helpers/functions";
+import {
+  setupServerUserToken,
+  serverTokenHeader,
 } from "@tests/helpers/functions";
 
 describe("Test 'deletePhotosById' endpoint", () => {
@@ -30,6 +35,7 @@ describe("Test 'deletePhotosById' endpoint", () => {
   beforeEach(async () => {
     await openAndInitDB();
     mockFsVolumeReset();
+    await setupServerUserToken(app);
   });
 
   afterEach(async () => {
@@ -44,9 +50,12 @@ describe("Test 'deletePhotosById' endpoint", () => {
       const addedPhotosData = await addNPhotos(app, p.n);
       const ids = addedPhotosData.map((e) => e.id);
 
-      const ret = await request(app).post("/deletePhotosById").send({
-        ids: ids,
-      });
+      const ret = await request(app)
+        .post("/deletePhotosById")
+        .set(serverTokenHeader())
+        .send({
+          ids: ids,
+        });
 
       expect(ret.statusCode).toBe(200);
       expect(ret.body.ok).toBe(true);
@@ -68,9 +77,12 @@ describe("Test 'deletePhotosById' endpoint", () => {
         .fill("")
         .map((_, i) => "id" + i.toString());
 
-      const ret = await request(app).post("/deletePhotosById").send({
-        ids: ids,
-      });
+      const ret = await request(app)
+        .post("/deletePhotosById")
+        .set(serverTokenHeader())
+        .send({
+          ids: ids,
+        });
 
       expect(ret.statusCode).toBe(200);
       expect(ret.body.ok).toBe(true);
@@ -84,9 +96,12 @@ describe("Test 'deletePhotosById' endpoint", () => {
     const addedPhotoData = await addPhoto(app);
     const ids = [addedPhotoData.id, "id2"];
 
-    const ret = await request(app).post("/deletePhotosById").send({
-      ids: ids,
-    });
+    const ret = await request(app)
+      .post("/deletePhotosById")
+      .set(serverTokenHeader())
+      .send({
+        ids: ids,
+      });
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
@@ -103,9 +118,12 @@ describe("Test 'deletePhotosById' endpoint", () => {
 
     const ids = [addedPhotosData[0].id];
 
-    const ret = await request(app).post("/deletePhotosById").send({
-      ids: ids,
-    });
+    const ret = await request(app)
+      .post("/deletePhotosById")
+      .set(serverTokenHeader())
+      .send({
+        ids: ids,
+      });
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);

@@ -10,6 +10,11 @@ import { verifyUserToken } from "@src/modules/tokenManagement";
 
 import { GetServerData } from "@src/modules/serverDataManager";
 
+import { AddServerData } from "@tests/helpers/mockFsValumeManager";
+import * as mockValues from "@tests/mockHelpers/backendRequestsMockValues";
+
+let serverUserToken = "";
+
 const defaultPhoto = {
   name: "image.jpg",
   fileSize: 1000,
@@ -34,6 +39,7 @@ async function addPhoto(
 ) {
   const ret = await request(app)
     .post("/addPhoto")
+    .set(serverTokenHeader())
     .send({
       name: data?.name ?? defaultPhoto.name,
       fileSize: data?.fileSize ?? defaultPhoto.fileSize,
@@ -174,6 +180,7 @@ function testPhotoData(
 async function checkPhotoExists(app: Express, id: string) {
   const ret = await request(app)
     .post("/getPhotosById")
+    .set(serverTokenHeader())
     .send({
       ids: [id],
       photoType: "data",
@@ -189,6 +196,7 @@ async function checkPhotoExists(app: Express, id: string) {
 async function getPhotoById(app: Express, id: string, photoType?: string) {
   const ret = await request(app)
     .post("/getPhotosById")
+    .set(serverTokenHeader())
     .send({ ids: [id], photoType: photoType ?? "data" });
 
   if (!ret.body.ok) {
@@ -203,7 +211,10 @@ async function getPhotoById(app: Express, id: string, photoType?: string) {
 }
 
 async function getNumberPhotos(app: Express) {
-  const ret = await request(app).post("/getNumberPhotos").send({});
+  const ret = await request(app)
+    .post("/getNumberPhotos")
+    .set(serverTokenHeader())
+    .send({});
 
   if (!ret.body.ok) {
     throw "Error checking photo exists";
@@ -227,6 +238,33 @@ async function testReturnedToken(ret: request.Response) {
   expect(tokenVerification.ok).toBe(true);
 }
 
+async function setupServerUserToken(app: Express) {
+  AddServerData({
+    serverId: mockValues.serverId,
+    serverKey: mockValues.validKey,
+  });
+
+  const ret = await request(app)
+    .post("/getToken")
+    .send({ userToken: mockValues.validUserToken });
+
+  if (!ret.body.ok || !ret.headers["authorization"]) {
+    throw new Error(
+      "Error seting up server to generate user token:\n " +
+        JSON.stringify(ret.body)
+    );
+  }
+  serverUserToken = ret.headers["authorization"].split(" ")[1];
+}
+
+function serverTokenHeader() {
+  if (serverUserToken) {
+    return { Authorization: "Bearer " + serverUserToken };
+  }
+
+  throw new Error("No serverUserToken to use in serverTokenHeader()");
+}
+
 export {
   addPhoto,
   addNPhotos,
@@ -241,4 +279,7 @@ export {
   waitForPhotoTransferToFinish,
   defaultPhoto,
   testReturnedToken,
+  setupServerUserToken,
+  serverUserToken,
+  serverTokenHeader,
 };

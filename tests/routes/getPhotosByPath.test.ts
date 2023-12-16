@@ -5,6 +5,7 @@ import { Express } from "express";
 
 import mockFsVolumeReset from "@tests/helpers/mockFsVolumeReset";
 jest.mock("fs/promises");
+jest.mock("@src/modules/backendRequests");
 
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB } from "@src/db/sequelizeDb";
@@ -17,6 +18,10 @@ import {
   testPhotoCompressed,
   testPhotoThumbnail,
   testPhotoData,
+} from "@tests/helpers/functions";
+import {
+  setupServerUserToken,
+  serverTokenHeader,
 } from "@tests/helpers/functions";
 
 describe("Test 'getPhotosByPath' endpoint", () => {
@@ -33,6 +38,7 @@ describe("Test 'getPhotosByPath' endpoint", () => {
   beforeEach(async () => {
     await openAndInitDB();
     mockFsVolumeReset();
+    await setupServerUserToken(app);
   });
 
   afterEach(async () => {
@@ -48,10 +54,13 @@ describe("Test 'getPhotosByPath' endpoint", () => {
 
       const paths = addedPhotosData.map((e) => e.path);
 
-      const ret = await request(app).post("/getPhotosByPath").send({
-        paths: paths,
-        photoType: "data",
-      });
+      const ret = await request(app)
+        .post("/getPhotosByPath")
+        .set(serverTokenHeader())
+        .send({
+          paths: paths,
+          photoType: "data",
+        });
 
       expect(ret.statusCode).toBe(200);
       expect(ret.body.ok).toBe(true);
@@ -73,10 +82,13 @@ describe("Test 'getPhotosByPath' endpoint", () => {
         .fill("")
         .map((_, i) => "path" + i.toString());
 
-      const ret = await request(app).post("/getPhotosByPath").send({
-        paths: paths,
-        photoType: "data",
-      });
+      const ret = await request(app)
+        .post("/getPhotosByPath")
+        .set(serverTokenHeader())
+        .send({
+          paths: paths,
+          photoType: "data",
+        });
 
       expect(ret.statusCode).toBe(200);
       expect(ret.body.ok).toBe(true);
@@ -96,10 +108,13 @@ describe("Test 'getPhotosByPath' endpoint", () => {
 
     const paths = [photoAddedData.path, "path2"];
 
-    const ret = await request(app).post("/getPhotosByPath").send({
-      paths: paths,
-      photoType: "data",
-    });
+    const ret = await request(app)
+      .post("/getPhotosByPath")
+      .set(serverTokenHeader())
+      .send({
+        paths: paths,
+        photoType: "data",
+      });
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
@@ -126,6 +141,7 @@ describe("Test 'getPhotosByPath' endpoint", () => {
 
       const ret = await request(app)
         .post("/getPhotosByPath")
+        .set(serverTokenHeader())
         .send({
           paths: [photoAddedData.path],
           photoType: testData.photoType,

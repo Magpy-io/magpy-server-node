@@ -5,6 +5,7 @@ import { Express } from "express";
 
 import mockFsVolumeReset from "@tests/helpers/mockFsVolumeReset";
 jest.mock("fs/promises");
+jest.mock("@src/modules/backendRequests");
 
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB } from "@src/db/sequelizeDb";
@@ -14,6 +15,11 @@ import {
   addPhoto,
   testPhotoMetaAndId,
   defaultPhoto,
+} from "@tests/helpers/functions";
+
+import {
+  setupServerUserToken,
+  serverTokenHeader,
 } from "@tests/helpers/functions";
 
 describe("Test 'getPhotoPartById' endpoint", () => {
@@ -30,6 +36,7 @@ describe("Test 'getPhotoPartById' endpoint", () => {
   beforeEach(async () => {
     await openAndInitDB();
     mockFsVolumeReset();
+    await setupServerUserToken(app);
   });
 
   afterEach(async () => {
@@ -43,6 +50,7 @@ describe("Test 'getPhotoPartById' endpoint", () => {
 
     const ret = await request(app)
       .post("/getPhotoPartById")
+      .set(serverTokenHeader())
       .send({ id: addedPhotoData.id, part: 0 });
 
     expect(ret.statusCode).toBe(200);
@@ -57,6 +65,7 @@ describe("Test 'getPhotoPartById' endpoint", () => {
     for (let i = 1; i < totalNumberOfParts; i++) {
       const reti = await request(app)
         .post("/getPhotoPartById")
+        .set(serverTokenHeader())
         .send({ id: addedPhotoData.id, part: i });
 
       expect(reti.statusCode).toBe(200);
@@ -74,6 +83,7 @@ describe("Test 'getPhotoPartById' endpoint", () => {
   it("Should return ID_NOT_FOUND error if requesting a photo that does not exist", async () => {
     const ret = await request(app)
       .post("/getPhotoPartById")
+      .set(serverTokenHeader())
       .send({ id: "id", part: 0 });
 
     expect(ret.statusCode).toBe(400);
@@ -88,6 +98,7 @@ describe("Test 'getPhotoPartById' endpoint", () => {
 
       const ret = await request(app)
         .post("/getPhotoPartById")
+        .set(serverTokenHeader())
         .send({ id: addedPhotoData.id, part: testParameter.n });
 
       expect(ret.statusCode).toBe(400);

@@ -5,6 +5,7 @@ import { Express } from "express";
 
 import mockFsVolumeReset from "@tests/helpers/mockFsVolumeReset";
 jest.mock("fs/promises");
+jest.mock("@src/modules/backendRequests");
 
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB } from "@src/db/sequelizeDb";
@@ -17,6 +18,10 @@ import {
   testPhotoCompressed,
   testPhotoThumbnail,
   testPhotoData,
+} from "@tests/helpers/functions";
+import {
+  setupServerUserToken,
+  serverTokenHeader,
 } from "@tests/helpers/functions";
 
 describe("Test 'getPhotosById' endpoint", () => {
@@ -33,6 +38,7 @@ describe("Test 'getPhotosById' endpoint", () => {
   beforeEach(async () => {
     await openAndInitDB();
     mockFsVolumeReset();
+    await setupServerUserToken(app);
   });
 
   afterEach(async () => {
@@ -48,10 +54,13 @@ describe("Test 'getPhotosById' endpoint", () => {
 
       const ids = addedPhotosData.map((e) => e.id);
 
-      const ret = await request(app).post("/getPhotosById").send({
-        ids: ids,
-        photoType: "data",
-      });
+      const ret = await request(app)
+        .post("/getPhotosById")
+        .set(serverTokenHeader())
+        .send({
+          ids: ids,
+          photoType: "data",
+        });
 
       expect(ret.statusCode).toBe(200);
       expect(ret.body.ok).toBe(true);
@@ -73,10 +82,13 @@ describe("Test 'getPhotosById' endpoint", () => {
         .fill("")
         .map((_, i) => "id" + i.toString());
 
-      const ret = await request(app).post("/getPhotosById").send({
-        ids: ids,
-        photoType: "data",
-      });
+      const ret = await request(app)
+        .post("/getPhotosById")
+        .set(serverTokenHeader())
+        .send({
+          ids: ids,
+          photoType: "data",
+        });
 
       expect(ret.statusCode).toBe(200);
       expect(ret.body.ok).toBe(true);
@@ -96,10 +108,13 @@ describe("Test 'getPhotosById' endpoint", () => {
 
     const ids = [photoAddedData.id, "id2"];
 
-    const ret = await request(app).post("/getPhotosById").send({
-      ids: ids,
-      photoType: "data",
-    });
+    const ret = await request(app)
+      .post("/getPhotosById")
+      .set(serverTokenHeader())
+      .send({
+        ids: ids,
+        photoType: "data",
+      });
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
@@ -126,6 +141,7 @@ describe("Test 'getPhotosById' endpoint", () => {
 
       const ret = await request(app)
         .post("/getPhotosById")
+        .set(serverTokenHeader())
         .send({
           ids: [photoAddedData.id],
           photoType: testData.photoType,

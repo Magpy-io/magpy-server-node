@@ -6,6 +6,7 @@ import { validate } from "uuid";
 
 import mockFsVolumeReset from "@tests/helpers/mockFsVolumeReset";
 jest.mock("fs/promises");
+jest.mock("@src/modules/backendRequests");
 
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB } from "@src/db/sequelizeDb";
@@ -17,6 +18,10 @@ import {
   waitForPhotoTransferToFinish,
 } from "@tests/helpers/functions";
 import FilesWaiting from "@src/modules/waitingFiles";
+import {
+  setupServerUserToken,
+  serverTokenHeader,
+} from "@tests/helpers/functions";
 
 describe("Test 'addPhotoInit' endpoint", () => {
   let app: Express;
@@ -32,6 +37,7 @@ describe("Test 'addPhotoInit' endpoint", () => {
   beforeEach(async () => {
     await openAndInitDB();
     mockFsVolumeReset();
+    await setupServerUserToken(app);
   });
 
   afterEach(async () => {
@@ -46,7 +52,10 @@ describe("Test 'addPhotoInit' endpoint", () => {
 
     const requestPhoto = { ...photo, image64Len: 132148 };
 
-    const ret = await request(app).post("/addPhotoInit").send(requestPhoto);
+    const ret = await request(app)
+      .post("/addPhotoInit")
+      .set(serverTokenHeader())
+      .send(requestPhoto);
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
@@ -71,7 +80,10 @@ describe("Test 'addPhotoInit' endpoint", () => {
     const requestPhoto = { ...photo, image64Len: 132148 };
     requestPhoto.path = addedPhotoData.path;
 
-    const ret = await request(app).post("/addPhotoInit").send(requestPhoto);
+    const ret = await request(app)
+      .post("/addPhotoInit")
+      .set(serverTokenHeader())
+      .send(requestPhoto);
 
     expect(ret.statusCode).toBe(400);
     expect(ret.body.ok).toBe(false);

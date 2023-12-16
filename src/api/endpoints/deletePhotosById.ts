@@ -3,6 +3,7 @@ import responseFormatter from "@src/api/responseFormatter";
 import { getPhotoByIdFromDB, deletePhotoByIdFromDB } from "@src/db/sequelizeDb";
 import { removePhotoFromDisk } from "@src/modules/diskManager";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
+import checkUserToken from "@src/middleware/checkUserToken";
 
 // deletePhotosById: deletes photos from server by id
 const endpoint = "/deletePhotosById";
@@ -41,4 +42,9 @@ const callback = async (req: Request, res: Response) => {
   }
 };
 
-export default { endpoint: endpoint, callback: callback, method: "post" };
+export default {
+  endpoint: endpoint,
+  callback: callback,
+  method: "post",
+  middleWare: checkUserToken,
+};

@@ -1,22 +1,19 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
-import { numberPhotosFromDB } from "@src/db/sequelizeDb";
 
 import checkUserToken from "@src/middleware/checkUserToken";
 
-// getNumberPhotos : return the number of photos in the server.
-const endpoint = "/getNumberPhotos";
+// whoAmI : checks user token is valid
+const endpoint = "/whoAmI";
 const callback = async (req: Request, res: Response) => {
-  console.log(`\n[getNumberPhotos]`);
+  console.log(`\n[whoAmI]`);
 
   try {
-    console.log("Getting number of photos in db.");
-    const nb = await numberPhotosFromDB();
-    console.log(`Number of photos found in db: ${nb}.`);
+    const userId = req.userId;
     const jsonResponse = {
-      number: nb,
+      user: { id: userId },
     };
-    console.log("Sending response data.");
+    console.log("Token verified, sending confirmation");
     responseFormatter.sendResponse(res, jsonResponse);
   } catch (err) {
     console.error(err);

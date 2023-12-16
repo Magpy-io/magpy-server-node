@@ -5,6 +5,7 @@ import { Express } from "express";
 
 import mockFsVolumeReset from "@tests/helpers/mockFsVolumeReset";
 jest.mock("fs/promises");
+jest.mock("@src/modules/backendRequests");
 
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB } from "@src/db/sequelizeDb";
@@ -17,6 +18,10 @@ import {
   testPhotoCompressed,
   testPhotoThumbnail,
   testPhotoData,
+} from "@tests/helpers/functions";
+import {
+  setupServerUserToken,
+  serverTokenHeader,
 } from "@tests/helpers/functions";
 
 describe("Test 'getPhotos' endpoint", () => {
@@ -33,6 +38,7 @@ describe("Test 'getPhotos' endpoint", () => {
   beforeEach(async () => {
     await openAndInitDB();
     mockFsVolumeReset();
+    await setupServerUserToken(app);
   });
 
   afterEach(async () => {
@@ -46,11 +52,14 @@ describe("Test 'getPhotos' endpoint", () => {
     async (p: { n: number }) => {
       await addNPhotos(app, p.n);
 
-      const ret = await request(app).post("/getPhotos").send({
-        number: 10,
-        offset: 0,
-        photoType: "data",
-      });
+      const ret = await request(app)
+        .post("/getPhotos")
+        .set(serverTokenHeader())
+        .send({
+          number: 10,
+          offset: 0,
+          photoType: "data",
+        });
 
       expect(ret.statusCode).toBe(200);
       expect(ret.body.ok).toBe(true);
@@ -71,11 +80,14 @@ describe("Test 'getPhotos' endpoint", () => {
     async (p: { n: number; r: number; endReached: boolean }) => {
       await addNPhotos(app, 2);
 
-      const ret = await request(app).post("/getPhotos").send({
-        number: p.n,
-        offset: 0,
-        photoType: "data",
-      });
+      const ret = await request(app)
+        .post("/getPhotos")
+        .set(serverTokenHeader())
+        .send({
+          number: p.n,
+          offset: 0,
+          photoType: "data",
+        });
 
       expect(ret.statusCode).toBe(200);
       expect(ret.body.ok).toBe(true);
@@ -88,11 +100,14 @@ describe("Test 'getPhotos' endpoint", () => {
   it("Should return endReached=true and number=1 after adding 2 photos and asking for 1 with offset=1", async () => {
     await addNPhotos(app, 2);
 
-    const ret = await request(app).post("/getPhotos").send({
-      number: 1,
-      offset: 1,
-      photoType: "data",
-    });
+    const ret = await request(app)
+      .post("/getPhotos")
+      .set(serverTokenHeader())
+      .send({
+        number: 1,
+        offset: 1,
+        photoType: "data",
+      });
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
@@ -111,11 +126,14 @@ describe("Test 'getPhotos' endpoint", () => {
     async (testData) => {
       const photoAddedData = await addPhoto(app);
 
-      const ret = await request(app).post("/getPhotos").send({
-        number: 1,
-        offset: 0,
-        photoType: testData.photoType,
-      });
+      const ret = await request(app)
+        .post("/getPhotos")
+        .set(serverTokenHeader())
+        .send({
+          number: 1,
+          offset: 0,
+          photoType: testData.photoType,
+        });
 
       expect(ret.statusCode).toBe(200);
       expect(ret.body.ok).toBe(true);

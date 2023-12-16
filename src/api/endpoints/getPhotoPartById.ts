@@ -5,6 +5,7 @@ import { getOriginalPhotoFromDisk } from "@src/modules/diskManager";
 
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import { getNumberOfParts, getPartN } from "@src/modules/stringHelper";
+import checkUserToken from "@src/middleware/checkUserToken";
 
 // getPhotoPartById : returns a part of a photo by id.
 const endpoint = "/getPhotoPartById";
@@ -77,4 +78,9 @@ const callback = async (req: Request, res: Response) => {
   }
 };
 
-export default { endpoint: endpoint, callback: callback, method: "post" };
+export default {
+  endpoint: endpoint,
+  callback: callback,
+  method: "post",
+  middleWare: checkUserToken,
+};
