@@ -1,6 +1,7 @@
 // IMPORTS
 import { Response } from "express";
 import { Photo } from "@src/types/photoType";
+import { ErrorCodes } from "@src/types/apiErrorCodes";
 
 async function sendResponse(res: Response, data: any, status = 200) {
   let jsonResponse = {
@@ -23,7 +24,7 @@ async function sendSuccessfulMessage(res: Response, msg: string, status = 200) {
 async function sendFailedMessage(
   res: Response,
   msg = "Bad request",
-  code = "BAD_REQUEST",
+  code: ErrorCodes = "BAD_REQUEST",
   status = 400
 ) {
   let jsonResponse = {
