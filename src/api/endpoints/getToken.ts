@@ -59,6 +59,15 @@ const callback = async (req: Request, res: Response) => {
           401
         );
         return;
+      } else if (retUser.errorCode == "AUTHORIZATION_EXPIRED") {
+        console.log("user token expired");
+        responseFormatter.sendFailedMessage(
+          res,
+          "User token expired",
+          "AUTHORIZATION_BACKEND_EXPIRED",
+          401
+        );
+        return;
       } else {
         console.error("Error requesting backend server");
         console.error(retUser);

@@ -14,6 +14,13 @@ async function registerServer(
     return f;
   }
 
+  if (userToken == mockValues.expiredUserToken) {
+    return {
+      ok: false,
+      errorCode: "AUTHORIZATION_EXPIRED",
+    };
+  }
+
   if (userToken != mockValues.validUserToken) {
     return {
       ok: false,
@@ -71,6 +78,13 @@ async function getServerInfo(serverToken: string) {
     return f;
   }
 
+  if (serverToken == mockValues.expiredServerToken) {
+    return {
+      ok: false,
+      errorCode: "AUTHORIZATION_EXPIRED",
+    };
+  }
+
   if (serverToken != mockValues.validServerToken) {
     return {
       ok: false,
@@ -95,6 +109,13 @@ async function whoAmI(userToken: string) {
   const f = mockValues.checkFails();
   if (f) {
     return f;
+  }
+
+  if (userToken == mockValues.expiredUserToken) {
+    return {
+      ok: false,
+      errorCode: "AUTHORIZATION_EXPIRED",
+    };
   }
 
   if (

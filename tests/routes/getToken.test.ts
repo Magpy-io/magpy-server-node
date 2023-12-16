@@ -70,6 +70,22 @@ describe("Test 'claimServer' endpoint", () => {
     expect(ret.body.errorCode).toBe("AUTHORIZATION_BACKEND_FAILED");
   });
 
+  it("Should return error AUTHORIZATION_BACKEND_EXPIRED when using an expired user token", async () => {
+    AddServerData({
+      serverId: mockValues.serverId,
+      serverKey: mockValues.validKey,
+      serverToken: mockValues.validServerToken,
+    });
+
+    const ret = await request(app)
+      .post("/getToken")
+      .send({ userToken: mockValues.expiredUserToken });
+
+    expect(ret.statusCode).toBe(401);
+    expect(ret.body.ok).toBe(false);
+    expect(ret.body.errorCode).toBe("AUTHORIZATION_BACKEND_EXPIRED");
+  });
+
   it("Should return error SERVER_NOT_CLAIMED when requesting a server not claimed", async () => {
     const ret = await request(app)
       .post("/getToken")
