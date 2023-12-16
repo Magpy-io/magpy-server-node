@@ -15,6 +15,6 @@ main().catch((err) => {
 
 async function main() {
   await openAndInitDB();
-  initServer();
+  await initServer();
   startMdns();
 }

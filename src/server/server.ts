@@ -8,7 +8,7 @@ import FilesWaiting from "@src/modules/waitingFiles";
 let app: Express;
 let server: any;
 
-function initServer() {
+async function initServer() {
   app = express();
 
   app.use(
@@ -22,11 +22,12 @@ function initServer() {
   loadEndpoints(app);
   console.log("Endpoints loaded");
 
-  server = app.listen(process.env.PORT, () => {
-    console.log(`Server is listening on port ${process.env.PORT}`);
+  return new Promise<Express>((resolve) => {
+    server = app.listen(process.env.PORT, () => {
+      console.log(`Server is listening on port ${process.env.PORT}`);
+      resolve(app);
+    });
   });
-
-  return app;
 }
 
 function clearFilesWaiting() {
