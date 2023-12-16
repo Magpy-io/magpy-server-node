@@ -32,7 +32,10 @@ async function checkServerHasValidCredentials(
       }
 
       if (!ret.ok) {
-        if (ret.errorCode == "AUTHORIZATION_FAILED") {
+        if (
+          ret.errorCode == "AUTHORIZATION_FAILED" ||
+          ret.errorCode == "AUTHORIZATION_EXPIRED"
+        ) {
           console.log("Invalid server token");
         } else {
           console.error("request to get server info failed");
@@ -80,6 +83,7 @@ async function checkServerHasValidCredentials(
           serverKey: serverData.serverKey,
           serverToken: serverToken,
         });
+
         req.hasValidCredentials = true;
         next();
         return;
