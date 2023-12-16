@@ -15,8 +15,8 @@ import { clearImagesDisk } from "@src/modules/diskManager";
 import {
   setupServerUserToken,
   serverTokenHeader,
+  expiredTokenHeader,
 } from "@tests/helpers/functions";
-import { getServerToken } from "@src/modules/backendRequests";
 
 const endpointsToTestInvalidToken = [
   "addPhoto",
@@ -107,6 +107,48 @@ describe("Test endpoints return error when invalid token", () => {
       expect(ret.statusCode).toBe(400);
       expect(ret.body.ok).toBe(false);
       expect(ret.body.errorCode).toBe("AUTHORIZATION_FAILED");
+    }
+  );
+
+  it.each(
+    endpointsToTestInvalidToken.map((endpoint) => {
+      return {
+        endpoint,
+      };
+    })
+  )(
+    "Should return error AUTHORIZATION_FAILED when invalid token is used for endpoint $endpoint",
+    async (p) => {
+      const ret = await request(app)
+        .post("/" + p.endpoint)
+        .set({ Authorization: "Bearer invalidToken" })
+        .set("Content-Type", "application/json")
+        .send({});
+
+      expect(ret.statusCode).toBe(400);
+      expect(ret.body.ok).toBe(false);
+      expect(ret.body.errorCode).toBe("AUTHORIZATION_FAILED");
+    }
+  );
+
+  it.each(
+    endpointsToTestInvalidToken.map((endpoint) => {
+      return {
+        endpoint,
+      };
+    })
+  )(
+    "Should return error AUTHORIZATION_EXPIRED when expired token is used for endpoint $endpoint",
+    async (p) => {
+      const ret = await request(app)
+        .post("/" + p.endpoint)
+        .set(expiredTokenHeader())
+        .set("Content-Type", "application/json")
+        .send({});
+
+      expect(ret.statusCode).toBe(400);
+      expect(ret.body.ok).toBe(false);
+      expect(ret.body.errorCode).toBe("AUTHORIZATION_EXPIRED");
     }
   );
 

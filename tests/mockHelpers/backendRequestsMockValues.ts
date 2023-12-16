@@ -17,6 +17,9 @@ const validServerToken =
 const invalidServerToken = "invalidServerToken";
 const expiredServerToken = "expiredServerToken";
 
+const expiredUserServerToken =
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6InVzZXJJZCIsImlhdCI6MTcwMjczNDA3OSwiZXhwIjoxNzAyNzM0MDgwfQ.j4R6-FkLVytTT6bEI1Ib_dNicJzKdu_Gvke5FUsIaPw";
+
 let shouldNextRequestFail = false;
 let shouldNextRequestFailServerUnreachable = false;
 
@@ -61,6 +64,7 @@ export {
   validServerToken,
   invalidServerToken,
   expiredServerToken,
+  expiredUserServerToken,
   failNextRequest,
   failNextRequestServerUnreachable,
   checkFails,

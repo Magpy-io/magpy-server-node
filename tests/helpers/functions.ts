@@ -265,6 +265,10 @@ function serverTokenHeader() {
   throw new Error("No serverUserToken to use in serverTokenHeader()");
 }
 
+function expiredTokenHeader() {
+  return { Authorization: "Bearer " + mockValues.expiredUserServerToken };
+}
+
 export {
   addPhoto,
   addNPhotos,
@@ -282,4 +286,5 @@ export {
   setupServerUserToken,
   serverUserToken,
   serverTokenHeader,
+  expiredTokenHeader,
 };
