@@ -1,10 +1,14 @@
 import { Request, Response, NextFunction } from "express";
 
+import checkServerHasCredentials from "@src/middleware/checkServerHasCredentials";
+
 import responseFormatter from "@src/api/responseFormatter";
+
+import { combineMiddleware } from "@src/modules/functions";
 
 import { getServerInfo, getServerToken } from "@src/modules/backendRequests";
 
-import { GetServerData, SaveServerData } from "@src/modules/serverDataManager";
+import { SaveServerData } from "@src/modules/serverDataManager";
 
 async function checkServerHasValidCredentials(
   req: Request,
@@ -12,7 +16,7 @@ async function checkServerHasValidCredentials(
   next: NextFunction
 ) {
   try {
-    const serverData = await GetServerData();
+    const serverData = req.serverData;
 
     if (serverData.serverToken) {
       console.log("server token found");
@@ -90,4 +94,7 @@ async function checkServerHasValidCredentials(
   }
 }
 
-export default checkServerHasValidCredentials;
+export default combineMiddleware([
+  checkServerHasCredentials,
+  checkServerHasValidCredentials,
+]);

@@ -55,7 +55,7 @@ const callback = async (req: Request, res: Response) => {
         responseFormatter.sendFailedMessage(
           res,
           "User token verification failed",
-          "AUTHORIZATION_FAILED",
+          "AUTHORIZATION_BACKEND_FAILED",
           401
         );
         return;

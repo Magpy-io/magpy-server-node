@@ -8,6 +8,8 @@ import { postPhotoPartTimeout } from "@src/config/config";
 import { timeout } from "@src/modules/functions";
 import { verifyUserToken } from "@src/modules/tokenManagement";
 
+import { GetServerData } from "@src/modules/serverDataManager";
+
 const defaultPhoto = {
   name: "image.jpg",
   fileSize: 1000,
@@ -215,12 +217,13 @@ async function waitForPhotoTransferToFinish() {
 }
 
 async function testReturnedToken(ret: request.Response) {
+  const serverData = await GetServerData();
   expect(ret.headers["authorization"]).toBeDefined();
   const auth = ret.headers["authorization"];
   const splited = auth.split(" ");
   expect(splited.length).toBe(2);
   expect(splited[0]).toBe("Bearer");
-  const tokenVerification = await verifyUserToken(splited[1]);
+  const tokenVerification = verifyUserToken(splited[1], serverData.serverKey);
   expect(tokenVerification.ok).toBe(true);
 }
 

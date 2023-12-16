@@ -1,0 +1,54 @@
+import { Request, Response, NextFunction } from "express";
+
+import responseFormatter from "@src/api/responseFormatter";
+
+import { combineMiddleware } from "@src/modules/functions";
+
+import checkServerHasCredentials from "@src/middleware/checkServerHasCredentials";
+
+import verifyAuthorizationHeader from "@src/middleware/verifyAuthorizationHeader";
+
+import { verifyUserToken } from "@src/modules/tokenManagement";
+
+async function checkUserToken(req: Request, res: Response, next: NextFunction) {
+  try {
+    console.log("\n#VerifyServerToken middleware");
+
+    const token = req.token;
+
+    if (!req?.serverData?.serverKey) {
+      console.log("server is not claimed");
+      responseFormatter.sendFailedMessage(
+        res,
+        "Server not claimed",
+        "SERVER_NOT_CLAIMED"
+      );
+      return;
+    }
+
+    const ret = verifyUserToken(token, req.serverData.serverKey);
+
+    if (!ret.ok) {
+      console.log("Invalid user Token");
+      console.log(ret);
+      responseFormatter.sendFailedMessage(
+        res,
+        "User token verification failed",
+        "AUTHORIZATION_FAILED"
+      );
+      return;
+    }
+
+    req.userId = ret.data.id;
+    next();
+  } catch (err) {
+    console.error(err);
+    responseFormatter.sendErrorMessage(res);
+  }
+}
+
+export default combineMiddleware([
+  checkServerHasCredentials,
+  verifyAuthorizationHeader,
+  checkUserToken,
+]);

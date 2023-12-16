@@ -2,6 +2,8 @@ import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
 import { numberPhotosFromDB } from "@src/db/sequelizeDb";
 
+import checkUserToken from "@src/middleware/checkUserToken";
+
 // getNumberPhotos : return the number of photos in the server.
 const endpoint = "/getNumberPhotos";
 const callback = async (req: Request, res: Response) => {
@@ -22,4 +24,9 @@ const callback = async (req: Request, res: Response) => {
   }
 };
 
-export default { endpoint: endpoint, callback: callback, method: "post" };
+export default {
+  endpoint: endpoint,
+  callback: callback,
+  method: "post",
+  //middleWare: checkUserToken,
+};

@@ -1,9 +1,13 @@
+import { ServerData } from "@src/modules/serverDataManager";
 export {};
 
 declare global {
   namespace Express {
     export interface Request {
-      hasValidCredentials: boolean;
+      serverData?: ServerData;
+      hasValidCredentials?: boolean;
+      userId?: string;
+      token?: string;
     }
   }
 }

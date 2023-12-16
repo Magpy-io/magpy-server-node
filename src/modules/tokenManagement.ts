@@ -2,28 +2,31 @@ import { GetServerData } from "@src/modules/serverDataManager";
 import jwt from "jsonwebtoken";
 import { jwtUserExp } from "@src/config/config";
 
+type TokenData = { id: string };
+
 async function generateUserToken(userId: string) {
   const serverData = await GetServerData();
   if (!serverData.serverKey) {
     throw new Error("Server key not defined");
   }
-  const token = jwt.sign({ id: userId }, serverData.serverKey, {
+
+  const tokenData: TokenData = { id: userId };
+  const token = jwt.sign(tokenData, serverData.serverKey, {
     expiresIn: jwtUserExp,
   });
   return token;
 }
 
-async function verifyUserToken(token: string): Promise<{
+function verifyUserToken(
+  token: string,
+  key: string
+): {
   ok: boolean;
-  data?: any;
+  data?: TokenData;
   error?: ErrorTypes;
-}> {
-  const serverData = await GetServerData();
+} {
   try {
-    if (!serverData.serverKey) {
-      throw new Error("Server key not defined");
-    }
-    const decoded = jwt.verify(token, serverData.serverKey);
+    const decoded: any = jwt.verify(token, key);
     return { ok: true, data: decoded };
   } catch (err: any) {
     if (err.name == "TokenExpiredError") {

@@ -4,7 +4,11 @@ import { createFolder } from "@src/modules/diskManager";
 import { serverDataFolder } from "@src/config/config";
 
 const fileName = "serverInfo.json";
-type ServerData = { serverId: string; serverKey: string; serverToken?: string };
+type ServerData = {
+  serverId?: string;
+  serverKey?: string;
+  serverToken?: string;
+};
 
 async function SaveServerData(data: ServerData) {
   await createFolder(serverDataFolder);
@@ -18,7 +22,7 @@ async function GetServerData(): Promise<ServerData> {
 
     return JSON.parse(buffer.toString());
   } catch (err) {
-    return { serverId: "", serverKey: "" };
+    return {};
   }
 }
 

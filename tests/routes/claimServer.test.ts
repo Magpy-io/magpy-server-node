@@ -46,14 +46,14 @@ describe("Test 'claimServer' endpoint", () => {
     expect(ret.body.ok).toBe(true);
   });
 
-  it("Should return not ok when trying to claim a server with a non valid token", async () => {
+  it("Should return error AUTHORIZATION_BACKEND_FAILED when trying to claim a server with a non valid token", async () => {
     const ret = await request(app)
       .post("/claimServer")
       .send({ userToken: mockValues.invalidUserToken });
 
     expect(ret.statusCode).toBe(401);
     expect(ret.body.ok).toBe(false);
-    expect(ret.body.errorCode).toBe("AUTHORIZATION_FAILED");
+    expect(ret.body.errorCode).toBe("AUTHORIZATION_BACKEND_FAILED");
   });
 
   it("Should return error SERVER_ALREADY_CLAIMED when claiming a server with a valid server token", async () => {

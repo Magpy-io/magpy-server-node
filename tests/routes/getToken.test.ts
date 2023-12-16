@@ -54,7 +54,7 @@ describe("Test 'claimServer' endpoint", () => {
     await testReturnedToken(ret);
   });
 
-  it("Should return error AUTHORIZATION_FAILED when using invalid user token", async () => {
+  it("Should return error AUTHORIZATION_BACKEND_FAILED when using invalid user token", async () => {
     AddServerData({
       serverId: mockValues.serverId,
       serverKey: mockValues.validKey,
@@ -67,7 +67,7 @@ describe("Test 'claimServer' endpoint", () => {
 
     expect(ret.statusCode).toBe(401);
     expect(ret.body.ok).toBe(false);
-    expect(ret.body.errorCode).toBe("AUTHORIZATION_FAILED");
+    expect(ret.body.errorCode).toBe("AUTHORIZATION_BACKEND_FAILED");
   });
 
   it("Should return error SERVER_NOT_CLAIMED when requesting a server not claimed", async () => {
