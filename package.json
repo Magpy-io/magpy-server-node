@@ -5,8 +5,7 @@
     "clean": "yarn build && node ./dist/src/clearImages.js",
     "test": "yarn build && cross-env NODE_ENV=test jest ./dist/tests --verbose=true --silent --collect-coverage --testTimeout=10000",
     "test:v": "yarn build && cross-env NODE_ENV=test jest ./dist/tests --verbose=true --collect-coverage --testTimeout=10000",
-    "test:single": "yarn build && cross-env NODE_ENV=test jest --verbose=true --collect-coverage --testTimeout=10000",
-    "pretest": "cross-env NODE_ENV=test"
+    "test:single": "yarn build && cross-env NODE_ENV=test jest --verbose=true --collect-coverage --testTimeout=10000"
   },
   "dependencies": {
     "@sequelize/core": "^7.0.0-alpha.29",
