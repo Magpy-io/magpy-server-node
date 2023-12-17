@@ -80,7 +80,6 @@ describe("Test endpoints return error when invalid token", () => {
     async (p) => {
       const ret = await request(app)
         .post("/" + p.endpoint)
-        .set("Content-Type", "application/json")
         .send({});
 
       expect(ret.statusCode).toBe(400);
@@ -101,28 +100,6 @@ describe("Test endpoints return error when invalid token", () => {
       const ret = await request(app)
         .post("/" + p.endpoint)
         .set({ Authorization: "Bearer invalidToken" })
-        .set("Content-Type", "application/json")
-        .send({});
-
-      expect(ret.statusCode).toBe(400);
-      expect(ret.body.ok).toBe(false);
-      expect(ret.body.errorCode).toBe("AUTHORIZATION_FAILED");
-    }
-  );
-
-  it.each(
-    endpointsToTestInvalidToken.map((endpoint) => {
-      return {
-        endpoint,
-      };
-    })
-  )(
-    "Should return error AUTHORIZATION_FAILED when invalid token is used for endpoint $endpoint",
-    async (p) => {
-      const ret = await request(app)
-        .post("/" + p.endpoint)
-        .set({ Authorization: "Bearer invalidToken" })
-        .set("Content-Type", "application/json")
         .send({});
 
       expect(ret.statusCode).toBe(400);
@@ -143,7 +120,6 @@ describe("Test endpoints return error when invalid token", () => {
       const ret = await request(app)
         .post("/" + p.endpoint)
         .set(expiredTokenHeader())
-        .set("Content-Type", "application/json")
         .send({});
 
       expect(ret.statusCode).toBe(400);
@@ -167,7 +143,6 @@ describe("Test endpoints return error when invalid token", () => {
       const ret = await request(app)
         .post("/" + p.endpoint)
         .set(serverTokenHeader())
-        .set("Content-Type", "application/json")
         .send({});
 
       expect(ret.statusCode).toBe(400);
