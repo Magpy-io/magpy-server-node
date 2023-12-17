@@ -2,6 +2,7 @@ import request from "supertest";
 import { expect } from "@jest/globals";
 import { Express } from "express";
 import { validate } from "uuid";
+import jwt from "jsonwebtoken";
 
 import { photoImage64 } from "@tests/helpers/imageBase64";
 import { postPhotoPartTimeout } from "@src/config/config";
@@ -266,7 +267,11 @@ function serverTokenHeader() {
 }
 
 function expiredTokenHeader() {
-  return { Authorization: "Bearer " + mockValues.expiredUserServerToken };
+  const expiredToken = jwt.sign({}, mockValues.validKey, {
+    expiresIn: 0,
+  });
+
+  return { Authorization: "Bearer " + expiredToken };
 }
 
 export {
