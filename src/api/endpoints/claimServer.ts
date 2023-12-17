@@ -61,8 +61,7 @@ const callback = async (req: Request, res: Response) => {
         responseFormatter.sendFailedMessage(
           res,
           "User token verification failed",
-          "AUTHORIZATION_BACKEND_FAILED",
-          401
+          "AUTHORIZATION_BACKEND_FAILED"
         );
         return;
       } else if (ret.errorCode == "AUTHORIZATION_EXPIRED") {
@@ -70,8 +69,7 @@ const callback = async (req: Request, res: Response) => {
         responseFormatter.sendFailedMessage(
           res,
           "User token expired",
-          "AUTHORIZATION_BACKEND_EXPIRED",
-          401
+          "AUTHORIZATION_BACKEND_EXPIRED"
         );
         return;
       } else {

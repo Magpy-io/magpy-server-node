@@ -16,8 +16,7 @@ const verifyAuthorizationHeader = async (
       responseFormatter.sendFailedMessage(
         res,
         "Invalid authorization",
-        "AUTHORIZATION_MISSING",
-        401
+        "AUTHORIZATION_MISSING"
       );
       return;
     }
@@ -28,8 +27,7 @@ const verifyAuthorizationHeader = async (
       responseFormatter.sendFailedMessage(
         res,
         "Invalid authorization",
-        "AUTHORIZATION_WRONG_FORMAT",
-        401
+        "AUTHORIZATION_WRONG_FORMAT"
       );
       return;
     }

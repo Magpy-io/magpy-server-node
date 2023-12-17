@@ -65,7 +65,7 @@ describe("Test 'claimServer' endpoint", () => {
       .post("/getToken")
       .send({ userToken: mockValues.invalidUserToken });
 
-    expect(ret.statusCode).toBe(401);
+    expect(ret.statusCode).toBe(400);
     expect(ret.body.ok).toBe(false);
     expect(ret.body.errorCode).toBe("AUTHORIZATION_BACKEND_FAILED");
   });
@@ -81,7 +81,7 @@ describe("Test 'claimServer' endpoint", () => {
       .post("/getToken")
       .send({ userToken: mockValues.expiredUserToken });
 
-    expect(ret.statusCode).toBe(401);
+    expect(ret.statusCode).toBe(400);
     expect(ret.body.ok).toBe(false);
     expect(ret.body.errorCode).toBe("AUTHORIZATION_BACKEND_EXPIRED");
   });

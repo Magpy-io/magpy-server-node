@@ -83,7 +83,7 @@ describe("Test endpoints return error when invalid token", () => {
         .set("Content-Type", "application/json")
         .send({});
 
-      expect(ret.statusCode).toBe(401);
+      expect(ret.statusCode).toBe(400);
       expect(ret.body.ok).toBe(false);
       expect(ret.body.errorCode).toBe("AUTHORIZATION_MISSING");
     }
