@@ -21,7 +21,7 @@ let postPhotoPartTimeoutTmp = 0;
 
 if (process.env.NODE_ENV === "test") {
   //supress console.log() when testing
-  console.log = function () {};
+  //console.log = function () {};
 
   rootPathTmp = rootPathTest;
   sqliteDbFileTmp = sqliteDbFileTest;
