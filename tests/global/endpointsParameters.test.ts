@@ -140,7 +140,6 @@ describe("Test endpoints return error when invalid request", () => {
     async (p) => {
       const ret = await request(app)
         .post("/" + p.endpoint)
-        .set(serverTokenHeader())
         .set("Content-Type", "application/json")
         .send("{");
 
