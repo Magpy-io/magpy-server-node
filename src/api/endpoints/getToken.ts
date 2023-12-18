@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import { getServerInfo, whoAmI } from "@src/modules/backendRequests";
+import { ErrorBackendUnreachable } from "@src/types/ExceptionTypes";
 
 import checkServerHasValidCredentials from "@src/middleware/checkServerHasValidCredentials";
 
@@ -43,9 +44,13 @@ const callback = async (req: Request, res: Response) => {
     try {
       retUser = await whoAmI(backendUserToken);
     } catch (err) {
-      console.error("Error requesting backend server");
-      console.error(err);
-      responseFormatter.sendErrorBackEndServerUnreachable(res);
+      if (err instanceof ErrorBackendUnreachable) {
+        console.log("Error requesting backend server");
+        responseFormatter.sendErrorBackEndServerUnreachable(res);
+      } else {
+        console.error(err);
+        responseFormatter.sendErrorMessage(res);
+      }
       return;
     }
 
@@ -78,9 +83,13 @@ const callback = async (req: Request, res: Response) => {
     try {
       retServer = await getServerInfo(serverData.serverToken);
     } catch (err) {
-      console.error("Error requesting backend server");
-      console.error(err);
-      responseFormatter.sendErrorBackEndServerUnreachable(res);
+      if (err instanceof ErrorBackendUnreachable) {
+        console.log("Error requesting backend server");
+        responseFormatter.sendErrorBackEndServerUnreachable(res);
+      } else {
+        console.error(err);
+        responseFormatter.sendErrorMessage(res);
+      }
       return;
     }
 

@@ -1,5 +1,5 @@
 import axios from "axios";
-
+import { ErrorBackendUnreachable } from "@src/types/ExceptionTypes";
 const url = process.env.BACK_HOST + ":" + process.env.BACK_PORT;
 
 async function registerServer(
@@ -24,13 +24,7 @@ async function registerServer(
     );
     return response.data;
   } catch (err: any) {
-    const body = err?.response?.data;
-
-    if (!body?.hasOwnProperty("ok")) {
-      throw err;
-    }
-
-    return body;
+    return handleAxiosError(err);
   }
 }
 
@@ -45,13 +39,7 @@ async function getServerToken(serverId_p: string, serverKey: string) {
       token: response.headers["authorization"].toString().split(" ")[1],
     };
   } catch (err: any) {
-    const body = err?.response?.data;
-
-    if (!body?.hasOwnProperty("ok")) {
-      throw err;
-    }
-
-    return body;
+    return handleAxiosError(err);
   }
 }
 
@@ -68,13 +56,7 @@ async function getServerInfo(serverToken: string) {
     );
     return response.data;
   } catch (err: any) {
-    const body = err?.response?.data;
-
-    if (!body?.hasOwnProperty("ok")) {
-      throw err;
-    }
-
-    return body;
+    return handleAxiosError(err);
   }
 }
 
@@ -91,13 +73,17 @@ async function whoAmI(userToken: string) {
     );
     return response.data;
   } catch (err: any) {
-    const body = err?.response?.data;
+    return handleAxiosError(err);
+  }
+}
 
-    if (!body?.hasOwnProperty("ok")) {
-      throw err;
-    }
-
-    return body;
+function handleAxiosError(err: any) {
+  if (err.response) {
+    return err.response.data;
+  } else if (err.request) {
+    throw new ErrorBackendUnreachable("Backend unreachable");
+  } else {
+    throw err;
   }
 }
 

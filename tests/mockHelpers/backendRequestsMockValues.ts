@@ -1,3 +1,5 @@
+import { ErrorBackendUnreachable } from "@src/types/ExceptionTypes";
+
 const userId = "userId";
 const userId2 = "userId2";
 const serverId = "657ccaba54ac70b873e81f8f";
@@ -36,7 +38,8 @@ function checkFails() {
   }
 
   if (shouldNextRequestFailServerUnreachable) {
-    throw new Error("Server unreachable");
+    shouldNextRequestFailServerUnreachable = false;
+    throw new ErrorBackendUnreachable("Server unreachable");
   }
 
   return false;

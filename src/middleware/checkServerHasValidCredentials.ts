@@ -8,6 +8,8 @@ import { combineMiddleware } from "@src/modules/functions";
 
 import { getServerInfo, getServerToken } from "@src/modules/backendRequests";
 
+import { ErrorBackendUnreachable } from "@src/types/ExceptionTypes";
+
 import { SaveServerData } from "@src/modules/serverDataManager";
 
 async function checkServerHasValidCredentials(
@@ -25,9 +27,13 @@ async function checkServerHasValidCredentials(
       try {
         ret = await getServerInfo(serverData.serverToken);
       } catch (err) {
-        console.error("Error requesting backend server");
-        console.error(err);
-        responseFormatter.sendErrorBackEndServerUnreachable(res);
+        if (err instanceof ErrorBackendUnreachable) {
+          console.log("Error requesting backend server");
+          responseFormatter.sendErrorBackEndServerUnreachable(res);
+        } else {
+          console.error(err);
+          responseFormatter.sendErrorMessage(res);
+        }
         return;
       }
 
@@ -58,9 +64,13 @@ async function checkServerHasValidCredentials(
       try {
         ret = await getServerToken(serverData.serverId, serverData.serverKey);
       } catch (err) {
-        console.error("Error requesting backend server");
-        console.error(err);
-        responseFormatter.sendErrorBackEndServerUnreachable(res);
+        if (err instanceof ErrorBackendUnreachable) {
+          console.log("Error requesting backend server");
+          responseFormatter.sendErrorBackEndServerUnreachable(res);
+        } else {
+          console.error(err);
+          responseFormatter.sendErrorMessage(res);
+        }
         return;
       }
 
