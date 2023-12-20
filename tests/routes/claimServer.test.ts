@@ -8,8 +8,11 @@ import { AddServerData } from "@tests/helpers/mockFsValumeManager";
 
 jest.mock("fs/promises");
 jest.mock("@src/modules/backendRequests");
+jest.mock("@src/modules/getMyIp");
 
 import * as mockValues from "@tests/mockHelpers/backendRequestsMockValues";
+
+import * as mockValuesGetIp from "@tests/mockHelpers/getMyIpMockValues";
 
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB, clearDB } from "@src/db/sequelizeDb";
@@ -96,11 +99,6 @@ describe("Test 'claimServer' endpoint", () => {
   });
 
   it("Should return error BACKEND_SERVER_UNREACHABLE when claiming a server but backend unreachable", async () => {
-    AddServerData({
-      serverId: mockValues.serverId,
-      serverKey: mockValues.validKey,
-      serverToken: mockValues.validServerToken,
-    });
     mockValues.failNextRequestServerUnreachable();
 
     const ret = await request(app)
@@ -113,12 +111,19 @@ describe("Test 'claimServer' endpoint", () => {
   });
 
   it("Should return error SERVER_ERROR when claiming a server but receiving unexpected error from backend", async () => {
-    AddServerData({
-      serverId: mockValues.serverId,
-      serverKey: mockValues.validKey,
-      serverToken: mockValues.validServerToken,
-    });
     mockValues.failNextRequest();
+
+    const ret = await request(app)
+      .post("/claimServer")
+      .send({ userToken: mockValues.validUserToken });
+
+    expect(ret.statusCode).toBe(500);
+    expect(ret.body.ok).toBe(false);
+    expect(ret.body.errorCode).toBe("SERVER_ERROR");
+  });
+
+  it("Should return error SERVER_ERROR when claiming a server but could not retrieve my own ip address", async () => {
+    mockValuesGetIp.failNextRequest();
 
     const ret = await request(app)
       .post("/claimServer")

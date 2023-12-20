@@ -4,6 +4,7 @@ import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing
 import { registerServer, getServerToken } from "@src/modules/backendRequests";
 import { ErrorBackendUnreachable } from "@src/types/ExceptionTypes";
 import { randomBytes } from "crypto";
+import { getMyIp } from "@src/modules/getMyIp";
 
 import { SaveServerData } from "@src/modules/serverDataManager";
 
@@ -25,6 +26,8 @@ const callback = async (req: Request, res: Response) => {
 
     const requestParameters: RequestType = req.body;
 
+    const myIp = await getMyIp();
+
     const { userToken } = requestParameters;
 
     if (req.hasValidCredentials) {
@@ -43,12 +46,7 @@ const callback = async (req: Request, res: Response) => {
 
     let ret: any;
     try {
-      ret = await registerServer(
-        userToken,
-        keyGenerated,
-        "MyServer",
-        "0.0.0.0"
-      );
+      ret = await registerServer(userToken, keyGenerated, "MyServer", myIp);
     } catch (err) {
       if (err instanceof ErrorBackendUnreachable) {
         console.log("Error requesting backend server");
