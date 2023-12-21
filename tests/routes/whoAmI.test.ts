@@ -42,7 +42,7 @@ describe("Test 'whoAmI' endpoint", () => {
 
   it("Should ok if valid user token", async () => {
     const ret = await request(app)
-      .post("/whoAmI")
+      .post("/whoami")
       .set(serverTokenHeader())
       .send({});
 
