@@ -2,7 +2,7 @@ import axios, { AxiosResponse } from "axios";
 
 import { timeout } from "@src/modules/functions";
 
-import * as mockValues from "@tests/mockHelpers/backendRequestsMockValues";
+import * as mockValues from "./backendRequestsMockValues";
 
 export function SetPath(path_p: string) {
   if (typeof path_p !== "string") {

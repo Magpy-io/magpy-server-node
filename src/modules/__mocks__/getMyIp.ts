@@ -1,4 +1,4 @@
-import * as mockValues from "@tests/mockHelpers/getMyIpMockValues";
+import * as mockValues from "./getMyIpMockValues";
 
 export async function getMyIp() {
   mockValues.checkFails();

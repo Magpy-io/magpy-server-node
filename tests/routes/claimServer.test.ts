@@ -9,9 +9,9 @@ mockModules();
 import mockFsVolumeReset from "@tests/helpers/mockFsVolumeReset";
 import { AddServerData } from "@tests/helpers/mockFsValumeManager";
 
-import * as mockValues from "@tests/mockHelpers/backendRequestsMockValues";
+import * as mockValues from "@src/modules/__mocks__/backendRequestsMockValues";
 
-import * as mockValuesGetIp from "@tests/mockHelpers/getMyIpMockValues";
+import * as mockValuesGetIp from "@src/modules/__mocks__/getMyIpMockValues";
 
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB, clearDB } from "@src/db/sequelizeDb";

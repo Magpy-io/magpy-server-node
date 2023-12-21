@@ -12,7 +12,7 @@ import { verifyUserToken } from "@src/modules/tokenManagement";
 import { GetServerData } from "@src/modules/serverDataManager";
 
 import { AddServerData } from "@tests/helpers/mockFsValumeManager";
-import * as mockValues from "@tests/mockHelpers/backendRequestsMockValues";
+import * as mockValues from "@src/modules/__mocks__/backendRequestsMockValues";
 
 let serverUserToken = "";
 
