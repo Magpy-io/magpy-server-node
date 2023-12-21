@@ -6,12 +6,12 @@ import { sqliteDbFile } from "@src/config/config";
 import { Photo } from "@src/types/photoType";
 import { createImageModel } from "@src/db/Image.model";
 
-let sequelize: Sequelize = null;
+let sequelize: Sequelize | null = null;
 let Image: any;
 
 async function openAndInitDB() {
   await openDb();
-  Image = createImageModel(sequelize);
+  Image = createImageModel(sequelize as Sequelize);
   await Image.sync();
 }
 
@@ -102,6 +102,8 @@ async function addPhotoToDB(photo: Photo): Promise<Photo> {
     if (image) {
       return image;
     }
+
+    throw new Error("Error adding photo to db");
   } catch (err) {
     console.error(err);
     throw err;
@@ -209,7 +211,7 @@ async function updatePhotoClientPathById(id: string, path: string) {
 async function clearDB() {
   assertDbOpen();
   try {
-    await sequelize.drop();
+    await (sequelize as Sequelize).drop();
   } catch (err) {
     console.error(err);
     throw err;

@@ -235,6 +235,11 @@ async function testReturnedToken(ret: request.Response) {
   const splited = auth.split(" ");
   expect(splited.length).toBe(2);
   expect(splited[0]).toBe("Bearer");
+  if (!serverData.serverKey) {
+    throw new Error(
+      "testReturnedToken: serverData.serverKey needs to be defined"
+    );
+  }
   const tokenVerification = verifyUserToken(splited[1], serverData.serverKey);
   expect(tokenVerification.ok).toBe(true);
 }

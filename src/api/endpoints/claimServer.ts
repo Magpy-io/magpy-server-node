@@ -1,8 +1,15 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
-import { registerServer, getServerToken } from "@src/modules/backendRequests";
-import { ErrorBackendUnreachable } from "@src/types/ExceptionTypes";
+import {
+  registerServerPost,
+  getServerTokenPost,
+  GetServerTokenResponseType,
+  RegisterServerResponseType,
+  GetServerToken,
+  SetUserToken,
+  ErrorBackendUnreachable,
+} from "@src/modules/backendImportedQueries";
 import { randomBytes } from "crypto";
 import { getMyIp } from "@src/modules/getMyIp";
 
@@ -44,9 +51,14 @@ const callback = async (req: Request, res: Response) => {
 
     const keyGenerated = randomBytes(32).toString("hex");
 
-    let ret: any;
+    let ret: RegisterServerResponseType;
     try {
-      ret = await registerServer(userToken, keyGenerated, "MyServer", myIp);
+      SetUserToken(userToken);
+      ret = await registerServerPost({
+        name: "MyServer",
+        ipAddress: myIp,
+        serverKey: keyGenerated,
+      });
     } catch (err) {
       if (err instanceof ErrorBackendUnreachable) {
         console.log("Error requesting backend server");
@@ -86,9 +98,9 @@ const callback = async (req: Request, res: Response) => {
     const id = ret.data.server._id;
     console.log("server registered, got id: " + id);
 
-    let ret1: any;
+    let ret1: GetServerTokenResponseType;
     try {
-      ret1 = await getServerToken(id, keyGenerated);
+      ret1 = await getServerTokenPost({ id: id, key: keyGenerated });
     } catch (err) {
       if (err instanceof ErrorBackendUnreachable) {
         console.log("Error requesting backend server");
@@ -109,7 +121,7 @@ const callback = async (req: Request, res: Response) => {
 
     console.log("got server token, saving to local");
 
-    const serverToken = ret1.token;
+    const serverToken = GetServerToken();
 
     await SaveServerData({
       serverId: id,

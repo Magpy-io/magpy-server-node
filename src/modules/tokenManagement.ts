@@ -20,11 +20,15 @@ async function generateUserToken(userId: string) {
 function verifyUserToken(
   token: string,
   key: string
-): {
-  ok: boolean;
-  data?: TokenData;
-  error?: ErrorTypes;
-} {
+):
+  | {
+      ok: true;
+      data: TokenData;
+    }
+  | {
+      ok: false;
+      error: ErrorTypes;
+    } {
   try {
     const decoded: any = jwt.verify(token, key);
     return { ok: true, data: decoded };

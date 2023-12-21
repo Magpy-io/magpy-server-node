@@ -1,8 +1,15 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
-import { getServerInfo, whoAmI } from "@src/modules/backendRequests";
-import { ErrorBackendUnreachable } from "@src/types/ExceptionTypes";
+import {
+  getServerInfoPost,
+  GetServerInfoResponseType,
+  whoAmIPost,
+  WhoAmIResponseType,
+  SetUserToken,
+  SetServerToken,
+  ErrorBackendUnreachable,
+} from "@src/modules/backendImportedQueries";
 
 import checkServerHasValidCredentials from "@src/middleware/checkServerHasValidCredentials";
 
@@ -40,9 +47,10 @@ const callback = async (req: Request, res: Response) => {
       return;
     }
 
-    let retUser: any;
+    let retUser: WhoAmIResponseType;
     try {
-      retUser = await whoAmI(backendUserToken);
+      SetUserToken(backendUserToken);
+      retUser = await whoAmIPost();
     } catch (err) {
       if (err instanceof ErrorBackendUnreachable) {
         console.log("Error requesting backend server");
@@ -79,9 +87,14 @@ const callback = async (req: Request, res: Response) => {
       }
     }
 
-    let retServer: any;
+    if (!serverData.serverToken) {
+      throw new Error("Should have server token");
+    }
+
+    let retServer: GetServerInfoResponseType;
     try {
-      retServer = await getServerInfo(serverData.serverToken);
+      SetServerToken(serverData.serverToken);
+      retServer = await getServerInfoPost();
     } catch (err) {
       if (err instanceof ErrorBackendUnreachable) {
         console.log("Error requesting backend server");

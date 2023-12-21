@@ -4,10 +4,10 @@ import request from "supertest";
 import { Express } from "express";
 import { validate } from "uuid";
 
-import mockFsVolumeReset from "@tests/helpers/mockFsVolumeReset";
-jest.mock("fs/promises");
-jest.mock("@src/modules/backendRequests");
+import { mockModules } from "@tests/helpers/mockModules";
+mockModules();
 
+import mockFsVolumeReset from "@tests/helpers/mockFsVolumeReset";
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB } from "@src/db/sequelizeDb";
 import { clearDB } from "@src/db/sequelizeDb";
@@ -47,7 +47,7 @@ describe("Test 'addPhotoInit' endpoint", () => {
   });
 
   it("Should return the id of the photo being added", async () => {
-    const photo = { ...defaultPhoto };
+    const photo = { ...defaultPhoto } as any;
     delete photo.image64;
 
     const requestPhoto = { ...photo, image64Len: 132148 };
@@ -74,7 +74,7 @@ describe("Test 'addPhotoInit' endpoint", () => {
   it("Should return error PHOTO_EXISTS and not add pending photo if tried to add an existing path", async () => {
     const addedPhotoData = await addPhoto(app);
 
-    const photo = { ...defaultPhoto };
+    const photo = { ...defaultPhoto } as any;
     delete photo.image64;
 
     const requestPhoto = { ...photo, image64Len: 132148 };

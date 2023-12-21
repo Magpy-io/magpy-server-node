@@ -3,12 +3,11 @@ import { describe, expect, it } from "@jest/globals";
 import request from "supertest";
 import { Express } from "express";
 
+import { mockModules } from "@tests/helpers/mockModules";
+mockModules();
+
 import mockFsVolumeReset from "@tests/helpers/mockFsVolumeReset";
 import { AddServerData } from "@tests/helpers/mockFsValumeManager";
-
-jest.mock("fs/promises");
-jest.mock("@src/modules/backendRequests");
-jest.mock("@src/modules/getMyIp");
 
 import * as mockValues from "@tests/mockHelpers/backendRequestsMockValues";
 
