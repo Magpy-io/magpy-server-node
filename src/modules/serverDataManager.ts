@@ -1,30 +1,39 @@
 // IMPORTS
 import fs from "fs/promises";
 import { createFolder } from "@src/modules/diskManager";
-import { serverDataFolder } from "@src/config/config";
+import { serverDataFile } from "@src/config/config";
 
-const fileName = "serverInfo.json";
 type ServerData = {
   serverId?: string;
   serverKey?: string;
   serverToken?: string;
+  adminUsername?: string;
+  adminPasswordHash?: string;
 };
 
 async function SaveServerData(data: ServerData) {
-  await createFolder(serverDataFolder);
+  const filePathSplit = serverDataFile.split("/");
 
-  await fs.writeFile(serverDataFolder + fileName, JSON.stringify(data));
+  if (filePathSplit.length >= 2) {
+    filePathSplit.pop();
+
+    await createFolder(filePathSplit.join("/"));
+  }
+
+  await fs.writeFile(serverDataFile, JSON.stringify(data));
 }
 
 async function GetServerData(): Promise<ServerData> {
   try {
-    const buffer = await fs.readFile(serverDataFolder + fileName);
+    const buffer = await fs.readFile(serverDataFile);
 
     return JSON.parse(buffer.toString());
   } catch (err) {
     return {};
   }
 }
+
+async function SetDefaultServerData() {}
 
 export { SaveServerData, GetServerData };
 
