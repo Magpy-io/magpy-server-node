@@ -16,7 +16,7 @@ import {
   ErrorBackendUnreachable,
 } from "@src/modules/backendImportedQueries";
 
-import { SaveServerData } from "@src/modules/serverDataManager";
+import { SaveServerCredentials } from "@src/modules/serverDataManager";
 
 async function checkServerHasValidCredentials(
   req: Request,
@@ -98,7 +98,7 @@ async function checkServerHasValidCredentials(
         const serverToken = GetServerToken();
 
         console.log("saving server token");
-        await SaveServerData({
+        await SaveServerCredentials({
           serverId: serverData.serverId,
           serverKey: serverData.serverKey,
           serverToken: serverToken,

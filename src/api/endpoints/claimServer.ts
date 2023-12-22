@@ -13,7 +13,7 @@ import {
 import { randomBytes } from "crypto";
 import { getMyIp } from "@src/modules/getMyIp";
 
-import { SaveServerData } from "@src/modules/serverDataManager";
+import { SaveServerCredentials } from "@src/modules/serverDataManager";
 
 import checkServerHasValidCredentials from "@src/middleware/checkServerHasValidCredentials";
 
@@ -123,7 +123,7 @@ const callback = async (req: Request, res: Response) => {
 
     const serverToken = GetServerToken();
 
-    await SaveServerData({
+    await SaveServerCredentials({
       serverId: id,
       serverKey: keyGenerated,
       serverToken: serverToken,

@@ -1,18 +1,19 @@
 // IMPORTS
 import fs from "fs/promises";
 import { createFolder } from "@src/modules/diskManager";
-import { serverDataFile } from "@src/config/config";
+import * as config from "@src/config/config";
+import { hashPassword } from "@src/modules/functions";
 
 export type ServerData = {
   serverId?: string;
   serverKey?: string;
   serverToken?: string;
-  adminUsername?: string;
-  adminPasswordHash?: string;
+  adminUsername: string;
+  adminPasswordHash: string;
 };
 
 async function CreateFileIfDoesNotExist() {
-  const filePathSplit = serverDataFile.split("/");
+  const filePathSplit = config.serverDataFile.split("/");
 
   if (filePathSplit.length >= 2) {
     filePathSplit.pop();
@@ -21,33 +22,38 @@ async function CreateFileIfDoesNotExist() {
   }
 
   try {
-    await fs.access(serverDataFile);
+    await fs.access(config.serverDataFile);
   } catch (error: any) {
     if (error.code === "ENOENT") {
       //The file does not exist
-      await fs.writeFile(serverDataFile, JSON.stringify({}));
+      await fs.writeFile(config.serverDataFile, JSON.stringify({}));
     } else {
       throw error;
     }
   }
 }
 
-export async function SaveServerData(data: ServerData) {
-  const filePathSplit = serverDataFile.split("/");
+export type ServerCredentials = {
+  serverId?: string;
+  serverKey?: string;
+  serverToken?: string;
+};
 
-  if (filePathSplit.length >= 2) {
-    filePathSplit.pop();
+export async function SaveServerCredentials(data: ServerCredentials) {
+  await CreateFileIfDoesNotExist();
 
-    await createFolder(filePathSplit.join("/"));
-  }
-
-  await fs.writeFile(serverDataFile, JSON.stringify(data));
+  await fs.writeFile(config.serverDataFile, JSON.stringify(data));
 }
 
 export async function GetServerData(): Promise<ServerData> {
   await CreateFileIfDoesNotExist();
+  await AddServerDataIfMissing();
+  return getServerDataFile();
+}
+
+async function getServerDataFile() {
   try {
-    const buffer = await fs.readFile(serverDataFile);
+    const buffer = await fs.readFile(config.serverDataFile);
 
     return JSON.parse(buffer.toString());
   } catch (err) {
@@ -56,6 +62,19 @@ export async function GetServerData(): Promise<ServerData> {
   }
 }
 
-export async function AddServerDataIfMissing() {
-  const data = await GetServerData();
+async function SaveServerDataFile(data: ServerData) {
+  await CreateFileIfDoesNotExist();
+
+  await fs.writeFile(config.serverDataFile, JSON.stringify(data));
+}
+
+async function AddServerDataIfMissing() {
+  const data = await getServerDataFile();
+
+  if (!data.adminPasswordHash || !data.adminUsername) {
+    data.adminUsername = data.adminUsername || config.defaultAdminUsername;
+    data.adminPasswordHash =
+      data.adminPasswordHash || config.defaultAdminPasswordHashed;
+    await SaveServerDataFile(data);
+  }
 }
