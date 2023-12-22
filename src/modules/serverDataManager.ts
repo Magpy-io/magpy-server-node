@@ -3,7 +3,7 @@ import fs from "fs/promises";
 import { createFolder } from "@src/modules/diskManager";
 import { serverDataFile } from "@src/config/config";
 
-type ServerData = {
+export type ServerData = {
   serverId?: string;
   serverKey?: string;
   serverToken?: string;
@@ -11,7 +11,28 @@ type ServerData = {
   adminPasswordHash?: string;
 };
 
-async function SaveServerData(data: ServerData) {
+async function CreateFileIfDoesNotExist() {
+  const filePathSplit = serverDataFile.split("/");
+
+  if (filePathSplit.length >= 2) {
+    filePathSplit.pop();
+
+    await createFolder(filePathSplit.join("/"));
+  }
+
+  try {
+    await fs.access(serverDataFile);
+  } catch (error: any) {
+    if (error.code === "ENOENT") {
+      //The file does not exist
+      await fs.writeFile(serverDataFile, JSON.stringify({}));
+    } else {
+      throw error;
+    }
+  }
+}
+
+export async function SaveServerData(data: ServerData) {
   const filePathSplit = serverDataFile.split("/");
 
   if (filePathSplit.length >= 2) {
@@ -23,18 +44,18 @@ async function SaveServerData(data: ServerData) {
   await fs.writeFile(serverDataFile, JSON.stringify(data));
 }
 
-async function GetServerData(): Promise<ServerData> {
+export async function GetServerData(): Promise<ServerData> {
+  await CreateFileIfDoesNotExist();
   try {
     const buffer = await fs.readFile(serverDataFile);
 
     return JSON.parse(buffer.toString());
   } catch (err) {
-    return {};
+    console.error("Error reading ServerData");
+    throw err;
   }
 }
 
-async function SetDefaultServerData() {}
-
-export { SaveServerData, GetServerData };
-
-export type { ServerData };
+export async function AddServerDataIfMissing() {
+  const data = await GetServerData();
+}
