@@ -78,6 +78,9 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
+    expect(ret.body).toHaveProperty("data");
+    expect(ret.body.data.lenWaiting).toBe(imageBase64Parts.photoLen);
+    expect(ret.body.data.lenReceived).toBe(imageBase64Parts.photoLenPart1);
 
     ret = await request(app)
       .post("/addPhotoPart")
@@ -91,6 +94,11 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
+    expect(ret.body).toHaveProperty("data");
+    expect(ret.body.data.lenWaiting).toBe(imageBase64Parts.photoLen);
+    expect(ret.body.data.lenReceived).toBe(
+      imageBase64Parts.photoLenPart1 + imageBase64Parts.photoLenPart2
+    );
 
     ret = await request(app)
       .post("/addPhotoPart")
@@ -106,6 +114,8 @@ describe("Test 'addPhotoPart' endpoint", () => {
     expect(ret.body.ok).toBe(true);
     expect(ret.body).toHaveProperty("data");
     expect(ret.body.data).toHaveProperty("photo");
+    expect(ret.body.data.lenWaiting).toBe(imageBase64Parts.photoLen);
+    expect(ret.body.data.lenReceived).toBe(imageBase64Parts.photoLen);
 
     testPhotoMetaAndId(ret.body.data.photo);
 

@@ -465,11 +465,11 @@ export type AddPhotoPartRequestData = {
   photoPart: string;
 };
 
-export type AddPhotoPartResponseData =
-  | ServerResponseMessage
-  | ServerResponseData<{
-      photo: Photo;
-    }>;
+export type AddPhotoPartResponseData = ServerResponseData<{
+  lenReceived: string;
+  lenWaiting: string;
+  photo: Photo;
+}>;
 
 export type AddPhotoPartResponseErrorTypes =
   | ErrorPhotoSizeExceeded

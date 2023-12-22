@@ -60,11 +60,13 @@ const callback = async (req: Request, res: Response) => {
           FilesWaiting.delete(partReceived.id);
         }, postPhotoPartTimeout);
 
+        const jsonResponse = {
+          lenReceived: photoWaiting.received,
+          lenWaiting: photoWaiting.image64Len,
+          photo: responseFormatter.createPhotoObject(photoWaiting.photo, ""),
+        };
         console.log("Sending response message.");
-        responseFormatter.sendSuccessfulMessage(
-          res,
-          "Photo part added successfully"
-        );
+        responseFormatter.sendResponse(res, jsonResponse);
       } else if (photoWaiting.received > photoWaiting.image64Len) {
         console.log(
           `Transfered data (${photoWaiting.received}) exceeds initial image size (${photoWaiting.image64Len}).`
@@ -128,6 +130,8 @@ const callback = async (req: Request, res: Response) => {
             FilesWaiting.delete(partReceived.id);
 
             const jsonResponse = {
+              lenReceived: photoWaiting.received,
+              lenWaiting: photoWaiting.image64Len,
               photo: responseFormatter.createPhotoObject(dbPhoto, ""),
             };
             console.log("Sending response message.");
