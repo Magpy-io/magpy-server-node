@@ -7,10 +7,6 @@ const MAX_PIXELS_IN_IMAGE_BIGGER = 200000;
 
 const serverDataFile = "./serverData/serverInfo.json";
 
-const defaultAdminUsername = "admin";
-const defaultAdminPasswordHashed =
-  "$2a$10$eKJVw.n/cxoD1ER5.OQ2Du624s08VJeHLSBYmzhrAkrliOp4XFEJm"; //nimda
-
 const postPhotoPartTimeoutDev = 60000; //in ms
 const rootPathDev = "/home/issam/Documents/Images/";
 const sqliteDbFileDev = "./db/database.db";
@@ -50,6 +46,4 @@ export {
   MAX_PIXELS_IN_IMAGE_BIGGER,
   serverDataFile,
   jwtUserExp,
-  defaultAdminUsername,
-  defaultAdminPasswordHashed,
 };

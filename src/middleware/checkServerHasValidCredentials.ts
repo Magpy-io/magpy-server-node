@@ -99,8 +99,6 @@ async function checkServerHasValidCredentials(
 
         console.log("saving server token");
         await SaveServerCredentials({
-          serverId: serverData.serverId,
-          serverKey: serverData.serverKey,
           serverToken: serverToken,
         });
 

@@ -2,14 +2,12 @@
 import fs from "fs/promises";
 import { createFolder } from "@src/modules/diskManager";
 import * as config from "@src/config/config";
-import { hashPassword } from "@src/modules/functions";
+import { randomBytes } from "crypto";
 
 export type ServerData = {
   serverId?: string;
-  serverKey?: string;
+  serverKey: string;
   serverToken?: string;
-  adminUsername: string;
-  adminPasswordHash: string;
 };
 
 async function CreateFileIfDoesNotExist() {
@@ -42,7 +40,13 @@ export type ServerCredentials = {
 export async function SaveServerCredentials(data: ServerCredentials) {
   await CreateFileIfDoesNotExist();
 
-  await fs.writeFile(config.serverDataFile, JSON.stringify(data));
+  const dataSaved = await getServerDataFile();
+
+  dataSaved.serverId = data.serverId || dataSaved.serverId;
+  dataSaved.serverKey = data.serverKey || dataSaved.serverKey;
+  dataSaved.serverToken = data.serverToken || dataSaved.serverToken;
+
+  await fs.writeFile(config.serverDataFile, JSON.stringify(dataSaved));
 }
 
 export async function GetServerData(): Promise<ServerData> {
@@ -51,7 +55,7 @@ export async function GetServerData(): Promise<ServerData> {
   return getServerDataFile();
 }
 
-async function getServerDataFile() {
+async function getServerDataFile(): Promise<ServerData> {
   try {
     const buffer = await fs.readFile(config.serverDataFile);
 
@@ -70,11 +74,13 @@ async function SaveServerDataFile(data: ServerData) {
 
 async function AddServerDataIfMissing() {
   const data = await getServerDataFile();
+  let dataChanged = false;
 
-  if (!data.adminPasswordHash || !data.adminUsername) {
-    data.adminUsername = data.adminUsername || config.defaultAdminUsername;
-    data.adminPasswordHash =
-      data.adminPasswordHash || config.defaultAdminPasswordHashed;
+  if (!data.serverKey) {
+    data.serverKey = randomBytes(32).toString("hex");
+    dataChanged = true;
+  }
+  if (dataChanged) {
     await SaveServerDataFile(data);
   }
 }

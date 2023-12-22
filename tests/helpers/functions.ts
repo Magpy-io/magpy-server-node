@@ -242,6 +242,9 @@ async function testReturnedToken(ret: request.Response) {
   }
   const tokenVerification = verifyUserToken(splited[1], serverData.serverKey);
   expect(tokenVerification.ok).toBe(true);
+  expect(
+    (tokenVerification as typeof tokenVerification & { ok: true }).data.id
+  ).toBeDefined();
 }
 
 async function setupServerUserToken(app: Express) {
