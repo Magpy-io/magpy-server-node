@@ -425,7 +425,7 @@ export type AddPhotoInitRequestData = {
   height: number;
   path: string;
   date: string;
-  image64: string;
+  image64Len: number;
 };
 
 export type AddPhotoInitResponseData = ServerResponseData<{
