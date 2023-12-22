@@ -96,6 +96,10 @@ const routes = {
     checkPathExists();
     return path + "getToken/";
   },
+  unclaimServer: () => {
+    checkPathExists();
+    return path + "unclaimServer/";
+  },
 };
 
 type ErrorBadRequest = "BAD_REQUEST";
@@ -619,6 +623,37 @@ export async function GetTokenPost(
   try {
     const response = await axios.post(routes.getToken(), data);
     UserToken = extractToken(response);
+    return response.data;
+  } catch (err: any) {
+    return handleAxiosError(err);
+  }
+}
+
+// UnclaimServer
+export type UnclaimServerRequestData = void;
+
+export type UnclaimServerResponseData = ServerResponseMessage;
+
+export type UnclaimServerResponseErrorTypes =
+  | ErrorBackendServerUnreachable
+  | ErrorServerNotClaimed
+  | ErrorsAuthorization;
+
+export type UnclaimServerResponseType = EndpointMethodsResponseType<
+  UnclaimServerResponseData,
+  UnclaimServerResponseErrorTypes
+>;
+
+export async function UnclaimServerPost(
+  data: UnclaimServerRequestData
+): Promise<UnclaimServerResponseType> {
+  verifyHasUserToken();
+  try {
+    const response = await axios.post(
+      routes.unclaimServer(),
+      data,
+      userAuthorizationObject()
+    );
     return response.data;
   } catch (err: any) {
     return handleAxiosError(err);

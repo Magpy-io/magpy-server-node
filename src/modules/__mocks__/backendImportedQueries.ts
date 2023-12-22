@@ -1,8 +1,10 @@
 import axios, { AxiosResponse } from "axios";
 
-import { timeout } from "@src/modules/functions";
-
 import * as mockValues from "./backendRequestsMockValues";
+
+function timeout(ms: number) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+}
 
 export function SetPath(path_p: string) {
   if (typeof path_p !== "string") {
@@ -457,6 +459,49 @@ export async function getServerInfoPost(
         owner: mockValues.userId,
       },
     },
+  };
+}
+
+// DeleteServer
+export type DeleteServerRequestData = void;
+
+export type DeleteServerResponseData = ServerResponseMessage;
+
+export type DeleteServerResponseErrorTypes = ErrorsAuthorization;
+
+export type DeleteServerResponseType = EndpointMethodsResponseType<
+  DeleteServerResponseData,
+  DeleteServerResponseErrorTypes
+>;
+
+export async function DeleteServerPost(
+  data: DeleteServerRequestData
+): Promise<DeleteServerResponseType> {
+  await timeout(10);
+  const f = mockValues.checkFails();
+  if (f) {
+    return f as any;
+  }
+
+  if (ServerToken == mockValues.expiredServerToken) {
+    return {
+      ok: false,
+      errorCode: "AUTHORIZATION_EXPIRED",
+      message: "",
+    };
+  }
+
+  if (ServerToken != mockValues.validServerToken) {
+    return {
+      ok: false,
+      errorCode: "AUTHORIZATION_FAILED",
+      message: "",
+    };
+  }
+
+  return {
+    ok: true,
+    message: "",
   };
 }
 

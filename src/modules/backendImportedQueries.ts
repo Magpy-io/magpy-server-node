@@ -94,6 +94,10 @@ const routes = {
     checkPathExists();
     return path + "getServerInfo/";
   },
+  deleteServer: () => {
+    checkPathExists();
+    return path + "deleteServer/";
+  },
 };
 
 type ErrorBadRequest = "BAD_REQUEST";
@@ -339,6 +343,34 @@ export async function getServerInfoPost(
   try {
     const response = await axios.post(
       routes.getServerInfo(),
+      data,
+      serverAuthorizationObject()
+    );
+    return response.data;
+  } catch (err: any) {
+    return handleAxiosError(err);
+  }
+}
+
+// DeleteServer
+export type DeleteServerRequestData = void;
+
+export type DeleteServerResponseData = ServerResponseMessage;
+
+export type DeleteServerResponseErrorTypes = ErrorsAuthorization;
+
+export type DeleteServerResponseType = EndpointMethodsResponseType<
+  DeleteServerResponseData,
+  DeleteServerResponseErrorTypes
+>;
+
+export async function DeleteServerPost(
+  data: DeleteServerRequestData
+): Promise<DeleteServerResponseType> {
+  verifyHasServerToken();
+  try {
+    const response = await axios.post(
+      routes.deleteServer(),
       data,
       serverAuthorizationObject()
     );

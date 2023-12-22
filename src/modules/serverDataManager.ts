@@ -42,17 +42,27 @@ export async function SaveServerCredentials(data: ServerCredentials) {
 
   const dataSaved = await getServerDataFile();
 
-  dataSaved.serverId = data.serverId || dataSaved.serverId;
-  dataSaved.serverKey = data.serverKey || dataSaved.serverKey;
-  dataSaved.serverToken = data.serverToken || dataSaved.serverToken;
+  if (data.serverId !== undefined) {
+    dataSaved.serverId = data.serverId;
+  }
+  if (data.serverKey !== undefined) {
+    dataSaved.serverKey = data.serverKey;
+  }
+  if (data.serverToken !== undefined) {
+    dataSaved.serverToken = data.serverToken;
+  }
 
-  await fs.writeFile(config.serverDataFile, JSON.stringify(dataSaved));
+  await SaveServerDataFile(dataSaved);
 }
 
 export async function GetServerData(): Promise<ServerData> {
   await CreateFileIfDoesNotExist();
   await AddServerDataIfMissing();
-  return getServerDataFile();
+  return await getServerDataFile();
+}
+
+export async function ClearServerCredentials() {
+  await SaveServerCredentials({ serverId: "", serverKey: "", serverToken: "" });
 }
 
 async function getServerDataFile(): Promise<ServerData> {
@@ -73,14 +83,13 @@ async function SaveServerDataFile(data: ServerData) {
 }
 
 async function AddServerDataIfMissing() {
-  const data = await getServerDataFile();
-  let dataChanged = false;
-
-  if (!data.serverKey) {
-    data.serverKey = randomBytes(32).toString("hex");
-    dataChanged = true;
-  }
-  if (dataChanged) {
-    await SaveServerDataFile(data);
-  }
+  // const data = await getServerDataFile();
+  // let dataChanged = false;
+  // if (!data.serverKey) {
+  //   data.serverKey = randomBytes(32).toString("hex");
+  //   dataChanged = true;
+  // }
+  // if (dataChanged) {
+  //   await SaveServerDataFile(data);
+  // }
 }

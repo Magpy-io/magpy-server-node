@@ -31,6 +31,7 @@ const endpointsToTestInvalidJson = [
   "claimServer",
   "getToken",
   "whoAmI",
+  "unclaimServer",
 ];
 
 const dataToTestEndpointsParameters: Array<{
