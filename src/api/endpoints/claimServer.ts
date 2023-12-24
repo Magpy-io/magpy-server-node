@@ -13,7 +13,10 @@ import {
 import { randomBytes } from "crypto";
 import { getMyIp } from "@src/modules/getMyIp";
 
-import { SaveServerCredentials } from "@src/modules/serverDataManager";
+import {
+  GetServerName,
+  SaveServerCredentials,
+} from "@src/modules/serverDataManager";
 
 import checkServerIsClaimed from "@src/middleware/checkServerIsClaimed";
 
@@ -55,7 +58,7 @@ const callback = async (req: Request, res: Response) => {
     try {
       SetUserToken(userToken);
       ret = await registerServerPost({
-        name: "MyServer",
+        name: await GetServerName(),
         ipAddress: myIp,
         serverKey: keyGenerated,
       });
