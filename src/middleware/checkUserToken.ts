@@ -4,7 +4,7 @@ import responseFormatter from "@src/api/responseFormatter";
 
 import { combineMiddleware } from "@src/modules/functions";
 
-import checkServerHasCredentials from "@src/middleware/checkServerHasCredentials";
+import checkServerIsClaimed from "@src/middleware/checkServerIsClaimed";
 
 import verifyAuthorizationHeader from "@src/middleware/verifyAuthorizationHeader";
 
@@ -63,7 +63,7 @@ async function checkUserToken(req: Request, res: Response, next: NextFunction) {
 }
 
 export default combineMiddleware([
-  checkServerHasCredentials,
+  checkServerIsClaimed,
   verifyAuthorizationHeader,
   checkUserToken,
 ]);

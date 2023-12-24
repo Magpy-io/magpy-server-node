@@ -100,6 +100,10 @@ const routes = {
     checkPathExists();
     return path + "unclaimServer/";
   },
+  getServerInfo: () => {
+    checkPathExists();
+    return path + "getServerInfo/";
+  },
 };
 
 type ErrorBadRequest = "BAD_REQUEST";
@@ -650,13 +654,35 @@ export type UnclaimServerResponseType = EndpointMethodsResponseType<
 export async function UnclaimServerPost(
   data: UnclaimServerRequestData
 ): Promise<UnclaimServerResponseType> {
-  verifyHasUserToken();
   try {
-    const response = await axios.post(
-      routes.unclaimServer(),
-      data,
-      userAuthorizationObject()
-    );
+    const response = await axios.post(routes.unclaimServer(), data);
+    return response.data;
+  } catch (err: any) {
+    return handleAxiosError(err);
+  }
+}
+
+// GetServerInfo
+export type GetServerInfoRequestData = void;
+
+export type GetServerInfoResponseData = ServerResponseData<{
+  storagePath: string;
+  serverName: string;
+  owner: { name: string; email: string } | null;
+}>;
+
+export type GetServerInfoResponseErrorTypes = ErrorsNotFromLocal;
+
+export type GetServerInfoResponseType = EndpointMethodsResponseType<
+  GetServerInfoResponseData,
+  GetServerInfoResponseErrorTypes
+>;
+
+export async function GetServerInfoPost(
+  data: GetServerInfoRequestData
+): Promise<GetServerInfoResponseType> {
+  try {
+    const response = await axios.post(routes.unclaimServer(), data);
     return response.data;
   } catch (err: any) {
     return handleAxiosError(err);

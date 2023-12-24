@@ -5,6 +5,9 @@ const jwtUserExp = "1d";
 const MAX_PIXELS_IN_IMAGE = 40000;
 const MAX_PIXELS_IN_IMAGE_BIGGER = 200000;
 
+const serverName = "MyLocalServer";
+const serverNameMdnsPrefix = "OpenCloudServer";
+
 const serverDataFile = "./serverData/serverInfo.json";
 
 const postPhotoPartTimeoutDev = 60000; //in ms
@@ -46,4 +49,6 @@ export {
   MAX_PIXELS_IN_IMAGE_BIGGER,
   serverDataFile,
   jwtUserExp,
+  serverName,
+  serverNameMdnsPrefix,
 };
