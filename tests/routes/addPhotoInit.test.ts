@@ -36,7 +36,7 @@ describe("Test 'addPhotoInit' endpoint", () => {
 
   beforeEach(async () => {
     await openAndInitDB();
-    mockFsVolumeReset();
+    await mockFsVolumeReset();
     await setupServerUserToken(app);
   });
 

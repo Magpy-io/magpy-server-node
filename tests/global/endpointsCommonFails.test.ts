@@ -59,7 +59,7 @@ describe("Test endpoints return error when invalid token", () => {
 
   beforeEach(async () => {
     await openAndInitDB();
-    mockFsVolumeReset();
+    await mockFsVolumeReset();
     await setupServerUserToken(app);
   });
 
@@ -138,7 +138,7 @@ describe("Test endpoints return error when invalid token", () => {
     "Should return error SERVER_NOT_CLAIMED when server was not claimed before for endpoint $endpoint",
     async (p) => {
       // clear server config
-      mockFsVolumeReset();
+      await mockFsVolumeReset();
 
       const ret = await request(app)
         .post("/" + p.endpoint)

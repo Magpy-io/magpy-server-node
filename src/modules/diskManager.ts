@@ -1,9 +1,8 @@
 // IMPORTS
 import fs from "fs/promises";
 import { Buffer } from "buffer";
-import path from "node:path";
 import sharp from "sharp";
-import { rootPath } from "@src/config/config";
+import { GetStorageFolderPath } from "@src/modules/serverDataManager";
 
 import {
   createServerImageThumbnailName,
@@ -105,9 +104,11 @@ async function getCompressedPhotoFromDisk(path: string) {
 
 async function clearImagesDisk() {
   try {
-    const files = await fs.readdir(rootPath);
+    const path = await GetStorageFolderPath();
+    console.error(path);
+    const files = await fs.readdir(path);
     const filesUnlinkedPromises = files.map((file) => {
-      return fs.unlink(path.join(rootPath, file));
+      return fs.unlink(path + file);
     });
     await Promise.all(filesUnlinkedPromises);
   } catch (err) {

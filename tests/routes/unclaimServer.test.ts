@@ -28,7 +28,7 @@ describe("Test 'unclaimServer' endpoint", () => {
 
   beforeEach(async () => {
     await openAndInitDB();
-    mockFsVolumeReset();
+    await mockFsVolumeReset();
     await setupServerUserToken(app);
   });
 

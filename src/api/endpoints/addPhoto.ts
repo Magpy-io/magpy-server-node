@@ -5,9 +5,10 @@ import { addPhotoToDisk } from "@src/modules/diskManager";
 import { createServerImageName } from "@src/modules/diskFilesNaming";
 import { hashString } from "@src/modules/hashing";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
-import { rootPath, hashLen } from "@src/config/config";
+import { hashLen } from "@src/config/config";
 import { Photo } from "@src/types/photoType";
 import checkUserToken from "@src/middleware/checkUserToken";
+import { GetStorageFolderPath } from "@src/modules/serverDataManager";
 
 // addPhoto : adds a photo to the server
 const endpoint = "/addPhoto";
@@ -54,7 +55,8 @@ const callback = async (req: Request, res: Response) => {
       console.log("Photo does not exist in server.");
       console.log("Creating syncDate, photoPath and the photo hash.");
       photo.syncDate = new Date(Date.now()).toJSON();
-      photo.serverPath = rootPath + createServerImageName(photo);
+      const path = await GetStorageFolderPath();
+      photo.serverPath = path + createServerImageName(photo);
       photo.hash = hashString(requestPhoto.image64, hashLen);
       console.log("Adding photo to db.");
       const dbPhoto = await addPhotoToDB(photo);

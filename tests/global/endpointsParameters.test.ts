@@ -120,7 +120,7 @@ describe("Test endpoints return error when invalid request", () => {
 
   beforeEach(async () => {
     await openAndInitDB();
-    mockFsVolumeReset();
+    await mockFsVolumeReset();
     await setupServerUserToken(app);
   });
 

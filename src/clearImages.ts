@@ -2,7 +2,6 @@
 require("module-alias/register");
 
 // IMPORTS
-import { rootPath } from "@src/config/config";
 import { clearDB, openAndInitDB, closeDb } from "@src/db/sequelizeDb";
 import { clearImagesDisk } from "@src/modules/diskManager";
 
@@ -25,8 +24,8 @@ openAndInitDB()
     return clearImagesDisk();
   })
   .then(() => {
-    console.log(rootPath + " directory cleared.");
+    console.log("storage directory cleared.");
   })
   .catch((err: any) => {
-    console.error("Error clearing directory " + rootPath);
+    console.error("Error clearing storage directory");
   });

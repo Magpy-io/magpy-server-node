@@ -30,7 +30,7 @@ describe("Test 'updatePhotoPath' endpoint", () => {
 
   beforeEach(async () => {
     await openAndInitDB();
-    mockFsVolumeReset();
+    await mockFsVolumeReset();
     await setupServerUserToken(app);
   });
 

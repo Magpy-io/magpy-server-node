@@ -28,7 +28,7 @@ describe("Test 'claimServer' endpoint", () => {
 
   beforeEach(async () => {
     await openAndInitDB();
-    mockFsVolumeReset();
+    await mockFsVolumeReset();
   });
 
   afterEach(async () => {

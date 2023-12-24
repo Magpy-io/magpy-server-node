@@ -5,9 +5,10 @@ import { getPhotoByClientPathFromDB } from "@src/db/sequelizeDb";
 import { createServerImageName } from "@src/modules/diskFilesNaming";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import { v4 as uuid } from "uuid";
-import { rootPath, postPhotoPartTimeout } from "@src/config/config";
+import { postPhotoPartTimeout } from "@src/config/config";
 import { Photo } from "@src/types/photoType";
 import checkUserToken from "@src/middleware/checkUserToken";
+import { GetStorageFolderPath } from "@src/modules/serverDataManager";
 
 // addPhotoInit : initializes the transfer of a photo to the server
 const endpoint = "/addPhotoInit";
@@ -56,7 +57,8 @@ const callback = async (req: Request, res: Response) => {
       const image64Len = requestPhoto.image64Len;
 
       photo.syncDate = new Date(Date.now()).toJSON();
-      photo.serverPath = rootPath + createServerImageName(photo);
+      const path = await GetStorageFolderPath();
+      photo.serverPath = path + createServerImageName(photo);
       const id = uuid();
 
       FilesWaiting.set(id, {
