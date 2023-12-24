@@ -18,5 +18,5 @@ async function main() {
   configModules();
   await openAndInitDB();
   await initServer();
-  startMdns();
+  await startMdns();
 }

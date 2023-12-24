@@ -1,13 +1,15 @@
+import { serverNameMdnsPrefix } from "@src/config/config";
+import { GetServerName } from "@src/modules/serverDataManager";
 import mdns from "mdns";
 
 let advert: any;
 
-function startMdns() {
+async function startMdns() {
   advert = mdns.createAdvertisement(
     mdns.tcp("http"),
     parseInt(process.env.PORT || "8000"),
     {
-      name: process.env.SERVER_MDNS_NAME,
+      name: serverNameMdnsPrefix + (await GetServerName()),
     }
   );
   advert.start();

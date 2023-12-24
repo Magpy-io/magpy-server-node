@@ -8,6 +8,7 @@ export type ServerData = {
   serverKey?: string;
   serverToken?: string;
   storageFolderPath: string;
+  serverName: string;
 };
 
 export async function GetServerData(): Promise<ServerData> {
@@ -71,6 +72,22 @@ export async function GetStorageFolderPath(): Promise<string> {
   return serverData.storageFolderPath;
 }
 
+export async function SaveServername(name: string) {
+  await CreateFileIfDoesNotExist();
+
+  const dataSaved = await getServerDataFromFile();
+
+  dataSaved.serverName = name;
+
+  await SaveServerDataFile(dataSaved);
+}
+
+export async function GetServerName(): Promise<string> {
+  const serverData = await GetServerData();
+
+  return serverData.serverName;
+}
+
 async function getServerDataFromFile(): Promise<any> {
   try {
     const buffer = await fs.readFile(config.serverDataFile);
@@ -92,6 +109,11 @@ function AddServerDataIfMissing(data: any): ServerData {
   if (!data.storageFolderPath) {
     data.storageFolderPath = config.rootPath;
   }
+
+  if (!data.serverName) {
+    data.serverName = config.serverName;
+  }
+
   return data;
 }
 
