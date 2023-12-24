@@ -121,6 +121,12 @@ type ErrorAuthorizationMissing = "AUTHORIZATION_MISSING";
 type ErrorAuthorizationWrongFormat = "AUTHORIZATION_WRONG_FORMAT";
 type ErrorAuthorizationFailed = "AUTHORIZATION_FAILED";
 type ErrorAuthorizationExpired = "AUTHORIZATION_EXPIRED";
+type ErrorCouldNotGetRequestAddress = "COULD_NOT_GET_REQUEST_ADDRESS";
+type ErrorRequestNotFromLoopback = "REQUEST_NOT_FROM_LOOPBACK";
+
+type ErrorsNotFromLocal =
+  | ErrorCouldNotGetRequestAddress
+  | ErrorRequestNotFromLoopback;
 
 type ErrorsAuthorization =
   | ErrorAuthorizationFailed
@@ -634,10 +640,7 @@ export type UnclaimServerRequestData = void;
 
 export type UnclaimServerResponseData = ServerResponseMessage;
 
-export type UnclaimServerResponseErrorTypes =
-  | ErrorBackendServerUnreachable
-  | ErrorServerNotClaimed
-  | ErrorsAuthorization;
+export type UnclaimServerResponseErrorTypes = ErrorsNotFromLocal;
 
 export type UnclaimServerResponseType = EndpointMethodsResponseType<
   UnclaimServerResponseData,

@@ -11,11 +11,7 @@ import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB } from "@src/db/sequelizeDb";
 import { clearDB } from "@src/db/sequelizeDb";
 import { clearImagesDisk } from "@src/modules/diskManager";
-import * as mockValues from "@src/modules/__mocks__/backendRequestsMockValues";
-import {
-  setupServerUserToken,
-  serverTokenHeader,
-} from "@tests/helpers/functions";
+import { setupServerUserToken } from "@tests/helpers/functions";
 
 import { GetServerData } from "@src/modules/serverDataManager";
 
@@ -43,10 +39,7 @@ describe("Test 'unclaimServer' endpoint", () => {
   });
 
   it("Should return ok if unclaimed a valid server", async () => {
-    const ret = await request(app)
-      .post("/unclaimServer")
-      .set(serverTokenHeader())
-      .send({});
+    const ret = await request(app).post("/unclaimServer").send({});
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);

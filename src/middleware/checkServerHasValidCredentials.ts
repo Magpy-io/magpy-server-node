@@ -24,6 +24,7 @@ async function checkServerHasValidCredentials(
   next: NextFunction
 ) {
   try {
+    console.log("\n#CheckServerHasValidCredentials middleware");
     const serverData = req.serverData;
 
     if (serverData?.serverToken) {

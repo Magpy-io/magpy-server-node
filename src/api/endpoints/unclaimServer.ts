@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
 
-import checkUserToken from "@src/middleware/checkUserToken";
 import { ClearServerCredentials } from "@src/modules/serverDataManager";
 import {
   DeleteServerPost,
-  ErrorBackendUnreachable,
   DeleteServerResponseType,
 } from "@src/modules/backendImportedQueries";
+import checkConnexionLocal from "@src/middleware/checkConnexionLocal";
+import checkServerHasValidCredentials from "@src/middleware/checkServerHasValidCredentials";
 
 // unclaimServer : removes server's credentials
 const endpoint = "/unclaimServer";
@@ -15,33 +15,24 @@ const callback = async (req: Request, res: Response) => {
   console.log(`\n[unclaimServer]`);
 
   try {
-    const userId = req.userId;
-    console.log("Token verified, sending confirmation");
+    if (req.hasValidCredentials) {
+      let ret: DeleteServerResponseType | undefined;
+      try {
+        ret = await DeleteServerPost();
+      } catch (err) {
+        console.log("error deleting server from backend");
+        console.log(err);
+      }
+
+      if (!ret?.ok) {
+        console.log("error deleting server from backend");
+        console.log(ret);
+      } else {
+        console.log("Server deleted from backend");
+      }
+    }
 
     await ClearServerCredentials();
-
-    let ret: DeleteServerResponseType;
-    try {
-      ret = await DeleteServerPost();
-    } catch (err) {
-      if (err instanceof ErrorBackendUnreachable) {
-        console.log("Error requesting backend server");
-        responseFormatter.sendErrorBackEndServerUnreachable(res);
-      } else {
-        console.error(err);
-        responseFormatter.sendErrorMessage(res);
-      }
-      return;
-    }
-
-    if (!ret.ok) {
-      console.error("error deleting server from backend");
-      console.error(ret);
-      responseFormatter.sendErrorMessage(res);
-      return;
-    }
-
-    console.log("Server deleted from backend");
 
     responseFormatter.sendSuccessfulMessage(res, "Server unclaimed");
   } catch (err) {
@@ -54,5 +45,5 @@ export default {
   endpoint: endpoint,
   callback: callback,
   method: "post",
-  middleWare: checkUserToken,
+  middleWare: [checkConnexionLocal, checkServerHasValidCredentials],
 };

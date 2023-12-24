@@ -30,7 +30,6 @@ const endpointsToTestInvalidToken = [
   "getPhotosByPath",
   "updatePhotoPath",
   "whoAmI",
-  "unclaimServer",
 ];
 
 const endpointsToTestServerNotClaimed = [
@@ -45,7 +44,6 @@ const endpointsToTestServerNotClaimed = [
   "getPhotosByPath",
   "updatePhotoPath",
   "whoAmI",
-  "unclaimServer",
 ];
 
 describe("Test endpoints return error when invalid token", () => {

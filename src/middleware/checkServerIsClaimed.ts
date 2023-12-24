@@ -12,6 +12,7 @@ async function checkServerIsClaimed(
   next: NextFunction
 ) {
   try {
+    console.log("\n#CheckServerIsClaimed middleware");
     if (!req.hasValidCredentials) {
       console.log("server is not claimed");
       req.isClaimed = false;
