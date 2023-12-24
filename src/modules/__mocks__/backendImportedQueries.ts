@@ -415,7 +415,11 @@ export async function getServerTokenPost(
 export type GetServerInfoRequestData = void;
 
 export type GetServerInfoResponseData = ServerResponseData<{
-  server: { _id: string; name: string; owner: string };
+  server: {
+    _id: string;
+    name: string;
+    owner: { _id: string; name: string; email: string } | null;
+  };
 }>;
 
 export type GetServerInfoResponseErrorTypes = ErrorsAuthorization;
@@ -456,7 +460,11 @@ export async function getServerInfoPost(
       server: {
         _id: mockValues.serverId,
         name: "MyLocalServer",
-        owner: mockValues.userId,
+        owner: {
+          _id: mockValues.userId,
+          name: "user name",
+          email: mockValues.validUserEmail,
+        },
       },
     },
   };
@@ -477,6 +485,54 @@ export type DeleteServerResponseType = EndpointMethodsResponseType<
 export async function DeleteServerPost(
   data: DeleteServerRequestData
 ): Promise<DeleteServerResponseType> {
+  await timeout(10);
+  const f = mockValues.checkFails();
+  if (f) {
+    return f as any;
+  }
+
+  if (ServerToken == mockValues.expiredServerToken) {
+    return {
+      ok: false,
+      errorCode: "AUTHORIZATION_EXPIRED",
+      message: "",
+    };
+  }
+
+  if (ServerToken != mockValues.validServerToken) {
+    return {
+      ok: false,
+      errorCode: "AUTHORIZATION_FAILED",
+      message: "",
+    };
+  }
+
+  return {
+    ok: true,
+    message: "",
+  };
+}
+
+// UpdateServerData
+export type UpdateServerDataRequestData = {
+  name?: string;
+  ipAddress?: string;
+};
+
+export type UpdateServerDataResponseData = ServerResponseMessage;
+
+export type UpdateServerDataResponseErrorTypes =
+  | ErrorInvalidIpAddress
+  | ErrorsAuthorization;
+
+export type UpdateServerDataResponseType = EndpointMethodsResponseType<
+  UpdateServerDataResponseData,
+  UpdateServerDataResponseErrorTypes
+>;
+
+export async function UpdateServerDataPost(
+  data: UpdateServerDataRequestData
+): Promise<UpdateServerDataResponseType> {
   await timeout(10);
   const f = mockValues.checkFails();
   if (f) {

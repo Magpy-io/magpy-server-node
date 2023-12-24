@@ -98,6 +98,10 @@ const routes = {
     checkPathExists();
     return path + "deleteServer/";
   },
+  updateServerData: () => {
+    checkPathExists();
+    return path + "updateServerData/";
+  },
 };
 
 type ErrorBadRequest = "BAD_REQUEST";
@@ -326,7 +330,11 @@ export async function getServerTokenPost(
 export type GetServerInfoRequestData = void;
 
 export type GetServerInfoResponseData = ServerResponseData<{
-  server: { _id: string; name: string; owner: string };
+  server: {
+    _id: string;
+    name: string;
+    owner: { _id: string; name: string; email: string } | null;
+  };
 }>;
 
 export type GetServerInfoResponseErrorTypes = ErrorsAuthorization;
@@ -371,6 +379,39 @@ export async function DeleteServerPost(
   try {
     const response = await axios.post(
       routes.deleteServer(),
+      data,
+      serverAuthorizationObject()
+    );
+    return response.data;
+  } catch (err: any) {
+    return handleAxiosError(err);
+  }
+}
+
+// UpdateServerData
+export type UpdateServerDataRequestData = {
+  name?: string;
+  ipAddress?: string;
+};
+
+export type UpdateServerDataResponseData = ServerResponseMessage;
+
+export type UpdateServerDataResponseErrorTypes =
+  | ErrorInvalidIpAddress
+  | ErrorsAuthorization;
+
+export type UpdateServerDataResponseType = EndpointMethodsResponseType<
+  UpdateServerDataResponseData,
+  UpdateServerDataResponseErrorTypes
+>;
+
+export async function UpdateServerDataPost(
+  data: UpdateServerDataRequestData
+): Promise<UpdateServerDataResponseType> {
+  verifyHasServerToken();
+  try {
+    const response = await axios.post(
+      routes.updateServerData(),
       data,
       serverAuthorizationObject()
     );

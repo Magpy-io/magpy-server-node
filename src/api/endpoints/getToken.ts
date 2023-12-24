@@ -11,7 +11,7 @@ import {
   ErrorBackendUnreachable,
 } from "@src/modules/backendImportedQueries";
 
-import checkServerHasValidCredentials from "@src/middleware/checkServerHasValidCredentials";
+import checkServerIsClaimed from "@src/middleware/checkServerIsClaimed";
 
 import { GetServerData } from "@src/modules/serverDataManager";
 
@@ -37,7 +37,7 @@ const callback = async (req: Request, res: Response) => {
 
     const serverData = await GetServerData();
 
-    if (!req.hasValidCredentials) {
+    if (!req.isClaimed) {
       console.log("server is not claimed");
       responseFormatter.sendFailedMessage(
         res,
@@ -113,7 +113,7 @@ const callback = async (req: Request, res: Response) => {
       return;
     }
 
-    if (retServer.data.server.owner != retUser.data.user._id) {
+    if (retServer.data.server.owner?._id != retUser.data.user._id) {
       console.log("user not allowed to access this server");
       responseFormatter.sendFailedMessage(
         res,
@@ -153,5 +153,5 @@ export default {
   endpoint: endpoint,
   callback: callback,
   method: "post",
-  middleWare: checkServerHasValidCredentials,
+  middleWare: checkServerIsClaimed,
 };

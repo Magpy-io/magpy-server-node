@@ -15,7 +15,7 @@ import { getMyIp } from "@src/modules/getMyIp";
 
 import { SaveServerCredentials } from "@src/modules/serverDataManager";
 
-import checkServerHasValidCredentials from "@src/middleware/checkServerHasValidCredentials";
+import checkServerIsClaimed from "@src/middleware/checkServerIsClaimed";
 
 // claimServer : creates server in backend and sets the requesting user as it's owner
 const endpoint = "/claimServer";
@@ -37,7 +37,7 @@ const callback = async (req: Request, res: Response) => {
 
     const { userToken } = requestParameters;
 
-    if (req.hasValidCredentials) {
+    if (req.isClaimed) {
       console.log("server already claimed, it has valid token");
       responseFormatter.sendFailedMessage(
         res,
@@ -150,5 +150,5 @@ export default {
   endpoint: endpoint,
   callback: callback,
   method: "post",
-  middleWare: checkServerHasValidCredentials,
+  middleWare: checkServerIsClaimed,
 };

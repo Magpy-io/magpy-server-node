@@ -57,7 +57,7 @@ async function checkServerHasValidCredentials(
           return;
         }
       } else {
-        console.log("server is claimed");
+        console.log("server has valid credentials");
         req.hasValidCredentials = true;
         next();
         return;
@@ -102,6 +102,7 @@ async function checkServerHasValidCredentials(
           serverToken: serverToken,
         });
 
+        console.log("server has valid credentials");
         req.hasValidCredentials = true;
         next();
         return;
