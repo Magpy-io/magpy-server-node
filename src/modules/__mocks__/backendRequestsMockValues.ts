@@ -1,8 +1,12 @@
-import { ErrorBackendUnreachable } from "@src/types/ExceptionTypes";
+import { ErrorBackendUnreachable } from "@src/modules/backendImportedQueries";
 
 const userId = "userId";
 const userId2 = "userId2";
 const serverId = "657ccaba54ac70b873e81f8f";
+
+const validUserEmail = "bla@gg.io";
+const validUserPassword = "password";
+const userEmailTaken = "takenEmail";
 
 const validUserToken = "validUserToken";
 const invalidUserToken = "invalidUserToken";
@@ -39,7 +43,7 @@ function checkFails() {
 
   if (shouldNextRequestFailServerUnreachable) {
     shouldNextRequestFailServerUnreachable = false;
-    throw new ErrorBackendUnreachable("Server unreachable");
+    throw new ErrorBackendUnreachable();
   }
 
   return false;
@@ -67,4 +71,7 @@ export {
   failNextRequest,
   failNextRequestServerUnreachable,
   checkFails,
+  validUserEmail,
+  validUserPassword,
+  userEmailTaken,
 };

@@ -12,7 +12,7 @@ import { verifyUserToken } from "@src/modules/tokenManagement";
 import { GetServerData } from "@src/modules/serverDataManager";
 
 import { AddServerData } from "@tests/helpers/mockFsValumeManager";
-import * as mockValues from "@tests/mockHelpers/backendRequestsMockValues";
+import * as mockValues from "@src/modules/__mocks__/backendRequestsMockValues";
 
 let serverUserToken = "";
 
@@ -235,8 +235,16 @@ async function testReturnedToken(ret: request.Response) {
   const splited = auth.split(" ");
   expect(splited.length).toBe(2);
   expect(splited[0]).toBe("Bearer");
+  if (!serverData.serverKey) {
+    throw new Error(
+      "testReturnedToken: serverData.serverKey needs to be defined"
+    );
+  }
   const tokenVerification = verifyUserToken(splited[1], serverData.serverKey);
   expect(tokenVerification.ok).toBe(true);
+  expect(
+    (tokenVerification as typeof tokenVerification & { ok: true }).data.id
+  ).toBeDefined();
 }
 
 async function setupServerUserToken(app: Express) {

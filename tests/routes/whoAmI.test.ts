@@ -3,15 +3,15 @@ import { describe, expect, it } from "@jest/globals";
 import request from "supertest";
 import { Express } from "express";
 
-import mockFsVolumeReset from "@tests/helpers/mockFsVolumeReset";
-jest.mock("fs/promises");
-jest.mock("@src/modules/backendRequests");
+import { mockModules } from "@tests/helpers/mockModules";
+mockModules();
 
+import mockFsVolumeReset from "@tests/helpers/mockFsVolumeReset";
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB } from "@src/db/sequelizeDb";
 import { clearDB } from "@src/db/sequelizeDb";
 import { clearImagesDisk } from "@src/modules/diskManager";
-import * as mockValues from "@tests/mockHelpers/backendRequestsMockValues";
+import * as mockValues from "@src/modules/__mocks__/backendRequestsMockValues";
 import {
   setupServerUserToken,
   serverTokenHeader,
@@ -42,7 +42,7 @@ describe("Test 'whoAmI' endpoint", () => {
 
   it("Should ok if valid user token", async () => {
     const ret = await request(app)
-      .post("/whoAmI")
+      .post("/whoami")
       .set(serverTokenHeader())
       .send({});
 

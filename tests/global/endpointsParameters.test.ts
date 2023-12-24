@@ -3,10 +3,10 @@ import { describe, expect, it } from "@jest/globals";
 import request from "supertest";
 import { Express } from "express";
 
-import mockFsVolumeReset from "@tests/helpers/mockFsVolumeReset";
-jest.mock("fs/promises");
-jest.mock("@src/modules/backendRequests");
+import { mockModules } from "@tests/helpers/mockModules";
+mockModules();
 
+import mockFsVolumeReset from "@tests/helpers/mockFsVolumeReset";
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB } from "@src/db/sequelizeDb";
 import { clearDB } from "@src/db/sequelizeDb";
@@ -31,6 +31,7 @@ const endpointsToTestInvalidJson = [
   "claimServer",
   "getToken",
   "whoAmI",
+  "unclaimServer",
 ];
 
 const dataToTestEndpointsParameters: Array<{

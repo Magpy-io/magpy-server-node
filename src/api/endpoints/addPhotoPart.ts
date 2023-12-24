@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 
 import responseFormatter from "@src/api/responseFormatter";
 import { getPhotoByClientPathFromDB, addPhotoToDB } from "@src/db/sequelizeDb";
-import FilesWaiting from "@src/modules/waitingFiles";
+import FilesWaiting, { FilesWaitingType } from "@src/modules/waitingFiles";
 import { addPhotoToDisk } from "@src/modules/diskManager";
 import { hashString } from "@src/modules/hashing";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
@@ -40,7 +40,9 @@ const callback = async (req: Request, res: Response) => {
 
     if (FilesWaiting.has(partReceived.id)) {
       console.log(`Photo transfer for id ${partReceived.id} found.`);
-      const photoWaiting = FilesWaiting.get(partReceived.id);
+      const photoWaiting = FilesWaiting.get(
+        partReceived.id
+      ) as FilesWaitingType;
       photoWaiting.received += partReceived.partSize;
       photoWaiting.dataParts.set(
         partReceived.partNumber,
@@ -58,11 +60,13 @@ const callback = async (req: Request, res: Response) => {
           FilesWaiting.delete(partReceived.id);
         }, postPhotoPartTimeout);
 
+        const jsonResponse = {
+          lenReceived: photoWaiting.received,
+          lenWaiting: photoWaiting.image64Len,
+          photo: responseFormatter.createPhotoObject(photoWaiting.photo, ""),
+        };
         console.log("Sending response message.");
-        responseFormatter.sendSuccessfulMessage(
-          res,
-          "Photo part added successfully"
-        );
+        responseFormatter.sendResponse(res, jsonResponse);
       } else if (photoWaiting.received > photoWaiting.image64Len) {
         console.log(
           `Transfered data (${photoWaiting.received}) exceeds initial image size (${photoWaiting.image64Len}).`
@@ -126,6 +130,8 @@ const callback = async (req: Request, res: Response) => {
             FilesWaiting.delete(partReceived.id);
 
             const jsonResponse = {
+              lenReceived: photoWaiting.received,
+              lenWaiting: photoWaiting.image64Len,
               photo: responseFormatter.createPhotoObject(dbPhoto, ""),
             };
             console.log("Sending response message.");
@@ -190,7 +196,7 @@ function joinParts(parts: Map<number, string>) {
 
   let ret = "";
   for (let i = 0; i < totalNumberOfParts; i++) {
-    ret = ret.concat(parts.get(i));
+    ret = ret.concat(parts.get(i) as string);
   }
   return ret;
 }

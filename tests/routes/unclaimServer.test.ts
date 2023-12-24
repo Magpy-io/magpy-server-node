@@ -11,13 +11,11 @@ import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB } from "@src/db/sequelizeDb";
 import { clearDB } from "@src/db/sequelizeDb";
 import { clearImagesDisk } from "@src/modules/diskManager";
-import { addNPhotos } from "@tests/helpers/functions";
-import {
-  setupServerUserToken,
-  serverTokenHeader,
-} from "@tests/helpers/functions";
+import { setupServerUserToken } from "@tests/helpers/functions";
 
-describe("Test 'getNumberPhotos' endpoint", () => {
+import { GetServerData } from "@src/modules/serverDataManager";
+
+describe("Test 'unclaimServer' endpoint", () => {
   let app: Express;
 
   beforeAll(async () => {
@@ -40,20 +38,16 @@ describe("Test 'getNumberPhotos' endpoint", () => {
     await clearFilesWaiting();
   });
 
-  it.each([{ n: 0 }, { n: 1 }, { n: 2 }])(
-    "Should return $n after adding $n photos",
-    async (p: { n: number }) => {
-      await addNPhotos(app, p.n);
+  it("Should return ok if unclaimed a valid server", async () => {
+    const ret = await request(app).post("/unclaimServer").send({});
 
-      const ret = await request(app)
-        .post("/getNumberPhotos")
-        .set(serverTokenHeader())
-        .send({});
+    expect(ret.statusCode).toBe(200);
+    expect(ret.body.ok).toBe(true);
 
-      expect(ret.statusCode).toBe(200);
-      expect(ret.body.ok).toBe(true);
-      expect(ret.body).toHaveProperty("data");
-      expect(ret.body.data.number).toBe(p.n);
-    }
-  );
+    const serverData = await GetServerData();
+
+    expect(serverData.serverId).toBeFalsy();
+    expect(serverData.serverKey).toBeFalsy();
+    expect(serverData.serverToken).toBeFalsy();
+  });
 });

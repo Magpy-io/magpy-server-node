@@ -6,11 +6,17 @@ import responseFormatter from "@src/api/responseFormatter";
 
 import { combineMiddleware } from "@src/modules/functions";
 
-import { getServerInfo, getServerToken } from "@src/modules/backendRequests";
+import {
+  getServerInfoPost,
+  getServerTokenPost,
+  SetServerToken,
+  GetServerToken,
+  GetServerTokenResponseType,
+  GetServerInfoResponseType,
+  ErrorBackendUnreachable,
+} from "@src/modules/backendImportedQueries";
 
-import { ErrorBackendUnreachable } from "@src/types/ExceptionTypes";
-
-import { SaveServerData } from "@src/modules/serverDataManager";
+import { SaveServerCredentials } from "@src/modules/serverDataManager";
 
 async function checkServerHasValidCredentials(
   req: Request,
@@ -18,14 +24,16 @@ async function checkServerHasValidCredentials(
   next: NextFunction
 ) {
   try {
+    console.log("\n#CheckServerHasValidCredentials middleware");
     const serverData = req.serverData;
 
-    if (serverData.serverToken) {
+    if (serverData?.serverToken) {
       console.log("server token found");
 
-      let ret: any;
+      let ret: GetServerInfoResponseType;
       try {
-        ret = await getServerInfo(serverData.serverToken);
+        SetServerToken(serverData.serverToken);
+        ret = await getServerInfoPost();
       } catch (err) {
         if (err instanceof ErrorBackendUnreachable) {
           console.log("Error requesting backend server");
@@ -50,19 +58,22 @@ async function checkServerHasValidCredentials(
           return;
         }
       } else {
-        console.log("server is claimed");
+        console.log("server has valid credentials");
         req.hasValidCredentials = true;
         next();
         return;
       }
     }
 
-    if (serverData.serverId && serverData.serverKey) {
+    if (serverData?.serverId && serverData?.serverKey) {
       console.log("server credentials found");
 
-      let ret: any;
+      let ret: GetServerTokenResponseType;
       try {
-        ret = await getServerToken(serverData.serverId, serverData.serverKey);
+        ret = await getServerTokenPost({
+          id: serverData.serverId,
+          key: serverData.serverKey,
+        });
       } catch (err) {
         if (err instanceof ErrorBackendUnreachable) {
           console.log("Error requesting backend server");
@@ -85,15 +96,14 @@ async function checkServerHasValidCredentials(
         }
       } else {
         console.log("server claimed, it has valid credentials");
-        const serverToken = ret.token;
+        const serverToken = GetServerToken();
 
         console.log("saving server token");
-        await SaveServerData({
-          serverId: serverData.serverId,
-          serverKey: serverData.serverKey,
+        await SaveServerCredentials({
           serverToken: serverToken,
         });
 
+        console.log("server has valid credentials");
         req.hasValidCredentials = true;
         next();
         return;

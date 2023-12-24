@@ -119,7 +119,7 @@ async function clearImagesDisk() {
 async function createFolder(dirPath: string) {
   try {
     await fs.access(dirPath);
-  } catch (error) {
+  } catch (error: any) {
     if (error.code === "ENOENT") {
       //The directory does NOT exist
       await fs.mkdir(dirPath, { recursive: true });

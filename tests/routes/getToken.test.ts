@@ -3,13 +3,12 @@ import { describe, expect, it } from "@jest/globals";
 import request from "supertest";
 import { Express } from "express";
 
+import { mockModules } from "@tests/helpers/mockModules";
+mockModules();
+
 import mockFsVolumeReset from "@tests/helpers/mockFsVolumeReset";
 import { AddServerData } from "@tests/helpers/mockFsValumeManager";
-
-jest.mock("fs/promises");
-jest.mock("@src/modules/backendRequests");
-
-import * as mockValues from "@tests/mockHelpers/backendRequestsMockValues";
+import * as mockValues from "@src/modules/__mocks__/backendRequestsMockValues";
 
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB, clearDB } from "@src/db/sequelizeDb";

@@ -1,13 +1,21 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
-import { registerServer, getServerToken } from "@src/modules/backendRequests";
-import { ErrorBackendUnreachable } from "@src/types/ExceptionTypes";
+import {
+  registerServerPost,
+  getServerTokenPost,
+  GetServerTokenResponseType,
+  RegisterServerResponseType,
+  GetServerToken,
+  SetUserToken,
+  ErrorBackendUnreachable,
+} from "@src/modules/backendImportedQueries";
 import { randomBytes } from "crypto";
+import { getMyIp } from "@src/modules/getMyIp";
 
-import { SaveServerData } from "@src/modules/serverDataManager";
+import { SaveServerCredentials } from "@src/modules/serverDataManager";
 
-import checkServerHasValidCredentials from "@src/middleware/checkServerHasValidCredentials";
+import checkServerIsClaimed from "@src/middleware/checkServerIsClaimed";
 
 // claimServer : creates server in backend and sets the requesting user as it's owner
 const endpoint = "/claimServer";
@@ -25,9 +33,11 @@ const callback = async (req: Request, res: Response) => {
 
     const requestParameters: RequestType = req.body;
 
+    const myIp = await getMyIp();
+
     const { userToken } = requestParameters;
 
-    if (req.hasValidCredentials) {
+    if (req.isClaimed) {
       console.log("server already claimed, it has valid token");
       responseFormatter.sendFailedMessage(
         res,
@@ -41,14 +51,14 @@ const callback = async (req: Request, res: Response) => {
 
     const keyGenerated = randomBytes(32).toString("hex");
 
-    let ret: any;
+    let ret: RegisterServerResponseType;
     try {
-      ret = await registerServer(
-        userToken,
-        keyGenerated,
-        "MyServer",
-        "0.0.0.0"
-      );
+      SetUserToken(userToken);
+      ret = await registerServerPost({
+        name: "MyServer",
+        ipAddress: myIp,
+        serverKey: keyGenerated,
+      });
     } catch (err) {
       if (err instanceof ErrorBackendUnreachable) {
         console.log("Error requesting backend server");
@@ -88,9 +98,9 @@ const callback = async (req: Request, res: Response) => {
     const id = ret.data.server._id;
     console.log("server registered, got id: " + id);
 
-    let ret1: any;
+    let ret1: GetServerTokenResponseType;
     try {
-      ret1 = await getServerToken(id, keyGenerated);
+      ret1 = await getServerTokenPost({ id: id, key: keyGenerated });
     } catch (err) {
       if (err instanceof ErrorBackendUnreachable) {
         console.log("Error requesting backend server");
@@ -111,9 +121,9 @@ const callback = async (req: Request, res: Response) => {
 
     console.log("got server token, saving to local");
 
-    const serverToken = ret1.token;
+    const serverToken = GetServerToken();
 
-    await SaveServerData({
+    await SaveServerCredentials({
       serverId: id,
       serverKey: keyGenerated,
       serverToken: serverToken,
@@ -140,5 +150,5 @@ export default {
   endpoint: endpoint,
   callback: callback,
   method: "post",
-  middleWare: checkServerHasValidCredentials,
+  middleWare: checkServerIsClaimed,
 };

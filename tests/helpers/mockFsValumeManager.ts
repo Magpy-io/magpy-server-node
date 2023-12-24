@@ -1,8 +1,8 @@
 import { vol } from "memfs";
-import { serverDataFolder } from "@src/config/config";
+import { serverDataFile } from "@src/config/config";
 
 export function AddServerData(serverData: any) {
-  const rootPathFile = serverDataFolder + "serverInfo.json";
+  const rootPathFile = serverDataFile;
   const json: any = {};
 
   json[rootPathFile] = JSON.stringify(serverData);

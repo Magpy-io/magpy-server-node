@@ -16,7 +16,11 @@ async function checkUserToken(req: Request, res: Response, next: NextFunction) {
 
     const token = req.token;
 
-    if (!req?.serverData?.serverKey) {
+    if (!token) {
+      throw new Error("Token undefined in checkUserToken");
+    }
+
+    if (!req?.serverData?.serverId || !req?.serverData.serverKey) {
       console.log("server is not claimed");
       responseFormatter.sendFailedMessage(
         res,

@@ -5,7 +5,7 @@ const jwtUserExp = "1d";
 const MAX_PIXELS_IN_IMAGE = 40000;
 const MAX_PIXELS_IN_IMAGE_BIGGER = 200000;
 
-const serverDataFolder = "./serverData/";
+const serverDataFile = "./serverData/serverInfo.json";
 
 const postPhotoPartTimeoutDev = 60000; //in ms
 const rootPathDev = "/home/issam/Documents/Images/";
@@ -44,6 +44,6 @@ export {
   getPhotoPartSize,
   MAX_PIXELS_IN_IMAGE,
   MAX_PIXELS_IN_IMAGE_BIGGER,
-  serverDataFolder,
+  serverDataFile,
   jwtUserExp,
 };

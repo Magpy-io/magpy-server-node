@@ -3,10 +3,10 @@ import { describe, expect, it } from "@jest/globals";
 import request from "supertest";
 import { Express } from "express";
 
-import mockFsVolumeReset from "@tests/helpers/mockFsVolumeReset";
-jest.mock("fs/promises");
-jest.mock("@src/modules/backendRequests");
+import { mockModules } from "@tests/helpers/mockModules";
+mockModules();
 
+import mockFsVolumeReset from "@tests/helpers/mockFsVolumeReset";
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB } from "@src/db/sequelizeDb";
 import { clearDB } from "@src/db/sequelizeDb";
@@ -49,7 +49,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
   });
 
   it("Should add the photo after sending all the parts of a photo", async () => {
-    const photo = { ...defaultPhoto };
+    const photo = { ...defaultPhoto } as any;
     delete photo.image64;
 
     const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };
@@ -78,6 +78,9 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
+    expect(ret.body).toHaveProperty("data");
+    expect(ret.body.data.lenWaiting).toBe(imageBase64Parts.photoLen);
+    expect(ret.body.data.lenReceived).toBe(imageBase64Parts.photoLenPart1);
 
     ret = await request(app)
       .post("/addPhotoPart")
@@ -91,6 +94,11 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
+    expect(ret.body).toHaveProperty("data");
+    expect(ret.body.data.lenWaiting).toBe(imageBase64Parts.photoLen);
+    expect(ret.body.data.lenReceived).toBe(
+      imageBase64Parts.photoLenPart1 + imageBase64Parts.photoLenPart2
+    );
 
     ret = await request(app)
       .post("/addPhotoPart")
@@ -106,6 +114,8 @@ describe("Test 'addPhotoPart' endpoint", () => {
     expect(ret.body.ok).toBe(true);
     expect(ret.body).toHaveProperty("data");
     expect(ret.body.data).toHaveProperty("photo");
+    expect(ret.body.data.lenWaiting).toBe(imageBase64Parts.photoLen);
+    expect(ret.body.data.lenReceived).toBe(imageBase64Parts.photoLen);
 
     testPhotoMetaAndId(ret.body.data.photo);
 
@@ -141,7 +151,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
   });
 
   it("Should return error PHOTO_TRANSFER_NOT_FOUND if started transfer and sended part too late", async () => {
-    const photo = { ...defaultPhoto };
+    const photo = { ...defaultPhoto } as any;
     delete photo.image64;
 
     const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };
@@ -182,7 +192,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
   });
 
   it("Should return error PHOTO_SIZE_EXCEEDED if sended more data in parts than needed", async () => {
-    const photo = { ...defaultPhoto };
+    const photo = { ...defaultPhoto } as any;
     delete photo.image64;
 
     const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };
@@ -243,7 +253,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
   });
 
   it("Should return error BAD_REQUEST if partSize not equal to photoPart length", async () => {
-    const photo = { ...defaultPhoto };
+    const photo = { ...defaultPhoto } as any;
     delete photo.image64;
 
     const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };
@@ -275,7 +285,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
   });
 
   it("Should return error MISSING_PARTS if added all parts but a number is missing", async () => {
-    const photo = { ...defaultPhoto };
+    const photo = { ...defaultPhoto } as any;
     delete photo.image64;
 
     const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };
@@ -340,7 +350,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
   });
 
   it("Should return error PHOTO_EXISTS if a photo with same path was added while adding photo parts", async () => {
-    const photo = { ...defaultPhoto };
+    const photo = { ...defaultPhoto } as any;
     delete photo.image64;
 
     const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };

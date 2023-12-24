@@ -4,9 +4,9 @@ import responseFormatter from "@src/api/responseFormatter";
 import checkUserToken from "@src/middleware/checkUserToken";
 
 // whoAmI : checks user token is valid
-const endpoint = "/whoAmI";
+const endpoint = "/whoami";
 const callback = async (req: Request, res: Response) => {
-  console.log(`\n[whoAmI]`);
+  console.log(`\n[whoami]`);
 
   try {
     const userId = req.userId;
