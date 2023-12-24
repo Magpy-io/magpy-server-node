@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
-import { addPhotoToDB, getPhotoByClientPathFromDB } from "@src/db/sequelizeDb";
+import {
+  addPhotoToDB,
+  deletePhotoByIdFromDB,
+  getPhotoByClientPathFromDB,
+} from "@src/db/sequelizeDb";
 import { addPhotoToDisk } from "@src/modules/diskManager";
 import { createServerImageName } from "@src/modules/diskFilesNaming";
 import { hashString } from "@src/modules/hashing";
@@ -62,15 +66,20 @@ const callback = async (req: Request, res: Response) => {
       const dbPhoto = await addPhotoToDB(photo);
 
       console.log("Photo added successfully to db.");
-      console.log("Adding photo to disk.");
-      await addPhotoToDisk(
-        requestPhoto.image64,
-        requestPhoto.width,
-        requestPhoto.height,
-        dbPhoto.serverPath
-      );
+      try {
+        console.log("Adding photo to disk.");
+        await addPhotoToDisk(
+          requestPhoto.image64,
+          requestPhoto.width,
+          requestPhoto.height,
+          dbPhoto.serverPath
+        );
+      } catch (err) {
+        console.log("Could not add photo to disk, removing photo from db");
+        await deletePhotoByIdFromDB(dbPhoto.id);
+        throw err;
+      }
       console.log("Photo added to disk.");
-
       const jsonResponse = {
         photo: responseFormatter.createPhotoObject(dbPhoto, ""),
       };

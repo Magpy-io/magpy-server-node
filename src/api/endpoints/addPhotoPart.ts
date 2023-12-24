@@ -1,7 +1,11 @@
 import { Request, Response } from "express";
 
 import responseFormatter from "@src/api/responseFormatter";
-import { getPhotoByClientPathFromDB, addPhotoToDB } from "@src/db/sequelizeDb";
+import {
+  getPhotoByClientPathFromDB,
+  addPhotoToDB,
+  deletePhotoByIdFromDB,
+} from "@src/db/sequelizeDb";
 import FilesWaiting, { FilesWaitingType } from "@src/modules/waitingFiles";
 import { addPhotoToDisk } from "@src/modules/diskManager";
 import { hashString } from "@src/modules/hashing";
@@ -112,22 +116,31 @@ const callback = async (req: Request, res: Response) => {
               "PHOTO_EXISTS"
             );
           } else {
+            console.log(`Deleting pending transfer for id ${partReceived.id}`);
+            FilesWaiting.delete(partReceived.id);
+
             photoWaiting.photo.id = partReceived.id;
             const dbPhoto = await addPhotoToDB(photoWaiting.photo);
 
             console.log("Photo added successfully to db.");
-            console.log("Adding photo to disk.");
-            await addPhotoToDisk(
-              image64,
-              dbPhoto.width,
-              dbPhoto.height,
-              dbPhoto.serverPath
-            );
+
+            try {
+              console.log("Adding photo to disk.");
+              await addPhotoToDisk(
+                image64,
+                dbPhoto.width,
+                dbPhoto.height,
+                dbPhoto.serverPath
+              );
+            } catch (err) {
+              console.log(
+                "Could not add photo to disk, removing photo from db"
+              );
+              await deletePhotoByIdFromDB(dbPhoto.id);
+              throw err;
+            }
 
             console.log("Photo added to disk.");
-
-            console.log(`Deleting pending transfer for id ${partReceived.id}`);
-            FilesWaiting.delete(partReceived.id);
 
             const jsonResponse = {
               lenReceived: photoWaiting.received,
