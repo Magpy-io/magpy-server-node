@@ -20,6 +20,7 @@ type ErrorCodes =
   | "AUTHORIZATION_EXPIRED"
   | "REQUEST_NOT_FROM_LOOPBACK"
   | "COULD_NOT_GET_REQUEST_ADDRESS"
-  | "PATH_ACCESS_DENIED";
+  | "PATH_ACCESS_DENIED"
+  | "INVALID_NAME";
 
 export type { ErrorCodes };

@@ -19,8 +19,12 @@ const callback = async (req: Request, res: Response) => {
     }
 
     if (name.length < 3 || name.length > 70) {
-      console.log("invalid name");
-      responseFormatter.sendFailedMessage(res);
+      console.log("Invalid name");
+      responseFormatter.sendFailedMessage(
+        res,
+        "Name too short or too long",
+        "INVALID_NAME"
+      );
       return;
     }
 

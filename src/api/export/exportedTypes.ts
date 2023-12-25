@@ -136,6 +136,7 @@ type ErrorAuthorizationExpired = "AUTHORIZATION_EXPIRED";
 type ErrorCouldNotGetRequestAddress = "COULD_NOT_GET_REQUEST_ADDRESS";
 type ErrorRequestNotFromLoopback = "REQUEST_NOT_FROM_LOOPBACK";
 type ErrorPathAccessDenied = "PATH_ACCESS_DENIED";
+type ErrorInvalidName = "INVALID_NAME";
 
 type ErrorsNotFromLocal =
   | ErrorCouldNotGetRequestAddress
@@ -708,6 +709,7 @@ export type UpdateServerNameRequestData = { name?: string };
 export type UpdateServerNameResponseData = ServerResponseMessage;
 
 export type UpdateServerNameResponseErrorTypes =
+  | ErrorInvalidName
   | ErrorsNotFromLocal
   | ErrorBackendServerUnreachable;
 
