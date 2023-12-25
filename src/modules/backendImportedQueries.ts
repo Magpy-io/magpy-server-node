@@ -112,6 +112,7 @@ type ErrorInvalidEmail = "INVALID_EMAIL";
 type ErrorInvalidName = "INVALID_NAME";
 type ErrorInvalidPassword = "INVALID_PASSWORD";
 type ErrorInvalidIpAddress = "INVALID_IP_ADDRESS";
+type ErrorInvalidServerName = "INVALID_SERVER_NAME";
 type ErrorInvalidKeyFormat = "INVALID_KEY_FORMAT";
 type ErrorNoAssociatedServer = "NO_ASSOCIATED_SERVER";
 type ErrorAuthorizationFailed = "AUTHORIZATION_FAILED";
@@ -275,6 +276,7 @@ export type RegisterServerResponseData = ServerResponseData<{
 
 export type RegisterServerResponseErrorTypes =
   | ErrorInvalidIpAddress
+  | ErrorInvalidServerName
   | ErrorInvalidKeyFormat
   | ErrorsAuthorization;
 
@@ -398,6 +400,7 @@ export type UpdateServerDataResponseData = ServerResponseMessage;
 
 export type UpdateServerDataResponseErrorTypes =
   | ErrorInvalidIpAddress
+  | ErrorInvalidServerName
   | ErrorsAuthorization;
 
 export type UpdateServerDataResponseType = EndpointMethodsResponseType<
