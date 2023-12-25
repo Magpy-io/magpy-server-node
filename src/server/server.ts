@@ -4,6 +4,7 @@ import express, { Express } from "express";
 import loadEndpoints from "@src/api/endpointsLoader";
 import jsonParsingErrorHandler from "@src/middleware/jsonParsingErrorHandler";
 import FilesWaiting from "@src/modules/waitingFiles";
+import path from "path";
 
 let app: Express;
 let server: any;
@@ -21,6 +22,16 @@ async function initServer() {
 
   loadEndpoints(app);
   console.log("Endpoints loaded");
+
+  // Serve static files from the React app
+  app.use(express.static(path.join(__dirname, "../../..", "client/build")));
+
+  // Catch-all route to serve React app
+  app.get("*", (req, res) => {
+    res.sendFile(
+      path.join(__dirname, "../../..", "client/build", "index.html")
+    );
+  });
 
   return new Promise<Express>((resolve) => {
     server = app.listen(process.env.PORT, () => {

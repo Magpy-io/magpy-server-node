@@ -1,7 +1,10 @@
 {
   "scripts": {
     "start": "yarn build && node ./dist/src/index.js",
-    "build": "rimraf ./dist && tsc",
+    "start:server": "yarn build:server && node ./dist/src/index.js",
+    "build:server": "rimraf ./dist && tsc",
+    "build:client": "cd client; yarn build; cd ..",
+    "build": "yarn build:client && yarn build:server",
     "clean": "yarn build && node ./dist/src/clearImages.js",
     "test": "yarn build && cross-env NODE_ENV=test jest ./dist/tests --verbose=true --silent --collect-coverage --testTimeout=10000",
     "test:v": "yarn build && cross-env NODE_ENV=test jest ./dist/tests --verbose=true --collect-coverage --testTimeout=10000",
