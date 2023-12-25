@@ -104,6 +104,14 @@ const routes = {
     checkPathExists();
     return path + "getServerInfo/";
   },
+  updateServerName: () => {
+    checkPathExists();
+    return path + "updateServerName/";
+  },
+  updateServerPath: () => {
+    checkPathExists();
+    return path + "updateServerPath/";
+  },
 };
 
 type ErrorBadRequest = "BAD_REQUEST";
@@ -127,6 +135,7 @@ type ErrorAuthorizationFailed = "AUTHORIZATION_FAILED";
 type ErrorAuthorizationExpired = "AUTHORIZATION_EXPIRED";
 type ErrorCouldNotGetRequestAddress = "COULD_NOT_GET_REQUEST_ADDRESS";
 type ErrorRequestNotFromLoopback = "REQUEST_NOT_FROM_LOOPBACK";
+type ErrorPathAccessDenied = "PATH_ACCESS_DENIED";
 
 type ErrorsNotFromLocal =
   | ErrorCouldNotGetRequestAddress
@@ -644,7 +653,9 @@ export type UnclaimServerRequestData = void;
 
 export type UnclaimServerResponseData = ServerResponseMessage;
 
-export type UnclaimServerResponseErrorTypes = ErrorsNotFromLocal;
+export type UnclaimServerResponseErrorTypes =
+  | ErrorsNotFromLocal
+  | ErrorBackendServerUnreachable;
 
 export type UnclaimServerResponseType = EndpointMethodsResponseType<
   UnclaimServerResponseData,
@@ -671,7 +682,9 @@ export type GetServerInfoResponseData = ServerResponseData<{
   owner: { name: string; email: string } | null;
 }>;
 
-export type GetServerInfoResponseErrorTypes = ErrorsNotFromLocal;
+export type GetServerInfoResponseErrorTypes =
+  | ErrorsNotFromLocal
+  | ErrorBackendServerUnreachable;
 
 export type GetServerInfoResponseType = EndpointMethodsResponseType<
   GetServerInfoResponseData,
@@ -682,7 +695,57 @@ export async function GetServerInfoPost(
   data: GetServerInfoRequestData
 ): Promise<GetServerInfoResponseType> {
   try {
-    const response = await axios.post(routes.unclaimServer(), data);
+    const response = await axios.post(routes.getServerInfo(), data);
+    return response.data;
+  } catch (err: any) {
+    return handleAxiosError(err);
+  }
+}
+
+// UpdateServerName
+export type UpdateServerNameRequestData = { name?: string };
+
+export type UpdateServerNameResponseData = ServerResponseMessage;
+
+export type UpdateServerNameResponseErrorTypes =
+  | ErrorsNotFromLocal
+  | ErrorBackendServerUnreachable;
+
+export type UpdateServerNameResponseType = EndpointMethodsResponseType<
+  UpdateServerNameResponseData,
+  UpdateServerNameResponseErrorTypes
+>;
+
+export async function UpdateServerNamePost(
+  data: UpdateServerNameRequestData
+): Promise<UpdateServerNameResponseType> {
+  try {
+    const response = await axios.post(routes.updateServerName(), data);
+    return response.data;
+  } catch (err: any) {
+    return handleAxiosError(err);
+  }
+}
+
+// UpdateServerPath
+export type UpdateServerPathRequestData = { path?: string };
+
+export type UpdateServerPathResponseData = ServerResponseMessage;
+
+export type UpdateServerPathResponseErrorTypes =
+  | ErrorPathAccessDenied
+  | ErrorsNotFromLocal;
+
+export type UpdateServerPathResponseType = EndpointMethodsResponseType<
+  UpdateServerPathResponseData,
+  UpdateServerPathResponseErrorTypes
+>;
+
+export async function UpdateServerPathPost(
+  data: UpdateServerPathRequestData
+): Promise<UpdateServerPathResponseType> {
+  try {
+    const response = await axios.post(routes.updateServerPath(), data);
     return response.data;
   } catch (err: any) {
     return handleAxiosError(err);

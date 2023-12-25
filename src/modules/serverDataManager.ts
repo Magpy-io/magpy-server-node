@@ -72,7 +72,7 @@ export async function GetStorageFolderPath(): Promise<string> {
   return serverData.storageFolderPath;
 }
 
-export async function SaveServername(name: string) {
+export async function SaveServerName(name: string) {
   await CreateFileIfDoesNotExist();
 
   const dataSaved = await getServerDataFromFile();

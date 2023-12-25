@@ -117,6 +117,15 @@ async function clearImagesDisk() {
   }
 }
 
+async function folderValid(dirPath: string) {
+  try {
+    await fs.access(dirPath, fs.constants.R_OK | fs.constants.W_OK);
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
 async function createFolder(dirPath: string) {
   try {
     await fs.access(dirPath);
@@ -138,4 +147,5 @@ export {
   clearImagesDisk,
   removePhotoFromDisk,
   createFolder,
+  folderValid,
 };
