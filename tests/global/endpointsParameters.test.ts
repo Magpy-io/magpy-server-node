@@ -32,6 +32,8 @@ const endpointsToTestInvalidJson = [
   "getToken",
   "whoAmI",
   "unclaimServer",
+  "updateServerName",
+  "updateServerPath",
 ];
 
 const dataToTestEndpointsParameters: Array<{
