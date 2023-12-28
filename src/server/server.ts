@@ -5,6 +5,7 @@ import loadEndpoints from "@src/api/endpointsLoader";
 import jsonParsingErrorHandler from "@src/middleware/jsonParsingErrorHandler";
 import FilesWaiting from "@src/modules/waitingFiles";
 import path from "path";
+import * as config from "@src/config/config"
 
 let app: Express;
 let server: any;
@@ -34,8 +35,8 @@ async function initServer() {
   });
 
   return new Promise<Express>((resolve) => {
-    server = app.listen(process.env.PORT, () => {
-      console.log(`Server is listening on port ${process.env.PORT}`);
+    server = app.listen(config.port, () => {
+      console.log(`Server is listening on port ${config.port}`);
       resolve(app);
     });
   });
