@@ -10,7 +10,8 @@ function splitImageName(fullName: string) {
 function createServerImageName(photo: Photo) {
   const { name, format } = splitImageName(photo.name);
   const date = photo.syncDate;
-  const serverFileName = `Ants_${name}_${date}.${format}`;
+  const dateFormated = date.replace(/\:/g, "-");
+  const serverFileName = `Ants_${name}_${dateFormated}.${format}`;
   return serverFileName;
 }
 
