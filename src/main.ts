@@ -18,9 +18,7 @@ const createWindow = () => {
   );
   tray = new Tray(icon);
 
-  const contextMenu = Menu.buildFromTemplate([
-    { label: "quit", role: "quit" },
-  ]);
+  const contextMenu = Menu.buildFromTemplate([{ label: "quit", role: "quit" }]);
 
   tray.setToolTip("This is my application.");
   tray.setContextMenu(contextMenu);
