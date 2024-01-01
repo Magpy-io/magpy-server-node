@@ -8,7 +8,6 @@ import { v4 as uuid } from "uuid";
 import { postPhotoPartTimeout } from "@src/config/config";
 import { Photo } from "@src/types/photoType";
 import checkUserToken from "@src/middleware/checkUserToken";
-import { GetStorageFolderPath } from "@src/modules/serverDataManager";
 
 // addPhotoInit : initializes the transfer of a photo to the server
 const endpoint = "/addPhotoInit";
@@ -57,8 +56,8 @@ const callback = async (req: Request, res: Response) => {
       const image64Len = requestPhoto.image64Len;
 
       photo.syncDate = new Date(Date.now()).toJSON();
-      const path = await GetStorageFolderPath();
-      photo.serverPath = path + createServerImageName(photo);
+
+      photo.serverPath = await createServerImageName(photo);
       const id = uuid();
 
       FilesWaiting.set(id, {

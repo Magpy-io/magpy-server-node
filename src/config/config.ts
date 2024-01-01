@@ -1,3 +1,6 @@
+import * as path from "path";
+import * as os from "os";
+
 const hashLen = 32;
 const getPhotoPartSize = 100000; //char in base64
 const jwtUserExp = "1d";
@@ -11,11 +14,11 @@ const backend_port = 8001;
 const serverName = "MyLocalServer";
 const serverNameMdnsPrefix = "OpenCloudServer";
 
-const serverDataFile = "./serverData/serverInfo.json";
+const serverDataFile = path.join(".", "serverData", "serverInfo.json");
 
 const postPhotoPartTimeoutDev = 60000; //in ms
-const rootPathDev = "D:\\Libraries\\Pictures\\OpenCloudPhotos\\";
-const sqliteDbFileDev = "./db/database.db";
+const rootPathDev = path.join(os.homedir(), "OpenCloudPhotos");
+const sqliteDbFileDev = path.join(".", "db", "database.db");
 const portDev = "8000";
 
 const postPhotoPartTimeoutTest = 100; //in ms
