@@ -21,6 +21,7 @@ type ErrorCodes =
   | "REQUEST_NOT_FROM_LOOPBACK"
   | "COULD_NOT_GET_REQUEST_ADDRESS"
   | "PATH_ACCESS_DENIED"
-  | "INVALID_NAME";
+  | "INVALID_NAME"
+  | "PATH_FOLDER_DOES_NOT_EXIST";
 
 export type { ErrorCodes };
