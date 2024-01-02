@@ -8,7 +8,7 @@ export function AddServerData(serverData: any) {
   const json: any = {};
 
   json[rootPathFile] = JSON.stringify(serverData);
-  vol.fromJSON(json, "./");
+  vol.fromJSON(json, ".");
 }
 
 export function CreatePath(path: string) {
