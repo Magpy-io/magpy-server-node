@@ -15,38 +15,32 @@ const serverName = "MyLocalServer";
 const serverNameMdnsPrefix = "OpenCloudServer";
 
 const postPhotoPartTimeoutDev = 60000; //in ms
-const rootPathDev = path.join(os.homedir(), "OpenCloudPhotos");
+const rootPath = path.join(os.homedir(), "OpenCloudPhotos");
 const sqliteDbFileDev = path.join(".", "db", "database.db");
 const serverDataFile = path.join(".", "serverData", "serverInfo.json");
 const portDev = "8000";
 
 const postPhotoPartTimeoutTest = 1000; //in ms
-const rootPathTest = "/home/issam/Documents/Images_test/";
 const sqliteDbFileTest = ":memory:";
 const portTest = "0";
 
 let sqliteDbFileTmp = "";
-let rootPathTmp = "";
 let postPhotoPartTimeoutTmp = 0;
 let portTmp = "";
 
 if (process.env.NODE_ENV === "test") {
   //supress console.log() when testing
   //console.log = function () {};
-
-  rootPathTmp = rootPathTest;
   sqliteDbFileTmp = sqliteDbFileTest;
   postPhotoPartTimeoutTmp = postPhotoPartTimeoutTest;
   portTmp = portTest;
 } else {
-  rootPathTmp = rootPathDev;
   sqliteDbFileTmp = sqliteDbFileDev;
   postPhotoPartTimeoutTmp = postPhotoPartTimeoutDev;
   portTmp = portDev;
 }
 
 const sqliteDbFile = sqliteDbFileTmp;
-const rootPath = rootPathTmp;
 const postPhotoPartTimeout = postPhotoPartTimeoutTmp;
 const port = portTmp;
 
