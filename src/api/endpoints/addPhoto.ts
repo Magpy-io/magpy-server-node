@@ -12,7 +12,6 @@ import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing
 import { hashLen } from "@src/config/config";
 import { Photo } from "@src/types/photoType";
 import checkUserToken from "@src/middleware/checkUserToken";
-import { GetStorageFolderPath } from "@src/modules/serverDataManager";
 
 // addPhoto : adds a photo to the server
 const endpoint = "/addPhoto";
@@ -59,8 +58,7 @@ const callback = async (req: Request, res: Response) => {
       console.log("Photo does not exist in server.");
       console.log("Creating syncDate, photoPath and the photo hash.");
       photo.syncDate = new Date(Date.now()).toJSON();
-      const path = await GetStorageFolderPath();
-      photo.serverPath = path + createServerImageName(photo);
+      photo.serverPath = await createServerImageName(photo);
       photo.hash = hashString(requestPhoto.image64, hashLen);
       console.log("Adding photo to db.");
       const dbPhoto = await addPhotoToDB(photo);

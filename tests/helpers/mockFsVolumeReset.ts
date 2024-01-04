@@ -1,7 +1,8 @@
 import { GetStorageFolderPath } from "@src/modules/serverDataManager";
-
+import * as os from "os";
 import { vol } from "memfs";
 import { join } from "path";
+import { GetRootPath } from "@tests/helpers/mockFsValumeManager";
 
 export default async function () {
   vol.reset();
@@ -10,5 +11,5 @@ export default async function () {
   const json: any = {};
   // Add file to create folder
   json[rootPathFile] = "";
-  vol.fromJSON(json, "/");
+  vol.fromJSON(json, GetRootPath());
 }

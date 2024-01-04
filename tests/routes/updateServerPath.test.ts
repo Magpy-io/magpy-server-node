@@ -2,12 +2,16 @@ import "@tests/helpers/loadEnvFile";
 import { describe, expect, it } from "@jest/globals";
 import request from "supertest";
 import { Express } from "express";
+import * as path from "path";
 
 import { mockModules } from "@tests/helpers/mockModules";
 mockModules();
 
 import mockFsVolumeReset from "@tests/helpers/mockFsVolumeReset";
-import { CreatePath } from "@tests/helpers/mockFsValumeManager";
+import {
+  CreatePath,
+  GetPathFromRoot,
+} from "@tests/helpers/mockFsValumeManager";
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB } from "@src/db/sequelizeDb";
 import { clearDB } from "@src/db/sequelizeDb";
@@ -40,11 +44,12 @@ describe("Test 'updateServerPath' endpoint", () => {
   });
 
   it("Should return ok when changing the server path to a valid one", async () => {
-    CreatePath("/pathToPhotos");
+    const photosPath = GetPathFromRoot("/pathToPhotos");
+    CreatePath(photosPath);
 
     const ret = await request(app)
       .post("/updateServerPath")
-      .send({ path: "/pathToPhotos" });
+      .send({ path: photosPath });
 
     console.log(ret.body);
     expect(ret.statusCode).toBe(200);
@@ -52,18 +57,18 @@ describe("Test 'updateServerPath' endpoint", () => {
 
     const serverName = await GetStorageFolderPath();
 
-    expect(serverName).toBe("/pathToPhotos");
+    expect(serverName).toBe(photosPath);
   });
 
-  it("Should return error PATH_ACCESS_DENIED when using an invalid or non existing path", async () => {
+  it("Should return error PATH_FOLDER_DOES_NOT_EXIST when using a folder that does not exist", async () => {
     const serverPathBefore = await GetStorageFolderPath();
     const ret = await request(app)
       .post("/updateServerPath")
-      .send({ path: "/nonExistingPath" });
+      .send({ path: GetPathFromRoot("/nonExistingPath") });
 
     expect(ret.statusCode).toBe(400);
     expect(ret.body.ok).toBe(false);
-    expect(ret.body.errorCode).toBe("PATH_ACCESS_DENIED");
+    expect(ret.body.errorCode).toBe("PATH_FOLDER_DOES_NOT_EXIST");
 
     const serverPath = await GetStorageFolderPath();
 

@@ -3,7 +3,7 @@ import fs from "fs/promises";
 import { Buffer } from "buffer";
 import sharp from "sharp";
 import { GetStorageFolderPath } from "@src/modules/serverDataManager";
-import { join } from "path";
+import * as path from "path";
 
 import {
   createServerImageThumbnailName,
@@ -19,15 +19,19 @@ async function addPhotoToDisk(
   data: string,
   photoWidth: number,
   photoHeight: number,
-  path: string
+  photoPath: string
 ) {
-  const factor = Math.sqrt((photoWidth * photoHeight) / MAX_PIXELS_IN_IMAGE);
+  await createFolder(path.parse(photoPath).dir);
+
+  const factorTmp = Math.sqrt((photoWidth * photoHeight) / MAX_PIXELS_IN_IMAGE);
+  const factor = factorTmp > 1 ? factorTmp : 1;
   const newWidth = Math.round(photoWidth / factor);
   const newHeight = Math.round(photoHeight / factor);
 
-  const factor2 = Math.sqrt(
+  const factor2Tmp = Math.sqrt(
     (photoWidth * photoHeight) / MAX_PIXELS_IN_IMAGE_BIGGER
   );
+  const factor2 = factor2Tmp > 1 ? factor2Tmp : 1;
   const newWidth2 = Math.round(photoWidth / factor2);
   const newHeight2 = Math.round(photoHeight / factor2);
 
@@ -49,29 +53,32 @@ async function addPhotoToDisk(
       console.error(err);
       throw err;
     });
-  const file1 = await fs.writeFile(path, buff);
+  const file1 = await fs.writeFile(photoPath, buff);
   const file2 = await fs.writeFile(
-    createServerImageCompressedName(path),
+    createServerImageCompressedName(photoPath),
     data2
   );
-  const file3 = await fs.writeFile(createServerImageThumbnailName(path), data1);
+  const file3 = await fs.writeFile(
+    createServerImageThumbnailName(photoPath),
+    data1
+  );
   return [file1, file2, file3];
 }
 
-async function removePhotoFromDisk(path: string) {
+async function removePhotoFromDisk(photoPath: string) {
   try {
-    await fs.unlink(path);
-    await fs.unlink(createServerImageThumbnailName(path));
-    await fs.unlink(createServerImageCompressedName(path));
+    await fs.unlink(photoPath);
+    await fs.unlink(createServerImageThumbnailName(photoPath));
+    await fs.unlink(createServerImageCompressedName(photoPath));
   } catch (err) {
     console.error(err);
     throw err;
   }
 }
 
-async function getOriginalPhotoFromDisk(path: string) {
+async function getOriginalPhotoFromDisk(photoPath: string) {
   try {
-    const result = await fs.readFile(path, { encoding: "base64" });
+    const result = await fs.readFile(photoPath, { encoding: "base64" });
     return Buffer.from(result).toString();
   } catch (err) {
     console.error(err);
@@ -79,11 +86,14 @@ async function getOriginalPhotoFromDisk(path: string) {
   }
 }
 
-async function getThumbnailPhotoFromDisk(path: string) {
+async function getThumbnailPhotoFromDisk(photoPath: string) {
   try {
-    const result = await fs.readFile(createServerImageThumbnailName(path), {
-      encoding: "base64",
-    });
+    const result = await fs.readFile(
+      createServerImageThumbnailName(photoPath),
+      {
+        encoding: "base64",
+      }
+    );
     return Buffer.from(result).toString();
   } catch (err) {
     console.error(err);
@@ -91,11 +101,14 @@ async function getThumbnailPhotoFromDisk(path: string) {
   }
 }
 
-async function getCompressedPhotoFromDisk(path: string) {
+async function getCompressedPhotoFromDisk(photoPath: string) {
   try {
-    const result = await fs.readFile(createServerImageCompressedName(path), {
-      encoding: "base64",
-    });
+    const result = await fs.readFile(
+      createServerImageCompressedName(photoPath),
+      {
+        encoding: "base64",
+      }
+    );
     return Buffer.from(result).toString();
   } catch (err) {
     console.error(err);
@@ -105,10 +118,16 @@ async function getCompressedPhotoFromDisk(path: string) {
 
 async function clearImagesDisk() {
   try {
-    const path = await GetStorageFolderPath();
-    const files = await fs.readdir(path);
+    const pathDir = await GetStorageFolderPath();
+    let files: string[] = [];
+    try {
+      files = await fs.readdir(pathDir);
+    } catch (err) {
+      console.log("Could not find storage folder : " + pathDir);
+      return;
+    }
     const filesUnlinkedPromises = files.map((file) => {
-      return fs.unlink(join(path, file));
+      return fs.unlink(path.join(pathDir, file));
     });
     await Promise.all(filesUnlinkedPromises);
   } catch (err) {
@@ -117,9 +136,32 @@ async function clearImagesDisk() {
   }
 }
 
-async function folderValid(dirPath: string) {
+async function folderHasRights(dirPath: string) {
   try {
-    await fs.access(dirPath, fs.constants.R_OK | fs.constants.W_OK);
+    const filename = "tmpFileForTestingAccessToFolder.txt";
+    const filePath = path.join(dirPath, filename);
+    let fileExists = false;
+
+    if (await pathExists(filePath)) {
+      fileExists = true;
+    }
+
+    let fh = await fs.open(filePath, "a");
+    await fh.close();
+
+    if (!fileExists) {
+      await fs.unlink(filePath);
+    }
+
+    return true;
+  } catch (err) {
+    return false;
+  }
+}
+
+async function pathExists(pathToTest: string) {
+  try {
+    await fs.access(pathToTest, fs.constants.F_OK);
     return true;
   } catch (err) {
     return false;
@@ -127,15 +169,10 @@ async function folderValid(dirPath: string) {
 }
 
 async function createFolder(dirPath: string) {
-  try {
-    await fs.access(dirPath);
-  } catch (error: any) {
-    if (error.code === "ENOENT") {
-      //The directory does NOT exist
-      await fs.mkdir(dirPath, { recursive: true });
-    } else {
-      throw error;
-    }
+  const exists = await pathExists(dirPath);
+
+  if (!exists) {
+    await fs.mkdir(dirPath, { recursive: true });
   }
 }
 
@@ -147,5 +184,6 @@ export {
   clearImagesDisk,
   removePhotoFromDisk,
   createFolder,
-  folderValid,
+  folderHasRights,
+  pathExists,
 };

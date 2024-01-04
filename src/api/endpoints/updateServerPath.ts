@@ -4,7 +4,9 @@ import responseFormatter from "@src/api/responseFormatter";
 import checkConnexionLocal from "@src/middleware/checkConnexionLocal";
 
 import { SaveStorageFolderPath } from "@src/modules/serverDataManager";
-import { folderValid } from "@src/modules/diskManager";
+import { folderHasRights, pathExists } from "@src/modules/diskManager";
+
+import { isAbsolutePath } from "@src/modules/functions";
 
 // updateServerPath : sets server name
 const endpoint = "/updateServerPath";
@@ -18,11 +20,27 @@ const callback = async (req: Request, res: Response) => {
       return;
     }
 
-    if (!(await folderValid(path))) {
-      console.log("invalid path");
+    if (!isAbsolutePath(path)) {
+      console.log("Invalid path, not an absolute path");
+      responseFormatter.sendFailedMessage(res, "Invalid path");
+      return;
+    }
+
+    if (!(await pathExists(path))) {
+      console.log("Invalid path, could not access the folder");
       responseFormatter.sendFailedMessage(
         res,
-        "Cannot reach given path",
+        "Cannot reach the given path",
+        "PATH_FOLDER_DOES_NOT_EXIST"
+      );
+      return;
+    }
+
+    if (!(await folderHasRights(path))) {
+      console.log("Invalid path, could not access the folder");
+      responseFormatter.sendFailedMessage(
+        res,
+        "Cannot access the given path",
         "PATH_ACCESS_DENIED"
       );
       return;

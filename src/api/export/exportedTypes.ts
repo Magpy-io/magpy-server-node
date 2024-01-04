@@ -136,6 +136,7 @@ type ErrorAuthorizationExpired = "AUTHORIZATION_EXPIRED";
 type ErrorCouldNotGetRequestAddress = "COULD_NOT_GET_REQUEST_ADDRESS";
 type ErrorRequestNotFromLoopback = "REQUEST_NOT_FROM_LOOPBACK";
 type ErrorPathAccessDenied = "PATH_ACCESS_DENIED";
+type ErrorPathFolderDoesNotExist = "PATH_FOLDER_DOES_NOT_EXIST";
 type ErrorInvalidName = "INVALID_NAME";
 
 type ErrorsNotFromLocal =
@@ -735,6 +736,7 @@ export type UpdateServerPathRequestData = { path?: string };
 export type UpdateServerPathResponseData = ServerResponseMessage;
 
 export type UpdateServerPathResponseErrorTypes =
+  | ErrorPathFolderDoesNotExist
   | ErrorPathAccessDenied
   | ErrorsNotFromLocal;
 

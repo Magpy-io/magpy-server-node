@@ -1,5 +1,6 @@
 import { Sequelize } from "sequelize";
 import { v4 as uuid } from "uuid";
+import * as path from "path";
 
 import { createFolder } from "@src/modules/diskManager";
 import { sqliteDbFile } from "@src/config/config";
@@ -53,11 +54,9 @@ async function closeDb() {
   console.log("Connection to DB closed");
 }
 
-async function createDbFolderIfDoesNotExist(sqliteDbFile: string) {
-  const dbFileSplit = sqliteDbFile.split("/");
-  dbFileSplit.pop();
-  const dirPath = dbFileSplit.join("/") + "/";
-  await createFolder(dirPath);
+async function createDbFolderIfDoesNotExist(sqliteDbFilePath: string) {
+  const parsed = path.parse(sqliteDbFilePath);
+  await createFolder(parsed.dir);
 }
 
 async function getPhotoByClientPathFromDB(

@@ -1,7 +1,8 @@
 // IMPORTS
 import fs from "fs/promises";
-import { createFolder } from "@src/modules/diskManager";
+import { createFolder, pathExists } from "@src/modules/diskManager";
 import * as config from "@src/config/config";
+import * as path from "path";
 
 export type ServerData = {
   serverId?: string;
@@ -56,12 +57,12 @@ export async function ClearServerCredentials() {
   await SaveServerCredentials({ serverId: "", serverKey: "", serverToken: "" });
 }
 
-export async function SaveStorageFolderPath(path: string) {
+export async function SaveStorageFolderPath(pathStorageFolder: string) {
   await CreateFileIfDoesNotExist();
 
   const dataSaved = await getServerDataFromFile();
 
-  dataSaved.storageFolderPath = path;
+  dataSaved.storageFolderPath = pathStorageFolder;
 
   await SaveServerDataFile(dataSaved);
 }
@@ -118,22 +119,9 @@ function AddServerDataIfMissing(data: any): ServerData {
 }
 
 async function CreateFileIfDoesNotExist() {
-  const filePathSplit = config.serverDataFile.split("/");
-
-  if (filePathSplit.length >= 2) {
-    filePathSplit.pop();
-
-    await createFolder(filePathSplit.join("/"));
-  }
-
-  try {
-    await fs.access(config.serverDataFile);
-  } catch (error: any) {
-    if (error.code === "ENOENT") {
-      //The file does not exist
-      await fs.writeFile(config.serverDataFile, JSON.stringify({}));
-    } else {
-      throw error;
-    }
+  const parsed = path.parse(config.serverDataFile);
+  await createFolder(parsed.dir);
+  if (!(await pathExists(config.serverDataFile))) {
+    await fs.writeFile(config.serverDataFile, JSON.stringify({}));
   }
 }

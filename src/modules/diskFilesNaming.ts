@@ -1,4 +1,7 @@
 import { Photo } from "@src/types/photoType";
+import * as path from "path";
+
+import { GetStorageFolderPath } from "@src/modules/serverDataManager";
 
 function splitImageName(fullName: string) {
   const nameSplited = fullName.split(".");
@@ -7,11 +10,13 @@ function splitImageName(fullName: string) {
   return { name: name, format: format };
 }
 
-function createServerImageName(photo: Photo) {
+async function createServerImageName(photo: Photo) {
+  const dirPath = await GetStorageFolderPath();
   const { name, format } = splitImageName(photo.name);
   const date = photo.syncDate;
-  const serverFileName = `Ants_${name}_${date}.${format}`;
-  return serverFileName;
+  const dateFormated = date.replace(/\:/g, "-");
+  const serverFileName = `Ants_${name}_${dateFormated}.${format}`;
+  return path.join(dirPath, serverFileName);
 }
 
 function createServerImageThumbnailName(fullImagePath: string) {
