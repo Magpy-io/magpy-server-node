@@ -14,10 +14,10 @@ const callback = async (req: Request, res: Response) => {
       user: { id: userId },
     };
     console.log("Token verified, sending confirmation");
-    responseFormatter.sendResponse(res, jsonResponse);
+    return responseFormatter.sendResponse(res, jsonResponse);
   } catch (err) {
     console.error(err);
-    responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(res);
   }
 };
 

@@ -34,10 +34,10 @@ const callback = async (req: Request, res: Response) => {
 
     await ClearServerCredentials();
 
-    responseFormatter.sendSuccessfulMessage(res, "Server unclaimed");
+    return responseFormatter.sendSuccessfulMessage(res, "Server unclaimed");
   } catch (err) {
     console.error(err);
-    responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(res);
   }
 };
 

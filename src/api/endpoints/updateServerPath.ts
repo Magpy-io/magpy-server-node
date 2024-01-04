@@ -16,42 +16,38 @@ const callback = async (req: Request, res: Response) => {
 
     if (!path) {
       console.log("Nothing to update, sending response");
-      responseFormatter.sendSuccessfulMessage(res, "Nothing to update");
-      return;
+      return responseFormatter.sendSuccessfulMessage(res, "Nothing to update");
     }
 
     if (!isAbsolutePath(path)) {
       console.log("Invalid path, not an absolute path");
-      responseFormatter.sendFailedMessage(res, "Invalid path");
-      return;
+      return responseFormatter.sendFailedMessage(res, "Invalid path");
     }
 
     if (!(await pathExists(path))) {
       console.log("Invalid path, could not access the folder");
-      responseFormatter.sendFailedMessage(
+      return responseFormatter.sendFailedMessage(
         res,
         "Cannot reach the given path",
         "PATH_FOLDER_DOES_NOT_EXIST"
       );
-      return;
     }
 
     if (!(await folderHasRights(path))) {
       console.log("Invalid path, could not access the folder");
-      responseFormatter.sendFailedMessage(
+      return responseFormatter.sendFailedMessage(
         res,
         "Cannot access the given path",
         "PATH_ACCESS_DENIED"
       );
-      return;
     }
 
     await SaveStorageFolderPath(path);
 
-    responseFormatter.sendSuccessfulMessage(res, "Server path changed");
+    return responseFormatter.sendSuccessfulMessage(res, "Server path changed");
   } catch (err) {
     console.error(err);
-    responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(res);
   }
 };
 

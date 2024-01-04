@@ -17,10 +17,10 @@ const callback = async (req: Request, res: Response) => {
       number: nb,
     };
     console.log("Sending response data.");
-    responseFormatter.sendResponse(res, jsonResponse);
+    return responseFormatter.sendResponse(res, jsonResponse);
   } catch (err) {
     console.error(err);
-    responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(res);
   }
 };
 

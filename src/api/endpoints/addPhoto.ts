@@ -19,8 +19,7 @@ const callback = async (req: Request, res: Response) => {
     if (checkBodyParamsMissing(req)) {
       console.log("Bad request parameters");
       console.log("Sending response message");
-      responseFormatter.sendFailedMessage(res);
-      return;
+      return responseFormatter.sendFailedMessage(res);
     }
     console.log("Request parameters ok.");
 
@@ -49,7 +48,7 @@ const callback = async (req: Request, res: Response) => {
     if (exists) {
       console.log("Photo exists in server.");
       console.log("Sending response message.");
-      responseFormatter.sendFailedMessage(
+      return responseFormatter.sendFailedMessage(
         res,
         "Photo already added to server.",
         "PHOTO_EXISTS"
@@ -82,11 +81,11 @@ const callback = async (req: Request, res: Response) => {
         photo: responseFormatter.createPhotoObject(dbPhoto, ""),
       };
       console.log("Sending response message.");
-      responseFormatter.sendResponse(res, jsonResponse);
+      return responseFormatter.sendResponse(res, jsonResponse);
     }
   } catch (err) {
     console.error(err);
-    responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(res);
   }
 };
 

@@ -14,8 +14,7 @@ const callback = async (req: Request, res: Response) => {
     if (checkReqBodyAttributeMissing(req, "ids", "Array string")) {
       console.log("Bad request parameters");
       console.log("Sending response message");
-      responseFormatter.sendFailedMessage(res);
-      return;
+      return responseFormatter.sendFailedMessage(res);
     }
     console.log("Request parameters ok.");
 
@@ -35,10 +34,10 @@ const callback = async (req: Request, res: Response) => {
 
     console.log("Photos removed from db and disk.");
     console.log("Sending response message.");
-    responseFormatter.sendResponse(res, { deletedIds: removedIds });
+    return responseFormatter.sendResponse(res, { deletedIds: removedIds });
   } catch (err) {
     console.error(err);
-    responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(res);
   }
 };
 

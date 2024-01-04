@@ -23,8 +23,7 @@ const callback = async (req: Request, res: Response) => {
     if (checkBodyParamsMissing(req)) {
       console.log("Bad request parameters");
       console.log("Sending response message");
-      responseFormatter.sendFailedMessage(res);
-      return;
+      return responseFormatter.sendFailedMessage(res);
     }
 
     console.log(`id: ${req.body.id}, part number: ${req.body.partNumber}`);
@@ -34,11 +33,10 @@ const callback = async (req: Request, res: Response) => {
     if (partReceived.partSize != partReceived.photoPart.length) {
       console.log("Bad request parameters");
       console.log("Sending response message");
-      responseFormatter.sendFailedMessage(
+      return responseFormatter.sendFailedMessage(
         res,
         "photoPart length and partSize do not match"
       );
-      return;
     }
 
     console.log("Request parameters ok.");
@@ -71,7 +69,7 @@ const callback = async (req: Request, res: Response) => {
           photo: responseFormatter.createPhotoObject(photoWaiting.photo, ""),
         };
         console.log("Sending response message.");
-        responseFormatter.sendResponse(res, jsonResponse);
+        return responseFormatter.sendResponse(res, jsonResponse);
       } else if (photoWaiting.received > photoWaiting.image64Len) {
         console.log(
           `Transfered data (${photoWaiting.received}) exceeds initial image size (${photoWaiting.image64Len}).`
@@ -111,7 +109,7 @@ const callback = async (req: Request, res: Response) => {
             FilesWaiting.delete(partReceived.id);
 
             console.log("Sending response message.");
-            responseFormatter.sendFailedMessage(
+            return responseFormatter.sendFailedMessage(
               res,
               "Photo already added to server.",
               "PHOTO_EXISTS"
@@ -149,7 +147,7 @@ const callback = async (req: Request, res: Response) => {
               photo: responseFormatter.createPhotoObject(dbPhoto, ""),
             };
             console.log("Sending response message.");
-            responseFormatter.sendResponse(res, jsonResponse);
+            return responseFormatter.sendResponse(res, jsonResponse);
           }
         } else {
           console.log(`Deleting pending transfer for id ${partReceived.id}`);
@@ -175,7 +173,7 @@ const callback = async (req: Request, res: Response) => {
     }
   } catch (err) {
     console.error(err);
-    responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(res);
   }
 };
 

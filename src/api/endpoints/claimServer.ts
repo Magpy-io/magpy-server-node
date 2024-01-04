@@ -29,8 +29,7 @@ const callback = async (req: Request, res: Response) => {
     if (checkBodyParamsMissing(req)) {
       console.log("Bad request parameters");
       console.log("Sending response message");
-      responseFormatter.sendFailedMessage(res);
-      return;
+      return responseFormatter.sendFailedMessage(res);
     }
     console.log("Request parameters ok.");
 
@@ -42,12 +41,11 @@ const callback = async (req: Request, res: Response) => {
 
     if (req.isClaimed) {
       console.log("server already claimed, it has valid token");
-      responseFormatter.sendFailedMessage(
+      return responseFormatter.sendFailedMessage(
         res,
         "Server already claimed",
         "SERVER_ALREADY_CLAIMED"
       );
-      return;
     }
 
     console.log("server not claimed");
@@ -65,10 +63,10 @@ const callback = async (req: Request, res: Response) => {
     } catch (err) {
       if (err instanceof ErrorBackendUnreachable) {
         console.log("Error requesting backend server");
-        responseFormatter.sendErrorBackEndServerUnreachable(res);
+        return responseFormatter.sendErrorBackEndServerUnreachable(res);
       } else {
         console.error(err);
-        responseFormatter.sendErrorMessage(res);
+        return responseFormatter.sendErrorMessage(res);
       }
       return;
     }
@@ -76,25 +74,22 @@ const callback = async (req: Request, res: Response) => {
     if (!ret.ok) {
       if (ret.errorCode == "AUTHORIZATION_FAILED") {
         console.log("user token authorization error");
-        responseFormatter.sendFailedMessage(
+        return responseFormatter.sendFailedMessage(
           res,
           "User token verification failed",
           "AUTHORIZATION_BACKEND_FAILED"
         );
-        return;
       } else if (ret.errorCode == "AUTHORIZATION_EXPIRED") {
         console.log("user token expired");
-        responseFormatter.sendFailedMessage(
+        return responseFormatter.sendFailedMessage(
           res,
           "User token expired",
           "AUTHORIZATION_BACKEND_EXPIRED"
         );
-        return;
       } else {
         console.error("request to verify user token failed");
         console.error(ret);
-        responseFormatter.sendErrorMessage(res);
-        return;
+        return responseFormatter.sendErrorMessage(res);
       }
     }
 
@@ -107,19 +102,17 @@ const callback = async (req: Request, res: Response) => {
     } catch (err) {
       if (err instanceof ErrorBackendUnreachable) {
         console.log("Error requesting backend server");
-        responseFormatter.sendErrorBackEndServerUnreachable(res);
+        return responseFormatter.sendErrorBackEndServerUnreachable(res);
       } else {
         console.error(err);
-        responseFormatter.sendErrorMessage(res);
+        return responseFormatter.sendErrorMessage(res);
       }
-      return;
     }
 
     if (!ret1.ok) {
       console.error("request to verify server credentials failed");
       console.error(ret1);
-      responseFormatter.sendErrorMessage(res);
-      return;
+      return responseFormatter.sendErrorMessage(res);
     }
 
     console.log("got server token, saving to local");
@@ -132,10 +125,10 @@ const callback = async (req: Request, res: Response) => {
       serverToken: serverToken,
     });
 
-    responseFormatter.sendSuccessfulMessage(res, "ok");
+    return responseFormatter.sendSuccessfulMessage(res, "ok");
   } catch (err) {
     console.error(err);
-    responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(res);
   }
 };
 

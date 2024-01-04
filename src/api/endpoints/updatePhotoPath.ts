@@ -19,8 +19,7 @@ const callback = async (req: Request, res: Response) => {
   if (checkBodyParamsMissing(req)) {
     console.log("Bad request parameters");
     console.log("Sending response message");
-    responseFormatter.sendFailedMessage(res);
-    return;
+    return responseFormatter.sendFailedMessage(res);
   }
   console.log("Request parameters ok.");
 
@@ -36,7 +35,7 @@ const callback = async (req: Request, res: Response) => {
     if (!exists) {
       console.log("Photo does not exist in server.");
       console.log("Sending response message.");
-      responseFormatter.sendFailedMessage(
+      return responseFormatter.sendFailedMessage(
         res,
         `Photo with id ${id} not found in server`,
         "ID_NOT_FOUND"
@@ -57,14 +56,14 @@ const callback = async (req: Request, res: Response) => {
 
         console.log("Photo updated successfully.");
         console.log("Sending response message.");
-        responseFormatter.sendSuccessfulMessage(
+        return responseFormatter.sendSuccessfulMessage(
           res,
           `Photo with id ${id} successfully updated with new path`
         );
       } else {
         console.log("Photo path already exists in db");
         console.log("Sending response message.");
-        responseFormatter.sendFailedMessage(
+        return responseFormatter.sendFailedMessage(
           res,
           `A photo already exists with path ${path}`,
           "PATH_EXISTS"
@@ -73,7 +72,7 @@ const callback = async (req: Request, res: Response) => {
     }
   } catch (err) {
     console.error(err);
-    responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(res);
   }
 };
 

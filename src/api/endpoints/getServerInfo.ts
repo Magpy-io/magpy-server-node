@@ -28,8 +28,7 @@ const callback = async (req: Request, res: Response) => {
       if (!ret.ok) {
         console.log("Error retrieving server info");
         console.log(ret);
-        responseFormatter.sendErrorMessage(res);
-        return;
+        return responseFormatter.sendErrorMessage(res);
       }
 
       if (ret.data.server.owner != null) {
@@ -41,10 +40,10 @@ const callback = async (req: Request, res: Response) => {
       }
     }
 
-    responseFormatter.sendResponse(res, responseJson);
+    return responseFormatter.sendResponse(res, responseJson);
   } catch (err) {
     console.error(err);
-    responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(res);
   }
 };
 

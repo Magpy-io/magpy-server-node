@@ -19,8 +19,7 @@ const callback = async (req: Request, res: Response) => {
     if (checkBodyParamsMissing(req)) {
       console.log("Bad request parameters");
       console.log("Sending response message");
-      responseFormatter.sendFailedMessage(res);
-      return;
+      return responseFormatter.sendFailedMessage(res);
     }
     console.log("Request parameters ok.");
 
@@ -80,7 +79,7 @@ const callback = async (req: Request, res: Response) => {
     }
   } catch (err) {
     console.error(err);
-    responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(res);
   }
 };
 

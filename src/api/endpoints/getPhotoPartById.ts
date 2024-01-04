@@ -17,8 +17,7 @@ const callback = async (req: Request, res: Response) => {
     if (checkReqBodyAttributeMissing(req, "id", "string")) {
       console.log("Bad request parameters");
       console.log("Sending response message");
-      responseFormatter.sendFailedMessage(res);
-      return;
+      return responseFormatter.sendFailedMessage(res);
     }
     console.log("Request parameters ok.");
 
@@ -39,7 +38,7 @@ const callback = async (req: Request, res: Response) => {
     if (!exists) {
       console.log("Photo not found in db.");
       console.log("Sending response message.");
-      responseFormatter.sendFailedMessage(
+      return responseFormatter.sendFailedMessage(
         res,
         `Photo with id: ${id} not found`,
         "ID_NOT_FOUND"
@@ -69,7 +68,7 @@ const callback = async (req: Request, res: Response) => {
           part: partNumber,
           totalNbOfParts: totalNbOfParts,
         };
-        responseFormatter.sendResponse(res, jsonResponse);
+        return responseFormatter.sendResponse(res, jsonResponse);
       } else {
         console.log(
           `Part number ${partNumber} must be between 0 and ${
@@ -77,7 +76,7 @@ const callback = async (req: Request, res: Response) => {
           } included`
         );
         console.log("Sending response message.");
-        responseFormatter.sendFailedMessage(
+        return responseFormatter.sendFailedMessage(
           res,
           `Part number ${partNumber} must be between 0 and ${
             totalNbOfParts - 1
@@ -88,7 +87,7 @@ const callback = async (req: Request, res: Response) => {
     }
   } catch (err) {
     console.error(err);
-    responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(res);
   }
 };
 

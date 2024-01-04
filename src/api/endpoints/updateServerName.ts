@@ -14,18 +14,16 @@ const callback = async (req: Request, res: Response) => {
 
     if (!name) {
       console.log("Nothing to update, sending response");
-      responseFormatter.sendSuccessfulMessage(res, "Nothing to update");
-      return;
+      return responseFormatter.sendSuccessfulMessage(res, "Nothing to update");
     }
 
     if (name.length < 3 || name.length > 70) {
       console.log("Invalid name");
-      responseFormatter.sendFailedMessage(
+      return responseFormatter.sendFailedMessage(
         res,
         "Name too short or too long",
         "INVALID_NAME"
       );
-      return;
     }
 
     await SaveServerName(name);
@@ -36,14 +34,13 @@ const callback = async (req: Request, res: Response) => {
       if (!ret.ok) {
         console.log("Error saving server name");
         console.log(ret);
-        responseFormatter.sendErrorMessage(res);
-        return;
+        return responseFormatter.sendErrorMessage(res);
       }
     }
-    responseFormatter.sendSuccessfulMessage(res, "Server name changed");
+    return responseFormatter.sendSuccessfulMessage(res, "Server name changed");
   } catch (err) {
     console.error(err);
-    responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(res);
   }
 };
 
