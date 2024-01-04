@@ -23,13 +23,15 @@ async function addPhotoToDisk(
 ) {
   await createFolder(path.parse(photoPath).dir);
 
-  const factor = Math.sqrt((photoWidth * photoHeight) / MAX_PIXELS_IN_IMAGE);
+  const factorTmp = Math.sqrt((photoWidth * photoHeight) / MAX_PIXELS_IN_IMAGE);
+  const factor = factorTmp > 1 ? factorTmp : 1;
   const newWidth = Math.round(photoWidth / factor);
   const newHeight = Math.round(photoHeight / factor);
 
-  const factor2 = Math.sqrt(
+  const factor2Tmp = Math.sqrt(
     (photoWidth * photoHeight) / MAX_PIXELS_IN_IMAGE_BIGGER
   );
+  const factor2 = factor2Tmp > 1 ? factor2Tmp : 1;
   const newWidth2 = Math.round(photoWidth / factor2);
   const newHeight2 = Math.round(photoHeight / factor2);
 
