@@ -9,6 +9,7 @@ import {
 } from "@src/modules/diskManager";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import checkUserToken from "@src/middleware/checkUserToken";
+import { filterPhotosAndDeleteMissing } from "@src/modules/functions";
 
 // getPhotos : returns "number" photos starting from "offset".
 const endpoint = "/getPhotos";
@@ -37,31 +38,38 @@ const callback = async (req: Request, res: Response) => {
 
     console.log(`Got ${photos?.length} photos.`);
 
+    const photosThatExist = await filterPhotosAndDeleteMissing(photos);
+    console.log(
+      `${photosThatExist?.length} photos exist in disk, ${
+        photos?.length - photosThatExist?.length
+      } photos were missing.`
+    );
+
     let images64Promises;
 
     if (photoType == "data") {
-      images64Promises = photos.map((photo) => "");
+      images64Promises = photosThatExist.map((photo) => "");
     } else if (photoType == "thumbnail") {
       console.log("Retrieving thumbnail photos from disk.");
-      images64Promises = photos.map((photo) => {
+      images64Promises = photosThatExist.map((photo) => {
         return getThumbnailPhotoFromDisk(photo.serverPath);
       });
     } else if (photoType == "compressed") {
       console.log("Retrieving compressed photos from disk.");
-      images64Promises = photos.map((photo) => {
+      images64Promises = photosThatExist.map((photo) => {
         return getCompressedPhotoFromDisk(photo.serverPath);
       });
     } else {
       // Photo Type "original"
       console.log("Retrieving original photos from disk.");
-      images64Promises = photos.map((photo) => {
+      images64Promises = photosThatExist.map((photo) => {
         return getOriginalPhotoFromDisk(photo.serverPath);
       });
     }
 
     const images64 = await Promise.all(images64Promises);
 
-    const photosWithImage64 = photos.map((photo, index) => {
+    const photosWithImage64 = photosThatExist.map((photo, index) => {
       return responseFormatter.createPhotoObject(photo, images64[index]);
     });
 

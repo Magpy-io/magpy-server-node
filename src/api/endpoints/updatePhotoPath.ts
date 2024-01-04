@@ -8,6 +8,7 @@ import {
 
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import checkUserToken from "@src/middleware/checkUserToken";
+import { checkPhotoExists } from "@src/modules/functions";
 
 // updatePhotoPath : updates the path of a photo in db
 const endpoint = "/updatePhotoPath";
@@ -29,7 +30,9 @@ const callback = async (req: Request, res: Response) => {
 
   try {
     console.log(`Searching in db for photo with id: ${id}`);
-    const exists = await getPhotoByIdFromDB(id);
+    const exists = await checkPhotoExists({
+      id: id,
+    });
     if (!exists) {
       console.log("Photo does not exist in server.");
       console.log("Sending response message.");
@@ -41,11 +44,13 @@ const callback = async (req: Request, res: Response) => {
     } else {
       console.log("Photo found");
 
-      console.log("Getting photos from db with new path");
-      const photo = await getPhotoByClientPathFromDB(path);
+      console.log("Getting photo from db with new path");
+      const photoWithNewPathExists = await checkPhotoExists({
+        clientPath: path,
+      });
       console.log("Received response from db.");
 
-      if (!photo) {
+      if (!photoWithNewPathExists) {
         console.log("Photo path does not exist in db");
         console.log("Updating path in db");
         await updatePhotoClientPathById(id, path);

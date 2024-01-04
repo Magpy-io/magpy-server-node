@@ -9,6 +9,7 @@ import {
   getOriginalPhotoFromDisk,
 } from "@src/modules/diskManager";
 import checkUserToken from "@src/middleware/checkUserToken";
+import { filterPhotosExistAndDeleteMissing } from "@src/modules/functions";
 
 // getPhotosByPath : returns array of photos by their paths.
 const endpoint = "/getPhotosByPath";
@@ -34,26 +35,27 @@ const callback = async (req: Request, res: Response) => {
     console.log("Getting photos from db with paths from request.");
     const photos = await getPhotosByClientPathFromDB(paths);
     console.log("Received response from db.");
+    const photosThatExist = await filterPhotosExistAndDeleteMissing(photos);
 
     let images64Promises;
     if (photoType == "data") {
-      images64Promises = photos.map((photo) => "");
+      images64Promises = photosThatExist.map((photo) => "");
     } else if (photoType == "thumbnail") {
       console.log("Retrieving thumbnail photos from disk.");
-      images64Promises = photos.map((photo) => {
+      images64Promises = photosThatExist.map((photo) => {
         if (!photo) return "";
         return getThumbnailPhotoFromDisk(photo.serverPath);
       });
     } else if (photoType == "compressed") {
       console.log("Retrieving compressed photos from disk.");
-      images64Promises = photos.map((photo) => {
+      images64Promises = photosThatExist.map((photo) => {
         if (!photo) return "";
         return getCompressedPhotoFromDisk(photo.serverPath);
       });
     } else {
       // Photo Type "original"
       console.log("Retrieving original photos from disk.");
-      images64Promises = photos.map((photo) => {
+      images64Promises = photosThatExist.map((photo) => {
         if (!photo) return "";
         return getOriginalPhotoFromDisk(photo.serverPath);
       });
@@ -62,7 +64,7 @@ const callback = async (req: Request, res: Response) => {
 
     console.log("Photos retrieved from disk if needed");
 
-    const photosResponse = photos.map((photo, index) => {
+    const photosResponse = photosThatExist.map((photo, index) => {
       if (!photo) return { path: paths[index], exists: false };
 
       const photoWithImage64 = responseFormatter.createPhotoObject(

@@ -8,6 +8,7 @@ import { v4 as uuid } from "uuid";
 import { postPhotoPartTimeout } from "@src/config/config";
 import { Photo } from "@src/types/photoType";
 import checkUserToken from "@src/middleware/checkUserToken";
+import { checkPhotoExists } from "@src/modules/functions";
 
 // addPhotoInit : initializes the transfer of a photo to the server
 const endpoint = "/addPhotoInit";
@@ -41,7 +42,10 @@ const callback = async (req: Request, res: Response) => {
     };
 
     console.log(`Searching in db for photo with path: ${requestPhoto.path}`);
-    const exists = await getPhotoByClientPathFromDB(requestPhoto.path);
+
+    const exists = await checkPhotoExists({
+      clientPath: requestPhoto.path,
+    });
     if (exists) {
       console.log("Photo exists in server.");
       console.log("Sending response message.");

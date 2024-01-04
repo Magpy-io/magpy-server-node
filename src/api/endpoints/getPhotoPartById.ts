@@ -6,6 +6,7 @@ import { getOriginalPhotoFromDisk } from "@src/modules/diskManager";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import { getNumberOfParts, getPartN } from "@src/modules/stringHelper";
 import checkUserToken from "@src/middleware/checkUserToken";
+import { checkPhotoExists } from "@src/modules/functions";
 
 // getPhotoPartById : returns a part of a photo by id.
 const endpoint = "/getPhotoPartById";
@@ -29,9 +30,13 @@ const callback = async (req: Request, res: Response) => {
 
     console.log(`id: ${req.body.id}, partNumber: ${partNumber}`);
 
-    console.log(`Getting photo with id = ${id} from db.`);
-    const dbPhoto = await getPhotoByIdFromDB(id);
-    if (!dbPhoto) {
+    console.log("Checking photo exists");
+
+    const exists = await checkPhotoExists({
+      id: id,
+    });
+
+    if (!exists) {
       console.log("Photo not found in db.");
       console.log("Sending response message.");
       responseFormatter.sendFailedMessage(
@@ -41,6 +46,15 @@ const callback = async (req: Request, res: Response) => {
       );
     } else {
       console.log("Photo found in db.");
+      console.log(`Getting photo with id = ${id} from db.`);
+      const dbPhoto = await getPhotoByIdFromDB(id);
+
+      if (!dbPhoto) {
+        throw new Error(
+          "getPhotoPartById: photo exists but cannot retrieve from db"
+        );
+      }
+
       console.log("Retrieving photo from disk.");
       const image64 = await getOriginalPhotoFromDisk(dbPhoto.serverPath);
       console.log("Photo retrieved.");

@@ -12,6 +12,7 @@ import { hashString } from "@src/modules/hashing";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import { hashLen, postPhotoPartTimeout } from "@src/config/config";
 import checkUserToken from "@src/middleware/checkUserToken";
+import { checkPhotoExists } from "@src/modules/functions";
 
 // addPhotoPart : adds a part of a photo to the server
 const endpoint = "/addPhotoPart";
@@ -98,9 +99,9 @@ const callback = async (req: Request, res: Response) => {
           const hash = hashString(image64, hashLen);
           photoWaiting.photo.hash = hash;
 
-          const exists = await getPhotoByClientPathFromDB(
-            photoWaiting.photo.clientPath
-          );
+          const exists = await checkPhotoExists({
+            clientPath: photoWaiting.photo.clientPath,
+          });
 
           if (exists) {
             console.log("Photo exists in server.");
