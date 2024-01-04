@@ -6,7 +6,10 @@ import {
   getPhotoByClientPathFromDB,
   getPhotoByIdFromDB,
 } from "@src/db/sequelizeDb";
-import { isPhotoOnDisk, removePhotoFromDisk } from "@src/modules/diskManager";
+import {
+  isPhotoOnDisk,
+  removePhotoVariationsFromDisk,
+} from "@src/modules/diskManager";
 import { Photo } from "@src/types/photoType";
 
 export function timeout(ms: number) {
@@ -80,7 +83,7 @@ export async function checkPhotoExistsAndDeleteMissing(
   const existsDisk = await isPhotoOnDisk(photo.serverPath);
 
   if (!existsDisk) {
-    await removePhotoFromDisk(photo.serverPath);
+    await removePhotoVariationsFromDisk(photo.serverPath);
     await deletePhotoByIdFromDB(photo.id);
     return false;
   }

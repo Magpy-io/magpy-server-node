@@ -74,6 +74,10 @@ export async function removePhotoFromDisk(photoPath: string) {
       throw err;
     }
   }
+  await removePhotoVariationsFromDisk(photoPath);
+}
+
+export async function removePhotoVariationsFromDisk(photoPath: string) {
   try {
     await fs.unlink(createServerImageThumbnailName(photoPath));
   } catch (err: any) {
