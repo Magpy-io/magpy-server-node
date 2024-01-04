@@ -61,7 +61,7 @@ const callback = async (req: Request, res: Response) => {
       });
     } catch (err) {
       if (err instanceof ErrorBackendUnreachable) {
-        console.log("Error requesting backend server");
+        console.error("Error requesting backend server");
         return responseFormatter.sendErrorBackEndServerUnreachable(res);
       } else {
         console.error(err);
@@ -100,7 +100,7 @@ const callback = async (req: Request, res: Response) => {
       ret1 = await getServerTokenPost({ id: id, key: keyGenerated });
     } catch (err) {
       if (err instanceof ErrorBackendUnreachable) {
-        console.log("Error requesting backend server");
+        console.error("Error requesting backend server");
         return responseFormatter.sendErrorBackEndServerUnreachable(res);
       } else {
         console.error(err);

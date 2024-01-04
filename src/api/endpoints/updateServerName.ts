@@ -32,8 +32,8 @@ const callback = async (req: Request, res: Response) => {
       const ret = await UpdateServerDataPost({ name: name });
 
       if (!ret.ok) {
-        console.log("Error saving server name");
-        console.log(ret);
+        console.error("Error saving server name");
+        console.error(ret);
         return responseFormatter.sendErrorMessage(res);
       }
     }
