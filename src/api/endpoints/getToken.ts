@@ -20,7 +20,6 @@ import { generateUserToken } from "@src/modules/tokenManagement";
 // getToken : creates and sends a user token that can be used to the the user's photos
 const endpoint = "/getToken";
 const callback = async (req: Request, res: Response) => {
-  console.log("\n[getToken]");
   try {
     console.log("Checking request parameters.");
     if (checkBodyParamsMissing(req)) {

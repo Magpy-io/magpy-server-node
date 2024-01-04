@@ -13,8 +13,6 @@ import { checkPhotoExistsAndDeleteMissing } from "@src/modules/functions";
 // updatePhotoPath : updates the path of a photo in db
 const endpoint = "/updatePhotoPath";
 const callback = async (req: Request, res: Response) => {
-  console.log(`\n[updatePhotoPath]`);
-
   console.log("Checking request parameters.");
   if (checkBodyParamsMissing(req)) {
     console.log("Bad request parameters");

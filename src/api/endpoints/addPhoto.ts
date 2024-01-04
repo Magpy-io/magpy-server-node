@@ -13,7 +13,6 @@ import checkUserToken from "@src/middleware/checkUserToken";
 // addPhoto : adds a photo to the server
 const endpoint = "/addPhoto";
 const callback = async (req: Request, res: Response) => {
-  console.log(`\n[addPhoto]`);
   try {
     console.log("Checking request parameters.");
     if (checkBodyParamsMissing(req)) {

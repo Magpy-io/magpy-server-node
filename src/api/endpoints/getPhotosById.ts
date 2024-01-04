@@ -15,7 +15,6 @@ import { filterPhotosExistAndDeleteMissing } from "@src/modules/functions";
 // getPhotosById : returns array of photos by their ids.
 const endpoint = "/getPhotosById";
 const callback = async (req: Request, res: Response) => {
-  console.log("\n[getPhotosById]");
   try {
     console.log("Checking request parameters.");
     if (checkBodyParamsMissing(req)) {

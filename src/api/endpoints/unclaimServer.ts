@@ -12,8 +12,6 @@ import checkServerHasValidCredentials from "@src/middleware/checkServerHasValidC
 // unclaimServer : removes server's credentials
 const endpoint = "/unclaimServer";
 const callback = async (req: Request, res: Response) => {
-  console.log(`\n[unclaimServer]`);
-
   try {
     if (req.hasValidCredentials) {
       let ret: DeleteServerResponseType | undefined;

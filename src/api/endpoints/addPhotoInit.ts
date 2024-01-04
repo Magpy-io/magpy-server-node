@@ -13,7 +13,6 @@ import { checkPhotoExistsAndDeleteMissing } from "@src/modules/functions";
 // addPhotoInit : initializes the transfer of a photo to the server
 const endpoint = "/addPhotoInit";
 const callback = async (req: Request, res: Response) => {
-  console.log(`\n[addPhotoInit]`);
   try {
     console.log("Checking request parameters.");
     if (checkBodyParamsMissing(req)) {

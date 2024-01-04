@@ -8,7 +8,6 @@ import checkUserToken from "@src/middleware/checkUserToken";
 // deletePhotosById: deletes photos from server by id
 const endpoint = "/deletePhotosById";
 const callback = async (req: Request, res: Response) => {
-  console.log("\n[deletePhotosById]");
   try {
     console.log("Checking request parameters.");
     if (checkReqBodyAttributeMissing(req, "ids", "Array string")) {

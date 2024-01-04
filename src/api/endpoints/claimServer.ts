@@ -23,7 +23,6 @@ import checkServerIsClaimed from "@src/middleware/checkServerIsClaimed";
 // claimServer : creates server in backend and sets the requesting user as it's owner
 const endpoint = "/claimServer";
 const callback = async (req: Request, res: Response) => {
-  console.log("\n[claimServer]");
   try {
     console.log("Checking request parameters.");
     if (checkBodyParamsMissing(req)) {

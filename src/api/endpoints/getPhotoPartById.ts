@@ -11,7 +11,6 @@ import { checkPhotoExistsAndDeleteMissing } from "@src/modules/functions";
 // getPhotoPartById : returns a part of a photo by id.
 const endpoint = "/getPhotoPartById";
 const callback = async (req: Request, res: Response) => {
-  console.log("\n[getPhotoPartById]");
   try {
     console.log("Checking request parameters.");
     if (checkReqBodyAttributeMissing(req, "id", "string")) {

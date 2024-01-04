@@ -17,7 +17,6 @@ import { checkPhotoExistsAndDeleteMissing } from "@src/modules/functions";
 // addPhotoPart : adds a part of a photo to the server
 const endpoint = "/addPhotoPart";
 const callback = async (req: Request, res: Response) => {
-  console.log(`\n[addPhotoPart]`);
   try {
     console.log("Checking request parameters.");
     if (checkBodyParamsMissing(req)) {

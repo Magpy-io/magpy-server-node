@@ -14,7 +14,6 @@ import { filterPhotosAndDeleteMissing } from "@src/modules/functions";
 // getPhotos : returns "number" photos starting from "offset".
 const endpoint = "/getPhotos";
 const callback = async (req: Request, res: Response) => {
-  console.log("\n[getPhotos]");
   try {
     console.log("Checking request parameters.");
     if (checkBodyParamsMissing(req)) {
