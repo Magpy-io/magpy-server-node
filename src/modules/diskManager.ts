@@ -15,7 +15,7 @@ import {
   MAX_PIXELS_IN_IMAGE_BIGGER,
 } from "@src/config/config";
 
-async function addPhotoToDisk(
+export async function addPhotoToDisk(
   data: string,
   photoWidth: number,
   photoHeight: number,
@@ -65,18 +65,34 @@ async function addPhotoToDisk(
   return [file1, file2, file3];
 }
 
-async function removePhotoFromDisk(photoPath: string) {
+export async function removePhotoFromDisk(photoPath: string) {
   try {
     await fs.unlink(photoPath);
+  } catch (err: any) {
+    if (err.code != "ENOENT") {
+      console.error(err);
+      throw err;
+    }
+  }
+  try {
     await fs.unlink(createServerImageThumbnailName(photoPath));
+  } catch (err: any) {
+    if (err.code != "ENOENT") {
+      console.error(err);
+      throw err;
+    }
+  }
+  try {
     await fs.unlink(createServerImageCompressedName(photoPath));
-  } catch (err) {
-    console.error(err);
-    throw err;
+  } catch (err: any) {
+    if (err.code != "ENOENT") {
+      console.error(err);
+      throw err;
+    }
   }
 }
 
-async function getOriginalPhotoFromDisk(photoPath: string) {
+export async function getOriginalPhotoFromDisk(photoPath: string) {
   try {
     const result = await fs.readFile(photoPath, { encoding: "base64" });
     return Buffer.from(result).toString();
@@ -86,7 +102,7 @@ async function getOriginalPhotoFromDisk(photoPath: string) {
   }
 }
 
-async function getThumbnailPhotoFromDisk(photoPath: string) {
+export async function getThumbnailPhotoFromDisk(photoPath: string) {
   try {
     const result = await fs.readFile(
       createServerImageThumbnailName(photoPath),
@@ -101,7 +117,7 @@ async function getThumbnailPhotoFromDisk(photoPath: string) {
   }
 }
 
-async function getCompressedPhotoFromDisk(photoPath: string) {
+export async function getCompressedPhotoFromDisk(photoPath: string) {
   try {
     const result = await fs.readFile(
       createServerImageCompressedName(photoPath),
@@ -116,7 +132,7 @@ async function getCompressedPhotoFromDisk(photoPath: string) {
   }
 }
 
-async function clearImagesDisk() {
+export async function clearImagesDisk() {
   try {
     const pathDir = await GetStorageFolderPath();
     let files: string[] = [];
@@ -136,7 +152,18 @@ async function clearImagesDisk() {
   }
 }
 
-async function folderHasRights(dirPath: string) {
+export async function isPhotoOnDisk(photoPath: string) {
+  const originalExists = await pathExists(photoPath);
+  const compressedExists = await pathExists(
+    createServerImageCompressedName(photoPath)
+  );
+  const thumbnailExists = await pathExists(
+    createServerImageThumbnailName(photoPath)
+  );
+  return originalExists && compressedExists && thumbnailExists;
+}
+
+export async function folderHasRights(dirPath: string) {
   try {
     const filename = "tmpFileForTestingAccessToFolder.txt";
     const filePath = path.join(dirPath, filename);
@@ -159,7 +186,7 @@ async function folderHasRights(dirPath: string) {
   }
 }
 
-async function pathExists(pathToTest: string) {
+export async function pathExists(pathToTest: string) {
   try {
     await fs.access(pathToTest, fs.constants.F_OK);
     return true;
@@ -168,22 +195,10 @@ async function pathExists(pathToTest: string) {
   }
 }
 
-async function createFolder(dirPath: string) {
+export async function createFolder(dirPath: string) {
   const exists = await pathExists(dirPath);
 
   if (!exists) {
     await fs.mkdir(dirPath, { recursive: true });
   }
 }
-
-export {
-  addPhotoToDisk,
-  getThumbnailPhotoFromDisk,
-  getCompressedPhotoFromDisk,
-  getOriginalPhotoFromDisk,
-  clearImagesDisk,
-  removePhotoFromDisk,
-  createFolder,
-  folderHasRights,
-  pathExists,
-};
