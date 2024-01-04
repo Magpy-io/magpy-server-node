@@ -6,7 +6,7 @@ import { getOriginalPhotoFromDisk } from "@src/modules/diskManager";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import { getNumberOfParts, getPartN } from "@src/modules/stringHelper";
 import checkUserToken from "@src/middleware/checkUserToken";
-import { checkPhotoExists } from "@src/modules/functions";
+import { checkPhotoExistsAndDeleteMissing } from "@src/modules/functions";
 
 // getPhotoPartById : returns a part of a photo by id.
 const endpoint = "/getPhotoPartById";
@@ -32,7 +32,7 @@ const callback = async (req: Request, res: Response) => {
 
     console.log("Checking photo exists");
 
-    const exists = await checkPhotoExists({
+    const exists = await checkPhotoExistsAndDeleteMissing({
       id: id,
     });
 

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
 import { addPhotoToDB, deletePhotoByIdFromDB } from "@src/db/sequelizeDb";
-import { checkPhotoExists } from "@src/modules/functions";
+import { checkPhotoExistsAndDeleteMissing } from "@src/modules/functions";
 import { addPhotoToDisk } from "@src/modules/diskManager";
 import { createServerImageName } from "@src/modules/diskFilesNaming";
 import { hashString } from "@src/modules/hashing";
@@ -42,7 +42,7 @@ const callback = async (req: Request, res: Response) => {
     };
 
     console.log(`Searching in db for photo with path: ${requestPhoto.path}`);
-    const exists = await checkPhotoExists({
+    const exists = await checkPhotoExistsAndDeleteMissing({
       clientPath: requestPhoto.path,
     });
 

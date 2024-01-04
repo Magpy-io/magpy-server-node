@@ -54,7 +54,7 @@ export function isAbsolutePath(path: string) {
  *
  * If any variation of the photo is missing from disk returns false and deletes the photo entry from db.
  */
-export async function checkPhotoExists(
+export async function checkPhotoExistsAndDeleteMissing(
   data:
     | { id: string }
     | {
@@ -97,7 +97,7 @@ export async function filterPhotosAndDeleteMissing(photos: Photo[]) {
   const photosThatExist = [];
 
   for (let photo of photos) {
-    if (await checkPhotoExists({ id: photo.id })) {
+    if (await checkPhotoExistsAndDeleteMissing({ id: photo.id })) {
       photosThatExist.push(photo);
     }
   }
@@ -117,7 +117,7 @@ export async function filterPhotosExistAndDeleteMissing(
   for (let photo of photos) {
     if (!photo) {
       photosThatExist.push(null);
-    } else if (await checkPhotoExists({ id: photo.id })) {
+    } else if (await checkPhotoExistsAndDeleteMissing({ id: photo.id })) {
       photosThatExist.push(photo);
     } else {
       photosThatExist.push(null);
