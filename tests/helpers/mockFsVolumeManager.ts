@@ -1,4 +1,5 @@
 import { vol } from "memfs";
+import { GetStorageFolderPath } from "@src/modules/serverDataManager";
 import { serverDataFile } from "@src/config/config";
 import { join } from "path";
 import * as os from "os";
@@ -29,4 +30,8 @@ export function GetRootPath() {
   } else {
     return "/";
   }
+}
+
+export function volumeReset() {
+  vol.reset();
 }

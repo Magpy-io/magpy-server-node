@@ -6,11 +6,10 @@ import { Express } from "express";
 import { mockModules } from "@tests/helpers/mockModules";
 mockModules();
 
-import mockFsVolumeReset from "@tests/helpers/mockFsVolumeReset";
+import { volumeReset } from "@tests/helpers/mockFsVolumeManager";
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB } from "@src/db/sequelizeDb";
 import { clearDB } from "@src/db/sequelizeDb";
-import { clearImagesDisk } from "@src/modules/diskManager";
 
 import {
   setupServerUserToken,
@@ -59,13 +58,12 @@ describe("Test endpoints return error when invalid token", () => {
 
   beforeEach(async () => {
     await openAndInitDB();
-    await mockFsVolumeReset();
+    await volumeReset();
     await setupServerUserToken(app);
   });
 
   afterEach(async () => {
     await clearDB();
-    await clearImagesDisk();
     await clearFilesWaiting();
   });
 
@@ -138,7 +136,7 @@ describe("Test endpoints return error when invalid token", () => {
     "Should return error SERVER_NOT_CLAIMED when server was not claimed before for endpoint $endpoint",
     async (p) => {
       // clear server config
-      await mockFsVolumeReset();
+      await volumeReset();
 
       const ret = await request(app)
         .post("/" + p.endpoint)

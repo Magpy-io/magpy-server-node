@@ -6,7 +6,7 @@ import { Express } from "express";
 import { mockModules } from "@tests/helpers/mockModules";
 mockModules();
 
-import mockFsVolumeReset from "@tests/helpers/mockFsVolumeReset";
+import { volumeReset } from "@tests/helpers/mockFsVolumeManager";
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB } from "@src/db/sequelizeDb";
 import { clearDB } from "@src/db/sequelizeDb";
@@ -29,7 +29,7 @@ describe("Test 'whoAmI' endpoint", () => {
 
   beforeEach(async () => {
     await openAndInitDB();
-    await mockFsVolumeReset();
+    await volumeReset();
     await setupServerUserToken(app);
   });
 

@@ -6,8 +6,8 @@ import { Express } from "express";
 import { mockModules } from "@tests/helpers/mockModules";
 mockModules();
 
-import mockFsVolumeReset from "@tests/helpers/mockFsVolumeReset";
-import { AddServerData } from "@tests/helpers/mockFsValumeManager";
+import { volumeReset, AddServerData } from "@tests/helpers/mockFsVolumeManager";
+
 import * as mockValues from "@src/modules/__mocks__/backendRequestsMockValues";
 
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
@@ -27,7 +27,7 @@ describe("Test 'claimServer' endpoint", () => {
 
   beforeEach(async () => {
     await openAndInitDB();
-    await mockFsVolumeReset();
+    await volumeReset();
   });
 
   afterEach(async () => {
