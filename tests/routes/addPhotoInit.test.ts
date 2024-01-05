@@ -15,9 +15,12 @@ import {
   defaultPhoto,
   addPhoto,
   waitForPhotoTransferToFinish,
+  getPhotoFromDb,
+  deletePhotoFromDisk,
 } from "@tests/helpers/functions";
 import FilesWaiting from "@src/modules/waitingFiles";
 import { serverTokenHeader } from "@tests/helpers/functions";
+import { PhotoTypes } from "@src/types/photoType";
 
 describe("Test 'addPhotoInit' endpoint", () => {
   let app: Express;
@@ -83,4 +86,32 @@ describe("Test 'addPhotoInit' endpoint", () => {
 
     expect(FilesWaiting.size).toBe(0);
   });
+
+  it.each([
+    { photoType: "thumbnail" },
+    { photoType: "compressed" },
+    { photoType: "original" },
+  ] as Array<{ photoType: PhotoTypes }>)(
+    "Should return the id of the photo being added if adding an existing photo but the $photoType file is missing",
+    async (testData) => {
+      const addedPhotoData = await addPhoto(app);
+
+      const dbPhoto = await getPhotoFromDb(addedPhotoData.id);
+      await deletePhotoFromDisk(dbPhoto, testData.photoType);
+
+      const photo = { ...defaultPhoto } as any;
+      delete photo.image64;
+
+      const requestPhoto = { ...photo, image64Len: 132148 };
+
+      const ret = await request(app)
+        .post("/addPhotoInit")
+        .set(serverTokenHeader())
+        .send(requestPhoto);
+
+      expect(ret.statusCode).toBe(200);
+      expect(ret.body.ok).toBe(true);
+      expect(ret.body).toHaveProperty("data");
+    }
+  );
 });

@@ -16,8 +16,12 @@ import {
   getNumberPhotos,
   defaultPhoto,
   testPhotosExistInDbAndDisk,
+  addPhoto,
+  getPhotoFromDb,
+  deletePhotoFromDisk,
 } from "@tests/helpers/functions";
 import { serverTokenHeader } from "@tests/helpers/functions";
+import { PhotoTypes } from "@src/types/photoType";
 
 describe("Test 'addPhoto' endpoint", () => {
   let app: Express;
@@ -113,4 +117,47 @@ describe("Test 'addPhoto' endpoint", () => {
     const nbPhotos = await getNumberPhotos(app);
     expect(nbPhotos).toBe(1);
   });
+
+  it.each([
+    { photoType: "thumbnail" },
+    { photoType: "compressed" },
+    { photoType: "original" },
+  ] as Array<{ photoType: PhotoTypes }>)(
+    "Should add 1 photo when called with an existing clientPath but $photoType missing on disk",
+    async (testData) => {
+      const addedPhotoData = await addPhoto(app);
+
+      const photo = await getPhotoFromDb(addedPhotoData.id);
+      await deletePhotoFromDisk(photo, testData.photoType);
+
+      const ret = await request(app)
+        .post("/addPhoto")
+        .set(serverTokenHeader())
+        .send(defaultPhoto);
+
+      expect(ret.statusCode).toBe(200);
+      expect(ret.body.ok).toBe(true);
+      expect(ret.body).toHaveProperty("data");
+      expect(ret.body.data).toHaveProperty("photo");
+
+      testPhotoMetaAndId(ret.body.data.photo);
+      await testPhotosExistInDbAndDisk(ret.body.data.photo);
+
+      const getPhoto = await getPhotoById(
+        app,
+        ret.body.data.photo.id,
+        "original"
+      );
+
+      expect(getPhoto).toBeTruthy();
+      expect(getPhoto.id).toBe(ret.body.data.photo.id);
+      expect(getPhoto.meta.name).toBe(defaultPhoto.name);
+      expect(getPhoto.meta.fileSize).toBe(defaultPhoto.fileSize);
+      expect(getPhoto.meta.width).toBe(defaultPhoto.width);
+      expect(getPhoto.meta.height).toBe(defaultPhoto.height);
+      expect(getPhoto.meta.clientPath).toBe(defaultPhoto.path);
+      expect(getPhoto.meta.date).toBe(defaultPhoto.date);
+      expect(getPhoto.image64).toBe(defaultPhoto.image64);
+    }
+  );
 });

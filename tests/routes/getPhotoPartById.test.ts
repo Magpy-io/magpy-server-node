@@ -14,9 +14,12 @@ import {
   addPhoto,
   testPhotoMetaAndId,
   defaultPhoto,
+  getPhotoFromDb,
+  deletePhotoFromDisk,
 } from "@tests/helpers/functions";
 
 import { serverTokenHeader } from "@tests/helpers/functions";
+import { PhotoTypes } from "@src/types/photoType";
 
 describe("Test 'getPhotoPartById' endpoint", () => {
   let app: Express;
@@ -96,6 +99,29 @@ describe("Test 'getPhotoPartById' endpoint", () => {
       expect(ret.statusCode).toBe(400);
       expect(ret.body.ok).toBe(false);
       expect(ret.body.errorCode).toBe("INVALID_PART_NUMBER");
+    }
+  );
+
+  it.each([
+    { photoType: "thumbnail" },
+    { photoType: "compressed" },
+    { photoType: "original" },
+  ] as Array<{ photoType: PhotoTypes }>)(
+    "Should return ID_NOT_FOUND error if requesting a photo that exists in db but $photoType is not on disk",
+    async (testData: { photoType: PhotoTypes }) => {
+      const addedPhotoData = await addPhoto(app);
+
+      const photo = await getPhotoFromDb(addedPhotoData.id);
+      await deletePhotoFromDisk(photo, testData.photoType);
+
+      const ret = await request(app)
+        .post("/getPhotoPartById")
+        .set(serverTokenHeader())
+        .send({ id: addedPhotoData.id, part: 0 });
+
+      expect(ret.statusCode).toBe(400);
+      expect(ret.body.ok).toBe(false);
+      expect(ret.body.errorCode).toBe("ID_NOT_FOUND");
     }
   );
 });

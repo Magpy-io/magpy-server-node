@@ -17,8 +17,11 @@ import {
   testPhotoCompressed,
   testPhotoThumbnail,
   testPhotoData,
+  getPhotoFromDb,
+  deletePhotoFromDisk,
 } from "@tests/helpers/functions";
 import { serverTokenHeader } from "@tests/helpers/functions";
+import { PhotoTypes } from "@src/types/photoType";
 
 describe("Test 'getPhotosByPath' endpoint", () => {
   let app: Express;
@@ -151,6 +154,37 @@ describe("Test 'getPhotosByPath' endpoint", () => {
         path: photoAddedData.path,
         id: photoAddedData.id,
       });
+    }
+  );
+
+  it.each([
+    { photoType: "thumbnail" },
+    { photoType: "compressed" },
+    { photoType: "original" },
+  ] as Array<{ photoType: PhotoTypes }>)(
+    "Should return photo does not exist if a photo exists on db but its $photoType is not on disk",
+    async (testData: { photoType: PhotoTypes }) => {
+      const addedPhotoData = await addPhoto(app);
+
+      const photo = await getPhotoFromDb(addedPhotoData.id);
+      await deletePhotoFromDisk(photo, testData.photoType);
+
+      const ret = await request(app)
+        .post("/getPhotosByPath")
+        .set(serverTokenHeader())
+        .send({
+          paths: [addedPhotoData.path],
+          photoType: "data",
+        });
+
+      expect(ret.statusCode).toBe(200);
+      expect(ret.body.ok).toBe(true);
+      expect(ret.body).toHaveProperty("data");
+      expect(ret.body.data.number).toBe(1);
+      expect(ret.body.data.photos.length).toBe(1);
+
+      expect(ret.body.data.photos[0].path).toBe(addedPhotoData.path);
+      expect(ret.body.data.photos[0].exists).toBe(false);
     }
   );
 });
