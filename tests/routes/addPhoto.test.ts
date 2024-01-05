@@ -15,6 +15,7 @@ import {
   getPhotoById,
   getNumberPhotos,
   defaultPhoto,
+  testPhotosExistInDbAndDisk,
 } from "@tests/helpers/functions";
 import { serverTokenHeader } from "@tests/helpers/functions";
 
@@ -49,6 +50,7 @@ describe("Test 'addPhoto' endpoint", () => {
     expect(ret.body.data).toHaveProperty("photo");
 
     testPhotoMetaAndId(ret.body.data.photo);
+    await testPhotosExistInDbAndDisk(ret.body.data.photo);
 
     const getPhoto = await getPhotoById(
       app,

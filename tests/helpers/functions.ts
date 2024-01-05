@@ -9,12 +9,17 @@ import { postPhotoPartTimeout } from "@src/config/config";
 import { timeout } from "@src/modules/functions";
 import { verifyUserToken } from "@src/modules/tokenManagement";
 
+import { pathExists } from "@src/modules/diskManager";
+
+import * as dbFunction from "@src/db/sequelizeDb";
+
 import {
   GetServerConfigData,
   SaveServerCredentials,
 } from "@src/modules/serverDataManager";
 
 import * as mockValues from "@src/modules/__mocks__/backendRequestsMockValues";
+import { Photo } from "@src/types/photoType";
 
 let serverUserToken = "";
 
@@ -74,6 +79,47 @@ async function addNPhotos(app: Express, n: number) {
   return ids;
 }
 
+async function getPhotoFromDb(id: string) {
+  const dbPhoto = await dbFunction.getPhotoByIdFromDB(id);
+
+  if (!dbPhoto) {
+    throw new Error("Photo not found in db");
+  }
+
+  return dbPhoto;
+}
+
+async function testPhotoNotInDbNorDisk(photo: Photo) {
+  const dbPhoto = await dbFunction.getPhotoByIdFromDB(photo.id);
+
+  expect(dbPhoto).toBeFalsy();
+
+  const originalExists = await pathExists(photo.serverPath);
+  const compressedExists = await pathExists(photo.serverCompressedPath);
+  const thumbnailExists = await pathExists(photo.serverThumbnailPath);
+
+  expect(originalExists).toBe(false);
+  expect(compressedExists).toBe(false);
+  expect(thumbnailExists).toBe(false);
+}
+
+async function testPhotosExistInDbAndDisk(photo: any) {
+  const dbPhoto = await dbFunction.getPhotoByIdFromDB(photo.id);
+
+  expect(dbPhoto).toBeTruthy();
+  if (!dbPhoto) {
+    throw new Error("dbPhoto expected to be thruthy");
+  }
+
+  const originalExists = await pathExists(dbPhoto.serverPath);
+  const compressedExists = await pathExists(dbPhoto.serverCompressedPath);
+  const thumbnailExists = await pathExists(dbPhoto.serverThumbnailPath);
+
+  expect(originalExists).toBe(true);
+  expect(compressedExists).toBe(true);
+  expect(thumbnailExists).toBe(true);
+}
+
 function testPhotoMetaAndId(
   photo: any,
   data?: {
@@ -100,7 +146,7 @@ function testPhotoMetaAndId(
   expect(photo.meta.height).toBe(data?.height ?? defaultPhoto.height);
   expect(photo.meta.date).toBe(data?.date ?? defaultPhoto.date);
 
-  // Less than 10 seconds since photo added
+  // Less than 10 seconds (arbitrary duration to test it's recent) since photo added
   const sync = new Date(photo.meta.syncDate);
   expect(Date.now() - sync.getTime()).toBeLessThan(10000);
 }
@@ -307,4 +353,7 @@ export {
   serverTokenHeader,
   expiredTokenHeader,
   randomTokenHeader,
+  getPhotoFromDb,
+  testPhotosExistInDbAndDisk,
+  testPhotoNotInDbNorDisk,
 };

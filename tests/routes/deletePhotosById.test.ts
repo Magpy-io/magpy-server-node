@@ -14,6 +14,8 @@ import {
   addNPhotos,
   addPhoto,
   checkPhotoExists,
+  testPhotoNotInDbNorDisk,
+  getPhotoFromDb,
 } from "@tests/helpers/functions";
 import { serverTokenHeader } from "@tests/helpers/functions";
 
@@ -42,6 +44,8 @@ describe("Test 'deletePhotosById' endpoint", () => {
       const addedPhotosData = await addNPhotos(app, p.n);
       const ids = addedPhotosData.map((e) => e.id);
 
+      const photos = await Promise.all(ids.map((id) => getPhotoFromDb(id)));
+
       const ret = await request(app)
         .post("/deletePhotosById")
         .set(serverTokenHeader())
@@ -58,6 +62,10 @@ describe("Test 'deletePhotosById' endpoint", () => {
       for (let i = 0; i < p.n; i++) {
         const photoExists = await checkPhotoExists(app, ids[i]);
         expect(photoExists).toBe(false);
+      }
+
+      for (let photo of photos) {
+        await testPhotoNotInDbNorDisk(photo);
       }
     }
   );

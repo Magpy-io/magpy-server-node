@@ -16,6 +16,7 @@ import {
   getPhotoById,
   addPhoto,
   waitForPhotoTransferToFinish,
+  testPhotosExistInDbAndDisk,
 } from "@tests/helpers/functions";
 import * as imageBase64Parts from "@tests/helpers/imageBase64Parts";
 import FilesWaiting from "@src/modules/waitingFiles";
@@ -110,6 +111,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
     expect(ret.body.data.lenReceived).toBe(imageBase64Parts.photoLen);
 
     testPhotoMetaAndId(ret.body.data.photo);
+    await testPhotosExistInDbAndDisk(ret.body.data.photo);
 
     const getPhoto = await getPhotoById(app, id, "original");
 
