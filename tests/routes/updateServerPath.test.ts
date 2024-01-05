@@ -15,7 +15,6 @@ import {
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB } from "@src/db/sequelizeDb";
 import { clearDB } from "@src/db/sequelizeDb";
-import { clearImagesDisk } from "@src/modules/diskManager";
 import { setupServerUserToken } from "@tests/helpers/functions";
 
 import { GetStorageFolderPath } from "@src/modules/serverDataManager";
@@ -39,7 +38,6 @@ describe("Test 'updateServerPath' endpoint", () => {
 
   afterEach(async () => {
     await clearDB();
-    await clearImagesDisk();
     await clearFilesWaiting();
   });
 

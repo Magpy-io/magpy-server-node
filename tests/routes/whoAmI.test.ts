@@ -10,7 +10,6 @@ import mockFsVolumeReset from "@tests/helpers/mockFsVolumeReset";
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB } from "@src/db/sequelizeDb";
 import { clearDB } from "@src/db/sequelizeDb";
-import { clearImagesDisk } from "@src/modules/diskManager";
 import * as mockValues from "@src/modules/__mocks__/backendRequestsMockValues";
 import {
   setupServerUserToken,
@@ -36,7 +35,6 @@ describe("Test 'whoAmI' endpoint", () => {
 
   afterEach(async () => {
     await clearDB();
-    await clearImagesDisk();
     await clearFilesWaiting();
   });
 

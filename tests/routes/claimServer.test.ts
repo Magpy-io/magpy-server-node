@@ -15,7 +15,6 @@ import * as mockValuesGetIp from "@src/modules/__mocks__/getMyIpMockValues";
 
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB, clearDB } from "@src/db/sequelizeDb";
-import { clearImagesDisk } from "@src/modules/diskManager";
 
 describe("Test 'claimServer' endpoint", () => {
   let app: Express;
@@ -35,7 +34,6 @@ describe("Test 'claimServer' endpoint", () => {
 
   afterEach(async () => {
     await clearDB();
-    await clearImagesDisk();
     await clearFilesWaiting();
   });
 

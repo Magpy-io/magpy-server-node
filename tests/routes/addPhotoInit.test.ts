@@ -11,7 +11,6 @@ import mockFsVolumeReset from "@tests/helpers/mockFsVolumeReset";
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB } from "@src/db/sequelizeDb";
 import { clearDB } from "@src/db/sequelizeDb";
-import { clearImagesDisk } from "@src/modules/diskManager";
 import {
   defaultPhoto,
   addPhoto,
@@ -42,7 +41,6 @@ describe("Test 'addPhotoInit' endpoint", () => {
 
   afterEach(async () => {
     await clearDB();
-    await clearImagesDisk();
     await clearFilesWaiting();
   });
 

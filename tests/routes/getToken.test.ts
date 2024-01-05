@@ -12,7 +12,6 @@ import * as mockValues from "@src/modules/__mocks__/backendRequestsMockValues";
 
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB, clearDB } from "@src/db/sequelizeDb";
-import { clearImagesDisk } from "@src/modules/diskManager";
 import { testReturnedToken } from "@tests/helpers/functions";
 
 describe("Test 'claimServer' endpoint", () => {
@@ -33,7 +32,6 @@ describe("Test 'claimServer' endpoint", () => {
 
   afterEach(async () => {
     await clearDB();
-    await clearImagesDisk();
     await clearFilesWaiting();
   });
 

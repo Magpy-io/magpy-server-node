@@ -10,7 +10,6 @@ import mockFsVolumeReset from "@tests/helpers/mockFsVolumeReset";
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
 import { openAndInitDB } from "@src/db/sequelizeDb";
 import { clearDB } from "@src/db/sequelizeDb";
-import { clearImagesDisk } from "@src/modules/diskManager";
 import { addNPhotos, addPhoto, getPhotoById } from "@tests/helpers/functions";
 import {
   setupServerUserToken,
@@ -36,7 +35,6 @@ describe("Test 'updatePhotoPath' endpoint", () => {
 
   afterEach(async () => {
     await clearDB();
-    await clearImagesDisk();
     await clearFilesWaiting();
   });
 

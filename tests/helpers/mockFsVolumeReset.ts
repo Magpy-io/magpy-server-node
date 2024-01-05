@@ -1,5 +1,4 @@
 import { GetStorageFolderPath } from "@src/modules/serverDataManager";
-import * as os from "os";
 import { vol } from "memfs";
 import { join } from "path";
 import { GetRootPath } from "@tests/helpers/mockFsValumeManager";
