@@ -2,14 +2,14 @@ import "@tests/helpers/loadEnvFile";
 import { describe, expect, it } from "@jest/globals";
 import request from "supertest";
 import { Express } from "express";
-import * as path from "path";
 
 import { mockModules } from "@tests/helpers/mockModules";
 mockModules();
 
+import { createFolder } from "@src/modules/diskManager";
+
 import {
   volumeReset,
-  CreatePath,
   GetPathFromRoot,
 } from "@tests/helpers/mockFsVolumeManager";
 import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
@@ -43,8 +43,8 @@ describe("Test 'updateServerPath' endpoint", () => {
 
   it("Should return ok when changing the server path to a valid one", async () => {
     const photosPath = GetPathFromRoot("/pathToPhotos");
-    CreatePath(photosPath);
 
+    await createFolder(photosPath);
     const ret = await request(app)
       .post("/updateServerPath")
       .send({ path: photosPath });

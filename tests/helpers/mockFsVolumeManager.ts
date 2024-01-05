@@ -12,14 +12,6 @@ export function AddServerData(serverData: any) {
   vol.fromJSON(json, ".");
 }
 
-export function CreatePath(path: string) {
-  const pathFile = join(path, "file.txt");
-  const json: any = {};
-  // Add file to create folder
-  json[pathFile] = "";
-  vol.fromJSON(json, GetRootPath());
-}
-
 export function GetPathFromRoot(path: string) {
   return join(GetRootPath(), path);
 }
@@ -34,4 +26,8 @@ export function GetRootPath() {
 
 export function volumeReset() {
   vol.reset();
+}
+
+export function getVolumeJson() {
+  return vol.toJSON();
 }

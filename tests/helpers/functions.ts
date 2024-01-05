@@ -259,7 +259,7 @@ async function setupServerUserToken(app: Express) {
 
   if (!ret.body.ok || !ret.headers["authorization"]) {
     throw new Error(
-      "Error seting up server to generate user token:\n " +
+      "Error setting up server to generate user token:\n " +
         JSON.stringify(ret.body)
     );
   }
