@@ -7,6 +7,8 @@ type Photo = {
   date: string;
   syncDate: string;
   serverPath: string;
+  serverCompressedPath: string;
+  serverThumbnailPath: string;
   clientPath: string;
   hash: string;
   image64?: string;

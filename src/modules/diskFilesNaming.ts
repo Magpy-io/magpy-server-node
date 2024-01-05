@@ -29,8 +29,17 @@ function createServerImageCompressedName(fullImagePath: string) {
   return name + "_compressed" + "." + format;
 }
 
+async function addServerImagePaths(photo: Photo) {
+  photo.serverPath = await createServerImageName(photo);
+  photo.serverCompressedPath = createServerImageCompressedName(
+    photo.serverPath
+  );
+  photo.serverThumbnailPath = createServerImageThumbnailName(photo.serverPath);
+}
+
 export {
   createServerImageName,
   createServerImageThumbnailName,
   createServerImageCompressedName,
+  addServerImagePaths,
 };

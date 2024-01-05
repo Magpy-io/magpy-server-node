@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
 import FilesWaiting from "@src/modules/waitingFiles";
 import { getPhotoByClientPathFromDB } from "@src/db/sequelizeDb";
-import { createServerImageName } from "@src/modules/diskFilesNaming";
+import { addServerImagePaths } from "@src/modules/diskFilesNaming";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import { v4 as uuid } from "uuid";
 import { postPhotoPartTimeout } from "@src/config/config";
@@ -36,6 +36,8 @@ const callback = async (req: Request, res: Response) => {
       syncDate: "",
       clientPath: requestPhoto.path,
       serverPath: "",
+      serverCompressedPath: "",
+      serverThumbnailPath: "",
       hash: "",
     };
 
@@ -56,10 +58,8 @@ const callback = async (req: Request, res: Response) => {
       console.log("Photo does not exist in server.");
       console.log("Creating syncDate and photoPath.");
       const image64Len = requestPhoto.image64Len;
-
       photo.syncDate = new Date(Date.now()).toJSON();
-
-      photo.serverPath = await createServerImageName(photo);
+      await addServerImagePaths(photo);
       const id = uuid();
 
       FilesWaiting.set(id, {

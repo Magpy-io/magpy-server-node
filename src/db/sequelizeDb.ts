@@ -78,22 +78,11 @@ async function getPhotoByClientPathFromDB(
 async function addPhotoToDB(photo: Photo): Promise<Photo> {
   assertDbOpen();
 
-  if (!photo.id) {
-    photo.id = uuid();
-  }
+  const dbPhoto = photo;
 
-  const dbPhoto: Photo = {
-    id: photo.id,
-    name: photo.name,
-    fileSize: photo.fileSize,
-    width: photo.width,
-    height: photo.height,
-    date: new Date(photo.date).toISOString(),
-    clientPath: photo.clientPath,
-    syncDate: new Date(photo.syncDate).toISOString(),
-    serverPath: photo.serverPath,
-    hash: photo.hash,
-  };
+  if (!dbPhoto.id) {
+    dbPhoto.id = uuid();
+  }
 
   try {
     const image: any = await Image.create(dbPhoto);

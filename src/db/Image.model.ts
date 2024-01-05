@@ -40,6 +40,14 @@ const modelDefinition = {
     type: DataTypes.STRING,
     allowNull: false,
   },
+  serverCompressedPath: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  serverThumbnailPath: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
   syncDate: {
     type: DataTypes.DATE,
     allowNull: false,

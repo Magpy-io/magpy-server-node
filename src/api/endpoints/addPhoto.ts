@@ -3,7 +3,7 @@ import responseFormatter from "@src/api/responseFormatter";
 import { addPhotoToDB, deletePhotoByIdFromDB } from "@src/db/sequelizeDb";
 import { checkPhotoExistsAndDeleteMissing } from "@src/modules/functions";
 import { addPhotoToDisk } from "@src/modules/diskManager";
-import { createServerImageName } from "@src/modules/diskFilesNaming";
+import { addServerImagePaths } from "@src/modules/diskFilesNaming";
 import { hashString } from "@src/modules/hashing";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import { hashLen } from "@src/config/config";
@@ -36,6 +36,8 @@ const callback = async (req: Request, res: Response) => {
       syncDate: "",
       clientPath: requestPhoto.path,
       serverPath: "",
+      serverCompressedPath: "",
+      serverThumbnailPath: "",
       hash: "",
     };
 
@@ -56,7 +58,7 @@ const callback = async (req: Request, res: Response) => {
       console.log("Photo does not exist in server.");
       console.log("Creating syncDate, photoPath and the photo hash.");
       photo.syncDate = new Date(Date.now()).toJSON();
-      photo.serverPath = await createServerImageName(photo);
+      await addServerImagePaths(photo);
       photo.hash = hashString(requestPhoto.image64, hashLen);
       console.log("Adding photo to db.");
       const dbPhoto = await addPhotoToDB(photo);
