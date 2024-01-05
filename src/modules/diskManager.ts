@@ -54,32 +54,26 @@ export async function addPhotoToDisk(photo: Photo, base64: string) {
 
 export async function removePhotoFromDisk(photo: Photo) {
   try {
-    await fs.unlink(photo.serverPath);
+    await fs.rm(photo.serverPath, { force: true });
   } catch (err: any) {
-    if (err.code != "ENOENT") {
-      console.error(err);
-      throw err;
-    }
+    console.error(err);
+    throw err;
   }
   await removePhotoVariationsFromDisk(photo);
 }
 
 export async function removePhotoVariationsFromDisk(photo: Photo) {
   try {
-    await fs.unlink(photo.serverThumbnailPath);
+    await fs.rm(photo.serverThumbnailPath, { force: true });
   } catch (err: any) {
-    if (err.code != "ENOENT") {
-      console.error(err);
-      throw err;
-    }
+    console.error(err);
+    throw err;
   }
   try {
-    await fs.unlink(photo.serverCompressedPath);
+    await fs.rm(photo.serverCompressedPath, { force: true });
   } catch (err: any) {
-    if (err.code != "ENOENT") {
-      console.error(err);
-      throw err;
-    }
+    console.error(err);
+    throw err;
   }
 }
 
@@ -120,17 +114,7 @@ export async function getCompressedPhotoFromDisk(photo: Photo) {
 export async function clearImagesDisk() {
   try {
     const pathDir = await GetStorageFolderPath();
-    let files: string[] = [];
-    try {
-      files = await fs.readdir(pathDir);
-    } catch (err) {
-      console.log("Could not find storage folder : " + pathDir);
-      return;
-    }
-    const filesUnlinkedPromises = files.map((file) => {
-      return fs.unlink(path.join(pathDir, file));
-    });
-    await Promise.all(filesUnlinkedPromises);
+    await fs.rm(pathDir, { force: true, recursive: true });
   } catch (err) {
     console.error(err);
     throw err;
@@ -158,7 +142,7 @@ export async function folderHasRights(dirPath: string) {
     await fh.close();
 
     if (!fileExists) {
-      await fs.unlink(filePath);
+      await fs.rm(filePath, { force: true });
     }
 
     return true;
