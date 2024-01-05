@@ -11,7 +11,7 @@ import * as mockValues from "@src/modules/__mocks__/backendRequestsMockValues";
 import * as mockValuesGetIp from "@src/modules/__mocks__/getMyIpMockValues";
 
 import { initServer, stopServer } from "@src/server/server";
-
+import { SaveServerCredentials } from "@src/modules/serverDataManager";
 import * as sac from "@tests/helpers/setupAndCleanup";
 
 describe("Test 'claimServer' endpoint", () => {
@@ -26,7 +26,7 @@ describe("Test 'claimServer' endpoint", () => {
   });
 
   beforeEach(async () => {
-    await sac.beforeEach(app);
+    await sac.beforeEachNoUserTokenSetup(app);
   });
 
   afterEach(async () => {
@@ -37,7 +37,7 @@ describe("Test 'claimServer' endpoint", () => {
     const ret = await request(app)
       .post("/claimServer")
       .send({ userToken: mockValues.validUserToken });
-
+    console.log(ret.body);
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
   });
@@ -63,7 +63,7 @@ describe("Test 'claimServer' endpoint", () => {
   });
 
   it("Should return error SERVER_ALREADY_CLAIMED when claiming a server with a valid server token", async () => {
-    AddServerData({
+    SaveServerCredentials({
       serverToken: mockValues.validServerToken,
     });
 
@@ -77,7 +77,7 @@ describe("Test 'claimServer' endpoint", () => {
   });
 
   it("Should return error SERVER_ALREADY_CLAIMED when claiming a server with a valid id and key", async () => {
-    AddServerData({
+    SaveServerCredentials({
       serverId: mockValues.serverId,
       serverKey: mockValues.validKey,
     });

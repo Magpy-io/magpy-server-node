@@ -8,6 +8,7 @@ import { configModules } from "@src/config/configModules";
 import { initServer } from "@src/server/server";
 import { openAndInitDB } from "@src/db/sequelizeDb";
 import { startMdns } from "@src/server/mdnsSetup";
+import { LoadConfigFile } from "@src/modules/serverDataManager";
 
 main().catch((err) => {
   console.log("error init server");
@@ -15,6 +16,7 @@ main().catch((err) => {
 });
 
 async function main() {
+  await LoadConfigFile();
   configModules();
   await openAndInitDB();
   await initServer();

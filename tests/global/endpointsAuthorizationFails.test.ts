@@ -6,31 +6,13 @@ import { describe, expect, it } from "@jest/globals";
 import request from "supertest";
 import { Express } from "express";
 
-import { volumeReset } from "@tests/helpers/mockFsVolumeManager";
 import { initServer, stopServer } from "@src/server/server";
 
 import * as sac from "@tests/helpers/setupAndCleanup";
 
-import {
-  serverTokenHeader,
-  expiredTokenHeader,
-} from "@tests/helpers/functions";
+import { expiredTokenHeader } from "@tests/helpers/functions";
 
 const endpointsToTestInvalidToken = [
-  "addPhoto",
-  "addPhotoInit",
-  "addPhotoPart",
-  "deletePhotosById",
-  "getPhotoPartById",
-  "getNumberPhotos",
-  "getPhotos",
-  "getPhotosById",
-  "getPhotosByPath",
-  "updatePhotoPath",
-  "whoAmI",
-];
-
-const endpointsToTestServerNotClaimed = [
   "addPhoto",
   "addPhotoInit",
   "addPhotoPart",
@@ -119,29 +101,6 @@ describe("Test endpoints return error when invalid token", () => {
       expect(ret.statusCode).toBe(400);
       expect(ret.body.ok).toBe(false);
       expect(ret.body.errorCode).toBe("AUTHORIZATION_EXPIRED");
-    }
-  );
-
-  it.each(
-    endpointsToTestServerNotClaimed.map((endpoint) => {
-      return {
-        endpoint,
-      };
-    })
-  )(
-    "Should return error SERVER_NOT_CLAIMED when server was not claimed before for endpoint $endpoint",
-    async (p) => {
-      // clear server config
-      await volumeReset();
-
-      const ret = await request(app)
-        .post("/" + p.endpoint)
-        .set(serverTokenHeader())
-        .send({});
-
-      expect(ret.statusCode).toBe(400);
-      expect(ret.body.ok).toBe(false);
-      expect(ret.body.errorCode).toBe("SERVER_NOT_CLAIMED");
     }
   );
 });

@@ -10,7 +10,7 @@ import { initServer, stopServer } from "@src/server/server";
 
 import * as sac from "@tests/helpers/setupAndCleanup";
 
-import { GetServerData } from "@src/modules/serverDataManager";
+import { GetServerConfigData } from "@src/modules/serverDataManager";
 
 describe("Test 'unclaimServer' endpoint", () => {
   let app: Express;
@@ -37,7 +37,7 @@ describe("Test 'unclaimServer' endpoint", () => {
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
 
-    const serverData = await GetServerData();
+    const serverData = GetServerConfigData();
 
     expect(serverData.serverId).toBeFalsy();
     expect(serverData.serverKey).toBeFalsy();

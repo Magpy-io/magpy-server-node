@@ -1,11 +1,11 @@
-import { GetServerData } from "@src/modules/serverDataManager";
+import { GetServerConfigData } from "@src/modules/serverDataManager";
 import jwt from "jsonwebtoken";
 import { jwtUserExp } from "@src/config/config";
 
 export type TokenUserData = { id: string };
 
-export async function generateUserToken(userId: string) {
-  const serverData = await GetServerData();
+export function generateUserToken(userId: string) {
+  const serverData = GetServerConfigData();
   if (!serverData.serverKey) {
     throw new Error("Server key not defined");
   }

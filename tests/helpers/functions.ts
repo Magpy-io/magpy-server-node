@@ -9,7 +9,10 @@ import { postPhotoPartTimeout } from "@src/config/config";
 import { timeout } from "@src/modules/functions";
 import { verifyUserToken } from "@src/modules/tokenManagement";
 
-import { GetServerData } from "@src/modules/serverDataManager";
+import {
+  GetServerConfigData,
+  SaveServerCredentials,
+} from "@src/modules/serverDataManager";
 
 import * as mockValues from "@src/modules/__mocks__/backendRequestsMockValues";
 
@@ -227,8 +230,8 @@ async function waitForPhotoTransferToFinish() {
   await timeout(postPhotoPartTimeout + 100);
 }
 
-async function testReturnedToken(ret: request.Response) {
-  const serverData = await GetServerData();
+function testReturnedToken(ret: request.Response) {
+  const serverData = GetServerConfigData();
   expect(ret.headers["authorization"]).toBeDefined();
   const auth = ret.headers["authorization"];
   const splited = auth.split(" ");
@@ -247,7 +250,7 @@ async function testReturnedToken(ret: request.Response) {
 }
 
 async function setupServerUserToken(app: Express) {
-  AddServerData({
+  SaveServerCredentials({
     serverId: mockValues.serverId,
     serverKey: mockValues.validKey,
   });
@@ -281,6 +284,10 @@ function expiredTokenHeader() {
   return { Authorization: "Bearer " + expiredToken };
 }
 
+function randomTokenHeader() {
+  return { Authorization: "Bearer serverUserToken" };
+}
+
 export {
   addPhoto,
   addNPhotos,
@@ -299,4 +306,5 @@ export {
   serverUserToken,
   serverTokenHeader,
   expiredTokenHeader,
+  randomTokenHeader,
 };

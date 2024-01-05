@@ -13,7 +13,7 @@ import {
 
 import checkServerIsClaimed from "@src/middleware/checkServerIsClaimed";
 
-import { GetServerData } from "@src/modules/serverDataManager";
+import { GetServerConfigData } from "@src/modules/serverDataManager";
 
 import { generateUserToken } from "@src/modules/tokenManagement";
 
@@ -33,7 +33,7 @@ const callback = async (req: Request, res: Response) => {
 
     const backendUserToken = requestParameters.userToken;
 
-    const serverData = await GetServerData();
+    const serverData = GetServerConfigData();
 
     if (!req.isClaimed) {
       console.log("server is not claimed");
@@ -115,7 +115,7 @@ const callback = async (req: Request, res: Response) => {
 
     console.log("user has access to server, generating token");
 
-    const userToken = await generateUserToken(retUser.data.user._id);
+    const userToken = generateUserToken(retUser.data.user._id);
     res.set("Authorization", "Bearer " + userToken);
 
     console.log("sending response");

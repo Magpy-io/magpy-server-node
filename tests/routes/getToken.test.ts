@@ -9,9 +9,9 @@ import { Express } from "express";
 import * as mockValues from "@src/modules/__mocks__/backendRequestsMockValues";
 
 import { initServer, stopServer } from "@src/server/server";
+import { SaveServerCredentials } from "@src/modules/serverDataManager";
 
 import * as sac from "@tests/helpers/setupAndCleanup";
-
 import { testReturnedToken } from "@tests/helpers/functions";
 
 describe("Test 'claimServer' endpoint", () => {
@@ -26,7 +26,7 @@ describe("Test 'claimServer' endpoint", () => {
   });
 
   beforeEach(async () => {
-    await sac.beforeEachGetTokenTest(app);
+    await sac.beforeEachNoUserTokenSetup(app);
   });
 
   afterEach(async () => {
@@ -34,7 +34,7 @@ describe("Test 'claimServer' endpoint", () => {
   });
 
   it("Should return a valid token when asking a claimed server", async () => {
-    AddServerData({
+    SaveServerCredentials({
       serverId: mockValues.serverId,
       serverKey: mockValues.validKey,
       serverToken: mockValues.validServerToken,
@@ -46,11 +46,11 @@ describe("Test 'claimServer' endpoint", () => {
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
-    await testReturnedToken(ret);
+    testReturnedToken(ret);
   });
 
   it("Should return error AUTHORIZATION_BACKEND_FAILED when using invalid user token", async () => {
-    AddServerData({
+    SaveServerCredentials({
       serverId: mockValues.serverId,
       serverKey: mockValues.validKey,
       serverToken: mockValues.validServerToken,
@@ -66,7 +66,7 @@ describe("Test 'claimServer' endpoint", () => {
   });
 
   it("Should return error AUTHORIZATION_BACKEND_EXPIRED when using an expired user token", async () => {
-    AddServerData({
+    SaveServerCredentials({
       serverId: mockValues.serverId,
       serverKey: mockValues.validKey,
       serverToken: mockValues.validServerToken,
@@ -92,7 +92,7 @@ describe("Test 'claimServer' endpoint", () => {
   });
 
   it("Should return error USER_NOT_ALLOWED when requesting a server not owned by user", async () => {
-    AddServerData({
+    SaveServerCredentials({
       serverId: mockValues.serverId,
       serverKey: mockValues.validKey,
       serverToken: mockValues.validServerToken,
@@ -108,7 +108,7 @@ describe("Test 'claimServer' endpoint", () => {
   });
 
   it("Should return error BACKEND_SERVER_UNREACHABLE when claiming a server but backend unreachable", async () => {
-    AddServerData({
+    SaveServerCredentials({
       serverId: mockValues.serverId,
       serverKey: mockValues.validKey,
       serverToken: mockValues.validServerToken,
@@ -125,7 +125,7 @@ describe("Test 'claimServer' endpoint", () => {
   });
 
   it("Should return error SERVER_ERROR when claiming a server but receiving unexpected error from backend", async () => {
-    AddServerData({
+    SaveServerCredentials({
       serverId: mockValues.serverId,
       serverKey: mockValues.validKey,
       serverToken: mockValues.validServerToken,

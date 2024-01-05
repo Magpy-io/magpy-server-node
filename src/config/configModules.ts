@@ -7,10 +7,9 @@ export function configModules() {
   const url = config.backend_host + ":" + config.backend_port;
   SetPath(url);
 
-  log.transports.file.level = "info";
-  console.log = log.info;
+  log.transports.file.level = "debug";
+  console.log = log.debug;
   console.error = (message: string) => {
-    log.info("#Error");
-    log.info(message);
+    log.info("#Error Log: " + message);
   };
 }

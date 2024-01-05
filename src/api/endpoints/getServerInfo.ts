@@ -4,13 +4,13 @@ import responseFormatter from "@src/api/responseFormatter";
 import { getServerInfoPost } from "@src/modules/backendImportedQueries";
 import checkConnexionLocal from "@src/middleware/checkConnexionLocal";
 import checkServerHasValidCredentials from "@src/middleware/checkServerHasValidCredentials";
-import { GetServerData } from "@src/modules/serverDataManager";
+import { GetServerConfigData } from "@src/modules/serverDataManager";
 
 // getServerInfo : gets information about the server
 const endpoint = "/getServerInfo";
 const callback = async (req: Request, res: Response) => {
   try {
-    const serverDataConfig = await GetServerData();
+    const serverDataConfig = GetServerConfigData();
 
     const responseJson: {
       storagePath: string;
