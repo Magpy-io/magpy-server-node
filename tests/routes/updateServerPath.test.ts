@@ -1,21 +1,17 @@
 import "@tests/helpers/loadEnvFile";
+import { mockModules } from "@tests/helpers/mockModules";
+mockModules();
+
 import { describe, expect, it } from "@jest/globals";
 import request from "supertest";
 import { Express } from "express";
 
-import { mockModules } from "@tests/helpers/mockModules";
-mockModules();
-
 import { createFolder } from "@src/modules/diskManager";
 
-import {
-  volumeReset,
-  GetPathFromRoot,
-} from "@tests/helpers/mockFsVolumeManager";
-import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
-import { openAndInitDB } from "@src/db/sequelizeDb";
-import { clearDB } from "@src/db/sequelizeDb";
-import { setupServerUserToken } from "@tests/helpers/functions";
+import { GetPathFromRoot } from "@tests/helpers/mockFsVolumeManager";
+import { initServer, stopServer } from "@src/server/server";
+
+import * as sac from "@tests/helpers/setupAndCleanup";
 
 import { GetStorageFolderPath } from "@src/modules/serverDataManager";
 
@@ -31,14 +27,11 @@ describe("Test 'updateServerPath' endpoint", () => {
   });
 
   beforeEach(async () => {
-    await openAndInitDB();
-    await volumeReset();
-    await setupServerUserToken(app);
+    await sac.beforeEach(app);
   });
 
   afterEach(async () => {
-    await clearDB();
-    await clearFilesWaiting();
+    await sac.afterEach();
   });
 
   it("Should return ok when changing the server path to a valid one", async () => {

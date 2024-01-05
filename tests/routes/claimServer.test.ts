@@ -1,19 +1,18 @@
 import "@tests/helpers/loadEnvFile";
-import { describe, expect, it } from "@jest/globals";
-import request from "supertest";
-import { Express } from "express";
-
 import { mockModules } from "@tests/helpers/mockModules";
 mockModules();
 
-import { volumeReset, AddServerData } from "@tests/helpers/mockFsVolumeManager";
+import { describe, expect, it } from "@jest/globals";
+import request from "supertest";
+import { Express } from "express";
 
 import * as mockValues from "@src/modules/__mocks__/backendRequestsMockValues";
 
 import * as mockValuesGetIp from "@src/modules/__mocks__/getMyIpMockValues";
 
-import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
-import { openAndInitDB, clearDB } from "@src/db/sequelizeDb";
+import { initServer, stopServer } from "@src/server/server";
+
+import * as sac from "@tests/helpers/setupAndCleanup";
 
 describe("Test 'claimServer' endpoint", () => {
   let app: Express;
@@ -27,13 +26,11 @@ describe("Test 'claimServer' endpoint", () => {
   });
 
   beforeEach(async () => {
-    await openAndInitDB();
-    await volumeReset();
+    await sac.beforeEach(app);
   });
 
   afterEach(async () => {
-    await clearDB();
-    await clearFilesWaiting();
+    await sac.afterEach();
   });
 
   it("Should return ok when claiming a non claimed server", async () => {

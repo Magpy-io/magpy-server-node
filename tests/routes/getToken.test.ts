@@ -1,17 +1,17 @@
 import "@tests/helpers/loadEnvFile";
+import { mockModules } from "@tests/helpers/mockModules";
+mockModules();
+
 import { describe, expect, it } from "@jest/globals";
 import request from "supertest";
 import { Express } from "express";
 
-import { mockModules } from "@tests/helpers/mockModules";
-mockModules();
-
-import { volumeReset, AddServerData } from "@tests/helpers/mockFsVolumeManager";
-
 import * as mockValues from "@src/modules/__mocks__/backendRequestsMockValues";
 
-import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
-import { openAndInitDB, clearDB } from "@src/db/sequelizeDb";
+import { initServer, stopServer } from "@src/server/server";
+
+import * as sac from "@tests/helpers/setupAndCleanup";
+
 import { testReturnedToken } from "@tests/helpers/functions";
 
 describe("Test 'claimServer' endpoint", () => {
@@ -26,13 +26,11 @@ describe("Test 'claimServer' endpoint", () => {
   });
 
   beforeEach(async () => {
-    await openAndInitDB();
-    await volumeReset();
+    await sac.beforeEachGetTokenTest(app);
   });
 
   afterEach(async () => {
-    await clearDB();
-    await clearFilesWaiting();
+    await sac.afterEach();
   });
 
   it("Should return a valid token when asking a claimed server", async () => {

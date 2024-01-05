@@ -1,20 +1,16 @@
 import "@tests/helpers/loadEnvFile";
+import { mockModules } from "@tests/helpers/mockModules";
+mockModules();
+
 import { describe, expect, it } from "@jest/globals";
 import request from "supertest";
 import { Express } from "express";
 
-import { mockModules } from "@tests/helpers/mockModules";
-mockModules();
+import { initServer, stopServer } from "@src/server/server";
 
-import { volumeReset } from "@tests/helpers/mockFsVolumeManager";
-import { initServer, stopServer, clearFilesWaiting } from "@src/server/server";
-import { openAndInitDB } from "@src/db/sequelizeDb";
-import { clearDB } from "@src/db/sequelizeDb";
+import * as sac from "@tests/helpers/setupAndCleanup";
 
-import {
-  setupServerUserToken,
-  serverTokenHeader,
-} from "@tests/helpers/functions";
+import { serverTokenHeader } from "@tests/helpers/functions";
 
 const endpointsToTestInvalidJson = [
   "addPhoto",
@@ -120,14 +116,11 @@ describe("Test endpoints return error when invalid request", () => {
   });
 
   beforeEach(async () => {
-    await openAndInitDB();
-    await volumeReset();
-    await setupServerUserToken(app);
+    await sac.beforeEach(app);
   });
 
   afterEach(async () => {
-    await clearDB();
-    await clearFilesWaiting();
+    await sac.afterEach();
   });
 
   it.each(
