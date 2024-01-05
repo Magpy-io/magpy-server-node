@@ -3,43 +3,39 @@ import * as path from "path";
 
 import { GetStorageFolderPath } from "@src/modules/serverDataManager";
 
-function splitImageName(fullName: string) {
-  const nameSplited = fullName.split(".");
-  const format = nameSplited.pop();
-  const name = nameSplited.join();
-  return { name: name, format: format };
-}
-
 async function createServerImageName(photo: Photo) {
   const dirPath = await GetStorageFolderPath();
-  const { name, format } = splitImageName(photo.name);
-  const date = photo.syncDate;
-  const dateFormated = date.replace(/\:/g, "-");
-  const serverFileName = `Ants_${name}_${dateFormated}.${format}`;
+  const nameParsed = path.parse(photo.name);
+  const serverFileName = createBaseName(photo) + nameParsed.ext;
   return path.join(dirPath, serverFileName);
 }
 
-function createServerImageThumbnailName(fullImagePath: string) {
-  const { name, format } = splitImageName(fullImagePath);
-  return name + "_thumbnail" + "." + format;
+async function createServerImageThumbnailName(photo: Photo) {
+  const dirPath = await GetStorageFolderPath();
+  const nameParsed = path.parse(photo.name);
+  const serverFileName = createBaseName(photo) + "_thumbnail" + nameParsed.ext;
+  return path.join(dirPath, serverFileName);
 }
 
-function createServerImageCompressedName(fullImagePath: string) {
-  const { name, format } = splitImageName(fullImagePath);
-  return name + "_compressed" + "." + format;
+async function createServerImageCompressedName(photo: Photo) {
+  const dirPath = await GetStorageFolderPath();
+  const nameParsed = path.parse(photo.name);
+  const serverFileName = createBaseName(photo) + "_compressed" + nameParsed.ext;
+  return path.join(dirPath, serverFileName);
+}
+
+function createBaseName(photo: Photo) {
+  const nameParsed = path.parse(photo.name);
+
+  const date = photo.syncDate;
+  const dateFormated = date.replace(/\:/g, "-");
+  return `Ants_${nameParsed.name}_${dateFormated}`;
 }
 
 async function addServerImagePaths(photo: Photo) {
   photo.serverPath = await createServerImageName(photo);
-  photo.serverCompressedPath = createServerImageCompressedName(
-    photo.serverPath
-  );
-  photo.serverThumbnailPath = createServerImageThumbnailName(photo.serverPath);
+  photo.serverCompressedPath = await createServerImageCompressedName(photo);
+  photo.serverThumbnailPath = await createServerImageThumbnailName(photo);
 }
 
-export {
-  createServerImageName,
-  createServerImageThumbnailName,
-  createServerImageCompressedName,
-  addServerImagePaths,
-};
+export { addServerImagePaths };

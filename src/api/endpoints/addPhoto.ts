@@ -66,12 +66,7 @@ const callback = async (req: Request, res: Response) => {
       console.log("Photo added successfully to db.");
       try {
         console.log("Adding photo to disk.");
-        await addPhotoToDisk(
-          requestPhoto.image64,
-          requestPhoto.width,
-          requestPhoto.height,
-          dbPhoto.serverPath
-        );
+        await addPhotoToDisk(dbPhoto, requestPhoto.image64);
       } catch (err) {
         console.log("Could not add photo to disk, removing photo from db");
         await deletePhotoByIdFromDB(dbPhoto.id);

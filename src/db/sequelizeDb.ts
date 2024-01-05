@@ -85,7 +85,7 @@ async function addPhotoToDB(photo: Photo): Promise<Photo> {
   }
 
   try {
-    const image: any = await Image.create(dbPhoto);
+    const image = await Image.create(dbPhoto);
 
     if (image) {
       return image;

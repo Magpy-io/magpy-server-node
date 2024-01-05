@@ -80,10 +80,10 @@ export async function checkPhotoExistsAndDeleteMissing(
     throw new Error("checkPhotoExists: Needs the photo id or clientPath");
   }
 
-  const existsDisk = await isPhotoOnDisk(photo.serverPath);
+  const existsDisk = await isPhotoOnDisk(photo);
 
   if (!existsDisk) {
-    await removePhotoVariationsFromDisk(photo.serverPath);
+    await removePhotoVariationsFromDisk(photo);
     await deletePhotoByIdFromDB(photo.id);
     return false;
   }

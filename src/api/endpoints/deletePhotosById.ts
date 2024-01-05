@@ -26,7 +26,7 @@ const callback = async (req: Request, res: Response) => {
       const dbPhoto = await getPhotoByIdFromDB(id);
       if (dbPhoto) {
         await deletePhotoByIdFromDB(id);
-        await removePhotoFromDisk(dbPhoto.serverPath);
+        await removePhotoFromDisk(dbPhoto);
         removedIds.push(id);
       }
     }

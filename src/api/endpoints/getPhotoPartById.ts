@@ -54,7 +54,7 @@ const callback = async (req: Request, res: Response) => {
       }
 
       console.log("Retrieving photo from disk.");
-      const image64 = await getOriginalPhotoFromDisk(dbPhoto.serverPath);
+      const image64 = await getOriginalPhotoFromDisk(dbPhoto);
       console.log("Photo retrieved.");
       console.log("Sending response data.");
 

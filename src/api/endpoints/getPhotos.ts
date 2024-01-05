@@ -50,18 +50,18 @@ const callback = async (req: Request, res: Response) => {
     } else if (photoType == "thumbnail") {
       console.log("Retrieving thumbnail photos from disk.");
       images64Promises = photosThatExist.map((photo) => {
-        return getThumbnailPhotoFromDisk(photo.serverPath);
+        return getThumbnailPhotoFromDisk(photo);
       });
     } else if (photoType == "compressed") {
       console.log("Retrieving compressed photos from disk.");
       images64Promises = photosThatExist.map((photo) => {
-        return getCompressedPhotoFromDisk(photo.serverPath);
+        return getCompressedPhotoFromDisk(photo);
       });
     } else {
       // Photo Type "original"
       console.log("Retrieving original photos from disk.");
       images64Promises = photosThatExist.map((photo) => {
-        return getOriginalPhotoFromDisk(photo.serverPath);
+        return getOriginalPhotoFromDisk(photo);
       });
     }
 

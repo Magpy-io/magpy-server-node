@@ -41,20 +41,20 @@ const callback = async (req: Request, res: Response) => {
       console.log("Retrieving thumbnail photos from disk.");
       images64Promises = photosThatExist.map((photo) => {
         if (!photo) return "";
-        return getThumbnailPhotoFromDisk(photo.serverPath);
+        return getThumbnailPhotoFromDisk(photo);
       });
     } else if (photoType == "compressed") {
       console.log("Retrieving compressed photos from disk.");
       images64Promises = photosThatExist.map((photo) => {
         if (!photo) return "";
-        return getCompressedPhotoFromDisk(photo.serverPath);
+        return getCompressedPhotoFromDisk(photo);
       });
     } else {
       // Photo Type "original"
       console.log("Retrieving original photos from disk.");
       images64Promises = photosThatExist.map((photo) => {
         if (!photo) return "";
-        return getOriginalPhotoFromDisk(photo.serverPath);
+        return getOriginalPhotoFromDisk(photo);
       });
     }
     const images64 = await Promise.all(images64Promises);
