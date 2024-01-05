@@ -9,7 +9,7 @@ import {
   MAX_PIXELS_IN_IMAGE,
   MAX_PIXELS_IN_IMAGE_BIGGER,
 } from "@src/config/config";
-import { Photo } from "@src/types/photoType";
+import { isValidPhotoType, Photo, PhotoTypes } from "@src/types/photoType";
 
 export async function addPhotoToDisk(photo: Photo, base64: string) {
   await createFolder(path.parse(photo.serverPath).dir);
@@ -77,33 +77,35 @@ export async function removePhotoVariationsFromDisk(photo: Photo) {
   }
 }
 
-export async function getOriginalPhotoFromDisk(photo: Photo) {
-  try {
-    const result = await fs.readFile(photo.serverPath, { encoding: "base64" });
-    return Buffer.from(result).toString();
-  } catch (err) {
-    console.error(err);
-    throw err;
+export async function getPhotoFromDisk(photo: Photo, photoType: PhotoTypes) {
+  if (!isValidPhotoType(photoType)) {
+    throw new Error(
+      `getPhotoFromDisk: invalid photoType: ${photoType}, should be one of "thumbnail", "compressed" or "original"`
+    );
   }
-}
+  let photoPath = "";
+  switch (photoType) {
+    case "thumbnail":
+      photoPath = photo.serverThumbnailPath;
+      break;
 
-export async function getThumbnailPhotoFromDisk(photo: Photo) {
-  try {
-    const result = await fs.readFile(photo.serverThumbnailPath, {
-      encoding: "base64",
-    });
-    return Buffer.from(result).toString();
-  } catch (err) {
-    console.error(err);
-    throw err;
+    case "compressed":
+      photoPath = photo.serverCompressedPath;
+      break;
+
+    case "original":
+      photoPath = photo.serverPath;
+      break;
+
+    default:
+      throw new Error(
+        `getPhotoFromDisk: invalid photoType: ${photoType}, should be one of "thumbnail", "compressed" or "original"`
+      );
+      break;
   }
-}
 
-export async function getCompressedPhotoFromDisk(photo: Photo) {
   try {
-    const result = await fs.readFile(photo.serverCompressedPath, {
-      encoding: "base64",
-    });
+    const result = await fs.readFile(photoPath, { encoding: "base64" });
     return Buffer.from(result).toString();
   } catch (err) {
     console.error(err);

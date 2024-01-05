@@ -2,11 +2,7 @@ import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
 import { getPhotosByIdFromDB } from "@src/db/sequelizeDb";
 import { PhotoTypes, isValidPhotoType } from "@src/types/photoType";
-import {
-  getOriginalPhotoFromDisk,
-  getThumbnailPhotoFromDisk,
-  getCompressedPhotoFromDisk,
-} from "@src/modules/diskManager";
+import { getPhotoFromDisk } from "@src/modules/diskManager";
 
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import checkUserToken from "@src/middleware/checkUserToken";
@@ -35,28 +31,17 @@ const callback = async (req: Request, res: Response) => {
     const photosThatExist = await filterPhotosExistAndDeleteMissing(photos);
 
     let images64Promises;
+
     if (photoType == "data") {
-      images64Promises = photosThatExist.map((photo) => "");
-    } else if (photoType == "thumbnail") {
-      console.log("Retrieving thumbnail photos from disk.");
-      images64Promises = photosThatExist.map((photo) => {
-        if (!photo) return "";
-        return getThumbnailPhotoFromDisk(photo);
-      });
-    } else if (photoType == "compressed") {
-      console.log("Retrieving compressed photos from disk.");
-      images64Promises = photosThatExist.map((photo) => {
-        if (!photo) return "";
-        return getCompressedPhotoFromDisk(photo);
-      });
+      images64Promises = new Array(photosThatExist.length).fill("");
     } else {
-      // Photo Type "original"
-      console.log("Retrieving original photos from disk.");
+      console.log(`Retrieving ${photoType} photos from disk.`);
       images64Promises = photosThatExist.map((photo) => {
         if (!photo) return "";
-        return getOriginalPhotoFromDisk(photo);
+        return getPhotoFromDisk(photo, photoType);
       });
     }
+
     const images64 = await Promise.all(images64Promises);
 
     console.log("Photos retrieved from disk if needed");

@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
 import { getPhotoByIdFromDB } from "@src/db/sequelizeDb";
-import { getOriginalPhotoFromDisk } from "@src/modules/diskManager";
+import { getPhotoFromDisk } from "@src/modules/diskManager";
 
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import { getNumberOfParts, getPartN } from "@src/modules/stringHelper";
@@ -54,7 +54,7 @@ const callback = async (req: Request, res: Response) => {
       }
 
       console.log("Retrieving photo from disk.");
-      const image64 = await getOriginalPhotoFromDisk(dbPhoto);
+      const image64 = await getPhotoFromDisk(dbPhoto, "original");
       console.log("Photo retrieved.");
       console.log("Sending response data.");
 
