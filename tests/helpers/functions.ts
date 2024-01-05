@@ -8,7 +8,7 @@ import { photoImage64 } from "@tests/helpers/imageBase64";
 import { postPhotoPartTimeout } from "@src/config/config";
 import { timeout } from "@src/modules/functions";
 import { verifyUserToken } from "@src/modules/tokenManagement";
-
+import fs from "fs/promises";
 import { pathExists } from "@src/modules/diskManager";
 
 import * as dbFunction from "@src/db/sequelizeDb";
@@ -18,8 +18,10 @@ import {
   SaveServerCredentials,
 } from "@src/modules/serverDataManager";
 
+import { getVolumeJson } from "@tests/helpers/mockFsVolumeManager";
+
 import * as mockValues from "@src/modules/__mocks__/backendRequestsMockValues";
-import { Photo } from "@src/types/photoType";
+import { Photo, PhotoTypes } from "@src/types/photoType";
 
 let serverUserToken = "";
 
@@ -77,6 +79,20 @@ async function addNPhotos(app: Express, n: number) {
     ids.push(photoAddedData);
   }
   return ids;
+}
+
+async function deletePhotoFromDisk(photo: Photo, photoType: PhotoTypes) {
+  if (photoType == "thumbnail") {
+    await fs.rm(photo.serverThumbnailPath, { force: true });
+  }
+
+  if (photoType == "compressed") {
+    await fs.rm(photo.serverCompressedPath, { force: true });
+  }
+
+  if (photoType == "original") {
+    await fs.rm(photo.serverPath, { force: true });
+  }
 }
 
 async function getPhotoFromDb(id: string) {
@@ -356,4 +372,5 @@ export {
   getPhotoFromDb,
   testPhotosExistInDbAndDisk,
   testPhotoNotInDbNorDisk,
+  deletePhotoFromDisk,
 };

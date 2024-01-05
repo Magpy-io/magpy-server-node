@@ -16,6 +16,7 @@ import {
   checkPhotoExists,
   testPhotoNotInDbNorDisk,
   getPhotoFromDb,
+  deletePhotoFromDisk,
 } from "@tests/helpers/functions";
 import { serverTokenHeader } from "@tests/helpers/functions";
 
@@ -136,5 +137,32 @@ describe("Test 'deletePhotosById' endpoint", () => {
 
     const photo2Exists = await checkPhotoExists(app, addedPhotosData[1].id);
     expect(photo2Exists).toBe(true);
+  });
+
+  it("Should delete and return the id of the delete photo even if the photo is not on the disk", async () => {
+    const addedPhotoData = await addPhoto(app);
+    const id = addedPhotoData.id;
+
+    const photo = await getPhotoFromDb(id);
+
+    await deletePhotoFromDisk(photo, "thumbnail");
+
+    const ret = await request(app)
+      .post("/deletePhotosById")
+      .set(serverTokenHeader())
+      .send({
+        ids: [id],
+      });
+
+    expect(ret.statusCode).toBe(200);
+    expect(ret.body.ok).toBe(true);
+    expect(ret.body).toHaveProperty("data");
+    expect(ret.body.data).toHaveProperty("deletedIds");
+    expect(ret.body.data.deletedIds).toEqual([id]);
+
+    const photoExists = await checkPhotoExists(app, id);
+    expect(photoExists).toBe(false);
+
+    await testPhotoNotInDbNorDisk(photo);
   });
 });
