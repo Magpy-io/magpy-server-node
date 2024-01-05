@@ -102,11 +102,13 @@ describe("Test 'getPhotoPartById' endpoint", () => {
     }
   );
 
-  it.each([
+  const testDataArray: Array<{ photoType: PhotoTypes }> = [
     { photoType: "thumbnail" },
     { photoType: "compressed" },
     { photoType: "original" },
-  ] as Array<{ photoType: PhotoTypes }>)(
+  ];
+
+  it.each(testDataArray)(
     "Should return ID_NOT_FOUND error if requesting a photo that exists in db but $photoType is not on disk",
     async (testData: { photoType: PhotoTypes }) => {
       const addedPhotoData = await addPhoto(app);

@@ -118,11 +118,13 @@ describe("Test 'addPhoto' endpoint", () => {
     expect(nbPhotos).toBe(1);
   });
 
-  it.each([
+  const testDataArray: Array<{ photoType: PhotoTypes }> = [
     { photoType: "thumbnail" },
     { photoType: "compressed" },
     { photoType: "original" },
-  ] as Array<{ photoType: PhotoTypes }>)(
+  ];
+
+  it.each(testDataArray)(
     "Should add 1 photo when called with an existing clientPath but $photoType missing on disk",
     async (testData) => {
       const addedPhotoData = await addPhoto(app);

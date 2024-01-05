@@ -143,11 +143,13 @@ describe("Test 'getPhotos' endpoint", () => {
     }
   );
 
-  it.each([
+  const testDataArray: Array<{ photoType: PhotoTypes }> = [
     { photoType: "thumbnail" },
     { photoType: "compressed" },
     { photoType: "original" },
-  ] as Array<{ photoType: PhotoTypes }>)(
+  ];
+
+  it.each(testDataArray)(
     "Should return no photos if a photo exists on db but its $photoType is not on disk",
     async (testData: { photoType: PhotoTypes }) => {
       const addedPhotoData = await addPhoto(app);

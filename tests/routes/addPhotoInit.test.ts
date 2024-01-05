@@ -87,11 +87,13 @@ describe("Test 'addPhotoInit' endpoint", () => {
     expect(FilesWaiting.size).toBe(0);
   });
 
-  it.each([
+  const testDataArray: Array<{ photoType: PhotoTypes }> = [
     { photoType: "thumbnail" },
     { photoType: "compressed" },
     { photoType: "original" },
-  ] as Array<{ photoType: PhotoTypes }>)(
+  ];
+
+  it.each(testDataArray)(
     "Should return the id of the photo being added if adding an existing photo but the $photoType file is missing",
     async (testData) => {
       const addedPhotoData = await addPhoto(app);
