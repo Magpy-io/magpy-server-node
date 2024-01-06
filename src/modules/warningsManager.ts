@@ -18,6 +18,10 @@ export function SetLastWarningForUser(
   warnings.set(userId, warning);
 }
 
+export function HasWarningForUser(userId: string) {
+  return warnings.has(userId);
+}
+
 export function ClearAllWarnings() {
   warnings.clear();
 }
