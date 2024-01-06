@@ -83,6 +83,9 @@ export async function checkPhotoExistsAndDeleteMissing(
   const existsDisk = await isPhotoOnDisk(photo);
 
   if (!existsDisk) {
+    console.error(
+      `Some variation of photo ${photo.serverPath} not found on disk, deleting the photo variations and removing it from db.`
+    );
     await removePhotoVariationsFromDisk(photo);
     await deletePhotoByIdFromDB(photo.id);
     return false;
