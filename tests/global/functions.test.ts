@@ -49,22 +49,22 @@ describe("Test 'checkPhotoExistsAndDeleteMissing' function", () => {
   it("Should return true if photo exists in db and disk", async () => {
     const addedPhotoData = await addPhoto(app);
 
-    const exists = await checkPhotoExistsAndDeleteMissing({
+    const ret = await checkPhotoExistsAndDeleteMissing({
       id: addedPhotoData.id,
     });
 
-    expect(exists).toBe(true);
+    expect(ret.exists).toBe(true);
 
     const dbPhoto = await getPhotoFromDb(addedPhotoData.id);
     await testPhotosExistInDbAndDisk(dbPhoto);
   });
 
   it("Should return false if photo does not exist in db nor disk", async () => {
-    const exists = await checkPhotoExistsAndDeleteMissing({
+    const ret = await checkPhotoExistsAndDeleteMissing({
       id: "id",
     });
 
-    expect(exists).toBe(false);
+    expect(ret.exists).toBe(false);
   });
 
   const testDataArray: Array<{ photoType: PhotoTypes }> = [
@@ -80,11 +80,11 @@ describe("Test 'checkPhotoExistsAndDeleteMissing' function", () => {
       const dbPhoto = await getPhotoFromDb(addedPhotoData.id);
       await deletePhotoFromDisk(dbPhoto, testData.photoType);
 
-      const exists = await checkPhotoExistsAndDeleteMissing({
+      const ret = await checkPhotoExistsAndDeleteMissing({
         id: addedPhotoData.id,
       });
 
-      expect(exists).toBe(false);
+      expect(ret.exists).toBe(false);
 
       const photoExistsInDb = await dbFunction.getPhotoByIdFromDB(dbPhoto.id);
 
