@@ -18,8 +18,6 @@ import {
   SaveServerCredentials,
 } from "@src/modules/serverDataManager";
 
-import { getVolumeJson } from "@tests/helpers/mockFsVolumeManager";
-
 import * as mockValues from "@src/modules/__mocks__/backendRequestsMockValues";
 import { Photo, PhotoTypes } from "@src/types/photoType";
 

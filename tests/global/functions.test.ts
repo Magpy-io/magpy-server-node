@@ -73,7 +73,7 @@ describe("Test 'checkPhotoExistsAndDeleteMissing' function", () => {
     { photoType: "original" },
   ];
   it.each(testDataArray)(
-    "Should return false if photo exists in db but $photoType is missing from disk, and delete other photo variations while keeping original",
+    "Should return false if photo exists in db but $photoType is missing from disk, delete other photo variations while keeping original, and return the photo deleted.",
     async (testData) => {
       const addedPhotoData = await addPhoto(app);
 
@@ -85,6 +85,7 @@ describe("Test 'checkPhotoExistsAndDeleteMissing' function", () => {
       });
 
       expect(ret.exists).toBe(false);
+      expect(ret.deleted).toEqual(dbPhoto);
 
       const photoExistsInDb = await dbFunction.getPhotoByIdFromDB(dbPhoto.id);
 
