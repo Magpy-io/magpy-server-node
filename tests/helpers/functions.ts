@@ -332,8 +332,27 @@ function serverTokenHeader() {
   if (serverUserToken) {
     return { Authorization: "Bearer " + serverUserToken };
   }
-
   throw new Error("No serverUserToken to use in serverTokenHeader()");
+}
+
+function getUserId() {
+  if (!serverUserToken) {
+    throw new Error("No serverUserToken to use in getUserId()");
+  }
+  const serverData = GetServerConfigData();
+  if (!serverData.serverKey) {
+    throw new Error("getUserId: serverData.serverKey needs to be defined");
+  }
+
+  const tokenVerification = verifyUserToken(
+    serverUserToken,
+    serverData.serverKey
+  );
+
+  if (!tokenVerification.ok) {
+    throw new Error("getUserId: token verification failed");
+  }
+  return tokenVerification.data.id;
 }
 
 function expiredTokenHeader() {
@@ -371,4 +390,5 @@ export {
   testPhotosExistInDbAndDisk,
   testPhotoNotInDbNorDisk,
   deletePhotoFromDisk,
+  getUserId,
 };
