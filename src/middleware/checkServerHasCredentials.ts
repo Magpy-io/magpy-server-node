@@ -10,7 +10,7 @@ async function checkServerHasCredentials(
   next: NextFunction
 ) {
   try {
-    console.log("\n#CheckServerHasCredentials middleware");
+    console.log("#CheckServerHasCredentials middleware");
     req.serverData = GetServerConfigData();
     next();
   } catch (err) {

@@ -8,7 +8,7 @@ const verifyAuthorizationHeader = async (
   next: NextFunction
 ) => {
   try {
-    console.log("\n#VerifyAuthorizationHeader middleware");
+    console.log("#VerifyAuthorizationHeader middleware");
     const bearerHeader = req.headers["authorization"];
 
     if (!bearerHeader) {

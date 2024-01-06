@@ -12,7 +12,7 @@ import { verifyUserToken } from "@src/modules/tokenManagement";
 
 async function checkUserToken(req: Request, res: Response, next: NextFunction) {
   try {
-    console.log("\n#VerifyServerToken middleware");
+    console.log("#VerifyServerToken middleware");
 
     const token = req.token;
 

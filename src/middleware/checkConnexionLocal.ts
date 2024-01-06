@@ -10,7 +10,7 @@ async function checkConnexionLocal(
   next: NextFunction
 ) {
   try {
-    console.log("\n#CheckConnexionLocal middleware");
+    console.log("#CheckConnexionLocal middleware");
 
     if (!req.ip) {
       console.log("Could not get ip from request");

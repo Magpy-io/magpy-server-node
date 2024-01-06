@@ -29,7 +29,7 @@ function loadEndpoints(app: any) {
       middleWare: any;
     }) => {
       const callbackWithLogging = (req: Request, res: Response) => {
-        console.log("\n" + endpoint);
+        console.log(endpoint);
         callback(req, res);
       };
       if (!middleWare) {
