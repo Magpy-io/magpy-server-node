@@ -1,4 +1,4 @@
-import { APIPhoto } from "@src/api/export/exportedTypes";
+import { WarningDataTypes } from "@src/api/export/exportedTypes";
 
 const warnings = new Map<string, WarningDataTypes>();
 
@@ -21,14 +21,3 @@ export function SetLastWarningForUser(
 export function ClearAllWarnings() {
   warnings.clear();
 }
-
-export type WarningFormat<Code, Data> = { code: Code; data: Data };
-
-export type WarningDataTypes = WarningPhotosNotOnDiskDeletedType;
-
-export type WarningPhotosNotOnDiskDeletedCode = "PHOTOS_NOT_ON_DISK_DELETED";
-export type WarningPhotosNotOnDiskDeletedDataType = Array<APIPhoto>;
-export type WarningPhotosNotOnDiskDeletedType = WarningFormat<
-  WarningPhotosNotOnDiskDeletedCode,
-  WarningPhotosNotOnDiskDeletedDataType
->;

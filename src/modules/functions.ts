@@ -160,7 +160,11 @@ export function checkAndSaveWarningPhotosDeleted(
     console.log("Photos missing deleted, adding warning");
     SetLastWarningForUser(userid, {
       code: "PHOTOS_NOT_ON_DISK_DELETED",
-      data: photosDeleted.map((p) => responseFormatter.createPhotoObject(p)),
+      data: {
+        photosDeleted: photosDeleted.map((p) =>
+          responseFormatter.createPhotoObject(p)
+        ),
+      },
     });
   }
   return warning;

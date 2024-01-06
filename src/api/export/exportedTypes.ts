@@ -112,6 +112,10 @@ const routes = {
     checkPathExists();
     return path + "updateServerPath/";
   },
+  getLastWarning: () => {
+    checkPathExists();
+    return path + "getLastWarning/";
+  },
 };
 
 type ErrorBadRequest = "BAD_REQUEST";
@@ -148,6 +152,18 @@ type ErrorsAuthorization =
   | ErrorAuthorizationMissing
   | ErrorAuthorizationExpired
   | ErrorAuthorizationWrongFormat;
+
+export type WarningFormat<Code, Data> = { code: Code; data: Data };
+
+export type WarningDataTypes = WarningPhotosNotOnDiskDeletedType;
+
+export type WarningPhotosNotOnDiskDeletedDataType = {
+  photosDeleted: Array<APIPhoto>;
+};
+export type WarningPhotosNotOnDiskDeletedType = WarningFormat<
+  "PHOTOS_NOT_ON_DISK_DELETED",
+  WarningPhotosNotOnDiskDeletedDataType
+>;
 
 export type ServerResponseMessage = {
   ok: true;
@@ -754,6 +770,38 @@ export async function UpdateServerPathPost(
 ): Promise<UpdateServerPathResponseType> {
   try {
     const response = await axios.post(routes.updateServerPath(), data);
+    return response.data;
+  } catch (err: any) {
+    return handleAxiosError(err);
+  }
+}
+
+// GetLastWarning
+export type GetLastWarningRequestData = void;
+
+export type GetLastWarningResponseData = ServerResponseData<{
+  warning: WarningDataTypes | null;
+}>;
+
+export type GetLastWarningResponseErrorTypes =
+  | ErrorServerNotClaimed
+  | ErrorsAuthorization;
+
+export type GetLastWarningResponseType = EndpointMethodsResponseType<
+  GetLastWarningResponseData,
+  GetLastWarningResponseErrorTypes
+>;
+
+export async function GetLastWarningPost(
+  data: GetLastWarningRequestData
+): Promise<GetLastWarningResponseType> {
+  verifyHasUserToken();
+  try {
+    const response = await axios.post(
+      routes.getLastWarning(),
+      data,
+      userAuthorizationObject()
+    );
     return response.data;
   } catch (err: any) {
     return handleAxiosError(err);
