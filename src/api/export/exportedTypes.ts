@@ -172,7 +172,7 @@ export type EndpointMethodsResponseType<T, U> = T | ServerResponseError<U>;
 
 export type PhotoTypes = "data" | "thumbnail" | "compressed" | "original";
 
-export type Photo = {
+export type APIPhoto = {
   id: string;
   meta: {
     name: string;
@@ -229,7 +229,7 @@ export type GetPhotosRequestData = {
 export type GetPhotosResponseData = ServerResponseData<{
   endReached: boolean;
   number: number;
-  photos: Photo[];
+  photos: APIPhoto[];
 }>;
 
 export type GetPhotosResponseErrorTypes =
@@ -266,7 +266,8 @@ export type GetPhotosByIdRequestData = {
 export type GetPhotosByIdResponseData = ServerResponseData<{
   number: number;
   photos: Array<
-    { id: string; exists: false } | { id: string; exists: true; photo: Photo }
+    | { id: string; exists: false }
+    | { id: string; exists: true; photo: APIPhoto }
   >;
 }>;
 
@@ -302,7 +303,7 @@ export type GetPhotoPartByIdRequestData = {
 };
 
 export type GetPhotoPartByIdResponseData = ServerResponseData<{
-  photo: Photo;
+  photo: APIPhoto;
   part: number;
   totalNbOfParts: number;
 }>;
@@ -344,7 +345,7 @@ export type GetPhotosByPathResponseData = ServerResponseData<{
   number: string;
   photos: Array<
     | { path: string; exists: false }
-    | { path: string; exists: true; photo: Photo }
+    | { path: string; exists: true; photo: APIPhoto }
   >;
 }>;
 
@@ -417,7 +418,7 @@ export type AddPhotoRequestData = {
 };
 
 export type AddPhotoResponseData = ServerResponseData<{
-  photo: Photo;
+  photo: APIPhoto;
 }>;
 
 export type AddPhotoResponseErrorTypes =
@@ -496,7 +497,7 @@ export type AddPhotoPartRequestData = {
 export type AddPhotoPartResponseData = ServerResponseData<{
   lenReceived: string;
   lenWaiting: string;
-  photo: Photo;
+  photo: APIPhoto;
 }>;
 
 export type AddPhotoPartResponseErrorTypes =

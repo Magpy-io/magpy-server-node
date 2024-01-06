@@ -7,6 +7,10 @@ import checkUserToken from "@src/middleware/checkUserToken";
 const endpoint = "/whoami";
 const callback = async (req: Request, res: Response) => {
   try {
+    if (!req.userId) {
+      throw new Error("UserId is not defined.");
+    }
+
     const userId = req.userId;
     const jsonResponse = {
       user: { id: userId },

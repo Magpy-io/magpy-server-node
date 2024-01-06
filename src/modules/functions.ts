@@ -6,6 +6,7 @@ import {
   getPhotoByClientPathFromDB,
   getPhotoByIdFromDB,
 } from "@src/db/sequelizeDb";
+import responseFormatter from "@src/api/responseFormatter";
 import {
   isPhotoOnDisk,
   removePhotoVariationsFromDisk,
@@ -159,7 +160,7 @@ export function checkAndSaveWarningPhotosDeleted(
     console.log("Photos missing deleted, adding warning");
     SetLastWarningForUser(userid, {
       code: "PHOTOS_NOT_ON_DISK_DELETED",
-      data: photosDeleted,
+      data: photosDeleted.map((p) => responseFormatter.createPhotoObject(p)),
     });
   }
   return warning;

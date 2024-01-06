@@ -1,6 +1,7 @@
 // IMPORTS
 import { Response } from "express";
 import { Photo } from "@src/types/photoType";
+import { APIPhoto } from "@src/api/export/exportedTypes";
 import { ErrorCodes } from "@src/types/apiErrorCodes";
 
 async function sendResponse(
@@ -75,7 +76,7 @@ async function sendErrorBackEndServerUnreachable(res: Response) {
   return await res.status(500).json(jsonResponse);
 }
 
-function createPhotoObject(dbPhoto: Photo, image64?: string) {
+function createPhotoObject(dbPhoto: Photo, image64?: string): APIPhoto {
   return {
     id: dbPhoto.id,
     meta: {
@@ -88,7 +89,7 @@ function createPhotoObject(dbPhoto: Photo, image64?: string) {
       serverPath: dbPhoto.serverPath,
       clientPath: dbPhoto.clientPath,
     },
-    image64: image64,
+    image64: image64 ? image64 : "",
   };
 }
 

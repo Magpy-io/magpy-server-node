@@ -1,4 +1,4 @@
-import { Photo } from "@src/types/photoType";
+import { APIPhoto } from "@src/api/export/exportedTypes";
 
 const warnings = new Map<string, WarningDataTypes>();
 
@@ -27,7 +27,7 @@ export type WarningFormat<Code, Data> = { code: Code; data: Data };
 export type WarningDataTypes = WarningPhotosNotOnDiskDeletedType;
 
 export type WarningPhotosNotOnDiskDeletedCode = "PHOTOS_NOT_ON_DISK_DELETED";
-export type WarningPhotosNotOnDiskDeletedDataType = Array<Photo>;
+export type WarningPhotosNotOnDiskDeletedDataType = Array<APIPhoto>;
 export type WarningPhotosNotOnDiskDeletedType = WarningFormat<
   WarningPhotosNotOnDiskDeletedCode,
   WarningPhotosNotOnDiskDeletedDataType
