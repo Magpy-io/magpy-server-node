@@ -152,11 +152,13 @@ type ErrorsAuthorization =
 export type ServerResponseMessage = {
   ok: true;
   message: string;
+  warning: boolean;
 };
 
 export type ServerResponseData<T> = {
   ok: true;
   data: T;
+  warning: boolean;
 };
 
 export type ServerResponseError<Errors> = {

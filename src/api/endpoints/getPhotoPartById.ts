@@ -16,7 +16,7 @@ const callback = async (req: Request, res: Response) => {
     if (checkReqBodyAttributeMissing(req, "id", "string")) {
       console.log("Bad request parameters");
       console.log("Sending response message");
-      return responseFormatter.sendFailedMessage(res);
+      return responseFormatter.sendFailedBadRequest(res);
     }
     console.log("Request parameters ok.");
 

@@ -22,7 +22,7 @@ const callback = async (req: Request, res: Response) => {
     if (checkBodyParamsMissing(req)) {
       console.log("Bad request parameters");
       console.log("Sending response message");
-      return responseFormatter.sendFailedMessage(res);
+      return responseFormatter.sendFailedBadRequest(res);
     }
 
     console.log(`id: ${req.body.id}, part number: ${req.body.partNumber}`);
@@ -34,7 +34,8 @@ const callback = async (req: Request, res: Response) => {
       console.log("Sending response message");
       return responseFormatter.sendFailedMessage(
         res,
-        "photoPart length and partSize do not match"
+        "photoPart length and partSize do not match",
+        "BAD_REQUEST"
       );
     }
 

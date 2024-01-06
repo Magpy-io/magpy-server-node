@@ -3,50 +3,57 @@ import { Response } from "express";
 import { Photo } from "@src/types/photoType";
 import { ErrorCodes } from "@src/types/apiErrorCodes";
 
-async function sendResponse(res: Response, data: any, status = 200) {
+async function sendResponse(res: Response, data: any) {
   let jsonResponse = {
     ok: true,
     data: data,
+    warning: false,
   };
 
-  return await res.status(status).json(jsonResponse);
+  return await res.status(200).json(jsonResponse);
 }
 
-async function sendSuccessfulMessage(res: Response, msg: string, status = 200) {
+async function sendSuccessfulMessage(res: Response, msg: string) {
   let jsonResponse = {
     ok: true,
     message: msg,
+    warning: false,
   };
 
-  return await res.status(status).json(jsonResponse);
+  return await res.status(200).json(jsonResponse);
 }
 
-async function sendFailedMessage(
-  res: Response,
-  msg = "Bad request",
-  code: ErrorCodes = "BAD_REQUEST",
-  status = 400
-) {
-  let jsonResponse = {
+function formatError(msg: string, code: ErrorCodes) {
+  return {
     ok: false,
     message: msg,
     errorCode: code,
   };
+}
 
-  return await res.status(status).json(jsonResponse);
+async function sendFailedMessage(res: Response, msg: string, code: ErrorCodes) {
+  let jsonResponse = formatError(msg, code);
+
+  return await res.status(400).json(jsonResponse);
+}
+
+async function sendFailedBadRequest(res: Response) {
+  let jsonResponse = formatError("Bad request", "BAD_REQUEST");
+  return await res.status(400).json(jsonResponse);
 }
 
 async function sendErrorMessage(res: Response) {
-  await sendFailedMessage(res, "Server internal error", "SERVER_ERROR", 500);
+  let jsonResponse = formatError("Server internal error", "SERVER_ERROR");
+  return await res.status(500).json(jsonResponse);
 }
 
 async function sendErrorBackEndServerUnreachable(res: Response) {
-  await sendFailedMessage(
-    res,
+  let jsonResponse = formatError(
     "Backend server unreachable",
-    "BACKEND_SERVER_UNREACHABLE",
-    500
+    "BACKEND_SERVER_UNREACHABLE"
   );
+
+  return await res.status(500).json(jsonResponse);
 }
 
 function createPhotoObject(dbPhoto: Photo, image64?: string) {
@@ -70,7 +77,8 @@ export default {
   sendResponse,
   sendSuccessfulMessage,
   sendFailedMessage,
+  sendFailedBadRequest,
+  sendErrorBackEndServerUnreachable,
   sendErrorMessage,
   createPhotoObject,
-  sendErrorBackEndServerUnreachable,
 };

@@ -21,7 +21,11 @@ const callback = async (req: Request, res: Response) => {
 
     if (!isAbsolutePath(path)) {
       console.log("Invalid path, not an absolute path");
-      return responseFormatter.sendFailedMessage(res, "Invalid path");
+      return responseFormatter.sendFailedMessage(
+        res,
+        "Invalid path",
+        "BAD_REQUEST"
+      );
     }
 
     if (!(await pathExists(path))) {

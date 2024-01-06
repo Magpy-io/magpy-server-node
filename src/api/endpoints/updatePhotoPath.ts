@@ -17,7 +17,7 @@ const callback = async (req: Request, res: Response) => {
   if (checkBodyParamsMissing(req)) {
     console.log("Bad request parameters");
     console.log("Sending response message");
-    return responseFormatter.sendFailedMessage(res);
+    return responseFormatter.sendFailedBadRequest(res);
   }
   console.log("Request parameters ok.");
 
