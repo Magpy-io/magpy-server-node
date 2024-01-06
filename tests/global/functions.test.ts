@@ -21,11 +21,19 @@ import {
   getPhotoFromDb,
   testPhotosExistInDbAndDisk,
   testPhotoNotInDbNorDisk,
+  getUserId,
 } from "@tests/helpers/functions";
 import * as dbFunction from "@src/db/sequelizeDb";
 import { pathExists } from "@src/modules/diskManager";
 import { PhotoTypes } from "@src/types/photoType";
-import { checkPhotoExistsAndDeleteMissing } from "@src/modules/functions";
+import {
+  checkAndSaveWarningPhotosDeleted,
+  checkPhotoExistsAndDeleteMissing,
+} from "@src/modules/functions";
+import {
+  GetLastWarningForUser,
+  HasWarningForUser,
+} from "@src/modules/warningsManager";
 
 describe("Test 'checkPhotoExistsAndDeleteMissing' function", () => {
   let app: Express;
@@ -100,4 +108,56 @@ describe("Test 'checkPhotoExistsAndDeleteMissing' function", () => {
       expect(thumbnailExists).toBe(false);
     }
   );
+});
+
+describe('Test "checkAndSaveWarningPhotosDeleted" function', () => {
+  let app: Express;
+
+  beforeAll(async () => {
+    app = await initServer();
+  });
+
+  afterAll(async () => {
+    stopServer();
+  });
+
+  beforeEach(async () => {
+    await sac.beforeEach(app);
+  });
+
+  afterEach(async () => {
+    await sac.afterEach();
+  });
+
+  it("Should generate a warning when deleting a photo in db but not on disk", async () => {
+    const addedPhotoData = await addPhoto(app);
+
+    const dbPhoto = await getPhotoFromDb(addedPhotoData.id);
+    await deletePhotoFromDisk(dbPhoto, "compressed");
+
+    const ret = await checkPhotoExistsAndDeleteMissing({
+      id: addedPhotoData.id,
+    });
+
+    const warningThrown = checkAndSaveWarningPhotosDeleted(
+      ret.deleted ? [ret.deleted] : [],
+      getUserId()
+    );
+
+    expect(warningThrown).toBe(true);
+    expect(HasWarningForUser(getUserId())).toBe(true);
+
+    const warning = GetLastWarningForUser(getUserId());
+    expect(warning).toBeTruthy();
+
+    if (!warning) {
+      throw new Error("warning should be defined");
+    }
+
+    expect(warning.code).toBe("PHOTOS_NOT_ON_DISK_DELETED");
+    expect(warning.data).toHaveProperty("photosDeleted");
+    expect(warning.data.photosDeleted.length).toBe(1);
+
+    expect(warning.data.photosDeleted[0].id).toBe(dbPhoto.id);
+  });
 });
