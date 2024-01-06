@@ -1,14 +1,13 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
-import {
-  getPhotoByIdFromDB,
-  updatePhotoClientPathById,
-  getPhotoByClientPathFromDB,
-} from "@src/db/sequelizeDb";
+import { updatePhotoClientPathById } from "@src/db/sequelizeDb";
 
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import checkUserToken from "@src/middleware/checkUserToken";
-import { checkPhotoExistsAndDeleteMissing } from "@src/modules/functions";
+import {
+  checkAndSaveWarningPhotosDeleted,
+  checkPhotoExistsAndDeleteMissing,
+} from "@src/modules/functions";
 
 // updatePhotoPath : updates the path of a photo in db
 const endpoint = "/updatePhotoPath";
@@ -21,33 +20,46 @@ const callback = async (req: Request, res: Response) => {
   }
   console.log("Request parameters ok.");
 
-  console.log(`id: ${req.body.id}, newPath: ${req.body.path}`);
+  if (!req.userId) {
+    throw new Error("UserId is not defined.");
+  }
 
   const { id, path }: RequestType = req.body;
 
   try {
     console.log(`Searching in db for photo with id: ${id}`);
-    const exists = await checkPhotoExistsAndDeleteMissing({
+
+    const ret = await checkPhotoExistsAndDeleteMissing({
       id: id,
     });
-    if (!exists) {
+
+    if (!ret.exists) {
+      const warning = checkAndSaveWarningPhotosDeleted(
+        ret.deleted ? [ret.deleted] : [],
+        req.userId
+      );
       console.log("Photo does not exist in server.");
       console.log("Sending response message.");
       return responseFormatter.sendFailedMessage(
         res,
         `Photo with id ${id} not found in server`,
-        "ID_NOT_FOUND"
+        "ID_NOT_FOUND",
+        warning
       );
     } else {
       console.log("Photo found");
 
       console.log("Getting photo from db with new path");
-      const photoWithNewPathExists = await checkPhotoExistsAndDeleteMissing({
+      const ret1 = await checkPhotoExistsAndDeleteMissing({
         clientPath: path,
       });
       console.log("Received response from db.");
 
-      if (!photoWithNewPathExists) {
+      if (!ret1.exists) {
+        const warning = checkAndSaveWarningPhotosDeleted(
+          ret1.deleted ? [ret1.deleted] : [],
+          req.userId
+        );
         console.log("Photo path does not exist in db");
         console.log("Updating path in db");
         await updatePhotoClientPathById(id, path);
@@ -56,7 +68,8 @@ const callback = async (req: Request, res: Response) => {
         console.log("Sending response message.");
         return responseFormatter.sendSuccessfulMessage(
           res,
-          `Photo with id ${id} successfully updated with new path`
+          `Photo with id ${id} successfully updated with new path`,
+          warning
         );
       } else {
         console.log("Photo path already exists in db");

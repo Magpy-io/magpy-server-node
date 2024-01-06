@@ -165,6 +165,7 @@ export type ServerResponseError<Errors> = {
   ok: false;
   message: string;
   errorCode: Errors | ErrorBadRequest | ErrorServerError;
+  warning: boolean;
 };
 
 export type EndpointMethodsResponseType<T, U> = T | ServerResponseError<U>;

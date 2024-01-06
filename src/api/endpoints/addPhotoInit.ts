@@ -8,7 +8,10 @@ import { v4 as uuid } from "uuid";
 import { postPhotoPartTimeout } from "@src/config/config";
 import { Photo } from "@src/types/photoType";
 import checkUserToken from "@src/middleware/checkUserToken";
-import { checkPhotoExistsAndDeleteMissing } from "@src/modules/functions";
+import {
+  checkAndSaveWarningPhotosDeleted,
+  checkPhotoExistsAndDeleteMissing,
+} from "@src/modules/functions";
 
 // addPhotoInit : initializes the transfer of a photo to the server
 const endpoint = "/addPhotoInit";
@@ -22,7 +25,9 @@ const callback = async (req: Request, res: Response) => {
     }
     console.log("Request parameters ok.");
 
-    console.log(`path: ${req.body.path}`);
+    if (!req.userId) {
+      throw new Error("UserId is not defined.");
+    }
 
     const requestPhoto: RequestType = req.body;
 
@@ -43,10 +48,10 @@ const callback = async (req: Request, res: Response) => {
 
     console.log(`Searching in db for photo with path: ${requestPhoto.path}`);
 
-    const exists = await checkPhotoExistsAndDeleteMissing({
+    const ret = await checkPhotoExistsAndDeleteMissing({
       clientPath: requestPhoto.path,
     });
-    if (exists) {
+    if (ret.exists) {
       console.log("Photo exists in server.");
       console.log("Sending response message.");
       return responseFormatter.sendFailedMessage(
@@ -55,6 +60,11 @@ const callback = async (req: Request, res: Response) => {
         "PHOTO_EXISTS"
       );
     } else {
+      const warning = checkAndSaveWarningPhotosDeleted(
+        ret.deleted ? [ret.deleted] : [],
+        req.userId
+      );
+
       console.log("Photo does not exist in server.");
       console.log("Creating syncDate and photoPath.");
       const image64Len = requestPhoto.image64Len;
@@ -74,7 +84,7 @@ const callback = async (req: Request, res: Response) => {
         photo: photo,
       });
       console.log("Sending response message.");
-      return responseFormatter.sendResponse(res, { id: id });
+      return responseFormatter.sendResponse(res, { id: id }, warning);
     }
   } catch (err) {
     console.error(err);

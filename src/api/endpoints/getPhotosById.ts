@@ -6,7 +6,10 @@ import { getPhotoFromDisk } from "@src/modules/diskManager";
 
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import checkUserToken from "@src/middleware/checkUserToken";
-import { filterPhotosExistAndDeleteMissing } from "@src/modules/functions";
+import {
+  checkAndSaveWarningPhotosDeleted,
+  filterPhotosExistAndDeleteMissing,
+} from "@src/modules/functions";
 
 // getPhotosById : returns array of photos by their ids.
 const endpoint = "/getPhotosById";
@@ -20,7 +23,9 @@ const callback = async (req: Request, res: Response) => {
     }
     console.log("Request parameters ok.");
 
-    console.log(`ids len: ${req.body.ids.length}, type: ${req.body.photoType}`);
+    if (!req.userId) {
+      throw new Error("UserId is not defined.");
+    }
 
     const { ids, photoType }: RequestType = req.body;
 
@@ -28,15 +33,20 @@ const callback = async (req: Request, res: Response) => {
     const photos = await getPhotosByIdFromDB(ids);
     console.log("Received response from db.");
 
-    const photosThatExist = await filterPhotosExistAndDeleteMissing(photos);
+    const ret = await filterPhotosExistAndDeleteMissing(photos);
+
+    const waiting = checkAndSaveWarningPhotosDeleted(
+      ret.photosDeleted,
+      req.userId
+    );
 
     let images64Promises;
 
     if (photoType == "data") {
-      images64Promises = new Array(photosThatExist.length).fill("");
+      images64Promises = new Array(ret.photosThatExist.length).fill("");
     } else {
       console.log(`Retrieving ${photoType} photos from disk.`);
-      images64Promises = photosThatExist.map((photo) => {
+      images64Promises = ret.photosThatExist.map((photo) => {
         if (!photo) return "";
         return getPhotoFromDisk(photo, photoType);
       });
@@ -46,7 +56,7 @@ const callback = async (req: Request, res: Response) => {
 
     console.log("Photos retrieved from disk if needed");
 
-    const photosResponse = photosThatExist.map((photo, index) => {
+    const photosResponse = ret.photosThatExist.map((photo, index) => {
       if (!photo) return { id: ids[index], exists: false };
 
       const photoWithImage64 = responseFormatter.createPhotoObject(
@@ -62,7 +72,7 @@ const callback = async (req: Request, res: Response) => {
     };
 
     console.log("Sending response data.");
-    return responseFormatter.sendResponse(res, jsonResponse);
+    return responseFormatter.sendResponse(res, jsonResponse, waiting);
   } catch (err) {
     console.error(err);
     return responseFormatter.sendErrorMessage(res);

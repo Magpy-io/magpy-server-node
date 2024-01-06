@@ -11,6 +11,7 @@ import {
   removePhotoVariationsFromDisk,
 } from "@src/modules/diskManager";
 import { Photo } from "@src/types/photoType";
+import { SetLastWarningForUser } from "./warningsManager";
 
 export function timeout(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -63,18 +64,20 @@ export async function checkPhotoExistsAndDeleteMissing(
     | {
         clientPath: string;
       }
-) {
+): Promise<
+  { exists: false; deleted: Photo | null } | { exists: true; deleted: null }
+> {
   let photo: Photo | null;
 
   if ("clientPath" in data) {
     photo = await getPhotoByClientPathFromDB(data.clientPath);
     if (!photo) {
-      return false;
+      return { exists: false, deleted: null };
     }
   } else if ("id" in data) {
     photo = await getPhotoByIdFromDB(data.id);
     if (!photo) {
-      return false;
+      return { exists: false, deleted: null };
     }
   } else {
     throw new Error("checkPhotoExists: Needs the photo id or clientPath");
@@ -88,10 +91,10 @@ export async function checkPhotoExistsAndDeleteMissing(
     );
     await removePhotoVariationsFromDisk(photo);
     await deletePhotoByIdFromDB(photo.id);
-    return false;
+    return { exists: false, deleted: photo };
   }
 
-  return true;
+  return { exists: true, deleted: null };
 }
 
 /**
@@ -101,13 +104,19 @@ export async function checkPhotoExistsAndDeleteMissing(
  */
 export async function filterPhotosAndDeleteMissing(photos: Photo[]) {
   const photosThatExist = [];
+  const photosDeleted = [];
 
   for (let photo of photos) {
-    if (await checkPhotoExistsAndDeleteMissing({ id: photo.id })) {
+    const ret = await checkPhotoExistsAndDeleteMissing({ id: photo.id });
+    if (ret.exists) {
       photosThatExist.push(photo);
     }
+
+    if (ret.deleted) {
+      photosDeleted.push(photo);
+    }
   }
-  return photosThatExist;
+  return { photosThatExist, photosDeleted };
 }
 
 /**
@@ -119,15 +128,39 @@ export async function filterPhotosExistAndDeleteMissing(
   photos: Array<Photo | null>
 ) {
   const photosThatExist: Array<Photo | null> = [];
+  const photosDeleted: Array<Photo> = [];
 
   for (let photo of photos) {
     if (!photo) {
       photosThatExist.push(null);
-    } else if (await checkPhotoExistsAndDeleteMissing({ id: photo.id })) {
-      photosThatExist.push(photo);
     } else {
-      photosThatExist.push(null);
+      const ret = await checkPhotoExistsAndDeleteMissing({ id: photo.id });
+      if (ret.exists) {
+        photosThatExist.push(photo);
+      } else {
+        photosThatExist.push(null);
+
+        if (ret.deleted) {
+          photosDeleted.push(photo);
+        }
+      }
     }
   }
-  return photosThatExist;
+  return { photosThatExist, photosDeleted };
+}
+
+export function checkAndSaveWarningPhotosDeleted(
+  photosDeleted: Photo[],
+  userid: string
+) {
+  let warning = false;
+  if (photosDeleted.length != 0) {
+    warning = true;
+    console.log("Photos missing deleted, adding warning");
+    SetLastWarningForUser(userid, {
+      code: "PHOTOS_NOT_ON_DISK_DELETED",
+      data: photosDeleted,
+    });
+  }
+  return warning;
 }

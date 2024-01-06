@@ -6,7 +6,10 @@ import { getPhotoFromDisk } from "@src/modules/diskManager";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import { getNumberOfParts, getPartN } from "@src/modules/stringHelper";
 import checkUserToken from "@src/middleware/checkUserToken";
-import { checkPhotoExistsAndDeleteMissing } from "@src/modules/functions";
+import {
+  checkAndSaveWarningPhotosDeleted,
+  checkPhotoExistsAndDeleteMissing,
+} from "@src/modules/functions";
 
 // getPhotoPartById : returns a part of a photo by id.
 const endpoint = "/getPhotoPartById";
@@ -20,6 +23,10 @@ const callback = async (req: Request, res: Response) => {
     }
     console.log("Request parameters ok.");
 
+    if (!req.userId) {
+      throw new Error("UserId is not defined.");
+    }
+
     const id: string = req.body.id;
     let partNumber = 0;
     if (!checkReqBodyAttributeMissing(req, "part", "number")) {
@@ -30,17 +37,22 @@ const callback = async (req: Request, res: Response) => {
 
     console.log("Checking photo exists");
 
-    const exists = await checkPhotoExistsAndDeleteMissing({
+    const ret = await checkPhotoExistsAndDeleteMissing({
       id: id,
     });
 
-    if (!exists) {
+    if (!ret.exists) {
+      const warning = checkAndSaveWarningPhotosDeleted(
+        ret.deleted ? [ret.deleted] : [],
+        req.userId
+      );
       console.log("Photo not found in db.");
       console.log("Sending response message.");
       return responseFormatter.sendFailedMessage(
         res,
         `Photo with id: ${id} not found`,
-        "ID_NOT_FOUND"
+        "ID_NOT_FOUND",
+        warning
       );
     } else {
       console.log("Photo found in db.");

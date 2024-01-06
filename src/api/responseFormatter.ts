@@ -3,54 +3,73 @@ import { Response } from "express";
 import { Photo } from "@src/types/photoType";
 import { ErrorCodes } from "@src/types/apiErrorCodes";
 
-async function sendResponse(res: Response, data: any) {
+async function sendResponse(
+  res: Response,
+  data: any,
+  warning: boolean = false
+) {
   let jsonResponse = {
     ok: true,
-    data: data,
-    warning: false,
+    data,
+    warning,
   };
 
   return await res.status(200).json(jsonResponse);
 }
 
-async function sendSuccessfulMessage(res: Response, msg: string) {
+async function sendSuccessfulMessage(
+  res: Response,
+  message: string,
+  warning: boolean = false
+) {
   let jsonResponse = {
     ok: true,
-    message: msg,
-    warning: false,
+    message,
+    warning,
   };
 
   return await res.status(200).json(jsonResponse);
 }
 
-function formatError(msg: string, code: ErrorCodes) {
+function formatError(msg: string, code: ErrorCodes, warning: boolean = false) {
   return {
     ok: false,
     message: msg,
     errorCode: code,
+    warning,
   };
 }
 
-async function sendFailedMessage(res: Response, msg: string, code: ErrorCodes) {
-  let jsonResponse = formatError(msg, code);
+async function sendFailedMessage(
+  res: Response,
+  msg: string,
+  code: ErrorCodes,
+  warning: boolean = false
+) {
+  let jsonResponse = formatError(msg, code, warning);
 
   return await res.status(400).json(jsonResponse);
 }
 
 async function sendFailedBadRequest(res: Response) {
-  let jsonResponse = formatError("Bad request", "BAD_REQUEST");
+  let jsonResponse = formatError("Bad request", "BAD_REQUEST", false);
   return await res.status(400).json(jsonResponse);
 }
 
 async function sendErrorMessage(res: Response) {
-  let jsonResponse = formatError("Server internal error", "SERVER_ERROR");
+  let jsonResponse = formatError(
+    "Server internal error",
+    "SERVER_ERROR",
+    false
+  );
   return await res.status(500).json(jsonResponse);
 }
 
 async function sendErrorBackEndServerUnreachable(res: Response) {
   let jsonResponse = formatError(
     "Backend server unreachable",
-    "BACKEND_SERVER_UNREACHABLE"
+    "BACKEND_SERVER_UNREACHABLE",
+    false
   );
 
   return await res.status(500).json(jsonResponse);

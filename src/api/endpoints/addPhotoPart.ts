@@ -12,7 +12,10 @@ import { hashString } from "@src/modules/hashing";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import { hashLen, postPhotoPartTimeout } from "@src/config/config";
 import checkUserToken from "@src/middleware/checkUserToken";
-import { checkPhotoExistsAndDeleteMissing } from "@src/modules/functions";
+import {
+  checkAndSaveWarningPhotosDeleted,
+  checkPhotoExistsAndDeleteMissing,
+} from "@src/modules/functions";
 
 // addPhotoPart : adds a part of a photo to the server
 const endpoint = "/addPhotoPart";
@@ -25,7 +28,9 @@ const callback = async (req: Request, res: Response) => {
       return responseFormatter.sendFailedBadRequest(res);
     }
 
-    console.log(`id: ${req.body.id}, part number: ${req.body.partNumber}`);
+    if (!req.userId) {
+      throw new Error("UserId is not defined.");
+    }
 
     const partReceived: RequestType = req.body;
 
@@ -97,11 +102,11 @@ const callback = async (req: Request, res: Response) => {
           const hash = hashString(image64, hashLen);
           photoWaiting.photo.hash = hash;
 
-          const exists = await checkPhotoExistsAndDeleteMissing({
+          const ret = await checkPhotoExistsAndDeleteMissing({
             clientPath: photoWaiting.photo.clientPath,
           });
 
-          if (exists) {
+          if (ret.exists) {
             console.log("Photo exists in server.");
 
             console.log(`Deleting pending transfer for id ${partReceived.id}`);
@@ -115,6 +120,10 @@ const callback = async (req: Request, res: Response) => {
               "PHOTO_EXISTS"
             );
           } else {
+            const warning = checkAndSaveWarningPhotosDeleted(
+              ret.deleted ? [ret.deleted] : [],
+              req.userId
+            );
             console.log(`Deleting pending transfer for id ${partReceived.id}`);
             FilesWaiting.delete(partReceived.id);
 
@@ -142,7 +151,7 @@ const callback = async (req: Request, res: Response) => {
               photo: responseFormatter.createPhotoObject(dbPhoto, ""),
             };
             console.log("Sending response message.");
-            return responseFormatter.sendResponse(res, jsonResponse);
+            return responseFormatter.sendResponse(res, jsonResponse, warning);
           }
         } else {
           console.log(`Deleting pending transfer for id ${partReceived.id}`);

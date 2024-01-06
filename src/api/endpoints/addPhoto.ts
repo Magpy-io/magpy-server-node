@@ -1,7 +1,10 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
 import { addPhotoToDB, deletePhotoByIdFromDB } from "@src/db/sequelizeDb";
-import { checkPhotoExistsAndDeleteMissing } from "@src/modules/functions";
+import {
+  checkAndSaveWarningPhotosDeleted,
+  checkPhotoExistsAndDeleteMissing,
+} from "@src/modules/functions";
 import { addPhotoToDisk } from "@src/modules/diskManager";
 import { addServerImagePaths } from "@src/modules/diskFilesNaming";
 import { hashString } from "@src/modules/hashing";
@@ -22,7 +25,9 @@ const callback = async (req: Request, res: Response) => {
     }
     console.log("Request parameters ok.");
 
-    console.log(`path: ${req.body.path}`);
+    if (!req.userId) {
+      throw new Error("UserId is not defined.");
+    }
 
     const requestPhoto: RequestType = req.body;
 
@@ -42,11 +47,11 @@ const callback = async (req: Request, res: Response) => {
     };
 
     console.log(`Searching in db for photo with path: ${requestPhoto.path}`);
-    const exists = await checkPhotoExistsAndDeleteMissing({
+    const ret = await checkPhotoExistsAndDeleteMissing({
       clientPath: requestPhoto.path,
     });
 
-    if (exists) {
+    if (ret.exists) {
       console.log("Photo exists in server.");
       console.log("Sending response message.");
       return responseFormatter.sendFailedMessage(
@@ -55,6 +60,11 @@ const callback = async (req: Request, res: Response) => {
         "PHOTO_EXISTS"
       );
     } else {
+      const warning = checkAndSaveWarningPhotosDeleted(
+        ret.deleted ? [ret.deleted] : [],
+        req.userId
+      );
+
       console.log("Photo does not exist in server.");
       console.log("Creating syncDate, photoPath and the photo hash.");
       photo.syncDate = new Date(Date.now()).toJSON();
@@ -77,7 +87,7 @@ const callback = async (req: Request, res: Response) => {
         photo: responseFormatter.createPhotoObject(dbPhoto, ""),
       };
       console.log("Sending response message.");
-      return responseFormatter.sendResponse(res, jsonResponse);
+      return responseFormatter.sendResponse(res, jsonResponse, warning);
     }
   } catch (err) {
     console.error(err);
