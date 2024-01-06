@@ -18,6 +18,10 @@ export function SetLastWarningForUser(
   warnings.set(userId, warning);
 }
 
+export function ClearAllWarnings() {
+  warnings.clear();
+}
+
 export type WarningFormat<Code, Data> = { code: Code; data: Data };
 
 export type WarningDataTypes = WarningPhotosNotOnDiskDeletedType;

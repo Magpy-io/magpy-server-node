@@ -2,14 +2,14 @@
 require("module-alias/register");
 
 // IMPORTS
-import config from "dotenv";
-config.config();
-import { configModules } from "@src/config/configModules";
+import dotenv from "dotenv";
+dotenv.config();
+import { InitModules } from "@src/config/configModules";
 import { initServer } from "@src/server/server";
 import { openAndInitDB } from "@src/db/sequelizeDb";
 import { startMdns } from "@src/server/mdnsSetup";
-import { LoadConfigFile } from "@src/modules/serverDataManager";
 import { app, Tray, Menu, nativeImage } from "electron";
+import { setupElectronLogging } from "./modules/electronLogging";
 
 let tray;
 
@@ -26,6 +26,8 @@ const createWindow = () => {
 };
 
 app.whenReady().then(() => {
+  setupElectronLogging();
+
   createWindow();
   main().catch((err) => {
     console.log("error init server");
@@ -34,8 +36,7 @@ app.whenReady().then(() => {
 });
 
 async function main() {
-  await LoadConfigFile();
-  configModules();
+  await InitModules();
   await openAndInitDB();
   await initServer();
   await startMdns();

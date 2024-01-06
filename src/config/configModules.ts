@@ -1,15 +1,21 @@
 import { SetPath } from "@src/modules/backendImportedQueries";
 import * as config from "@src/config/config";
 
-import log from "electron-log";
+import { LoadConfigFile } from "@src/modules/serverDataManager";
+import { clearFilesWaiting } from "@src/server/server";
+import { ClearAllWarnings } from "@src/modules/warningsManager";
+import { ClearServerDataFile } from "@src/modules/serverDataManager/serverDataFileManager";
 
-export function configModules() {
-  const url = config.backend_host + ":" + config.backend_port;
-  SetPath(url);
+export async function InitModules() {
+  SetPath(config.backend_host + ":" + config.backend_port);
+  await LoadConfigFile();
+  await clearFilesWaiting();
+  ClearAllWarnings();
+}
 
-  log.transports.file.level = "debug";
-  console.log = log.debug;
-  console.error = (message: string) => {
-    log.info("#Error Log: " + message);
-  };
+export async function ResetModules() {
+  SetPath("");
+  await ClearServerDataFile();
+  await clearFilesWaiting();
+  ClearAllWarnings();
 }
