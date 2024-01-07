@@ -123,7 +123,6 @@ type ErrorServerError = "SERVER_ERROR";
 type ErrorAuthorizationBackendFailed = "AUTHORIZATION_BACKEND_FAILED";
 type ErrorAuthorizationBackendExpired = "AUTHORIZATION_BACKEND_EXPIRED";
 type ErrorBackendServerUnreachable = "BACKEND_SERVER_UNREACHABLE";
-type ErrorPathExists = "PATH_EXISTS";
 type ErrorIdNotFound = "ID_NOT_FOUND";
 type ErrorUserNotAllowed = "USER_NOT_ALLOWED";
 type ErrorServerNotClaimed = "SERVER_NOT_CLAIMED";
@@ -131,7 +130,6 @@ type ErrorInvalidPartNumber = "INVALID_PART_NUMBER";
 type ErrorServerAlreadyClaimed = "SERVER_ALREADY_CLAIMED";
 type ErrorPhotoTransferNotFound = "PHOTO_TRANSFER_NOT_FOUND";
 type ErrorMissingParts = "MISSING_PARTS";
-type ErrorPhotoExists = "PHOTO_EXISTS";
 type ErrorPhotoSizeExceeded = "PHOTO_SIZE_EXCEEDED";
 type ErrorAuthorizationMissing = "AUTHORIZATION_MISSING";
 type ErrorAuthorizationWrongFormat = "AUTHORIZATION_WRONG_FORMAT";
@@ -353,7 +351,7 @@ export async function GetPhotoPartByIdPost(
 
 // GetPhotosByPath
 export type GetPhotosByPathRequestData = {
-  paths: string[];
+  photosData: Array<{ path: string; size: number; date: string }>;
   photoType: PhotoTypes;
 };
 
@@ -438,7 +436,6 @@ export type AddPhotoResponseData = ServerResponseData<{
 }>;
 
 export type AddPhotoResponseErrorTypes =
-  | ErrorPhotoExists
   | ErrorServerNotClaimed
   | ErrorsAuthorization;
 
@@ -478,7 +475,6 @@ export type AddPhotoInitResponseData = ServerResponseData<{
 }>;
 
 export type AddPhotoInitResponseErrorTypes =
-  | ErrorPhotoExists
   | ErrorServerNotClaimed
   | ErrorsAuthorization;
 
@@ -520,7 +516,6 @@ export type AddPhotoPartResponseErrorTypes =
   | ErrorPhotoSizeExceeded
   | ErrorMissingParts
   | ErrorPhotoTransferNotFound
-  | ErrorPhotoExists
   | ErrorServerNotClaimed
   | ErrorsAuthorization;
 
@@ -554,7 +549,6 @@ export type UpdatePhotoPathResponseData = ServerResponseMessage;
 
 export type UpdatePhotoPathResponseErrorTypes =
   | ErrorIdNotFound
-  | ErrorPathExists
   | ErrorServerNotClaimed
   | ErrorsAuthorization;
 
