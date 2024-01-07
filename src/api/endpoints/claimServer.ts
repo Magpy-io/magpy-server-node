@@ -67,7 +67,6 @@ const callback = async (req: Request, res: Response) => {
         console.error(err);
         return responseFormatter.sendErrorMessage(res);
       }
-      return;
     }
 
     if (!ret.ok) {
