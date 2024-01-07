@@ -48,13 +48,24 @@ describe("Test 'getPhotosByPath' endpoint", () => {
     async (testData: { n: number }) => {
       const addedPhotosData = await addNPhotos(app, testData.n);
 
-      const paths = addedPhotosData.map((e) => e.path);
+      const photosAdded = await Promise.all(
+        addedPhotosData.map((photoData) => {
+          return getPhotoFromDb(photoData.id);
+        })
+      );
+      const photosData = photosAdded.map((photo) => {
+        return {
+          path: photo.clientPath,
+          size: photo.fileSize,
+          date: photo.date,
+        };
+      });
 
       const ret = await request(app)
         .post("/getPhotosByPath")
         .set(serverTokenHeader())
         .send({
-          paths: paths,
+          photosData: photosData,
           photoType: "data",
         });
 
@@ -66,7 +77,7 @@ describe("Test 'getPhotosByPath' endpoint", () => {
       expect(ret.body.data.photos.length).toBe(testData.n);
 
       for (let i = 0; i < testData.n; i++) {
-        expect(ret.body.data.photos[i].path).toBe(paths[i]);
+        expect(ret.body.data.photos[i].path).toBe(photosData[i].path);
         expect(ret.body.data.photos[i].exists).toBe(true);
       }
     }
@@ -75,15 +86,17 @@ describe("Test 'getPhotosByPath' endpoint", () => {
   it.each([{ n: 0 }, { n: 1 }, { n: 2 }])(
     "Should return $n photos all not existing after adding no photos and requesting $n photo paths",
     async (testData: { n: number }) => {
-      const paths = Array(testData.n)
+      const photosData = Array(testData.n)
         .fill("")
-        .map((_, i) => "path" + i.toString());
+        .map((_, i) => {
+          return { path: "path" + i.toString(), size: 0, date: "" };
+        });
 
       const ret = await request(app)
         .post("/getPhotosByPath")
         .set(serverTokenHeader())
         .send({
-          paths: paths,
+          photosData: photosData,
           photoType: "data",
         });
 
@@ -94,7 +107,7 @@ describe("Test 'getPhotosByPath' endpoint", () => {
       expect(ret.body.data.photos.length).toBe(testData.n);
 
       for (let i = 0; i < testData.n; i++) {
-        expect(ret.body.data.photos[i].path).toBe(paths[i]);
+        expect(ret.body.data.photos[i].path).toBe(photosData[i].path);
         expect(ret.body.data.photos[i].exists).toBe(false);
       }
     }
@@ -103,13 +116,18 @@ describe("Test 'getPhotosByPath' endpoint", () => {
   it("Should return 2 photos, the first exists and the second does not, after adding 1 photo and requesting 2", async () => {
     const photoAddedData = await addPhoto(app);
 
-    const paths = [photoAddedData.path, "path2"];
+    const dbPhoto = await getPhotoFromDb(photoAddedData.id);
+
+    const photosData = [
+      { path: photoAddedData.path, size: dbPhoto.fileSize, date: dbPhoto.date },
+      { path: "path2", size: 0, date: "" },
+    ];
 
     const ret = await request(app)
       .post("/getPhotosByPath")
       .set(serverTokenHeader())
       .send({
-        paths: paths,
+        photosData: photosData,
         photoType: "data",
       });
 
@@ -119,10 +137,10 @@ describe("Test 'getPhotosByPath' endpoint", () => {
     expect(ret.body.data.number).toBe(2);
     expect(ret.body.data.photos.length).toBe(2);
 
-    expect(ret.body.data.photos[0].path).toBe(paths[0]);
+    expect(ret.body.data.photos[0].path).toBe(photosData[0].path);
     expect(ret.body.data.photos[0].exists).toBe(true);
 
-    expect(ret.body.data.photos[1].path).toBe(paths[1]);
+    expect(ret.body.data.photos[1].path).toBe(photosData[1].path);
     expect(ret.body.data.photos[1].exists).toBe(false);
   });
 
@@ -136,11 +154,21 @@ describe("Test 'getPhotosByPath' endpoint", () => {
     async (testData) => {
       const photoAddedData = await addPhoto(app);
 
+      const dbPhoto = await getPhotoFromDb(photoAddedData.id);
+
+      const photosData = [
+        {
+          path: photoAddedData.path,
+          size: dbPhoto.fileSize,
+          date: dbPhoto.date,
+        },
+      ];
+
       const ret = await request(app)
         .post("/getPhotosByPath")
         .set(serverTokenHeader())
         .send({
-          paths: [photoAddedData.path],
+          photosData: photosData,
           photoType: testData.photoType,
         });
 
@@ -171,13 +199,22 @@ describe("Test 'getPhotosByPath' endpoint", () => {
       const addedPhotoData = await addPhoto(app);
 
       const photo = await getPhotoFromDb(addedPhotoData.id);
+
       await deletePhotoFromDisk(photo, testData.photoType);
+
+      const photosData = [
+        {
+          path: addedPhotoData.path,
+          size: photo.fileSize,
+          date: photo.date,
+        },
+      ];
 
       const ret = await request(app)
         .post("/getPhotosByPath")
         .set(serverTokenHeader())
         .send({
-          paths: [addedPhotoData.path],
+          photosData: photosData,
           photoType: "data",
         });
 

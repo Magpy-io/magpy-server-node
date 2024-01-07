@@ -34,7 +34,6 @@ const modelDefinition = {
   clientPath: {
     type: DataTypes.STRING,
     allowNull: false,
-    unique: true,
   },
   serverPath: {
     type: DataTypes.STRING,
@@ -59,7 +58,11 @@ const modelDefinition = {
 };
 
 const modelOptions = {
-  indexes: [{ fields: ["date"] }, { fields: ["clientPath"] }],
+  indexes: [
+    { fields: ["date"] },
+    { fields: ["clientPath"] },
+    { fields: ["syncDate"] },
+  ],
 };
 
 export function createImageModel(sequelize: Sequelize) {

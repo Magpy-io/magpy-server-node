@@ -1,10 +1,7 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
 import { addPhotoToDB, deletePhotoByIdFromDB } from "@src/db/sequelizeDb";
-import {
-  AddWarningPhotosDeleted,
-  checkPhotoExistsAndDeleteMissing,
-} from "@src/modules/functions";
+
 import { addPhotoToDisk } from "@src/modules/diskManager";
 import { addServerImagePaths } from "@src/modules/diskFilesNaming";
 import { hashFile } from "@src/modules/hashing";
@@ -45,48 +42,29 @@ const callback = async (req: Request, res: Response) => {
       hash: "",
     };
 
-    console.log(`Searching in db for photo with path: ${requestPhoto.path}`);
-    const ret = await checkPhotoExistsAndDeleteMissing({
-      clientPath: requestPhoto.path,
-    });
-    const warning = ret.warning;
-    if (warning) {
-      AddWarningPhotosDeleted([ret.deleted], req.userId);
-    }
+    console.log("Photo does not exist in server.");
+    console.log("Creating syncDate, photoPath and the photo hash.");
+    photo.syncDate = new Date(Date.now()).toJSON();
+    await addServerImagePaths(photo);
+    photo.hash = hashFile(requestPhoto.image64);
+    console.log("Adding photo to db.");
+    const dbPhoto = await addPhotoToDB(photo);
 
-    if (ret.exists) {
-      console.log("Photo exists in server.");
-      console.log("Sending response message.");
-      return responseFormatter.sendFailedMessage(
-        res,
-        "Photo already added to server.",
-        "PHOTO_EXISTS"
-      );
-    } else {
-      console.log("Photo does not exist in server.");
-      console.log("Creating syncDate, photoPath and the photo hash.");
-      photo.syncDate = new Date(Date.now()).toJSON();
-      await addServerImagePaths(photo);
-      photo.hash = hashFile(requestPhoto.image64);
-      console.log("Adding photo to db.");
-      const dbPhoto = await addPhotoToDB(photo);
-
-      console.log("Photo added successfully to db.");
-      try {
-        console.log("Adding photo to disk.");
-        await addPhotoToDisk(dbPhoto, requestPhoto.image64);
-      } catch (err) {
-        console.log("Could not add photo to disk, removing photo from db");
-        await deletePhotoByIdFromDB(dbPhoto.id);
-        throw err;
-      }
-      console.log("Photo added to disk.");
-      const jsonResponse = {
-        photo: responseFormatter.createPhotoObject(dbPhoto, ""),
-      };
-      console.log("Sending response message.");
-      return responseFormatter.sendResponse(res, jsonResponse, warning);
+    console.log("Photo added successfully to db.");
+    try {
+      console.log("Adding photo to disk.");
+      await addPhotoToDisk(dbPhoto, requestPhoto.image64);
+    } catch (err) {
+      console.log("Could not add photo to disk, removing photo from db");
+      await deletePhotoByIdFromDB(dbPhoto.id);
+      throw err;
     }
+    console.log("Photo added to disk.");
+    const jsonResponse = {
+      photo: responseFormatter.createPhotoObject(dbPhoto, ""),
+    };
+    console.log("Sending response message.");
+    return responseFormatter.sendResponse(res, jsonResponse);
   } catch (err) {
     console.error(err);
     return responseFormatter.sendErrorMessage(res);

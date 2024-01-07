@@ -61,14 +61,43 @@ async function createDbFolderIfDoesNotExist(sqliteDbFilePath: string) {
 
 async function getPhotoByClientPathFromDB(
   photoPath: string
-): Promise<Photo | null> {
+): Promise<Array<Photo>> {
   assertDbOpen();
   try {
-    const image: any = await Image.findOne({
+    const images: any = await Image.findAll({
       where: { clientPath: photoPath },
     });
 
-    return image;
+    return images;
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
+
+async function getPhotoByClientPathAndSizeAndDateFromDB(data: {
+  path: string;
+  size: number;
+  date: string;
+}): Promise<Photo | null> {
+  assertDbOpen();
+  try {
+    const images: any = await Image.findAll({
+      where: { clientPath: data.path, fileSize: data.size, date: data.date },
+      order: [["syncDate", "DESC"]],
+    });
+
+    if (images.length > 1) {
+      console.error(
+        "Got more than one item from database with the same clientPath, size and date"
+      );
+    }
+
+    if (images.length == 1) {
+      return images[0];
+    } else {
+      return null;
+    }
   } catch (err) {
     console.error(err);
     throw err;
@@ -158,11 +187,26 @@ async function deletePhotoByIdFromDB(id: string) {
 
 async function getPhotosByClientPathFromDB(
   photosPaths: string[]
-): Promise<Array<Photo | null>> {
+): Promise<Array<Photo[] | null>> {
   assertDbOpen();
   try {
     const photosFoundPromise = photosPaths.map((photoPath) => {
       return getPhotoByClientPathFromDB(photoPath);
+    });
+    return await Promise.all(photosFoundPromise);
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
+
+async function getPhotosByClientPathAndSizeAndDateFromDB(
+  photosData: Array<{ path: string; size: number; date: string }>
+): Promise<Array<Photo | null>> {
+  assertDbOpen();
+  try {
+    const photosFoundPromise = photosData.map((photoData) => {
+      return getPhotoByClientPathAndSizeAndDateFromDB(photoData);
     });
     return await Promise.all(photosFoundPromise);
   } catch (err) {
@@ -228,4 +272,5 @@ export {
   getPhotosByClientPathFromDB,
   getPhotosByIdFromDB,
   updatePhotoClientPathById,
+  getPhotosByClientPathAndSizeAndDateFromDB,
 };

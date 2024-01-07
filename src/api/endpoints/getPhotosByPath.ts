@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
-import { getPhotosByClientPathFromDB } from "@src/db/sequelizeDb";
+import { getPhotosByClientPathAndSizeAndDateFromDB } from "@src/db/sequelizeDb";
 import { PhotoTypes, isValidPhotoType } from "@src/types/photoType";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import { getPhotoFromDisk } from "@src/modules/diskManager";
@@ -26,10 +26,10 @@ const callback = async (req: Request, res: Response) => {
       throw new Error("UserId is not defined.");
     }
 
-    const { paths, photoType }: RequestType = req.body;
+    const { photosData, photoType }: RequestType = req.body;
 
     console.log("Getting photos from db with paths from request.");
-    const photos = await getPhotosByClientPathFromDB(paths);
+    const photos = await getPhotosByClientPathAndSizeAndDateFromDB(photosData);
     console.log("Received response from db.");
 
     const ret = await filterPhotosExistAndDeleteMissing(photos);
@@ -53,13 +53,17 @@ const callback = async (req: Request, res: Response) => {
     console.log("Photos retrieved from disk if needed");
 
     const photosResponse = ret.photosThatExist.map((photo, index) => {
-      if (!photo) return { path: paths[index], exists: false };
+      if (!photo) return { path: photosData[index].path, exists: false };
 
       const photoWithImage64 = responseFormatter.createPhotoObject(
         photo,
         images64[index]
       );
-      return { path: paths[index], exists: true, photo: photoWithImage64 };
+      return {
+        path: photosData[index].path,
+        exists: true,
+        photo: photoWithImage64,
+      };
     });
 
     const jsonResponse = {
@@ -76,7 +80,7 @@ const callback = async (req: Request, res: Response) => {
 };
 
 function checkBodyParamsMissing(req: Request) {
-  if (checkReqBodyAttributeMissing(req, "paths", "Array string")) return true;
+  if (checkReqBodyAttributeMissing(req, "photosData", "Array")) return true;
   if (checkReqBodyAttributeMissing(req, "photoType", "string")) return true;
   if (!isValidPhotoType(req.body.photoType)) return true;
 
@@ -84,7 +88,7 @@ function checkBodyParamsMissing(req: Request) {
 }
 
 type RequestType = {
-  paths: string[];
+  photosData: Array<{ path: string; size: number; date: string }>;
   photoType: PhotoTypes;
 };
 

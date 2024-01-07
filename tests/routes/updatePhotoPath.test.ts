@@ -72,25 +72,6 @@ describe("Test 'updatePhotoPath' endpoint", () => {
     expect(ret.body.errorCode).toBe("ID_NOT_FOUND");
   });
 
-  it("Should change the path of photo after adding the photo", async () => {
-    const addedPhotosData = await addNPhotos(app, 2);
-
-    const ret = await request(app)
-      .post("/updatePhotoPath")
-      .set(serverTokenHeader())
-      .send({
-        id: addedPhotosData[0].id,
-        path: addedPhotosData[1].path,
-      });
-
-    expect(ret.statusCode).toBe(400);
-    expect(ret.body.ok).toBe(false);
-    expect(ret.body.errorCode).toBe("PATH_EXISTS");
-
-    const photo = await getPhotoById(app, addedPhotosData[0].id);
-    expect(photo.meta.clientPath).toBe(addedPhotosData[0].path);
-  });
-
   it("Should return error ID_NOT_FOUND when id is in db but compressed photo is missing from disk", async () => {
     const addedPhotoData = await addPhoto(app);
 

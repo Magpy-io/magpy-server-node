@@ -98,57 +98,32 @@ const callback = async (req: Request, res: Response) => {
           const hash = hashFile(image64);
           photoWaiting.photo.hash = hash;
 
-          const ret = await checkPhotoExistsAndDeleteMissing({
-            clientPath: photoWaiting.photo.clientPath,
-          });
-          const warning = ret.warning;
-          if (warning) {
-            AddWarningPhotosDeleted([ret.deleted], req.userId);
+          console.log(`Deleting pending transfer for id ${partReceived.id}`);
+          FilesWaiting.delete(partReceived.id);
+
+          photoWaiting.photo.id = partReceived.id;
+          const dbPhoto = await addPhotoToDB(photoWaiting.photo);
+
+          console.log("Photo added successfully to db.");
+
+          try {
+            console.log("Adding photo to disk.");
+            await addPhotoToDisk(dbPhoto, image64);
+          } catch (err) {
+            console.log("Could not add photo to disk, removing photo from db");
+            await deletePhotoByIdFromDB(dbPhoto.id);
+            throw err;
           }
 
-          if (ret.exists) {
-            console.log("Photo exists in server.");
+          console.log("Photo added to disk.");
 
-            console.log(`Deleting pending transfer for id ${partReceived.id}`);
-            clearTimeout(photoWaiting.timeout);
-            FilesWaiting.delete(partReceived.id);
-
-            console.log("Sending response message.");
-            return responseFormatter.sendFailedMessage(
-              res,
-              "Photo already added to server.",
-              "PHOTO_EXISTS"
-            );
-          } else {
-            console.log(`Deleting pending transfer for id ${partReceived.id}`);
-            FilesWaiting.delete(partReceived.id);
-
-            photoWaiting.photo.id = partReceived.id;
-            const dbPhoto = await addPhotoToDB(photoWaiting.photo);
-
-            console.log("Photo added successfully to db.");
-
-            try {
-              console.log("Adding photo to disk.");
-              await addPhotoToDisk(dbPhoto, image64);
-            } catch (err) {
-              console.log(
-                "Could not add photo to disk, removing photo from db"
-              );
-              await deletePhotoByIdFromDB(dbPhoto.id);
-              throw err;
-            }
-
-            console.log("Photo added to disk.");
-
-            const jsonResponse = {
-              lenReceived: photoWaiting.received,
-              lenWaiting: photoWaiting.image64Len,
-              photo: responseFormatter.createPhotoObject(dbPhoto, ""),
-            };
-            console.log("Sending response message.");
-            return responseFormatter.sendResponse(res, jsonResponse, warning);
-          }
+          const jsonResponse = {
+            lenReceived: photoWaiting.received,
+            lenWaiting: photoWaiting.image64Len,
+            photo: responseFormatter.createPhotoObject(dbPhoto, ""),
+          };
+          console.log("Sending response message.");
+          return responseFormatter.sendResponse(res, jsonResponse);
         } else {
           console.log(`Deleting pending transfer for id ${partReceived.id}`);
           clearTimeout(photoWaiting.timeout);
