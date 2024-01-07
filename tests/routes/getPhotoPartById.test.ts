@@ -16,6 +16,7 @@ import {
   defaultPhoto,
   getPhotoFromDb,
   deletePhotoFromDisk,
+  testWarning,
 } from "@tests/helpers/functions";
 
 import { serverTokenHeader } from "@tests/helpers/functions";
@@ -127,4 +128,23 @@ describe("Test 'getPhotoPartById' endpoint", () => {
       expect(ret.body.errorCode).toBe("ID_NOT_FOUND");
     }
   );
+
+  it("Should return ID_NOT_FOUND error and a warning if requesting a photo that exists in db but not in disk", async () => {
+    const addedPhotoData = await addPhoto(app);
+
+    const dbPhoto = await getPhotoFromDb(addedPhotoData.id);
+    await deletePhotoFromDisk(dbPhoto, "compressed");
+
+    const ret = await request(app)
+      .post("/getPhotoPartById")
+      .set(serverTokenHeader())
+      .send({ id: addedPhotoData.id, part: 0 });
+
+    expect(ret.statusCode).toBe(400);
+    expect(ret.body.ok).toBe(false);
+    expect(ret.body.warning).toBe(true);
+    expect(ret.body.errorCode).toBe("ID_NOT_FOUND");
+
+    testWarning(dbPhoto);
+  });
 });

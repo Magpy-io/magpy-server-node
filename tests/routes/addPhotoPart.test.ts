@@ -17,6 +17,9 @@ import {
   addPhoto,
   waitForPhotoTransferToFinish,
   testPhotosExistInDbAndDisk,
+  testWarning,
+  getPhotoFromDb,
+  deletePhotoFromDisk,
 } from "@tests/helpers/functions";
 import * as imageBase64Parts from "@tests/helpers/imageBase64Parts";
 import FilesWaiting from "@src/modules/waitingFiles";
@@ -411,5 +414,60 @@ describe("Test 'addPhotoPart' endpoint", () => {
     expect(getPhoto).toBeTruthy();
 
     expect(FilesWaiting.size).toBe(0);
+  });
+
+  it("Should add the photo after sending all the parts of a photo with a warning when photo exists but deleted from drive", async () => {
+    const photo = { ...defaultPhoto } as any;
+    delete photo.image64;
+
+    const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };
+
+    const retInit = await request(app)
+      .post("/addPhotoInit")
+      .set(serverTokenHeader())
+      .send(requestPhoto);
+
+    const addedPhotoData = await addPhoto(app);
+
+    const dbPhoto = await getPhotoFromDb(addedPhotoData.id);
+    await deletePhotoFromDisk(dbPhoto, "compressed");
+
+    const id = retInit.body.data.id;
+
+    let ret = await request(app)
+      .post("/addPhotoPart")
+      .set(serverTokenHeader())
+      .send({
+        id: id,
+        partNumber: 0,
+        partSize: imageBase64Parts.photoLenPart1,
+        photoPart: imageBase64Parts.photoImage64Part1,
+      });
+
+    ret = await request(app)
+      .post("/addPhotoPart")
+      .set(serverTokenHeader())
+      .send({
+        id: id,
+        partNumber: 1,
+        partSize: imageBase64Parts.photoLenPart2,
+        photoPart: imageBase64Parts.photoImage64Part2,
+      });
+
+    ret = await request(app)
+      .post("/addPhotoPart")
+      .set(serverTokenHeader())
+      .send({
+        id: id,
+        partNumber: 2,
+        partSize: imageBase64Parts.photoLenPart3,
+        photoPart: imageBase64Parts.photoImage64Part3,
+      });
+
+    expect(ret.statusCode).toBe(200);
+    expect(ret.body.ok).toBe(true);
+    expect(ret.body.warning).toBe(true);
+
+    testWarning(dbPhoto);
   });
 });

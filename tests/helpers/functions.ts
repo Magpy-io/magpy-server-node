@@ -20,6 +20,10 @@ import {
 
 import * as mockValues from "@src/modules/__mocks__/backendRequestsMockValues";
 import { Photo, PhotoTypes } from "@src/types/photoType";
+import {
+  GetLastWarningForUser,
+  HasWarningForUser,
+} from "@src/modules/warningsManager";
 
 let serverUserToken = "";
 
@@ -367,6 +371,23 @@ function randomTokenHeader() {
   return { Authorization: "Bearer serverUserToken" };
 }
 
+function testWarning(dbPhoto: Photo) {
+  expect(HasWarningForUser(getUserId())).toBe(true);
+
+  const warning = GetLastWarningForUser(getUserId());
+  expect(warning).toBeTruthy();
+
+  if (!warning) {
+    throw new Error("warning should be defined");
+  }
+
+  expect(warning.code).toBe("PHOTOS_NOT_ON_DISK_DELETED");
+  expect(warning.data).toHaveProperty("photosDeleted");
+  expect(warning.data.photosDeleted.length).toBe(1);
+
+  expect(warning.data.photosDeleted[0].id).toBe(dbPhoto.id);
+}
+
 export {
   addPhoto,
   addNPhotos,
@@ -391,4 +412,5 @@ export {
   testPhotoNotInDbNorDisk,
   deletePhotoFromDisk,
   getUserId,
+  testWarning,
 };

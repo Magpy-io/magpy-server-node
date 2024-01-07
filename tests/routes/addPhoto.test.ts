@@ -19,9 +19,15 @@ import {
   addPhoto,
   getPhotoFromDb,
   deletePhotoFromDisk,
+  getUserId,
+  testWarning,
 } from "@tests/helpers/functions";
 import { serverTokenHeader } from "@tests/helpers/functions";
 import { PhotoTypes } from "@src/types/photoType";
+import {
+  GetLastWarningForUser,
+  HasWarningForUser,
+} from "@src/modules/warningsManager";
 
 describe("Test 'addPhoto' endpoint", () => {
   let app: Express;
@@ -163,4 +169,24 @@ describe("Test 'addPhoto' endpoint", () => {
       expect(getPhoto.image64).toBe(defaultPhoto.image64);
     }
   );
+
+  it("Should add 1 photo with warning when photo exists but deleted from drive", async () => {
+    const addedPhotoData = await addPhoto(app);
+
+    const dbPhoto = await getPhotoFromDb(addedPhotoData.id);
+    await deletePhotoFromDisk(dbPhoto, "compressed");
+
+    const ret = await request(app)
+      .post("/addPhoto")
+      .set(serverTokenHeader())
+      .send(defaultPhoto);
+
+    expect(ret.statusCode).toBe(200);
+    expect(ret.body.ok).toBe(true);
+    expect(ret.body.warning).toBe(true);
+
+    await testPhotosExistInDbAndDisk(ret.body.data.photo);
+
+    testWarning(dbPhoto);
+  });
 });

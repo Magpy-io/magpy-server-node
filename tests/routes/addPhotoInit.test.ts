@@ -17,6 +17,7 @@ import {
   waitForPhotoTransferToFinish,
   getPhotoFromDb,
   deletePhotoFromDisk,
+  testWarning,
 } from "@tests/helpers/functions";
 import FilesWaiting from "@src/modules/waitingFiles";
 import { serverTokenHeader } from "@tests/helpers/functions";
@@ -117,4 +118,27 @@ describe("Test 'addPhotoInit' endpoint", () => {
       expect(ret.body).toHaveProperty("data");
     }
   );
+
+  it("Should return the id of the photo being added with a warning when photo exists but deleted from drive", async () => {
+    const addedPhotoData = await addPhoto(app);
+
+    const dbPhoto = await getPhotoFromDb(addedPhotoData.id);
+    await deletePhotoFromDisk(dbPhoto, "compressed");
+
+    const photo = { ...defaultPhoto } as any;
+    delete photo.image64;
+
+    const requestPhoto = { ...photo, image64Len: 132148 };
+
+    const ret = await request(app)
+      .post("/addPhotoInit")
+      .set(serverTokenHeader())
+      .send(requestPhoto);
+
+    expect(ret.statusCode).toBe(200);
+    expect(ret.body.ok).toBe(true);
+    expect(ret.body.warning).toBe(true);
+
+    testWarning(dbPhoto);
+  });
 });
