@@ -13,7 +13,7 @@ import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing
 import { hashLen, postPhotoPartTimeout } from "@src/config/config";
 import checkUserToken from "@src/middleware/checkUserToken";
 import {
-  checkAndSaveWarningPhotosDeleted,
+  AddWarningPhotosDeleted,
   checkPhotoExistsAndDeleteMissing,
 } from "@src/modules/functions";
 
@@ -105,6 +105,10 @@ const callback = async (req: Request, res: Response) => {
           const ret = await checkPhotoExistsAndDeleteMissing({
             clientPath: photoWaiting.photo.clientPath,
           });
+          const warning = ret.warning;
+          if (warning) {
+            AddWarningPhotosDeleted([ret.deleted], req.userId);
+          }
 
           if (ret.exists) {
             console.log("Photo exists in server.");
@@ -120,10 +124,6 @@ const callback = async (req: Request, res: Response) => {
               "PHOTO_EXISTS"
             );
           } else {
-            const warning = checkAndSaveWarningPhotosDeleted(
-              ret.deleted ? [ret.deleted] : [],
-              req.userId
-            );
             console.log(`Deleting pending transfer for id ${partReceived.id}`);
             FilesWaiting.delete(partReceived.id);
 

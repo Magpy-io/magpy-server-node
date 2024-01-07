@@ -27,7 +27,7 @@ import * as dbFunction from "@src/db/sequelizeDb";
 import { pathExists } from "@src/modules/diskManager";
 import { PhotoTypes } from "@src/types/photoType";
 import {
-  checkAndSaveWarningPhotosDeleted,
+  AddWarningPhotosDeleted,
   checkPhotoExistsAndDeleteMissing,
 } from "@src/modules/functions";
 import {
@@ -62,6 +62,7 @@ describe("Test 'checkPhotoExistsAndDeleteMissing' function", () => {
     });
 
     expect(ret.exists).toBe(true);
+    expect(ret.warning).toBe(false);
 
     const dbPhoto = await getPhotoFromDb(addedPhotoData.id);
     await testPhotosExistInDbAndDisk(dbPhoto);
@@ -73,6 +74,7 @@ describe("Test 'checkPhotoExistsAndDeleteMissing' function", () => {
     });
 
     expect(ret.exists).toBe(false);
+    expect(ret.warning).toBe(false);
   });
 
   const testDataArray: Array<{ photoType: PhotoTypes }> = [
@@ -94,6 +96,7 @@ describe("Test 'checkPhotoExistsAndDeleteMissing' function", () => {
 
       expect(ret.exists).toBe(false);
       expect(ret.deleted).toEqual(dbPhoto);
+      expect(ret.warning).toBe(true);
 
       const photoExistsInDb = await dbFunction.getPhotoByIdFromDB(dbPhoto.id);
 
@@ -110,7 +113,7 @@ describe("Test 'checkPhotoExistsAndDeleteMissing' function", () => {
   );
 });
 
-describe('Test "checkAndSaveWarningPhotosDeleted" function', () => {
+describe('Test "SaveWarningPhotosDeleted" function', () => {
   let app: Express;
 
   beforeAll(async () => {
@@ -139,10 +142,11 @@ describe('Test "checkAndSaveWarningPhotosDeleted" function', () => {
       id: addedPhotoData.id,
     });
 
-    const warningThrown = checkAndSaveWarningPhotosDeleted(
-      ret.deleted ? [ret.deleted] : [],
-      getUserId()
-    );
+    const warningThrown = ret.warning;
+
+    if (warningThrown) {
+      AddWarningPhotosDeleted(ret.deleted ? [ret.deleted] : [], getUserId());
+    }
 
     expect(warningThrown).toBe(true);
     expect(HasWarningForUser(getUserId())).toBe(true);

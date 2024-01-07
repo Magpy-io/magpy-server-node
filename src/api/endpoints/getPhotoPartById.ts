@@ -7,7 +7,7 @@ import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing
 import { getNumberOfParts, getPartN } from "@src/modules/stringHelper";
 import checkUserToken from "@src/middleware/checkUserToken";
 import {
-  checkAndSaveWarningPhotosDeleted,
+  AddWarningPhotosDeleted,
   checkPhotoExistsAndDeleteMissing,
 } from "@src/modules/functions";
 
@@ -40,12 +40,12 @@ const callback = async (req: Request, res: Response) => {
     const ret = await checkPhotoExistsAndDeleteMissing({
       id: id,
     });
+    const warning = ret.warning;
+    if (warning) {
+      AddWarningPhotosDeleted([ret.deleted], req.userId);
+    }
 
     if (!ret.exists) {
-      const warning = checkAndSaveWarningPhotosDeleted(
-        ret.deleted ? [ret.deleted] : [],
-        req.userId
-      );
       console.log("Photo not found in db.");
       console.log("Sending response message.");
       return responseFormatter.sendFailedMessage(

@@ -66,19 +66,21 @@ export async function checkPhotoExistsAndDeleteMissing(
         clientPath: string;
       }
 ): Promise<
-  { exists: false; deleted: Photo | null } | { exists: true; deleted: null }
+  | { exists: false; deleted: Photo; warning: true }
+  | { exists: false; deleted: null; warning: false }
+  | { exists: true; deleted: null; warning: false }
 > {
   let photo: Photo | null;
 
   if ("clientPath" in data) {
     photo = await getPhotoByClientPathFromDB(data.clientPath);
     if (!photo) {
-      return { exists: false, deleted: null };
+      return { exists: false, deleted: null, warning: false };
     }
   } else if ("id" in data) {
     photo = await getPhotoByIdFromDB(data.id);
     if (!photo) {
-      return { exists: false, deleted: null };
+      return { exists: false, deleted: null, warning: false };
     }
   } else {
     throw new Error("checkPhotoExists: Needs the photo id or clientPath");
@@ -92,10 +94,10 @@ export async function checkPhotoExistsAndDeleteMissing(
     );
     await removePhotoVariationsFromDisk(photo);
     await deletePhotoByIdFromDB(photo.id);
-    return { exists: false, deleted: photo };
+    return { exists: false, deleted: photo, warning: true };
   }
 
-  return { exists: true, deleted: null };
+  return { exists: true, deleted: null, warning: false };
 }
 
 /**
@@ -117,7 +119,7 @@ export async function filterPhotosAndDeleteMissing(photos: Photo[]) {
       photosDeleted.push(photo);
     }
   }
-  return { photosThatExist, photosDeleted };
+  return { photosThatExist, photosDeleted, warning: photosDeleted.length != 0 };
 }
 
 /**
@@ -147,25 +149,20 @@ export async function filterPhotosExistAndDeleteMissing(
       }
     }
   }
-  return { photosThatExist, photosDeleted };
+  return { photosThatExist, photosDeleted, warning: photosDeleted.length != 0 };
 }
 
-export function checkAndSaveWarningPhotosDeleted(
+export function AddWarningPhotosDeleted(
   photosDeleted: Photo[],
   userid: string
 ) {
-  let warning = false;
-  if (photosDeleted.length != 0) {
-    warning = true;
-    console.log("Photos missing deleted, adding warning");
-    SetLastWarningForUser(userid, {
-      code: "PHOTOS_NOT_ON_DISK_DELETED",
-      data: {
-        photosDeleted: photosDeleted.map((p) =>
-          responseFormatter.createPhotoObject(p)
-        ),
-      },
-    });
-  }
-  return warning;
+  console.log("Photos missing deleted, adding warning");
+  SetLastWarningForUser(userid, {
+    code: "PHOTOS_NOT_ON_DISK_DELETED",
+    data: {
+      photosDeleted: photosDeleted.map((p) =>
+        responseFormatter.createPhotoObject(p)
+      ),
+    },
+  });
 }

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
 import { addPhotoToDB, deletePhotoByIdFromDB } from "@src/db/sequelizeDb";
 import {
-  checkAndSaveWarningPhotosDeleted,
+  AddWarningPhotosDeleted,
   checkPhotoExistsAndDeleteMissing,
 } from "@src/modules/functions";
 import { addPhotoToDisk } from "@src/modules/diskManager";
@@ -50,6 +50,10 @@ const callback = async (req: Request, res: Response) => {
     const ret = await checkPhotoExistsAndDeleteMissing({
       clientPath: requestPhoto.path,
     });
+    const warning = ret.warning;
+    if (warning) {
+      AddWarningPhotosDeleted([ret.deleted], req.userId);
+    }
 
     if (ret.exists) {
       console.log("Photo exists in server.");
@@ -60,11 +64,6 @@ const callback = async (req: Request, res: Response) => {
         "PHOTO_EXISTS"
       );
     } else {
-      const warning = checkAndSaveWarningPhotosDeleted(
-        ret.deleted ? [ret.deleted] : [],
-        req.userId
-      );
-
       console.log("Photo does not exist in server.");
       console.log("Creating syncDate, photoPath and the photo hash.");
       photo.syncDate = new Date(Date.now()).toJSON();

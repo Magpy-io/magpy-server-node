@@ -7,7 +7,7 @@ import { getPhotoFromDisk } from "@src/modules/diskManager";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import checkUserToken from "@src/middleware/checkUserToken";
 import {
-  checkAndSaveWarningPhotosDeleted,
+  AddWarningPhotosDeleted,
   filterPhotosExistAndDeleteMissing,
 } from "@src/modules/functions";
 
@@ -34,11 +34,10 @@ const callback = async (req: Request, res: Response) => {
     console.log("Received response from db.");
 
     const ret = await filterPhotosExistAndDeleteMissing(photos);
-
-    const waiting = checkAndSaveWarningPhotosDeleted(
-      ret.photosDeleted,
-      req.userId
-    );
+    const warning = ret.warning;
+    if (warning) {
+      AddWarningPhotosDeleted(ret.photosDeleted, req.userId);
+    }
 
     let images64Promises;
 
@@ -72,7 +71,7 @@ const callback = async (req: Request, res: Response) => {
     };
 
     console.log("Sending response data.");
-    return responseFormatter.sendResponse(res, jsonResponse, waiting);
+    return responseFormatter.sendResponse(res, jsonResponse, warning);
   } catch (err) {
     console.error(err);
     return responseFormatter.sendErrorMessage(res);

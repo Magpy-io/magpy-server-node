@@ -5,7 +5,7 @@ import { updatePhotoClientPathById } from "@src/db/sequelizeDb";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import checkUserToken from "@src/middleware/checkUserToken";
 import {
-  checkAndSaveWarningPhotosDeleted,
+  AddWarningPhotosDeleted,
   checkPhotoExistsAndDeleteMissing,
 } from "@src/modules/functions";
 
@@ -33,11 +33,12 @@ const callback = async (req: Request, res: Response) => {
       id: id,
     });
 
+    const warning = ret.warning;
+    if (warning) {
+      AddWarningPhotosDeleted([ret.deleted], req.userId);
+    }
+
     if (!ret.exists) {
-      const warning = checkAndSaveWarningPhotosDeleted(
-        ret.deleted ? [ret.deleted] : [],
-        req.userId
-      );
       console.log("Photo does not exist in server.");
       console.log("Sending response message.");
       return responseFormatter.sendFailedMessage(
@@ -53,13 +54,14 @@ const callback = async (req: Request, res: Response) => {
       const ret1 = await checkPhotoExistsAndDeleteMissing({
         clientPath: path,
       });
+      const warning = ret1.warning;
+      if (warning) {
+        AddWarningPhotosDeleted([ret1.deleted], req.userId);
+      }
+
       console.log("Received response from db.");
 
       if (!ret1.exists) {
-        const warning = checkAndSaveWarningPhotosDeleted(
-          ret1.deleted ? [ret1.deleted] : [],
-          req.userId
-        );
         console.log("Photo path does not exist in db");
         console.log("Updating path in db");
         await updatePhotoClientPathById(id, path);

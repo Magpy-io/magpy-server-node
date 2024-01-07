@@ -9,7 +9,7 @@ import { postPhotoPartTimeout } from "@src/config/config";
 import { Photo } from "@src/types/photoType";
 import checkUserToken from "@src/middleware/checkUserToken";
 import {
-  checkAndSaveWarningPhotosDeleted,
+  AddWarningPhotosDeleted,
   checkPhotoExistsAndDeleteMissing,
 } from "@src/modules/functions";
 
@@ -51,6 +51,11 @@ const callback = async (req: Request, res: Response) => {
     const ret = await checkPhotoExistsAndDeleteMissing({
       clientPath: requestPhoto.path,
     });
+    const warning = ret.warning;
+    if (warning) {
+      AddWarningPhotosDeleted([ret.deleted], req.userId);
+    }
+
     if (ret.exists) {
       console.log("Photo exists in server.");
       console.log("Sending response message.");
@@ -60,11 +65,6 @@ const callback = async (req: Request, res: Response) => {
         "PHOTO_EXISTS"
       );
     } else {
-      const warning = checkAndSaveWarningPhotosDeleted(
-        ret.deleted ? [ret.deleted] : [],
-        req.userId
-      );
-
       console.log("Photo does not exist in server.");
       console.log("Creating syncDate and photoPath.");
       const image64Len = requestPhoto.image64Len;
