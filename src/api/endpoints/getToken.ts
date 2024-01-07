@@ -17,6 +17,8 @@ import { GetServerConfigData } from "@src/modules/serverDataManager";
 
 import { generateUserToken } from "@src/modules/tokenManagement";
 
+import { GetTokenRequestData } from "@src/api/export/exportedTypes";
+
 // getToken : creates and sends a user token that can be used to the the user's photos
 const endpoint = "/getToken";
 const callback = async (req: Request, res: Response) => {
@@ -29,7 +31,7 @@ const callback = async (req: Request, res: Response) => {
     }
     console.log("Request parameters ok.");
 
-    const requestParameters: RequestType = req.body;
+    const requestParameters: GetTokenRequestData = req.body;
 
     const backendUserToken = requestParameters.userToken;
 
@@ -132,10 +134,6 @@ function checkBodyParamsMissing(req: Request) {
 
   return false;
 }
-
-type RequestType = {
-  userToken: string;
-};
 
 export default {
   endpoint: endpoint,

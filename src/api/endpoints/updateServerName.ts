@@ -6,11 +6,13 @@ import checkConnexionLocal from "@src/middleware/checkConnexionLocal";
 import checkServerHasValidCredentials from "@src/middleware/checkServerHasValidCredentials";
 import { SaveServerName } from "@src/modules/serverDataManager";
 
+import { UpdateServerNameRequestData } from "@src/api/export/exportedTypes";
+
 // updateServerName : sets server name
 const endpoint = "/updateServerName";
 const callback = async (req: Request, res: Response) => {
   try {
-    const { name } = req.body;
+    const { name }: UpdateServerNameRequestData = req.body;
 
     if (!name) {
       console.log("Nothing to update, sending response");

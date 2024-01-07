@@ -151,6 +151,30 @@ type ErrorsAuthorization =
   | ErrorAuthorizationExpired
   | ErrorAuthorizationWrongFormat;
 
+export type ErrorCodes =
+  | ErrorBadRequest
+  | ErrorServerError
+  | ErrorAuthorizationBackendFailed
+  | ErrorAuthorizationBackendExpired
+  | ErrorBackendServerUnreachable
+  | ErrorIdNotFound
+  | ErrorUserNotAllowed
+  | ErrorServerNotClaimed
+  | ErrorInvalidPartNumber
+  | ErrorServerAlreadyClaimed
+  | ErrorPhotoTransferNotFound
+  | ErrorMissingParts
+  | ErrorPhotoSizeExceeded
+  | ErrorAuthorizationMissing
+  | ErrorAuthorizationWrongFormat
+  | ErrorAuthorizationFailed
+  | ErrorAuthorizationExpired
+  | ErrorCouldNotGetRequestAddress
+  | ErrorRequestNotFromLoopback
+  | ErrorPathAccessDenied
+  | ErrorPathFolderDoesNotExist
+  | ErrorInvalidName;
+
 export type WarningFormat<Code, Data> = { code: Code; data: Data };
 
 export type WarningDataTypes = WarningPhotosNotOnDiskDeletedType;

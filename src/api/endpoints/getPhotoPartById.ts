@@ -11,6 +11,8 @@ import {
   checkPhotoExistsAndDeleteMissing,
 } from "@src/modules/functions";
 
+import { GetPhotoPartByIdRequestData } from "@src/api/export/exportedTypes";
+
 // getPhotoPartById : returns a part of a photo by id.
 const endpoint = "/getPhotoPartById";
 const callback = async (req: Request, res: Response) => {
@@ -23,17 +25,19 @@ const callback = async (req: Request, res: Response) => {
     }
     console.log("Request parameters ok.");
 
+    const requestParameters: GetPhotoPartByIdRequestData = req.body;
+
     if (!req.userId) {
       throw new Error("UserId is not defined.");
     }
 
-    const id: string = req.body.id;
+    const id: string = requestParameters.id;
     let partNumber = 0;
     if (!checkReqBodyAttributeMissing(req, "part", "number")) {
-      partNumber = req.body.part;
+      partNumber = requestParameters.part;
     }
 
-    console.log(`id: ${req.body.id}, partNumber: ${partNumber}`);
+    console.log(`id: ${requestParameters.id}, partNumber: ${partNumber}`);
 
     console.log("Checking photo exists");
 

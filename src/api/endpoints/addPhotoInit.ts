@@ -7,10 +7,8 @@ import { v4 as uuid } from "uuid";
 import { postPhotoPartTimeout } from "@src/config/config";
 import { Photo } from "@src/types/photoType";
 import checkUserToken from "@src/middleware/checkUserToken";
-import {
-  AddWarningPhotosDeleted,
-  checkPhotoExistsAndDeleteMissing,
-} from "@src/modules/functions";
+
+import { AddPhotoInitRequestData } from "@src/api/export/exportedTypes";
 
 // addPhotoInit : initializes the transfer of a photo to the server
 const endpoint = "/addPhotoInit";
@@ -28,7 +26,7 @@ const callback = async (req: Request, res: Response) => {
       throw new Error("UserId is not defined.");
     }
 
-    const requestPhoto: RequestType = req.body;
+    const requestPhoto: AddPhotoInitRequestData = req.body;
 
     const photo: Photo = {
       id: "",
@@ -82,16 +80,6 @@ function checkBodyParamsMissing(req: Request) {
 
   return false;
 }
-
-type RequestType = {
-  name: string;
-  fileSize: number;
-  width: number;
-  height: number;
-  path: string;
-  date: string;
-  image64Len: number;
-};
 
 export default {
   endpoint: endpoint,

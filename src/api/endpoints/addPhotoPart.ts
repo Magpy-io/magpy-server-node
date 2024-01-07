@@ -8,10 +8,7 @@ import { hashFile } from "@src/modules/hashing";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import { postPhotoPartTimeout } from "@src/config/config";
 import checkUserToken from "@src/middleware/checkUserToken";
-import {
-  AddWarningPhotosDeleted,
-  checkPhotoExistsAndDeleteMissing,
-} from "@src/modules/functions";
+import { AddPhotoPartRequestData } from "@src/api/export/exportedTypes";
 
 // addPhotoPart : adds a part of a photo to the server
 const endpoint = "/addPhotoPart";
@@ -28,7 +25,7 @@ const callback = async (req: Request, res: Response) => {
       throw new Error("UserId is not defined.");
     }
 
-    const partReceived: RequestType = req.body;
+    const partReceived: AddPhotoPartRequestData = req.body;
 
     if (partReceived.partSize != partReceived.photoPart.length) {
       console.log("Bad request parameters");
@@ -159,13 +156,6 @@ function checkBodyParamsMissing(req: Request) {
   if (checkReqBodyAttributeMissing(req, "photoPart", "string")) return true;
   return false;
 }
-
-type RequestType = {
-  id: string;
-  partNumber: number;
-  partSize: number;
-  photoPart: string;
-};
 
 function arePartsValid(parts: Map<number, string>) {
   const totalNumberOfParts = parts.size;

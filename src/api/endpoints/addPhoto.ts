@@ -8,6 +8,7 @@ import { hashFile } from "@src/modules/hashing";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import { Photo } from "@src/types/photoType";
 import checkUserToken from "@src/middleware/checkUserToken";
+import { AddPhotoRequestData } from "@src/api/export/exportedTypes";
 
 // addPhoto : adds a photo to the server
 const endpoint = "/addPhoto";
@@ -25,7 +26,7 @@ const callback = async (req: Request, res: Response) => {
       throw new Error("UserId is not defined.");
     }
 
-    const requestPhoto: RequestType = req.body;
+    const requestPhoto: AddPhotoRequestData = req.body;
 
     const photo: Photo = {
       id: "",
@@ -82,16 +83,6 @@ function checkBodyParamsMissing(req: Request) {
 
   return false;
 }
-
-type RequestType = {
-  name: string;
-  fileSize: number;
-  width: number;
-  height: number;
-  path: string;
-  date: string;
-  image64: string;
-};
 
 export default {
   endpoint: endpoint,

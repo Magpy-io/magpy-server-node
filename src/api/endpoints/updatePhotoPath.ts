@@ -9,6 +9,8 @@ import {
   checkPhotoExistsAndDeleteMissing,
 } from "@src/modules/functions";
 
+import { UpdatePhotoPathRequestData } from "@src/api/export/exportedTypes";
+
 // updatePhotoPath : updates the path of a photo in db
 const endpoint = "/updatePhotoPath";
 const callback = async (req: Request, res: Response) => {
@@ -24,7 +26,7 @@ const callback = async (req: Request, res: Response) => {
     throw new Error("UserId is not defined.");
   }
 
-  const { id, path }: RequestType = req.body;
+  const { id, path }: UpdatePhotoPathRequestData = req.body;
 
   try {
     console.log(`Searching in db for photo with id: ${id}`);
@@ -73,11 +75,6 @@ function checkBodyParamsMissing(req: Request) {
 
   return false;
 }
-
-type RequestType = {
-  id: string;
-  path: string;
-};
 
 export default {
   endpoint: endpoint,

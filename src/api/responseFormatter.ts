@@ -2,7 +2,7 @@
 import { Response } from "express";
 import { Photo } from "@src/types/photoType";
 import { APIPhoto } from "@src/api/export/exportedTypes";
-import { ErrorCodes } from "@src/types/apiErrorCodes";
+import { ErrorCodes } from "@src/api/export/exportedTypes";
 
 async function sendResponse(
   res: Response,

@@ -4,6 +4,7 @@ import { getPhotoByIdFromDB, deletePhotoByIdFromDB } from "@src/db/sequelizeDb";
 import { removePhotoFromDisk } from "@src/modules/diskManager";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import checkUserToken from "@src/middleware/checkUserToken";
+import { DeletePhotosByIdRequestData } from "@src/api/export/exportedTypes";
 
 // deletePhotosById: deletes photos from server by id
 const endpoint = "/deletePhotosById";
@@ -17,9 +18,9 @@ const callback = async (req: Request, res: Response) => {
     }
     console.log("Request parameters ok.");
 
-    console.log(`ids len: ${req.body.ids.length}`);
+    const requestParameters: DeletePhotosByIdRequestData = req.body;
 
-    const ids: string[] = req.body.ids;
+    const ids: string[] = requestParameters.ids;
 
     const removedIds = [];
     for (const id of ids) {

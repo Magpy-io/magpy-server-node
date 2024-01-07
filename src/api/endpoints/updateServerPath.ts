@@ -8,11 +8,13 @@ import { folderHasRights, pathExists } from "@src/modules/diskManager";
 
 import { isAbsolutePath } from "@src/modules/functions";
 
+import { UpdateServerPathRequestData } from "@src/api/export/exportedTypes";
+
 // updateServerPath : sets server name
 const endpoint = "/updateServerPath";
 const callback = async (req: Request, res: Response) => {
   try {
-    const { path } = req.body;
+    const { path }: UpdateServerPathRequestData = req.body;
 
     if (!path) {
       console.log("Nothing to update, sending response");

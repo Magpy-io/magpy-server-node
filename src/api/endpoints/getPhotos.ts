@@ -9,6 +9,7 @@ import {
   AddWarningPhotosDeleted,
   filterPhotosAndDeleteMissing,
 } from "@src/modules/functions";
+import { GetPhotosRequestData } from "@src/api/export/exportedTypes";
 
 // getPhotos : returns "number" photos starting from "offset".
 const endpoint = "/getPhotos";
@@ -30,7 +31,7 @@ const callback = async (req: Request, res: Response) => {
       `number: ${req.body.number}, offset: ${req.body.offset}, type: ${req.body.photoType}`
     );
 
-    const requestParameters: RequestType = req.body;
+    const requestParameters: GetPhotosRequestData = req.body;
 
     const { number, offset, photoType } = requestParameters;
 
@@ -91,12 +92,6 @@ function checkBodyParamsMissing(req: Request) {
 
   return false;
 }
-
-type RequestType = {
-  number: number;
-  offset: number;
-  photoType: PhotoTypes;
-};
 
 export default {
   endpoint: endpoint,

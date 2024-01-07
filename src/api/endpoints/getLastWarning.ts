@@ -3,7 +3,6 @@ import responseFormatter from "@src/api/responseFormatter";
 
 import checkUserToken from "@src/middleware/checkUserToken";
 import { GetLastWarningForUser } from "@src/modules/warningsManager";
-import { GetLastWarningPost } from "@src/api/export/exportedTypes";
 
 // getLastWarning : returns last generated warning for this user
 const endpoint = "/getLastWarning";

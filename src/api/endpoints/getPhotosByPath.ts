@@ -10,6 +10,8 @@ import {
   filterPhotosExistAndDeleteMissing,
 } from "@src/modules/functions";
 
+import { GetPhotosByPathRequestData } from "@src/api/export/exportedTypes";
+
 // getPhotosByPath : returns array of photos by their paths.
 const endpoint = "/getPhotosByPath";
 const callback = async (req: Request, res: Response) => {
@@ -26,7 +28,7 @@ const callback = async (req: Request, res: Response) => {
       throw new Error("UserId is not defined.");
     }
 
-    const { photosData, photoType }: RequestType = req.body;
+    const { photosData, photoType }: GetPhotosByPathRequestData = req.body;
 
     console.log("Getting photos from db with paths from request.");
     const photos = await getPhotosByClientPathAndSizeAndDateFromDB(photosData);
@@ -86,11 +88,6 @@ function checkBodyParamsMissing(req: Request) {
 
   return false;
 }
-
-type RequestType = {
-  photosData: Array<{ path: string; size: number; date: string }>;
-  photoType: PhotoTypes;
-};
 
 export default {
   endpoint: endpoint,
