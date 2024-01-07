@@ -9,7 +9,13 @@ import {
   AddWarningPhotosDeleted,
   filterPhotosAndDeleteMissing,
 } from "@src/modules/functions";
-import { GetPhotosRequestData } from "@src/api/export/exportedTypes";
+import {
+  GetPhotosRequestData,
+  GetPhotosResponseData,
+} from "@src/api/export/exportedTypes";
+
+const sendResponse =
+  responseFormatter.getCustomSendResponse<GetPhotosResponseData>();
 
 // getPhotos : returns "number" photos starting from "offset".
 const endpoint = "/getPhotos";
@@ -77,7 +83,7 @@ const callback = async (req: Request, res: Response) => {
     };
 
     console.log("Sending response data.");
-    return responseFormatter.sendResponse(res, jsonResponse, warning);
+    return sendResponse(res, jsonResponse, warning);
   } catch (err) {
     console.error(err);
     return responseFormatter.sendErrorMessage(res);

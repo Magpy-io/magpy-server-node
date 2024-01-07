@@ -11,7 +11,13 @@ import {
   checkPhotoExistsAndDeleteMissing,
 } from "@src/modules/functions";
 
-import { GetPhotoPartByIdRequestData } from "@src/api/export/exportedTypes";
+import {
+  GetPhotoPartByIdRequestData,
+  GetPhotoPartByIdResponseData,
+} from "@src/api/export/exportedTypes";
+
+const sendResponse =
+  responseFormatter.getCustomSendResponse<GetPhotoPartByIdResponseData>();
 
 // getPhotoPartById : returns a part of a photo by id.
 const endpoint = "/getPhotoPartById";
@@ -83,7 +89,7 @@ const callback = async (req: Request, res: Response) => {
           part: partNumber,
           totalNbOfParts: totalNbOfParts,
         };
-        return responseFormatter.sendResponse(res, jsonResponse);
+        return sendResponse(res, jsonResponse);
       } else {
         console.log(
           `Part number ${partNumber} must be between 0 and ${

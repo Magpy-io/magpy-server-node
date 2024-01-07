@@ -6,7 +6,13 @@ import checkConnexionLocal from "@src/middleware/checkConnexionLocal";
 import checkServerHasValidCredentials from "@src/middleware/checkServerHasValidCredentials";
 import { SaveServerName } from "@src/modules/serverDataManager";
 
-import { UpdateServerNameRequestData } from "@src/api/export/exportedTypes";
+import {
+  UpdateServerNameRequestData,
+  UpdateServerNameResponseData,
+} from "@src/api/export/exportedTypes";
+
+const sendResponse =
+  responseFormatter.getCustomSendResponse<UpdateServerNameResponseData>();
 
 // updateServerName : sets server name
 const endpoint = "/updateServerName";
@@ -16,7 +22,7 @@ const callback = async (req: Request, res: Response) => {
 
     if (!name) {
       console.log("Nothing to update, sending response");
-      return responseFormatter.sendSuccessfulMessage(res, "Nothing to update");
+      return sendResponse(res, "Nothing to update");
     }
 
     if (name.length < 3 || name.length > 70) {
@@ -37,7 +43,7 @@ const callback = async (req: Request, res: Response) => {
         throw new Error("Error saving server name. " + JSON.stringify(ret));
       }
     }
-    return responseFormatter.sendSuccessfulMessage(res, "Server name changed");
+    return sendResponse(res, "Server name changed");
   } catch (err) {
     console.error(err);
     return responseFormatter.sendErrorMessage(res);

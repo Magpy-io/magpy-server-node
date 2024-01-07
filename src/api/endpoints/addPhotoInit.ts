@@ -8,7 +8,13 @@ import { postPhotoPartTimeout } from "@src/config/config";
 import { Photo } from "@src/types/photoType";
 import checkUserToken from "@src/middleware/checkUserToken";
 
-import { AddPhotoInitRequestData } from "@src/api/export/exportedTypes";
+import {
+  AddPhotoInitRequestData,
+  AddPhotoInitResponseData,
+} from "@src/api/export/exportedTypes";
+
+const sendResponse =
+  responseFormatter.getCustomSendResponse<AddPhotoInitResponseData>();
 
 // addPhotoInit : initializes the transfer of a photo to the server
 const endpoint = "/addPhotoInit";
@@ -62,7 +68,7 @@ const callback = async (req: Request, res: Response) => {
       photo: photo,
     });
     console.log("Sending response message.");
-    return responseFormatter.sendResponse(res, { id: id });
+    return sendResponse(res, { id: id });
   } catch (err) {
     console.error(err);
     return responseFormatter.sendErrorMessage(res);

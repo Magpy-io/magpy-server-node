@@ -4,6 +4,11 @@ import responseFormatter from "@src/api/responseFormatter";
 import checkUserToken from "@src/middleware/checkUserToken";
 import { GetLastWarningForUser } from "@src/modules/warningsManager";
 
+import { GetLastWarningResponseData } from "@src/api/export/exportedTypes";
+
+const sendResponse =
+  responseFormatter.getCustomSendResponse<GetLastWarningResponseData>();
+
 // getLastWarning : returns last generated warning for this user
 const endpoint = "/getLastWarning";
 const callback = async (req: Request, res: Response) => {
@@ -20,7 +25,7 @@ const callback = async (req: Request, res: Response) => {
       warning: warning ? warning : null,
     };
     console.log("Warning found, sending response");
-    return responseFormatter.sendResponse(res, jsonResponse);
+    return sendResponse(res, jsonResponse);
   } catch (err) {
     console.error(err);
     return responseFormatter.sendErrorMessage(res);

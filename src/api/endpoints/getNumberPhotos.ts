@@ -4,6 +4,11 @@ import { numberPhotosFromDB } from "@src/db/sequelizeDb";
 
 import checkUserToken from "@src/middleware/checkUserToken";
 
+import { GetNumberPhotosResponseData } from "@src/api/export/exportedTypes";
+
+const sendResponse =
+  responseFormatter.getCustomSendResponse<GetNumberPhotosResponseData>();
+
 // getNumberPhotos : return the number of photos in the server.
 const endpoint = "/getNumberPhotos";
 const callback = async (req: Request, res: Response) => {
@@ -15,7 +20,7 @@ const callback = async (req: Request, res: Response) => {
       number: nb,
     };
     console.log("Sending response data.");
-    return responseFormatter.sendResponse(res, jsonResponse);
+    return sendResponse(res, jsonResponse);
   } catch (err) {
     console.error(err);
     return responseFormatter.sendErrorMessage(res);

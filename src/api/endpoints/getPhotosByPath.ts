@@ -10,7 +10,14 @@ import {
   filterPhotosExistAndDeleteMissing,
 } from "@src/modules/functions";
 
-import { GetPhotosByPathRequestData } from "@src/api/export/exportedTypes";
+import {
+  APIPhoto,
+  GetPhotosByPathRequestData,
+  GetPhotosByPathResponseData,
+} from "@src/api/export/exportedTypes";
+
+const sendResponse =
+  responseFormatter.getCustomSendResponse<GetPhotosByPathResponseData>();
 
 // getPhotosByPath : returns array of photos by their paths.
 const endpoint = "/getPhotosByPath";
@@ -55,7 +62,11 @@ const callback = async (req: Request, res: Response) => {
     console.log("Photos retrieved from disk if needed");
 
     const photosResponse = ret.photosThatExist.map((photo, index) => {
-      if (!photo) return { path: photosData[index].path, exists: false };
+      if (!photo)
+        return { path: photosData[index].path, exists: false } as {
+          path: string;
+          exists: false;
+        };
 
       const photoWithImage64 = responseFormatter.createPhotoObject(
         photo,
@@ -65,7 +76,7 @@ const callback = async (req: Request, res: Response) => {
         path: photosData[index].path,
         exists: true,
         photo: photoWithImage64,
-      };
+      } as { path: string; exists: true; photo: APIPhoto };
     });
 
     const jsonResponse = {
@@ -74,7 +85,7 @@ const callback = async (req: Request, res: Response) => {
     };
 
     console.log("Sending response data.");
-    return responseFormatter.sendResponse(res, jsonResponse, warning);
+    return sendResponse(res, jsonResponse, warning);
   } catch (err) {
     console.error(err);
     return responseFormatter.sendErrorMessage(res);

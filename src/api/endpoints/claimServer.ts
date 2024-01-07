@@ -18,9 +18,15 @@ import {
   SaveServerCredentials,
 } from "@src/modules/serverDataManager";
 
-import { ClaimServerRequestData } from "@src/api/export/exportedTypes";
+import {
+  ClaimServerRequestData,
+  ClaimServerResponseData,
+} from "@src/api/export/exportedTypes";
 
 import checkServerIsClaimed from "@src/middleware/checkServerIsClaimed";
+
+const sendResponse =
+  responseFormatter.getCustomSendResponse<ClaimServerResponseData>();
 
 // claimServer : creates server in backend and sets the requesting user as it's owner
 const endpoint = "/claimServer";
@@ -123,7 +129,7 @@ const callback = async (req: Request, res: Response) => {
       serverToken: serverToken,
     });
 
-    return responseFormatter.sendSuccessfulMessage(res, "ok");
+    return sendResponse(res, "ok");
   } catch (err) {
     console.error(err);
     return responseFormatter.sendErrorMessage(res);

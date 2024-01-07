@@ -380,7 +380,7 @@ export type GetPhotosByPathRequestData = {
 };
 
 export type GetPhotosByPathResponseData = ServerResponseData<{
-  number: string;
+  number: number;
   photos: Array<
     | { path: string; exists: false }
     | { path: string; exists: true; photo: APIPhoto }
@@ -531,8 +531,8 @@ export type AddPhotoPartRequestData = {
 };
 
 export type AddPhotoPartResponseData = ServerResponseData<{
-  lenReceived: string;
-  lenWaiting: string;
+  lenReceived: number;
+  lenWaiting: number;
   photo: APIPhoto;
 }>;
 

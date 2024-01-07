@@ -6,6 +6,11 @@ import checkConnexionLocal from "@src/middleware/checkConnexionLocal";
 import checkServerHasValidCredentials from "@src/middleware/checkServerHasValidCredentials";
 import { GetServerConfigData } from "@src/modules/serverDataManager";
 
+import { GetServerInfoResponseData } from "@src/api/export/exportedTypes";
+
+const sendResponse =
+  responseFormatter.getCustomSendResponse<GetServerInfoResponseData>();
+
 // getServerInfo : gets information about the server
 const endpoint = "/getServerInfo";
 const callback = async (req: Request, res: Response) => {
@@ -38,7 +43,7 @@ const callback = async (req: Request, res: Response) => {
       }
     }
 
-    return responseFormatter.sendResponse(res, responseJson);
+    return sendResponse(res, responseJson);
   } catch (err) {
     console.error(err);
     return responseFormatter.sendErrorMessage(res);

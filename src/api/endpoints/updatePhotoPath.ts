@@ -9,7 +9,13 @@ import {
   checkPhotoExistsAndDeleteMissing,
 } from "@src/modules/functions";
 
-import { UpdatePhotoPathRequestData } from "@src/api/export/exportedTypes";
+import {
+  UpdatePhotoPathRequestData,
+  UpdatePhotoPathResponseData,
+} from "@src/api/export/exportedTypes";
+
+const sendResponse =
+  responseFormatter.getCustomSendResponse<UpdatePhotoPathResponseData>();
 
 // updatePhotoPath : updates the path of a photo in db
 const endpoint = "/updatePhotoPath";
@@ -58,7 +64,7 @@ const callback = async (req: Request, res: Response) => {
 
       console.log("Photo updated successfully.");
       console.log("Sending response message.");
-      return responseFormatter.sendSuccessfulMessage(
+      return sendResponse(
         res,
         `Photo with id ${id} successfully updated with new path`
       );

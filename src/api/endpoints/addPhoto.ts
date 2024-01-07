@@ -8,7 +8,13 @@ import { hashFile } from "@src/modules/hashing";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import { Photo } from "@src/types/photoType";
 import checkUserToken from "@src/middleware/checkUserToken";
-import { AddPhotoRequestData } from "@src/api/export/exportedTypes";
+import {
+  AddPhotoRequestData,
+  AddPhotoResponseData,
+} from "@src/api/export/exportedTypes";
+
+const sendResponse =
+  responseFormatter.getCustomSendResponse<AddPhotoResponseData>();
 
 // addPhoto : adds a photo to the server
 const endpoint = "/addPhoto";
@@ -65,7 +71,7 @@ const callback = async (req: Request, res: Response) => {
       photo: responseFormatter.createPhotoObject(dbPhoto, ""),
     };
     console.log("Sending response message.");
-    return responseFormatter.sendResponse(res, jsonResponse);
+    return sendResponse(res, jsonResponse);
   } catch (err) {
     console.error(err);
     return responseFormatter.sendErrorMessage(res);

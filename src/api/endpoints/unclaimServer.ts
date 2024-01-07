@@ -9,6 +9,11 @@ import {
 import checkConnexionLocal from "@src/middleware/checkConnexionLocal";
 import checkServerHasValidCredentials from "@src/middleware/checkServerHasValidCredentials";
 
+import { UnclaimServerResponseData } from "@src/api/export/exportedTypes";
+
+const sendResponse =
+  responseFormatter.getCustomSendResponse<UnclaimServerResponseData>();
+
 // unclaimServer : removes server's credentials
 const endpoint = "/unclaimServer";
 const callback = async (req: Request, res: Response) => {
@@ -32,7 +37,7 @@ const callback = async (req: Request, res: Response) => {
 
     await ClearServerCredentials();
 
-    return responseFormatter.sendSuccessfulMessage(res, "Server unclaimed");
+    return sendResponse(res, "Server unclaimed");
   } catch (err) {
     console.error(err);
     return responseFormatter.sendErrorMessage(res);

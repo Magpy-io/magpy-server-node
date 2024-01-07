@@ -8,7 +8,13 @@ import { hashFile } from "@src/modules/hashing";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import { postPhotoPartTimeout } from "@src/config/config";
 import checkUserToken from "@src/middleware/checkUserToken";
-import { AddPhotoPartRequestData } from "@src/api/export/exportedTypes";
+import {
+  AddPhotoPartRequestData,
+  AddPhotoPartResponseData,
+} from "@src/api/export/exportedTypes";
+
+const sendResponse =
+  responseFormatter.getCustomSendResponse<AddPhotoPartResponseData>();
 
 // addPhotoPart : adds a part of a photo to the server
 const endpoint = "/addPhotoPart";
@@ -67,7 +73,7 @@ const callback = async (req: Request, res: Response) => {
           photo: responseFormatter.createPhotoObject(photoWaiting.photo, ""),
         };
         console.log("Sending response message.");
-        return responseFormatter.sendResponse(res, jsonResponse);
+        return sendResponse(res, jsonResponse);
       } else if (photoWaiting.received > photoWaiting.image64Len) {
         console.log(
           `Transfered data (${photoWaiting.received}) exceeds initial image size (${photoWaiting.image64Len}).`
@@ -120,7 +126,7 @@ const callback = async (req: Request, res: Response) => {
             photo: responseFormatter.createPhotoObject(dbPhoto, ""),
           };
           console.log("Sending response message.");
-          return responseFormatter.sendResponse(res, jsonResponse);
+          return sendResponse(res, jsonResponse);
         } else {
           console.log(`Deleting pending transfer for id ${partReceived.id}`);
           clearTimeout(photoWaiting.timeout);

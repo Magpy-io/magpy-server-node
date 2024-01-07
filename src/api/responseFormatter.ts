@@ -4,9 +4,28 @@ import { Photo } from "@src/types/photoType";
 import { APIPhoto } from "@src/api/export/exportedTypes";
 import { ErrorCodes } from "@src/api/export/exportedTypes";
 
-async function sendResponse(
+function getCustomSendResponse<T>() {
+  // get the type of the data parameter of type T
+  type DataType = T extends { data: infer D } ? D : never;
+
+  type Message = T extends { message: string } ? string : never;
+
+  return async function (
+    res: Response,
+    data: DataType | Message,
+    warning: boolean = false
+  ) {
+    if (typeof data == "string") {
+      return await sendSuccessfulMessage(res, data, warning);
+    } else {
+      return await sendResponse<DataType>(res, data, warning);
+    }
+  };
+}
+
+async function sendResponse<T>(
   res: Response,
-  data: any,
+  data: T,
   warning: boolean = false
 ) {
   let jsonResponse = {
@@ -94,8 +113,7 @@ function createPhotoObject(dbPhoto: Photo, image64?: string): APIPhoto {
 }
 
 export default {
-  sendResponse,
-  sendSuccessfulMessage,
+  getCustomSendResponse,
   sendFailedMessage,
   sendFailedBadRequest,
   sendErrorBackEndServerUnreachable,

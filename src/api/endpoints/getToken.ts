@@ -17,7 +17,13 @@ import { GetServerConfigData } from "@src/modules/serverDataManager";
 
 import { generateUserToken } from "@src/modules/tokenManagement";
 
-import { GetTokenRequestData } from "@src/api/export/exportedTypes";
+import {
+  GetTokenRequestData,
+  GetTokenResponseData,
+} from "@src/api/export/exportedTypes";
+
+const sendResponse =
+  responseFormatter.getCustomSendResponse<GetTokenResponseData>();
 
 // getToken : creates and sends a user token that can be used to the the user's photos
 const endpoint = "/getToken";
@@ -119,10 +125,7 @@ const callback = async (req: Request, res: Response) => {
     res.set("Authorization", "Bearer " + userToken);
 
     console.log("sending response");
-    return responseFormatter.sendSuccessfulMessage(
-      res,
-      "Token generated successfully"
-    );
+    return sendResponse(res, "Token generated successfully");
   } catch (err) {
     console.error(err);
     return responseFormatter.sendErrorMessage(res);

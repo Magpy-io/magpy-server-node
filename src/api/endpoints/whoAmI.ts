@@ -3,6 +3,11 @@ import responseFormatter from "@src/api/responseFormatter";
 
 import checkUserToken from "@src/middleware/checkUserToken";
 
+import { WhoAmIResponseData } from "@src/api/export/exportedTypes";
+
+const sendResponse =
+  responseFormatter.getCustomSendResponse<WhoAmIResponseData>();
+
 // whoAmI : checks user token is valid
 const endpoint = "/whoami";
 const callback = async (req: Request, res: Response) => {
@@ -16,7 +21,7 @@ const callback = async (req: Request, res: Response) => {
       user: { id: userId },
     };
     console.log("Token verified, sending confirmation");
-    return responseFormatter.sendResponse(res, jsonResponse);
+    return sendResponse(res, jsonResponse);
   } catch (err) {
     console.error(err);
     return responseFormatter.sendErrorMessage(res);

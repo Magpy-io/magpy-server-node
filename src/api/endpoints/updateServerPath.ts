@@ -8,7 +8,13 @@ import { folderHasRights, pathExists } from "@src/modules/diskManager";
 
 import { isAbsolutePath } from "@src/modules/functions";
 
-import { UpdateServerPathRequestData } from "@src/api/export/exportedTypes";
+import {
+  UpdateServerPathRequestData,
+  UpdateServerPathResponseData,
+} from "@src/api/export/exportedTypes";
+
+const sendResponse =
+  responseFormatter.getCustomSendResponse<UpdateServerPathResponseData>();
 
 // updateServerPath : sets server name
 const endpoint = "/updateServerPath";
@@ -18,7 +24,7 @@ const callback = async (req: Request, res: Response) => {
 
     if (!path) {
       console.log("Nothing to update, sending response");
-      return responseFormatter.sendSuccessfulMessage(res, "Nothing to update");
+      return sendResponse(res, "Nothing to update");
     }
 
     if (!isAbsolutePath(path)) {
@@ -50,7 +56,7 @@ const callback = async (req: Request, res: Response) => {
 
     await SaveStorageFolderPath(path);
 
-    return responseFormatter.sendSuccessfulMessage(res, "Server path changed");
+    return sendResponse(res, "Server path changed");
   } catch (err) {
     console.error(err);
     return responseFormatter.sendErrorMessage(res);
