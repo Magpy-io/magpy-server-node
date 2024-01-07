@@ -1,7 +1,7 @@
 import { Express } from "express";
 import { volumeReset } from "@tests/helpers/mockFsVolumeManager";
 import { openAndInitDB, clearDB } from "@src/db/sequelizeDb";
-import { InitModules, ResetModules } from "@src/config/configModules";
+import { InitModules, ClearModules } from "@src/config/configModules";
 import { setupServerUserToken } from "@tests/helpers/functions";
 
 export async function beforeEachNoUserTokenSetup(app: Express) {
@@ -19,5 +19,5 @@ export async function beforeEach(app: Express) {
 
 export async function afterEach() {
   await clearDB();
-  await ResetModules();
+  await ClearModules();
 }

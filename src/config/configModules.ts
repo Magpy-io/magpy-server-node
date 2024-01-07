@@ -13,7 +13,7 @@ export async function InitModules() {
   ClearAllWarnings();
 }
 
-export async function ResetModules() {
+export async function ClearModules() {
   SetPath("");
   await ClearServerDataFile();
   await clearFilesWaiting();
