@@ -7,5 +7,5 @@ export async function main() {
   await InitModules();
   await openAndInitDB();
   await initServer();
-  await startMdns();
+  startMdns();
 }

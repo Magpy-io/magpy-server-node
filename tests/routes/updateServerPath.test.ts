@@ -47,13 +47,13 @@ describe("Test 'updateServerPath' endpoint", () => {
     expect(ret.body.ok).toBe(true);
     expect(ret.body.warning).toBe(false);
 
-    const serverName = await GetStorageFolderPath();
+    const serverName = GetStorageFolderPath();
 
     expect(serverName).toBe(photosPath);
   });
 
   it("Should return error PATH_FOLDER_DOES_NOT_EXIST when using a folder that does not exist", async () => {
-    const serverPathBefore = await GetStorageFolderPath();
+    const serverPathBefore = GetStorageFolderPath();
     const ret = await request(app)
       .post("/updateServerPath")
       .send({ path: GetPathFromRoot("/nonExistingPath") });
@@ -62,7 +62,7 @@ describe("Test 'updateServerPath' endpoint", () => {
     expect(ret.body.ok).toBe(false);
     expect(ret.body.errorCode).toBe("PATH_FOLDER_DOES_NOT_EXIST");
 
-    const serverPath = await GetStorageFolderPath();
+    const serverPath = GetStorageFolderPath();
 
     expect(serverPath).toBe(serverPathBefore);
   });

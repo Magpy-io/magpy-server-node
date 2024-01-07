@@ -4,6 +4,8 @@ const userId = "userId";
 const userId2 = "userId2";
 const serverId = "657ccaba54ac70b873e81f8f";
 
+const validUserName = "UserName";
+
 const validUserEmail = "bla@gg.io";
 const validUserPassword = "password";
 const userEmailTaken = "takenEmail";
@@ -57,6 +59,7 @@ export {
   userId,
   userId2,
   serverId,
+  validUserName,
   validUserToken,
   validUserToken2,
   expiredUserToken,

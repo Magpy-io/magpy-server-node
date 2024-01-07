@@ -39,7 +39,7 @@ describe("Test 'updateServerName' endpoint", () => {
     expect(ret.body.ok).toBe(true);
     expect(ret.body.warning).toBe(false);
 
-    const serverName = await GetServerName();
+    const serverName = GetServerName();
 
     expect(serverName).toBe("newName");
   });
@@ -52,7 +52,7 @@ describe("Test 'updateServerName' endpoint", () => {
   ])(
     "Should return error INVALID_NAME when using the name : $name",
     async (testData) => {
-      const serverNameBefore = await GetServerName();
+      const serverNameBefore = GetServerName();
       const ret = await request(app)
         .post("/updateServerName")
         .send({ name: testData.name });
@@ -61,7 +61,7 @@ describe("Test 'updateServerName' endpoint", () => {
       expect(ret.body.ok).toBe(false);
       expect(ret.body.errorCode).toBe("INVALID_NAME");
 
-      const serverName = await GetServerName();
+      const serverName = GetServerName();
 
       expect(serverName).toBe(serverNameBefore);
     }

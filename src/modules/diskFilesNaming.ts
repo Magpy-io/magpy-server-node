@@ -5,7 +5,7 @@ import { GetStorageFolderPath } from "@src/modules/serverDataManager";
 import { pathExists, createFolder } from "@src/modules/diskManager";
 
 async function createServerImageName(photo: Photo) {
-  const dirPath = await GetStorageFolderPath();
+  const dirPath = GetStorageFolderPath();
   const nameParsed = path.parse(photo.name);
   const serverFileName = createBaseName(photo) + nameParsed.ext;
   const folderPath = path.join(dirPath, "Originals");
@@ -15,7 +15,7 @@ async function createServerImageName(photo: Photo) {
 }
 
 async function createServerImageThumbnailName(photo: Photo) {
-  const dirPath = await GetStorageFolderPath();
+  const dirPath = GetStorageFolderPath();
   const nameParsed = path.parse(photo.name);
   const serverFileName = createBaseName(photo) + "_thumbnail" + nameParsed.ext;
   const folderPath = path.join(dirPath, "Thumbnails");
@@ -25,7 +25,7 @@ async function createServerImageThumbnailName(photo: Photo) {
 }
 
 async function createServerImageCompressedName(photo: Photo) {
-  const dirPath = await GetStorageFolderPath();
+  const dirPath = GetStorageFolderPath();
   const nameParsed = path.parse(photo.name);
   const serverFileName = createBaseName(photo) + "_compressed" + nameParsed.ext;
   const folderPath = path.join(dirPath, "Compressed");

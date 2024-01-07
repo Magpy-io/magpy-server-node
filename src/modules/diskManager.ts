@@ -115,7 +115,7 @@ export async function getPhotoFromDisk(photo: Photo, photoType: PhotoTypes) {
 
 export async function clearImagesDisk() {
   try {
-    const pathDir = await GetStorageFolderPath();
+    const pathDir = GetStorageFolderPath();
     await fs.rm(pathDir, { force: true, recursive: true });
   } catch (err) {
     console.error(err);

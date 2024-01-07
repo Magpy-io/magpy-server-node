@@ -4,12 +4,12 @@ import mdns from "mdns";
 
 let advert: any;
 
-async function startMdns() {
+function startMdns() {
   advert = mdns.createAdvertisement(
     mdns.tcp("http"),
-    parseInt( port || "8000"),
+    parseInt(port || "8000"),
     {
-      name: serverNameMdnsPrefix + (await GetServerName()),
+      name: serverNameMdnsPrefix + GetServerName(),
     }
   );
   advert.start();

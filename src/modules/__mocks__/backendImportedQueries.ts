@@ -462,7 +462,7 @@ export async function getServerInfoPost(
         name: "MyLocalServer",
         owner: {
           _id: mockValues.userId,
-          name: "user name",
+          name: mockValues.validUserName,
           email: mockValues.validUserEmail,
         },
       },

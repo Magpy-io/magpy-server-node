@@ -55,7 +55,7 @@ const callback = async (req: Request, res: Response) => {
     try {
       SetUserToken(userToken);
       ret = await registerServerPost({
-        name: await GetServerName(),
+        name: GetServerName(),
         ipAddress: myIp,
         serverKey: keyGenerated,
       });
