@@ -1,16 +1,12 @@
 import { Request, Response } from "express";
 
 import responseFormatter from "@src/api/responseFormatter";
-import {
-  getPhotoByClientPathFromDB,
-  addPhotoToDB,
-  deletePhotoByIdFromDB,
-} from "@src/db/sequelizeDb";
+import { addPhotoToDB, deletePhotoByIdFromDB } from "@src/db/sequelizeDb";
 import FilesWaiting, { FilesWaitingType } from "@src/modules/waitingFiles";
 import { addPhotoToDisk } from "@src/modules/diskManager";
-import { hashString } from "@src/modules/hashing";
+import { hashFile } from "@src/modules/hashing";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
-import { hashLen, postPhotoPartTimeout } from "@src/config/config";
+import { postPhotoPartTimeout } from "@src/config/config";
 import checkUserToken from "@src/middleware/checkUserToken";
 import {
   AddWarningPhotosDeleted,
@@ -99,7 +95,7 @@ const callback = async (req: Request, res: Response) => {
         if (arePartsValid(photoWaiting.dataParts)) {
           const image64 = joinParts(photoWaiting.dataParts);
 
-          const hash = hashString(image64, hashLen);
+          const hash = hashFile(image64);
           photoWaiting.photo.hash = hash;
 
           const ret = await checkPhotoExistsAndDeleteMissing({

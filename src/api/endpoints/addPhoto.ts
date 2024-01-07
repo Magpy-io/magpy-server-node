@@ -7,9 +7,8 @@ import {
 } from "@src/modules/functions";
 import { addPhotoToDisk } from "@src/modules/diskManager";
 import { addServerImagePaths } from "@src/modules/diskFilesNaming";
-import { hashString } from "@src/modules/hashing";
+import { hashFile } from "@src/modules/hashing";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
-import { hashLen } from "@src/config/config";
 import { Photo } from "@src/types/photoType";
 import checkUserToken from "@src/middleware/checkUserToken";
 
@@ -68,7 +67,7 @@ const callback = async (req: Request, res: Response) => {
       console.log("Creating syncDate, photoPath and the photo hash.");
       photo.syncDate = new Date(Date.now()).toJSON();
       await addServerImagePaths(photo);
-      photo.hash = hashString(requestPhoto.image64, hashLen);
+      photo.hash = hashFile(requestPhoto.image64);
       console.log("Adding photo to db.");
       const dbPhoto = await addPhotoToDB(photo);
 
