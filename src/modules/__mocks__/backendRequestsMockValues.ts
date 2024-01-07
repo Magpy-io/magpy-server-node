@@ -1,4 +1,4 @@
-import { ErrorBackendUnreachable } from "@src/modules/backendImportedQueries";
+import { ErrorBackendUnreachable } from "../backendImportedQueries";
 
 const userId = "userId";
 const userId2 = "userId2";
