@@ -39,8 +39,7 @@ async function checkServerHasValidCredentials(
           console.log("Error requesting backend server");
           responseFormatter.sendErrorBackEndServerUnreachable(res);
         } else {
-          console.error(err);
-          responseFormatter.sendErrorMessage(res);
+          throw err;
         }
         return;
       }
@@ -52,10 +51,9 @@ async function checkServerHasValidCredentials(
         ) {
           console.log("Invalid server token");
         } else {
-          console.error("request to get server info failed");
-          console.error(ret);
-          responseFormatter.sendErrorMessage(res);
-          return;
+          throw new Error(
+            "request to get server info failed. " + JSON.stringify(ret)
+          );
         }
       } else {
         console.log("server has valid credentials");
@@ -79,8 +77,7 @@ async function checkServerHasValidCredentials(
           console.log("Error requesting backend server");
           responseFormatter.sendErrorBackEndServerUnreachable(res);
         } else {
-          console.error(err);
-          responseFormatter.sendErrorMessage(res);
+          throw err;
         }
         return;
       }
@@ -89,10 +86,10 @@ async function checkServerHasValidCredentials(
         if (ret.errorCode == "INVALID_CREDENTIALS") {
           console.log("invalid server credentials");
         } else {
-          console.error("request to verify server credentials failed");
-          console.error(ret);
-          responseFormatter.sendErrorMessage(res);
-          return;
+          throw new Error(
+            "request to verify server credentials failed. " +
+              JSON.stringify(ret)
+          );
         }
       } else {
         console.log("server claimed, it has valid credentials");

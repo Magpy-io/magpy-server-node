@@ -23,10 +23,7 @@ async function checkServerIsClaimed(
     const ret = await getServerInfoPost();
 
     if (!ret.ok) {
-      console.log("Error retrieving server info");
-      console.log(ret);
-      responseFormatter.sendErrorMessage(res);
-      return;
+      throw new Error("Error retrieving server info. " + JSON.stringify(ret));
     }
 
     if (ret.data.server.owner == null) {

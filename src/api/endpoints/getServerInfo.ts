@@ -26,9 +26,7 @@ const callback = async (req: Request, res: Response) => {
       const ret = await getServerInfoPost();
 
       if (!ret.ok) {
-        console.error("Error retrieving server info");
-        console.error(ret);
-        return responseFormatter.sendErrorMessage(res);
+        throw new Error("Error retrieving server info. " + JSON.stringify(ret));
       }
 
       if (ret.data.server.owner != null) {

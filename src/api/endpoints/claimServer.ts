@@ -64,8 +64,7 @@ const callback = async (req: Request, res: Response) => {
         console.error("Error requesting backend server");
         return responseFormatter.sendErrorBackEndServerUnreachable(res);
       } else {
-        console.error(err);
-        return responseFormatter.sendErrorMessage(res);
+        throw err;
       }
     }
 
@@ -85,9 +84,9 @@ const callback = async (req: Request, res: Response) => {
           "AUTHORIZATION_BACKEND_EXPIRED"
         );
       } else {
-        console.error("request to verify user token failed");
-        console.error(ret);
-        return responseFormatter.sendErrorMessage(res);
+        throw new Error(
+          "request to verify user token failed. " + JSON.stringify(ret)
+        );
       }
     }
 
@@ -102,15 +101,14 @@ const callback = async (req: Request, res: Response) => {
         console.error("Error requesting backend server");
         return responseFormatter.sendErrorBackEndServerUnreachable(res);
       } else {
-        console.error(err);
-        return responseFormatter.sendErrorMessage(res);
+        throw err;
       }
     }
 
     if (!ret1.ok) {
-      console.error("request to verify server credentials failed");
-      console.error(ret1);
-      return responseFormatter.sendErrorMessage(res);
+      throw new Error(
+        "request to verify server credentials failed. " + JSON.stringify(ret1)
+      );
     }
 
     console.log("got server token, saving to local");

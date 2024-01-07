@@ -53,8 +53,7 @@ const callback = async (req: Request, res: Response) => {
         console.error("Error requesting backend server");
         return responseFormatter.sendErrorBackEndServerUnreachable(res);
       } else {
-        console.error(err);
-        return responseFormatter.sendErrorMessage(res);
+        throw err;
       }
     }
 
@@ -93,15 +92,14 @@ const callback = async (req: Request, res: Response) => {
         console.error("Error requesting backend server");
         return responseFormatter.sendErrorBackEndServerUnreachable(res);
       } else {
-        console.error(err);
-        return responseFormatter.sendErrorMessage(res);
+        throw err;
       }
     }
 
     if (!retServer.ok) {
-      console.error("request to get server info failed");
-      console.error(retServer);
-      return responseFormatter.sendErrorMessage(res);
+      throw new Error(
+        "request to get server info failed. " + JSON.stringify(retServer)
+      );
     }
 
     if (retServer.data.server.owner?._id != retUser.data.user._id) {
