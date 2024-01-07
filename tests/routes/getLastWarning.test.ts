@@ -43,6 +43,7 @@ describe("Test 'getLastWarning' endpoint", () => {
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
+    expect(ret.body.warning).toBe(false);
     expect(ret.body).toHaveProperty("data");
     expect(ret.body.data).toHaveProperty("warning");
     expect(ret.body.data.warning).toBeNull();
@@ -78,6 +79,7 @@ describe("Test 'getLastWarning' endpoint", () => {
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
+    expect(ret.body.warning).toBe(false);
     expect(ret.body).toHaveProperty("data");
     expect(ret.body.data).toHaveProperty("warning");
     expect(ret.body.data.warning).toEqual(warning);

@@ -56,6 +56,7 @@ describe("Test 'deletePhotosById' endpoint", () => {
 
       expect(ret.statusCode).toBe(200);
       expect(ret.body.ok).toBe(true);
+      expect(ret.body.warning).toBe(false);
       expect(ret.body).toHaveProperty("data");
       expect(ret.body.data).toHaveProperty("deletedIds");
       expect(ret.body.data.deletedIds).toEqual(ids);

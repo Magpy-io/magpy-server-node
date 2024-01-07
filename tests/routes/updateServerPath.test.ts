@@ -45,6 +45,7 @@ describe("Test 'updateServerPath' endpoint", () => {
     console.log(ret.body);
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
+    expect(ret.body.warning).toBe(false);
 
     const serverName = await GetStorageFolderPath();
 

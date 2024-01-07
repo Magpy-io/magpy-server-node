@@ -50,6 +50,7 @@ describe("Test 'getPhotoPartById' endpoint", () => {
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
+    expect(ret.body.warning).toBe(false);
     expect(ret.body.data.part).toBe(0);
     testPhotoMetaAndId(ret.body.data.photo, { id: addedPhotoData.id });
 

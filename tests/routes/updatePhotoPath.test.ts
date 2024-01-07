@@ -45,6 +45,7 @@ describe("Test 'updatePhotoPath' endpoint", () => {
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
+    expect(ret.body.warning).toBe(false);
 
     const photo = await getPhotoById(app, addedPhotoData.id);
     expect(photo.meta.clientPath).toBe("newPath");

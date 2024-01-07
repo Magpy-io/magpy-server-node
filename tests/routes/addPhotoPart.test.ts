@@ -71,6 +71,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
+    expect(ret.body.warning).toBe(false);
     expect(ret.body).toHaveProperty("data");
     expect(ret.body.data.lenWaiting).toBe(imageBase64Parts.photoLen);
     expect(ret.body.data.lenReceived).toBe(imageBase64Parts.photoLenPart1);
@@ -87,6 +88,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
+    expect(ret.body.warning).toBe(false);
     expect(ret.body).toHaveProperty("data");
     expect(ret.body.data.lenWaiting).toBe(imageBase64Parts.photoLen);
     expect(ret.body.data.lenReceived).toBe(
@@ -105,6 +107,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
+    expect(ret.body.warning).toBe(false);
     expect(ret.body).toHaveProperty("data");
     expect(ret.body.data).toHaveProperty("photo");
     expect(ret.body.data.lenWaiting).toBe(imageBase64Parts.photoLen);

@@ -40,6 +40,7 @@ describe("Test 'claimServer' endpoint", () => {
     console.log(ret.body);
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
+    expect(ret.body.warning).toBe(false);
   });
 
   it("Should return error AUTHORIZATION_BACKEND_FAILED when trying to claim a server with a non valid token", async () => {

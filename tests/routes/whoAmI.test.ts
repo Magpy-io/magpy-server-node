@@ -39,6 +39,7 @@ describe("Test 'whoAmI' endpoint", () => {
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
+    expect(ret.body.warning).toBe(false);
     expect(ret.body).toHaveProperty("data");
     expect(ret.body.data).toHaveProperty("user");
     expect(ret.body.data.user.id).toBe(mockValues.userId);

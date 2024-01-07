@@ -36,6 +36,7 @@ describe("Test 'unclaimServer' endpoint", () => {
 
     expect(ret.statusCode).toBe(200);
     expect(ret.body.ok).toBe(true);
+    expect(ret.body.warning).toBe(false);
 
     const serverData = GetServerConfigData();
 
