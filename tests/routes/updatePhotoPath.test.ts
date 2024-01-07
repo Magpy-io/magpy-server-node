@@ -72,7 +72,7 @@ describe("Test 'updatePhotoPath' endpoint", () => {
     expect(ret.body.errorCode).toBe("ID_NOT_FOUND");
   });
 
-  it("Should change the path of photo after adding the photo", async () => {
+  it("Should return error PATH_EXISTS when trying to change the path to an existing path", async () => {
     const addedPhotosData = await addNPhotos(app, 2);
 
     const ret = await request(app)

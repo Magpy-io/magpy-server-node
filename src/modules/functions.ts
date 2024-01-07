@@ -1,11 +1,7 @@
 import bcrypt from "bcryptjs";
 import { isAbsolute } from "path";
 import { platform } from "os";
-import {
-  deletePhotoByIdFromDB,
-  getPhotoByClientPathFromDB,
-  getPhotoByIdFromDB,
-} from "@src/db/sequelizeDb";
+import { deletePhotoByIdFromDB, getPhotoByIdFromDB } from "@src/db/sequelizeDb";
 import responseFormatter from "@src/api/responseFormatter";
 import {
   isPhotoOnDisk,
@@ -59,31 +55,18 @@ export function isAbsolutePath(path: string) {
  *
  * If any variation of the photo is missing from disk returns false and deletes the photo entry from db.
  */
-export async function checkPhotoExistsAndDeleteMissing(
-  data:
-    | { id: string }
-    | {
-        clientPath: string;
-      }
-): Promise<
+export async function checkPhotoExistsAndDeleteMissing(data: {
+  id: string;
+}): Promise<
   | { exists: false; deleted: Photo; warning: true }
   | { exists: false; deleted: null; warning: false }
   | { exists: true; deleted: null; warning: false }
 > {
   let photo: Photo | null;
 
-  if ("clientPath" in data) {
-    photo = await getPhotoByClientPathFromDB(data.clientPath);
-    if (!photo) {
-      return { exists: false, deleted: null, warning: false };
-    }
-  } else if ("id" in data) {
-    photo = await getPhotoByIdFromDB(data.id);
-    if (!photo) {
-      return { exists: false, deleted: null, warning: false };
-    }
-  } else {
-    throw new Error("checkPhotoExists: Needs the photo id or clientPath");
+  photo = await getPhotoByIdFromDB(data.id);
+  if (!photo) {
+    return { exists: false, deleted: null, warning: false };
   }
 
   const existsDisk = await isPhotoOnDisk(photo);
