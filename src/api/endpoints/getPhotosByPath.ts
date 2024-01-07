@@ -80,7 +80,7 @@ const callback = async (req: Request, res: Response) => {
 };
 
 function checkBodyParamsMissing(req: Request) {
-  if (checkReqBodyAttributeMissing(req, "paths", "Array")) return true;
+  if (checkReqBodyAttributeMissing(req, "photosData", "Array")) return true;
   if (checkReqBodyAttributeMissing(req, "photoType", "string")) return true;
   if (!isValidPhotoType(req.body.photoType)) return true;
 
