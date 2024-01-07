@@ -10,7 +10,14 @@ import { initServer, stopServer } from "@src/server/server";
 
 import * as sac from "@tests/helpers/setupAndCleanup";
 
-import { addNPhotos, addPhoto, getPhotoById } from "@tests/helpers/functions";
+import {
+  addNPhotos,
+  addPhoto,
+  deletePhotoFromDisk,
+  getPhotoById,
+  getPhotoFromDb,
+  testWarning,
+} from "@tests/helpers/functions";
 import { serverTokenHeader } from "@tests/helpers/functions";
 
 describe("Test 'updatePhotoPath' endpoint", () => {
@@ -82,5 +89,27 @@ describe("Test 'updatePhotoPath' endpoint", () => {
 
     const photo = await getPhotoById(app, addedPhotosData[0].id);
     expect(photo.meta.clientPath).toBe(addedPhotosData[0].path);
+  });
+
+  it("Should return error ID_NOT_FOUND when id is in db but compressed photo is missing from disk", async () => {
+    const addedPhotoData = await addPhoto(app);
+
+    const photo = await getPhotoFromDb(addedPhotoData.id);
+    await deletePhotoFromDisk(photo, "compressed");
+
+    const ret = await request(app)
+      .post("/updatePhotoPath")
+      .set(serverTokenHeader())
+      .send({
+        id: addedPhotoData.id,
+        path: addedPhotoData.path,
+      });
+
+    expect(ret.statusCode).toBe(400);
+    expect(ret.body.ok).toBe(false);
+    expect(ret.body.warning).toBe(true);
+    expect(ret.body.errorCode).toBe("ID_NOT_FOUND");
+
+    testWarning(photo);
   });
 });

@@ -132,7 +132,7 @@ describe("Test 'addPhoto' endpoint", () => {
   ];
 
   it.each(testDataArray)(
-    "Should add 1 photo when called with an existing clientPath but $photoType missing on disk",
+    "Should add 1 photo when called with an existing photo in db but $photoType missing on disk, and generate a warning",
     async (testData) => {
       const addedPhotoData = await addPhoto(app);
 
@@ -146,6 +146,7 @@ describe("Test 'addPhoto' endpoint", () => {
 
       expect(ret.statusCode).toBe(200);
       expect(ret.body.ok).toBe(true);
+      expect(ret.body.warning).toBe(true);
       expect(ret.body).toHaveProperty("data");
       expect(ret.body.data).toHaveProperty("photo");
 
@@ -167,26 +168,8 @@ describe("Test 'addPhoto' endpoint", () => {
       expect(getPhoto.meta.clientPath).toBe(defaultPhoto.path);
       expect(getPhoto.meta.date).toBe(defaultPhoto.date);
       expect(getPhoto.image64).toBe(defaultPhoto.image64);
+
+      testWarning(photo);
     }
   );
-
-  it("Should add 1 photo with warning when photo exists but deleted from drive", async () => {
-    const addedPhotoData = await addPhoto(app);
-
-    const dbPhoto = await getPhotoFromDb(addedPhotoData.id);
-    await deletePhotoFromDisk(dbPhoto, "compressed");
-
-    const ret = await request(app)
-      .post("/addPhoto")
-      .set(serverTokenHeader())
-      .send(defaultPhoto);
-
-    expect(ret.statusCode).toBe(200);
-    expect(ret.body.ok).toBe(true);
-    expect(ret.body.warning).toBe(true);
-
-    await testPhotosExistInDbAndDisk(ret.body.data.photo);
-
-    testWarning(dbPhoto);
-  });
 });

@@ -111,7 +111,7 @@ describe("Test 'getPhotoPartById' endpoint", () => {
   ];
 
   it.each(testDataArray)(
-    "Should return ID_NOT_FOUND error if requesting a photo that exists in db but $photoType is not on disk",
+    "Should return ID_NOT_FOUND error and generate a warning if requesting a photo that exists in db but $photoType is not on disk",
     async (testData: { photoType: PhotoTypes }) => {
       const addedPhotoData = await addPhoto(app);
 
@@ -125,26 +125,10 @@ describe("Test 'getPhotoPartById' endpoint", () => {
 
       expect(ret.statusCode).toBe(400);
       expect(ret.body.ok).toBe(false);
+      expect(ret.body.warning).toBe(true);
       expect(ret.body.errorCode).toBe("ID_NOT_FOUND");
+
+      testWarning(photo);
     }
   );
-
-  it("Should return ID_NOT_FOUND error and a warning if requesting a photo that exists in db but not in disk", async () => {
-    const addedPhotoData = await addPhoto(app);
-
-    const dbPhoto = await getPhotoFromDb(addedPhotoData.id);
-    await deletePhotoFromDisk(dbPhoto, "compressed");
-
-    const ret = await request(app)
-      .post("/getPhotoPartById")
-      .set(serverTokenHeader())
-      .send({ id: addedPhotoData.id, part: 0 });
-
-    expect(ret.statusCode).toBe(400);
-    expect(ret.body.ok).toBe(false);
-    expect(ret.body.warning).toBe(true);
-    expect(ret.body.errorCode).toBe("ID_NOT_FOUND");
-
-    testWarning(dbPhoto);
-  });
 });

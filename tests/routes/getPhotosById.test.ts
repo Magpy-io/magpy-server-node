@@ -19,6 +19,7 @@ import {
   testPhotoData,
   getPhotoFromDb,
   deletePhotoFromDisk,
+  testWarning,
 } from "@tests/helpers/functions";
 import { serverTokenHeader } from "@tests/helpers/functions";
 import { PhotoTypes } from "@src/types/photoType";
@@ -181,12 +182,15 @@ describe("Test 'getPhotosById' endpoint", () => {
 
       expect(ret.statusCode).toBe(200);
       expect(ret.body.ok).toBe(true);
+      expect(ret.body.warning).toBe(true);
       expect(ret.body).toHaveProperty("data");
       expect(ret.body.data.number).toBe(1);
       expect(ret.body.data.photos.length).toBe(1);
 
       expect(ret.body.data.photos[0].id).toBe(addedPhotoData.id);
       expect(ret.body.data.photos[0].exists).toBe(false);
+
+      testWarning(photo);
     }
   );
 });

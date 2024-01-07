@@ -96,7 +96,7 @@ describe("Test 'addPhotoInit' endpoint", () => {
   ];
 
   it.each(testDataArray)(
-    "Should return the id of the photo being added if adding an existing photo but the $photoType file is missing",
+    "Should return the id of the photo being added with a warning if adding an existing photo but the $photoType is missing from drive",
     async (testData) => {
       const addedPhotoData = await addPhoto(app);
 
@@ -115,30 +115,10 @@ describe("Test 'addPhotoInit' endpoint", () => {
 
       expect(ret.statusCode).toBe(200);
       expect(ret.body.ok).toBe(true);
+      expect(ret.body.warning).toBe(true);
       expect(ret.body).toHaveProperty("data");
+
+      testWarning(dbPhoto);
     }
   );
-
-  it("Should return the id of the photo being added with a warning when photo exists but deleted from drive", async () => {
-    const addedPhotoData = await addPhoto(app);
-
-    const dbPhoto = await getPhotoFromDb(addedPhotoData.id);
-    await deletePhotoFromDisk(dbPhoto, "compressed");
-
-    const photo = { ...defaultPhoto } as any;
-    delete photo.image64;
-
-    const requestPhoto = { ...photo, image64Len: 132148 };
-
-    const ret = await request(app)
-      .post("/addPhotoInit")
-      .set(serverTokenHeader())
-      .send(requestPhoto);
-
-    expect(ret.statusCode).toBe(200);
-    expect(ret.body.ok).toBe(true);
-    expect(ret.body.warning).toBe(true);
-
-    testWarning(dbPhoto);
-  });
 });
