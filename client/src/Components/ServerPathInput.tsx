@@ -21,14 +21,14 @@ export default function ServerPathInput({
         <Typography color="secondary.dark" variant="h5">
           Path
         </Typography>
-        <Button
+        {/* <Button
           endIcon={<DeleteIcon />}
           variant="text"
           color="error"
           onClick={onClearPhotos}
         >
           Clear Photos
-        </Button>
+        </Button> */}
       </Box>
       <Typography color="secondary.dark" variant="body1">
         This is where your photos are stored

@@ -13,10 +13,10 @@ export default function ServerNameInput() {
         defaultValue=""
         rules={{
           required: { value: true, message: "Server name required" },
-          minLength: {
-            value: 3,
-            message: "Should be at least 3 characters long",
-          },
+          // minLength: {
+          //   value: 3,
+          //   message: "Should be at least 3 characters long",
+          // },
         }}
         render={({
           field: { onChange, value },

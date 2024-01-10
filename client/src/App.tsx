@@ -3,6 +3,8 @@ import "./App.css";
 import { Box } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import ServerConfig from "./Components/ServerConfig";
+import { SetPath } from "./ServerImportedQueries";
+import { PATH } from "./config";
 
 const theme = createTheme({
   palette: {
@@ -29,6 +31,7 @@ const theme = createTheme({
 const BACKGROUND_COLOR = "#f1f3f9";
 
 function App() {
+  SetPath(PATH);
   return (
     <ThemeProvider theme={theme}>
       <Box

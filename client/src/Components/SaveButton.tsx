@@ -12,11 +12,11 @@ export default function SaveButton({
       variant="contained"
       onClick={onSubmit}
       sx={{
-        marginTop: 10,
+        marginTop: 4,
         width: 200,
         padding: 1,
         color: "white",
-        alignSelf: "end",
+        alignSelf: "center",
       }}
       // color={"secondary"}
       size="large"
