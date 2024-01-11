@@ -122,9 +122,7 @@ async function getPhotoByClientPathFromDB(
     });
 
     if (!device) {
-      throw new Error(
-        "getPhotoByClientPathFromDB: deviceUniqueId not found in db"
-      );
+      return [];
     }
 
     // Possibly same path present for multiple photos on the same device
@@ -181,7 +179,7 @@ async function getPhotoByClientPathAndSizeAndDateFromDB(
     );
 
     const images = imagesNonFiltered.filter((image) => {
-      return image.fileSize == data.size && image.date == data.date;
+      return image.fileSize == data.size && image.date.toJSON() == data.date;
     });
 
     if (images.length > 1) {
@@ -204,7 +202,12 @@ async function getPhotoByClientPathAndSizeAndDateFromDB(
 async function addPhotoToDB(photo: AddPhotoType): Promise<Photo> {
   assertDbOpen();
 
-  const dbPhoto = { ...photo, id: uuid() };
+  const dbPhoto = {
+    ...photo,
+    id: uuid(),
+    date: new Date(photo.date),
+    syncDate: new Date(photo.syncDate),
+  };
 
   try {
     const image = await ImageModel.create(dbPhoto);

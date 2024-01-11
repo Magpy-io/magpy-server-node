@@ -67,8 +67,8 @@ export interface PhotoDB {
   fileSize: number;
   width: number;
   height: number;
-  date: string;
-  syncDate: string;
+  date: Date;
+  syncDate: Date;
   serverPath: string;
   serverCompressedPath: string;
   serverThumbnailPath: string;
