@@ -3,8 +3,9 @@ import { mockModules } from "@tests/helpers/mockModules";
 mockModules();
 
 import { describe, expect, it } from "@jest/globals";
-import request from "supertest";
+
 import { Express } from "express";
+import * as exportedTypes from "@src/api/export/exportedTypes";
 
 import { initServer, stopServer } from "@src/server/server";
 
@@ -22,6 +23,7 @@ import {
   testPhotosExistInDbAndDisk,
   testPhotoNotInDbNorDisk,
   getUserId,
+  getPhotoById,
 } from "@tests/helpers/functions";
 import * as dbFunction from "@src/db/sequelizeDb";
 import { pathExists } from "@src/modules/diskManager";
@@ -55,8 +57,8 @@ describe("Test 'checkPhotoExistsAndDeleteMissing' function", () => {
     await sac.afterEach();
   });
 
-  it("Should return true if photo exists in db and disk", async () => {
-    const addedPhotoData = await addPhoto(app);
+  it("Should return true when photo exists in db and disk", async () => {
+    const addedPhotoData = await addPhoto();
 
     const ret = await checkPhotoExistsAndDeleteMissing({
       id: addedPhotoData.id,
@@ -65,8 +67,13 @@ describe("Test 'checkPhotoExistsAndDeleteMissing' function", () => {
     expect(ret.exists).toBe(true);
     expect(ret.warning).toBe(false);
 
-    const dbPhoto = await getPhotoFromDb(addedPhotoData.id);
-    await testPhotosExistInDbAndDisk(dbPhoto);
+    const photo = await getPhotoById(addedPhotoData.id);
+
+    if (!photo) {
+      throw new Error("photo not found");
+    }
+
+    await testPhotosExistInDbAndDisk(photo);
   });
 
   it("Should return false if photo does not exist in db nor disk", async () => {
@@ -86,7 +93,7 @@ describe("Test 'checkPhotoExistsAndDeleteMissing' function", () => {
   it.each(testDataArray)(
     "Should return false if photo exists in db but $photoType is missing from disk, delete other photo variations while keeping original, and return the photo deleted.",
     async (testData) => {
-      const addedPhotoData = await addPhoto(app);
+      const addedPhotoData = await addPhoto();
 
       const dbPhoto = await getPhotoFromDb(addedPhotoData.id);
       await deletePhotoFromDisk(dbPhoto, testData.photoType);
@@ -134,7 +141,7 @@ describe('Test "SaveWarningPhotosDeleted" function', () => {
   });
 
   it("Should generate a warning when deleting a photo in db but not on disk", async () => {
-    const addedPhotoData = await addPhoto(app);
+    const addedPhotoData = await addPhoto();
 
     const dbPhoto = await getPhotoFromDb(addedPhotoData.id);
     await deletePhotoFromDisk(dbPhoto, "compressed");

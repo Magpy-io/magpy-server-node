@@ -3,13 +3,19 @@ import { mockModules } from "@tests/helpers/mockModules";
 mockModules();
 
 import { describe, expect, it } from "@jest/globals";
-import request from "supertest";
+
 import { Express } from "express";
+import * as exportedTypes from "@src/api/export/exportedTypes";
 
 import { initServer, stopServer } from "@src/server/server";
 import * as sac from "@tests/helpers/setupAndCleanup";
 
 import { GetServerName } from "@src/modules/serverDataManager";
+import {
+  expectErrorCodeToBe,
+  expectToBeOk,
+  expectToNotBeOk,
+} from "@tests/helpers/functions";
 
 describe("Test 'updateServerName' endpoint", () => {
   let app: Express;
@@ -31,13 +37,10 @@ describe("Test 'updateServerName' endpoint", () => {
   });
 
   it("Should return ok when changing the server name", async () => {
-    const ret = await request(app)
-      .post("/updateServerName")
-      .send({ name: "newName" });
+    const ret = await exportedTypes.UpdateServerNamePost({ name: "newName" });
 
-    expect(ret.statusCode).toBe(200);
-    expect(ret.body.ok).toBe(true);
-    expect(ret.body.warning).toBe(false);
+    expectToBeOk(ret);
+    expect(ret.warning).toBe(false);
 
     const serverName = GetServerName();
 
@@ -53,13 +56,12 @@ describe("Test 'updateServerName' endpoint", () => {
     "Should return error INVALID_NAME when using the name : $name",
     async (testData) => {
       const serverNameBefore = GetServerName();
-      const ret = await request(app)
-        .post("/updateServerName")
-        .send({ name: testData.name });
+      const ret = await exportedTypes.UpdateServerNamePost({
+        name: testData.name,
+      });
 
-      expect(ret.statusCode).toBe(400);
-      expect(ret.body.ok).toBe(false);
-      expect(ret.body.errorCode).toBe("INVALID_NAME");
+      expectToNotBeOk(ret);
+      expectErrorCodeToBe(ret, "INVALID_NAME");
 
       const serverName = GetServerName();
 

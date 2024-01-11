@@ -3,8 +3,9 @@ import { mockModules } from "@tests/helpers/mockModules";
 mockModules();
 
 import { describe, expect, it } from "@jest/globals";
-import request from "supertest";
+
 import { Express } from "express";
+import * as exportedTypes from "@src/api/export/exportedTypes";
 import { validate } from "uuid";
 
 import { initServer, stopServer } from "@src/server/server";
@@ -13,14 +14,11 @@ import * as sac from "@tests/helpers/setupAndCleanup";
 
 import {
   defaultPhoto,
-  addPhoto,
   waitForPhotoTransferToFinish,
-  getPhotoFromDb,
-  deletePhotoFromDisk,
-  testWarning,
+  getDataFromRet,
+  expectToBeOk,
 } from "@tests/helpers/functions";
 import FilesWaiting from "@src/modules/waitingFiles";
-import { serverTokenHeader } from "@tests/helpers/functions";
 
 describe("Test 'addPhotoInit' endpoint", () => {
   let app: Express;
@@ -42,22 +40,18 @@ describe("Test 'addPhotoInit' endpoint", () => {
   });
 
   it("Should return the id of the photo being added", async () => {
-    const photo = { ...defaultPhoto } as any;
-    delete photo.image64;
-
+    //delete photo.image64;
+    const { image64: _, ...photo } = defaultPhoto;
     const requestPhoto = { ...photo, image64Len: 132148 };
 
-    const ret = await request(app)
-      .post("/addPhotoInit")
-      .set(serverTokenHeader())
-      .send(requestPhoto);
+    const ret = await exportedTypes.AddPhotoInitPost(requestPhoto);
 
-    expect(ret.statusCode).toBe(200);
-    expect(ret.body.ok).toBe(true);
-    expect(ret.body.warning).toBe(false);
-    expect(ret.body).toHaveProperty("data");
+    expectToBeOk(ret);
+    expect(ret.warning).toBe(false);
 
-    const validId = validate(ret.body.data.id);
+    const data = getDataFromRet(ret);
+
+    const validId = validate(data.id);
     expect(validId).toBe(true);
 
     expect(FilesWaiting.size).toBe(1);

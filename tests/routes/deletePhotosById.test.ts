@@ -3,8 +3,9 @@ import { mockModules } from "@tests/helpers/mockModules";
 mockModules();
 
 import { describe, expect, it } from "@jest/globals";
-import request from "supertest";
+
 import { Express } from "express";
+import * as exportedTypes from "@src/api/export/exportedTypes";
 
 import { initServer, stopServer } from "@src/server/server";
 
@@ -17,8 +18,9 @@ import {
   testPhotoNotInDbNorDisk,
   getPhotoFromDb,
   deletePhotoFromDisk,
+  getDataFromRet,
+  expectToBeOk,
 } from "@tests/helpers/functions";
-import { serverTokenHeader } from "@tests/helpers/functions";
 
 describe("Test 'deletePhotosById' endpoint", () => {
   let app: Express;
@@ -42,27 +44,24 @@ describe("Test 'deletePhotosById' endpoint", () => {
   it.each([{ n: 0 }, { n: 1 }, { n: 2 }])(
     "Should delete and return $n ids when removing $n ids after adding $n photos",
     async (p: { n: number }) => {
-      const addedPhotosData = await addNPhotos(app, p.n);
+      const addedPhotosData = await addNPhotos(p.n);
       const ids = addedPhotosData.map((e) => e.id);
 
       const photos = await Promise.all(ids.map((id) => getPhotoFromDb(id)));
 
-      const ret = await request(app)
-        .post("/deletePhotosById")
-        .set(serverTokenHeader())
-        .send({
-          ids: ids,
-        });
+      const ret = await exportedTypes.DeletePhotosByIdPost({
+        ids: ids,
+      });
 
-      expect(ret.statusCode).toBe(200);
-      expect(ret.body.ok).toBe(true);
-      expect(ret.body.warning).toBe(false);
-      expect(ret.body).toHaveProperty("data");
-      expect(ret.body.data).toHaveProperty("deletedIds");
-      expect(ret.body.data.deletedIds).toEqual(ids);
+      expectToBeOk(ret);
+      expect(ret.warning).toBe(false);
+      const data = getDataFromRet(ret);
+
+      expect(data).toHaveProperty("deletedIds");
+      expect(data.deletedIds).toEqual(ids);
 
       for (let i = 0; i < p.n; i++) {
-        const photoExists = await checkPhotoExists(app, ids[i]);
+        const photoExists = await checkPhotoExists(ids[i]);
         expect(photoExists).toBe(false);
       }
 
@@ -79,89 +78,72 @@ describe("Test 'deletePhotosById' endpoint", () => {
         .fill("")
         .map((_, i) => "id" + i.toString());
 
-      const ret = await request(app)
-        .post("/deletePhotosById")
-        .set(serverTokenHeader())
-        .send({
-          ids: ids,
-        });
+      const ret = await exportedTypes.DeletePhotosByIdPost({
+        ids: ids,
+      });
 
-      expect(ret.statusCode).toBe(200);
-      expect(ret.body.ok).toBe(true);
-      expect(ret.body).toHaveProperty("data");
-      expect(ret.body.data).toHaveProperty("deletedIds");
-      expect(ret.body.data.deletedIds).toEqual([]);
+      expectToBeOk(ret);
+      const data = getDataFromRet(ret);
+      expect(data).toHaveProperty("deletedIds");
+      expect(data.deletedIds).toEqual([]);
     }
   );
 
   it("Should delete and return a single id when removing 2 ids, 1 exists and the other does not", async () => {
-    const addedPhotoData = await addPhoto(app);
+    const addedPhotoData = await addPhoto();
     const ids = [addedPhotoData.id, "id2"];
 
-    const ret = await request(app)
-      .post("/deletePhotosById")
-      .set(serverTokenHeader())
-      .send({
-        ids: ids,
-      });
+    const ret = await exportedTypes.DeletePhotosByIdPost({
+      ids: ids,
+    });
 
-    expect(ret.statusCode).toBe(200);
-    expect(ret.body.ok).toBe(true);
-    expect(ret.body).toHaveProperty("data");
-    expect(ret.body.data).toHaveProperty("deletedIds");
-    expect(ret.body.data.deletedIds).toEqual([addedPhotoData.id]);
+    expectToBeOk(ret);
+    const data = getDataFromRet(ret);
+    expect(data).toHaveProperty("deletedIds");
+    expect(data.deletedIds).toEqual([addedPhotoData.id]);
 
-    const photoExists = await checkPhotoExists(app, addedPhotoData.id);
+    const photoExists = await checkPhotoExists(addedPhotoData.id);
     expect(photoExists).toBe(false);
   });
 
   it("Should only delete 1 photo when adding 2 photos and asking the removal of one of them", async () => {
-    const addedPhotosData = await addNPhotos(app, 2);
+    const addedPhotosData = await addNPhotos(2);
 
     const ids = [addedPhotosData[0].id];
 
-    const ret = await request(app)
-      .post("/deletePhotosById")
-      .set(serverTokenHeader())
-      .send({
-        ids: ids,
-      });
+    const ret = await exportedTypes.DeletePhotosByIdPost({
+      ids: ids,
+    });
+    expectToBeOk(ret);
+    const data = getDataFromRet(ret);
+    expect(data).toHaveProperty("deletedIds");
+    expect(data.deletedIds).toEqual([addedPhotosData[0].id]);
 
-    expect(ret.statusCode).toBe(200);
-    expect(ret.body.ok).toBe(true);
-    expect(ret.body).toHaveProperty("data");
-    expect(ret.body.data).toHaveProperty("deletedIds");
-    expect(ret.body.data.deletedIds).toEqual([addedPhotosData[0].id]);
-
-    const photo1Exists = await checkPhotoExists(app, addedPhotosData[0].id);
+    const photo1Exists = await checkPhotoExists(addedPhotosData[0].id);
     expect(photo1Exists).toBe(false);
 
-    const photo2Exists = await checkPhotoExists(app, addedPhotosData[1].id);
+    const photo2Exists = await checkPhotoExists(addedPhotosData[1].id);
     expect(photo2Exists).toBe(true);
   });
 
   it("Should delete and return the id of the delete photo even if the photo is not on the disk", async () => {
-    const addedPhotoData = await addPhoto(app);
+    const addedPhotoData = await addPhoto();
     const id = addedPhotoData.id;
 
     const photo = await getPhotoFromDb(id);
 
     await deletePhotoFromDisk(photo, "thumbnail");
 
-    const ret = await request(app)
-      .post("/deletePhotosById")
-      .set(serverTokenHeader())
-      .send({
-        ids: [id],
-      });
+    const ret = await exportedTypes.DeletePhotosByIdPost({
+      ids: [id],
+    });
 
-    expect(ret.statusCode).toBe(200);
-    expect(ret.body.ok).toBe(true);
-    expect(ret.body).toHaveProperty("data");
-    expect(ret.body.data).toHaveProperty("deletedIds");
-    expect(ret.body.data.deletedIds).toEqual([id]);
+    expectToBeOk(ret);
+    const data = getDataFromRet(ret);
+    expect(data).toHaveProperty("deletedIds");
+    expect(data.deletedIds).toEqual([id]);
 
-    const photoExists = await checkPhotoExists(app, id);
+    const photoExists = await checkPhotoExists(id);
     expect(photoExists).toBe(false);
 
     await testPhotoNotInDbNorDisk(photo);

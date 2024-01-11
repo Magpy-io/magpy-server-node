@@ -3,8 +3,9 @@ import { mockModules } from "@tests/helpers/mockModules";
 mockModules();
 
 import { describe, expect, it } from "@jest/globals";
-import request from "supertest";
+
 import { Express } from "express";
+import * as exportedTypes from "@src/api/export/exportedTypes";
 
 import { createFolder } from "@src/modules/diskManager";
 
@@ -14,6 +15,11 @@ import { initServer, stopServer } from "@src/server/server";
 import * as sac from "@tests/helpers/setupAndCleanup";
 
 import { GetStorageFolderPath } from "@src/modules/serverDataManager";
+import {
+  expectErrorCodeToBe,
+  expectToBeOk,
+  expectToNotBeOk,
+} from "@tests/helpers/functions";
 
 describe("Test 'updateServerPath' endpoint", () => {
   let app: Express;
@@ -38,14 +44,10 @@ describe("Test 'updateServerPath' endpoint", () => {
     const photosPath = GetPathFromRoot("/pathToPhotos");
 
     await createFolder(photosPath);
-    const ret = await request(app)
-      .post("/updateServerPath")
-      .send({ path: photosPath });
+    const ret = await exportedTypes.UpdateServerPathPost({ path: photosPath });
 
-    console.log(ret.body);
-    expect(ret.statusCode).toBe(200);
-    expect(ret.body.ok).toBe(true);
-    expect(ret.body.warning).toBe(false);
+    expectToBeOk(ret);
+    expect(ret.warning).toBe(false);
 
     const serverName = GetStorageFolderPath();
 
@@ -54,13 +56,13 @@ describe("Test 'updateServerPath' endpoint", () => {
 
   it("Should return error PATH_FOLDER_DOES_NOT_EXIST when using a folder that does not exist", async () => {
     const serverPathBefore = GetStorageFolderPath();
-    const ret = await request(app)
-      .post("/updateServerPath")
-      .send({ path: GetPathFromRoot("/nonExistingPath") });
 
-    expect(ret.statusCode).toBe(400);
-    expect(ret.body.ok).toBe(false);
-    expect(ret.body.errorCode).toBe("PATH_FOLDER_DOES_NOT_EXIST");
+    const ret = await exportedTypes.UpdateServerPathPost({
+      path: GetPathFromRoot("/nonExistingPath"),
+    });
+
+    expectToNotBeOk(ret);
+    expectErrorCodeToBe(ret, "PATH_FOLDER_DOES_NOT_EXIST");
 
     const serverPath = GetStorageFolderPath();
 

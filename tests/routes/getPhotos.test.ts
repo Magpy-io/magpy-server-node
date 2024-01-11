@@ -3,8 +3,9 @@ import { mockModules } from "@tests/helpers/mockModules";
 mockModules();
 
 import { describe, expect, it } from "@jest/globals";
-import request from "supertest";
+
 import { Express } from "express";
+import * as exportedTypes from "@src/api/export/exportedTypes";
 
 import { initServer, stopServer } from "@src/server/server";
 
@@ -20,8 +21,9 @@ import {
   deletePhotoFromDisk,
   getPhotoFromDb,
   testWarning,
+  expectToBeOk,
+  getDataFromRet,
 } from "@tests/helpers/functions";
-import { serverTokenHeader } from "@tests/helpers/functions";
 import { PhotoTypes } from "@src/api/export/exportedTypes";
 
 describe("Test 'getPhotos' endpoint", () => {
@@ -46,24 +48,21 @@ describe("Test 'getPhotos' endpoint", () => {
   it.each([{ n: 0 }, { n: 1 }, { n: 2 }])(
     "Should return number = $n after adding $n photos",
     async (p: { n: number }) => {
-      await addNPhotos(app, p.n);
+      await addNPhotos(p.n);
 
-      const ret = await request(app)
-        .post("/getPhotos")
-        .set(serverTokenHeader())
-        .send({
-          number: 10,
-          offset: 0,
-          photoType: "data",
-        });
+      const ret = await exportedTypes.GetPhotosPost({
+        number: p.n,
+        offset: 0,
+        photoType: "data",
+      });
 
-      expect(ret.statusCode).toBe(200);
-      expect(ret.body.ok).toBe(true);
-      expect(ret.body.warning).toBe(false);
-      expect(ret.body).toHaveProperty("data");
-      expect(ret.body.data.number).toBe(p.n);
-      expect(ret.body.data.endReached).toBe(true);
-      expect(ret.body.data.photos.length).toBe(p.n);
+      expectToBeOk(ret);
+      expect(ret.warning).toBe(false);
+      const data = getDataFromRet(ret);
+
+      expect(data.number).toBe(p.n);
+      expect(data.endReached).toBe(true);
+      expect(data.photos.length).toBe(p.n);
     }
   );
 
@@ -75,105 +74,99 @@ describe("Test 'getPhotos' endpoint", () => {
   ])(
     "Should return endReached=$endReached and number=$r after adding 2 photos and asking for $n",
     async (p: { n: number; r: number; endReached: boolean }) => {
-      await addNPhotos(app, 2);
+      await addNPhotos(2);
 
-      const ret = await request(app)
-        .post("/getPhotos")
-        .set(serverTokenHeader())
-        .send({
-          number: p.n,
-          offset: 0,
-          photoType: "data",
-        });
+      const ret = await exportedTypes.GetPhotosPost({
+        number: p.n,
+        offset: 0,
+        photoType: "data",
+      });
 
-      expect(ret.statusCode).toBe(200);
-      expect(ret.body.ok).toBe(true);
-      expect(ret.body).toHaveProperty("data");
-      expect(ret.body.data.number).toBe(p.r);
-      expect(ret.body.data.endReached).toBe(p.endReached);
+      expectToBeOk(ret);
+      const data = getDataFromRet(ret);
+
+      expect(data.number).toBe(p.r);
+      expect(data.endReached).toBe(p.endReached);
     }
   );
 
   it("Should return endReached=true and number=1 after adding 2 photos and asking for 1 with offset=1", async () => {
-    await addNPhotos(app, 2);
+    await addNPhotos(2);
 
-    const ret = await request(app)
-      .post("/getPhotos")
-      .set(serverTokenHeader())
-      .send({
-        number: 1,
-        offset: 1,
-        photoType: "data",
-      });
+    const ret = await exportedTypes.GetPhotosPost({
+      number: 1,
+      offset: 1,
+      photoType: "data",
+    });
 
-    expect(ret.statusCode).toBe(200);
-    expect(ret.body.ok).toBe(true);
-    expect(ret.body).toHaveProperty("data");
-    expect(ret.body.data.number).toBe(1);
-    expect(ret.body.data.endReached).toBe(true);
+    expectToBeOk(ret);
+    const data = getDataFromRet(ret);
+
+    expect(data.number).toBe(1);
+    expect(data.endReached).toBe(true);
   });
 
-  it.each([
+  const testDataArrayPhotoTypeTestFunction: Array<{
+    photoType: PhotoTypes;
+    testFunction: (...args: any[]) => any;
+  }> = [
     { photoType: "original", testFunction: testPhotoOriginal },
     { photoType: "compressed", testFunction: testPhotoCompressed },
     { photoType: "thumbnail", testFunction: testPhotoThumbnail },
     { photoType: "data", testFunction: testPhotoData },
-  ])(
+  ];
+
+  it.each(testDataArrayPhotoTypeTestFunction)(
     "Should return the image added in the quality $photoType",
     async (testData) => {
-      const photoAddedData = await addPhoto(app);
+      const photoAddedData = await addPhoto();
 
-      const ret = await request(app)
-        .post("/getPhotos")
-        .set(serverTokenHeader())
-        .send({
-          number: 1,
-          offset: 0,
-          photoType: testData.photoType,
-        });
+      const ret = await exportedTypes.GetPhotosPost({
+        number: 1,
+        offset: 0,
+        photoType: testData.photoType,
+      });
 
-      expect(ret.statusCode).toBe(200);
-      expect(ret.body.ok).toBe(true);
-      expect(ret.body).toHaveProperty("data");
-      expect(ret.body.data.number).toBe(1);
-      expect(ret.body.data.photos.length).toBe(1);
-      expect(ret.body.data.endReached).toBe(true);
-      testData.testFunction(ret.body.data.photos[0], {
+      expectToBeOk(ret);
+      const data = getDataFromRet(ret);
+
+      expect(data.number).toBe(1);
+      expect(data.photos.length).toBe(1);
+      expect(data.endReached).toBe(true);
+
+      testData.testFunction(data.photos[0], {
         path: photoAddedData.path,
         id: photoAddedData.id,
       });
     }
   );
 
-  const testDataArray: Array<{ photoType: PhotoTypes }> = [
+  const testDataArrayPhotoType: Array<{ photoType: PhotoTypes }> = [
     { photoType: "thumbnail" },
     { photoType: "compressed" },
     { photoType: "original" },
   ];
 
-  it.each(testDataArray)(
+  it.each(testDataArrayPhotoType)(
     "Should return no photos if a photo exists on db but its $photoType is not on disk",
     async (testData: { photoType: PhotoTypes }) => {
-      const addedPhotoData = await addPhoto(app);
+      const addedPhotoData = await addPhoto();
 
       const photo = await getPhotoFromDb(addedPhotoData.id);
       await deletePhotoFromDisk(photo, testData.photoType);
 
-      const ret = await request(app)
-        .post("/getPhotos")
-        .set(serverTokenHeader())
-        .send({
-          number: 1,
-          offset: 0,
-          photoType: "data",
-        });
+      const ret = await exportedTypes.GetPhotosPost({
+        number: 1,
+        offset: 0,
+        photoType: "data",
+      });
 
-      expect(ret.statusCode).toBe(200);
-      expect(ret.body.ok).toBe(true);
-      expect(ret.body.warning).toBe(true);
-      expect(ret.body).toHaveProperty("data");
-      expect(ret.body.data.number).toBe(0);
-      expect(ret.body.data.endReached).toBe(true);
+      expectToBeOk(ret);
+      expect(ret.warning).toBe(true);
+      const data = getDataFromRet(ret);
+
+      expect(data.number).toBe(0);
+      expect(data.endReached).toBe(true);
 
       testWarning(photo);
     }

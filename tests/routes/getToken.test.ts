@@ -3,16 +3,21 @@ import { mockModules } from "@tests/helpers/mockModules";
 mockModules();
 
 import { describe, expect, it } from "@jest/globals";
-import request from "supertest";
+
 import { Express } from "express";
+import * as exportedTypes from "@src/api/export/exportedTypes";
 
 import * as mockValues from "@src/modules/__mocks__/backendRequestsMockValues";
 
 import { initServer, stopServer } from "@src/server/server";
-import { SaveServerCredentials } from "@src/modules/serverDataManager";
 
 import * as sac from "@tests/helpers/setupAndCleanup";
-import { testReturnedToken } from "@tests/helpers/functions";
+import {
+  expectErrorCodeToBe,
+  expectToBeOk,
+  expectToNotBeOk,
+  testReturnedToken,
+} from "@tests/helpers/functions";
 
 describe("Test 'claimServer' endpoint", () => {
   let app: Express;
@@ -26,7 +31,7 @@ describe("Test 'claimServer' endpoint", () => {
   });
 
   beforeEach(async () => {
-    await sac.beforeEachNoUserTokenSetup(app);
+    await sac.beforeEachNoUserTokenRequested(app);
   });
 
   afterEach(async () => {
@@ -34,111 +39,73 @@ describe("Test 'claimServer' endpoint", () => {
   });
 
   it("Should return a valid token when asking a claimed server", async () => {
-    SaveServerCredentials({
-      serverId: mockValues.serverId,
-      serverKey: mockValues.validKey,
-      serverToken: mockValues.validServerToken,
+    const ret = await exportedTypes.GetTokenPost({
+      userToken: mockValues.validUserToken,
     });
 
-    const ret = await request(app)
-      .post("/getToken")
-      .send({ userToken: mockValues.validUserToken });
+    expectToBeOk(ret);
+    expect(ret.warning).toBe(false);
 
-    expect(ret.statusCode).toBe(200);
-    expect(ret.body.ok).toBe(true);
-    expect(ret.body.warning).toBe(false);
-    testReturnedToken(ret);
+    testReturnedToken();
   });
 
   it("Should return error AUTHORIZATION_BACKEND_FAILED when using invalid user token", async () => {
-    SaveServerCredentials({
-      serverId: mockValues.serverId,
-      serverKey: mockValues.validKey,
-      serverToken: mockValues.validServerToken,
+    const ret = await exportedTypes.GetTokenPost({
+      userToken: mockValues.invalidUserToken,
     });
 
-    const ret = await request(app)
-      .post("/getToken")
-      .send({ userToken: mockValues.invalidUserToken });
-
-    expect(ret.statusCode).toBe(400);
-    expect(ret.body.ok).toBe(false);
-    expect(ret.body.errorCode).toBe("AUTHORIZATION_BACKEND_FAILED");
+    expectToNotBeOk(ret);
+    expectErrorCodeToBe(ret, "AUTHORIZATION_BACKEND_FAILED");
   });
 
   it("Should return error AUTHORIZATION_BACKEND_EXPIRED when using an expired user token", async () => {
-    SaveServerCredentials({
-      serverId: mockValues.serverId,
-      serverKey: mockValues.validKey,
-      serverToken: mockValues.validServerToken,
+    const ret = await exportedTypes.GetTokenPost({
+      userToken: mockValues.expiredUserToken,
     });
 
-    const ret = await request(app)
-      .post("/getToken")
-      .send({ userToken: mockValues.expiredUserToken });
-
-    expect(ret.statusCode).toBe(400);
-    expect(ret.body.ok).toBe(false);
-    expect(ret.body.errorCode).toBe("AUTHORIZATION_BACKEND_EXPIRED");
+    expectToNotBeOk(ret);
+    expectErrorCodeToBe(ret, "AUTHORIZATION_BACKEND_EXPIRED");
   });
 
   it("Should return error SERVER_NOT_CLAIMED when requesting a server not claimed", async () => {
-    const ret = await request(app)
-      .post("/getToken")
-      .send({ userToken: mockValues.validUserToken });
+    await exportedTypes.UnclaimServerPost();
 
-    expect(ret.statusCode).toBe(400);
-    expect(ret.body.ok).toBe(false);
-    expect(ret.body.errorCode).toBe("SERVER_NOT_CLAIMED");
+    const ret = await exportedTypes.GetTokenPost({
+      userToken: mockValues.validUserToken,
+    });
+
+    expectToNotBeOk(ret);
+    expectErrorCodeToBe(ret, "SERVER_NOT_CLAIMED");
   });
 
   it("Should return error USER_NOT_ALLOWED when requesting a server not owned by user", async () => {
-    SaveServerCredentials({
-      serverId: mockValues.serverId,
-      serverKey: mockValues.validKey,
-      serverToken: mockValues.validServerToken,
+    const ret = await exportedTypes.GetTokenPost({
+      userToken: mockValues.validUserToken2,
     });
 
-    const ret = await request(app)
-      .post("/getToken")
-      .send({ userToken: mockValues.validUserToken2 });
-
-    expect(ret.statusCode).toBe(400);
-    expect(ret.body.ok).toBe(false);
-    expect(ret.body.errorCode).toBe("USER_NOT_ALLOWED");
+    expectToNotBeOk(ret);
+    expectErrorCodeToBe(ret, "USER_NOT_ALLOWED");
   });
 
   it("Should return error BACKEND_SERVER_UNREACHABLE when claiming a server but backend unreachable", async () => {
-    SaveServerCredentials({
-      serverId: mockValues.serverId,
-      serverKey: mockValues.validKey,
-      serverToken: mockValues.validServerToken,
-    });
     mockValues.failNextRequestServerUnreachable();
 
-    const ret = await request(app)
-      .post("/getToken")
-      .send({ userToken: mockValues.validUserToken });
+    const ret = await exportedTypes.GetTokenPost({
+      userToken: mockValues.validUserToken,
+    });
 
-    expect(ret.statusCode).toBe(500);
-    expect(ret.body.ok).toBe(false);
-    expect(ret.body.errorCode).toBe("BACKEND_SERVER_UNREACHABLE");
+    expectToNotBeOk(ret);
+    expectErrorCodeToBe(ret, "BACKEND_SERVER_UNREACHABLE");
   });
 
   it("Should return error SERVER_ERROR when claiming a server but receiving unexpected error from backend", async () => {
-    SaveServerCredentials({
-      serverId: mockValues.serverId,
-      serverKey: mockValues.validKey,
-      serverToken: mockValues.validServerToken,
-    });
     mockValues.failNextRequest();
 
-    const ret = await request(app)
-      .post("/getToken")
-      .send({ userToken: mockValues.validUserToken });
+    const ret = await exportedTypes.GetTokenPost({
+      userToken: mockValues.validUserToken,
+    });
 
-    expect(ret.statusCode).toBe(500);
-    expect(ret.body.ok).toBe(false);
-    expect(ret.body.errorCode).toBe("SERVER_ERROR");
+    expectToNotBeOk(ret);
+    expectErrorCodeToBe(ret, "SERVER_ERROR");
   });
 });

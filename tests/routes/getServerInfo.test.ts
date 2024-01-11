@@ -3,8 +3,9 @@ import { mockModules } from "@tests/helpers/mockModules";
 mockModules();
 
 import { describe, expect, it } from "@jest/globals";
-import request from "supertest";
+
 import { Express } from "express";
+import * as exportedTypes from "@src/api/export/exportedTypes";
 
 import { initServer, stopServer } from "@src/server/server";
 import * as sac from "@tests/helpers/setupAndCleanup";
@@ -16,6 +17,7 @@ import {
   SaveStorageFolderPath,
   SaveServerName,
 } from "@src/modules/serverDataManager";
+import { expectToBeOk, getDataFromRet } from "@tests/helpers/functions";
 
 describe("Test 'getServerInfo' endpoint", () => {
   let app: Express;
@@ -36,50 +38,48 @@ describe("Test 'getServerInfo' endpoint", () => {
     await sac.afterEach();
   });
 
-  type returntype = {
-    storagePath: string;
-    serverName: string;
-    owner: { name: string; email: string } | null;
-  };
-
   it("Should return the default server info", async () => {
-    const ret = await request(app).post("/getServerInfo").send({});
+    const ret = await exportedTypes.GetServerInfoPost();
 
-    expect(ret.statusCode).toBe(200);
-    expect(ret.body.ok).toBe(true);
-    expect(ret.body.warning).toBe(false);
+    expectToBeOk(ret);
+    expect(ret.warning).toBe(false);
+
+    const data = getDataFromRet(ret);
 
     const serverName = GetServerName();
     const serverPath = GetStorageFolderPath();
 
-    expect(ret.body.data.storagePath).toBe(serverPath);
-    expect(ret.body.data.serverName).toBe(serverName);
-    expect(ret.body.data.owner.name).toBe(mockValues.validUserName);
-    expect(ret.body.data.owner.email).toBe(mockValues.validUserEmail);
+    expect(data.storagePath).toBe(serverPath);
+    expect(data.serverName).toBe(serverName);
+
+    if (!data.owner) {
+      throw new Error("owner not found");
+    }
+
+    expect(data.owner.name).toBe(mockValues.validUserName);
+    expect(data.owner.email).toBe(mockValues.validUserEmail);
   });
 
   it("Should return the updated server info when changed", async () => {
     await SaveStorageFolderPath("newPath");
     await SaveServerName("newName");
 
-    const ret = await request(app).post("/getServerInfo").send({});
+    const ret = await exportedTypes.GetServerInfoPost();
 
-    expect(ret.statusCode).toBe(200);
-    expect(ret.body.ok).toBe(true);
-    expect(ret.body.warning).toBe(false);
+    expectToBeOk(ret);
+    const data = getDataFromRet(ret);
 
-    expect(ret.body.data.storagePath).toBe("newPath");
-    expect(ret.body.data.serverName).toBe("newName");
+    expect(data.storagePath).toBe("newPath");
+    expect(data.serverName).toBe("newName");
   });
 
   it("Should return owner null for an unclaimed server", async () => {
-    await request(app).post("/unclaimServer").send({});
+    await exportedTypes.UnclaimServerPost();
 
-    const ret = await request(app).post("/getServerInfo").send({});
+    const ret = await exportedTypes.GetServerInfoPost();
 
-    expect(ret.statusCode).toBe(200);
-    expect(ret.body.ok).toBe(true);
-    expect(ret.body.warning).toBe(false);
-    expect(ret.body.data.owner).toBeNull();
+    expectToBeOk(ret);
+    const data = getDataFromRet(ret);
+    expect(data.owner).toBeNull();
   });
 });

@@ -3,14 +3,15 @@ import { mockModules } from "@tests/helpers/mockModules";
 mockModules();
 
 import { describe, expect, it } from "@jest/globals";
-import request from "supertest";
+
 import { Express } from "express";
+import * as exportedTypes from "@src/api/export/exportedTypes";
 
 import { initServer, stopServer } from "@src/server/server";
 import * as sac from "@tests/helpers/setupAndCleanup";
 
 import * as mockValues from "@src/modules/__mocks__/backendRequestsMockValues";
-import { serverTokenHeader } from "@tests/helpers/functions";
+import { expectToBeOk, getDataFromRet } from "@tests/helpers/functions";
 
 describe("Test 'whoAmI' endpoint", () => {
   let app: Express;
@@ -32,16 +33,13 @@ describe("Test 'whoAmI' endpoint", () => {
   });
 
   it("Should ok if valid user token", async () => {
-    const ret = await request(app)
-      .post("/whoami")
-      .set(serverTokenHeader())
-      .send({});
+    const ret = await exportedTypes.WhoAmIPost();
 
-    expect(ret.statusCode).toBe(200);
-    expect(ret.body.ok).toBe(true);
-    expect(ret.body.warning).toBe(false);
-    expect(ret.body).toHaveProperty("data");
-    expect(ret.body.data).toHaveProperty("user");
-    expect(ret.body.data.user.id).toBe(mockValues.userId);
+    expectToBeOk(ret);
+    expect(ret.warning).toBe(false);
+
+    const data = getDataFromRet(ret);
+
+    expect(data.user.id).toBe(mockValues.userId);
   });
 });

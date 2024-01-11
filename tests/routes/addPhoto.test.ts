@@ -3,31 +3,23 @@ import { mockModules } from "@tests/helpers/mockModules";
 mockModules();
 
 import { describe, expect, it } from "@jest/globals";
-import request from "supertest";
-import { Express } from "express";
 
-import { initServer, stopServer } from "@src/server/server";
+import { Express } from "express";
+import * as exportedTypes from "@src/api/export/exportedTypes";
 
 import * as sac from "@tests/helpers/setupAndCleanup";
+
+import { initServer, stopServer } from "@src/server/server";
 
 import {
   testPhotoMetaAndId,
   getPhotoById,
-  getNumberPhotos,
   defaultPhoto,
   testPhotosExistInDbAndDisk,
-  addPhoto,
-  getPhotoFromDb,
-  deletePhotoFromDisk,
-  getUserId,
-  testWarning,
+  testPhotoOriginal,
+  getDataFromRet,
+  expectToBeOk,
 } from "@tests/helpers/functions";
-import { serverTokenHeader } from "@tests/helpers/functions";
-
-import {
-  GetLastWarningForUser,
-  HasWarningForUser,
-} from "@src/modules/warningsManager";
 
 describe("Test 'addPhoto' endpoint", () => {
   let app: Express;
@@ -49,34 +41,17 @@ describe("Test 'addPhoto' endpoint", () => {
   });
 
   it("Should add 1 photo when called", async () => {
-    const ret = await request(app)
-      .post("/addPhoto")
-      .set(serverTokenHeader())
-      .send(defaultPhoto);
+    const ret = await exportedTypes.AddPhotoPost(defaultPhoto);
 
-    expect(ret.statusCode).toBe(200);
-    expect(ret.body.ok).toBe(true);
-    expect(ret.body.warning).toBe(false);
-    expect(ret.body).toHaveProperty("data");
-    expect(ret.body.data).toHaveProperty("photo");
+    expectToBeOk(ret);
+    expect(ret.warning).toBe(false);
 
-    testPhotoMetaAndId(ret.body.data.photo);
-    await testPhotosExistInDbAndDisk(ret.body.data.photo);
+    const data = getDataFromRet(ret);
+    testPhotoMetaAndId(data.photo);
+    await testPhotosExistInDbAndDisk(data.photo);
 
-    const getPhoto = await getPhotoById(
-      app,
-      ret.body.data.photo.id,
-      "original"
-    );
-
+    const getPhoto = await getPhotoById(data.photo.id, "original");
     expect(getPhoto).toBeTruthy();
-    expect(getPhoto.id).toBe(ret.body.data.photo.id);
-    expect(getPhoto.meta.name).toBe(defaultPhoto.name);
-    expect(getPhoto.meta.fileSize).toBe(defaultPhoto.fileSize);
-    expect(getPhoto.meta.width).toBe(defaultPhoto.width);
-    expect(getPhoto.meta.height).toBe(defaultPhoto.height);
-    expect(getPhoto.meta.clientPath).toBe(defaultPhoto.path);
-    expect(getPhoto.meta.date).toBe(defaultPhoto.date);
-    expect(getPhoto.image64).toBe(defaultPhoto.image64);
+    testPhotoOriginal(getPhoto, { id: data.photo.id });
   });
 });

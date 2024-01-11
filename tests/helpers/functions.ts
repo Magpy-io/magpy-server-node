@@ -1,6 +1,5 @@
-import request from "supertest";
 import { expect } from "@jest/globals";
-import { Express } from "express";
+
 import { validate } from "uuid";
 import jwt from "jsonwebtoken";
 
@@ -12,6 +11,8 @@ import fs from "fs/promises";
 import { pathExists } from "@src/modules/diskManager";
 
 import * as dbFunction from "@src/db/sequelizeDb";
+
+import * as exportedTypes from "@src/api/export/exportedTypes";
 
 import {
   GetServerConfigData,
@@ -36,52 +37,49 @@ const defaultPhoto = {
   path: "/path/to/image.jpg",
   date: "2022-12-11T17:05:21.396Z",
   image64: photoImage64,
+  deviceUniqueId: "0123456789",
 };
 
-async function addPhoto(
-  app: Express,
-  data?: {
-    path?: string;
-    name?: string;
-    fileSize?: number;
-    width?: number;
-    height?: number;
-    date?: string;
-    image64?: string;
-  }
-) {
-  const ret = await request(app)
-    .post("/addPhoto")
-    .set(serverTokenHeader())
-    .send({
-      name: data?.name ?? defaultPhoto.name,
-      fileSize: data?.fileSize ?? defaultPhoto.fileSize,
-      width: data?.width ?? defaultPhoto.width,
-      height: data?.height ?? defaultPhoto.height,
-      path: data?.path ?? defaultPhoto.path,
-      date: data?.date ?? defaultPhoto.date,
-      image64: data?.image64 ?? defaultPhoto.image64,
-    });
+async function addPhoto(data?: {
+  path?: string;
+  name?: string;
+  fileSize?: number;
+  width?: number;
+  height?: number;
+  date?: string;
+  image64?: string;
+  deviceUniqueId?: string;
+}) {
+  const ret = await exportedTypes.AddPhotoPost({
+    name: data?.name ?? defaultPhoto.name,
+    fileSize: data?.fileSize ?? defaultPhoto.fileSize,
+    width: data?.width ?? defaultPhoto.width,
+    height: data?.height ?? defaultPhoto.height,
+    path: data?.path ?? defaultPhoto.path,
+    date: data?.date ?? defaultPhoto.date,
+    image64: data?.image64 ?? defaultPhoto.image64,
+    deviceUniqueId: data?.deviceUniqueId ?? defaultPhoto.deviceUniqueId,
+  });
 
-  if (!ret.body.ok) {
+  if (!ret.ok) {
     throw "Error adding photo";
   }
 
   return {
-    id: ret.body.data.photo.id,
+    id: ret.data.photo.id,
     path: data?.path ?? defaultPhoto.path,
   };
 }
 
-async function addNPhotos(app: Express, n: number) {
-  const ids: { id: string; path: string }[] = [];
+async function addNPhotos(n: number) {
+  const ret: { id: string; path: string }[] = [];
   for (let i = 0; i < n; i++) {
-    const photoAddedData = await addPhoto(app, {
+    const photoAddedData = await addPhoto({
       path: "/path/to/image" + i.toString() + ".jpg",
     });
-    ids.push(photoAddedData);
+    ret.push(photoAddedData);
   }
-  return ids;
+  return ret;
 }
 
 async function deletePhotoFromDisk(photo: Photo, photoType: PhotoTypes) {
@@ -122,7 +120,7 @@ async function testPhotoNotInDbNorDisk(photo: Photo) {
   expect(thumbnailExists).toBe(false);
 }
 
-async function testPhotosExistInDbAndDisk(photo: any) {
+async function testPhotosExistInDbAndDisk(photo: exportedTypes.APIPhoto) {
   const dbPhoto = await dbFunction.getPhotoByIdFromDB(photo.id);
 
   expect(dbPhoto).toBeTruthy();
@@ -140,8 +138,9 @@ async function testPhotosExistInDbAndDisk(photo: any) {
 }
 
 function testPhotoMetaAndId(
-  photo: any,
+  photo: exportedTypes.APIPhoto,
   data?: {
+    deviceUniqueId?: string;
     path?: string;
     name?: string;
     fileSize?: number;
@@ -158,7 +157,12 @@ function testPhotoMetaAndId(
     expect(photo.id).toBe(data.id);
   }
 
-  expect(photo.meta.clientPath).toBe(data?.path ?? defaultPhoto.path);
+  expect(photo.meta.clientPaths.length).toBe(1);
+  expect(photo.meta.clientPaths[0].deviceUniqueId).toBe(
+    data?.deviceUniqueId ?? defaultPhoto.deviceUniqueId
+  );
+  expect(photo.meta.clientPaths[0].path).toBe(data?.path ?? defaultPhoto.path);
+
   expect(photo.meta.name).toBe(data?.name ?? defaultPhoto.name);
   expect(photo.meta.fileSize).toBe(data?.fileSize ?? defaultPhoto.fileSize);
   expect(photo.meta.width).toBe(data?.width ?? defaultPhoto.width);
@@ -171,7 +175,7 @@ function testPhotoMetaAndId(
 }
 
 function testPhotoOriginal(
-  photo: any,
+  photo?: exportedTypes.APIPhoto,
   data?: {
     path?: string;
     name?: string;
@@ -183,13 +187,16 @@ function testPhotoOriginal(
   },
   image64?: string
 ) {
+  if (!photo) {
+    throw new Error("testPhotoOriginal: no photo to test");
+  }
   testPhotoMetaAndId(photo, data);
 
-  expect(photo.image64).toBe(image64 ?? photoImage64);
+  expect(photo.image64).toBe(image64 ?? defaultPhoto.image64);
 }
 
 function testPhotoCompressed(
-  photo: any,
+  photo: exportedTypes.APIPhoto,
   data?: {
     path?: string;
     name?: string;
@@ -209,7 +216,7 @@ function testPhotoCompressed(
 }
 
 function testPhotoThumbnail(
-  photo: any,
+  photo: exportedTypes.APIPhoto,
   data?: {
     path?: string;
     name?: string;
@@ -229,7 +236,7 @@ function testPhotoThumbnail(
 }
 
 function testPhotoData(
-  photo: any,
+  photo: exportedTypes.APIPhoto,
   data?: {
     path?: string;
     name?: string;
@@ -245,92 +252,92 @@ function testPhotoData(
   expect(photo.image64).toBe("");
 }
 
-async function checkPhotoExists(app: Express, id: string) {
-  const ret = await request(app)
-    .post("/getPhotosById")
-    .set(serverTokenHeader())
-    .send({
-      ids: [id],
-      photoType: "data",
-    });
+async function checkPhotoExists(id: string) {
+  const ret = await exportedTypes.GetPhotosByIdPost({
+    ids: [id],
+    photoType: "data",
+  });
 
-  if (!ret.body.ok) {
+  if (!ret.ok) {
     throw "Error checking photo exists";
   }
 
-  return ret.body.data.photos[0].exists;
+  return ret.data.photos[0].exists;
 }
 
-async function getPhotoById(app: Express, id: string, photoType?: string) {
-  const ret = await request(app)
-    .post("/getPhotosById")
-    .set(serverTokenHeader())
-    .send({ ids: [id], photoType: photoType ?? "data" });
+async function getPhotoById(id: string, photoType?: PhotoTypes) {
+  const ret = await exportedTypes.GetPhotosByIdPost({
+    ids: [id],
+    photoType: photoType ?? "data",
+  });
 
-  if (!ret.body.ok) {
+  if (!ret.ok) {
     throw "Error checking photo exists";
   }
 
-  if (!ret.body.data.photos[0].exists) {
-    return false;
+  if (!ret.data.photos[0].exists) {
+    return;
   }
 
-  return ret.body.data.photos[0].photo;
+  return ret.data.photos[0].photo;
 }
 
-async function getNumberPhotos(app: Express) {
-  const ret = await request(app)
-    .post("/getNumberPhotos")
-    .set(serverTokenHeader())
-    .send({});
+async function getNumberPhotos() {
+  const ret = await exportedTypes.GetNumberPhotosPost();
 
-  if (!ret.body.ok) {
+  if (!ret.ok) {
     throw "Error checking photo exists";
   }
 
-  return ret.body.data.number;
+  return ret.data.number;
 }
 
 async function waitForPhotoTransferToFinish() {
   await timeout(postPhotoPartTimeout + 100);
 }
 
-function testReturnedToken(ret: request.Response) {
+function testReturnedToken() {
   const serverData = GetServerConfigData();
-  expect(ret.headers["authorization"]).toBeDefined();
-  const auth = ret.headers["authorization"];
-  const splited = auth.split(" ");
-  expect(splited.length).toBe(2);
-  expect(splited[0]).toBe("Bearer");
+
   if (!serverData.serverKey) {
     throw new Error(
       "testReturnedToken: serverData.serverKey needs to be defined"
     );
   }
-  const tokenVerification = verifyUserToken(splited[1], serverData.serverKey);
+
+  expect(exportedTypes.HasUserToken()).toBe(true);
+
+  const userTokenRetured = exportedTypes.GetUserToken();
+
+  const tokenVerification = verifyUserToken(
+    userTokenRetured,
+    serverData.serverKey
+  );
   expect(tokenVerification.ok).toBe(true);
   expect(
     (tokenVerification as typeof tokenVerification & { ok: true }).data.id
   ).toBeDefined();
 }
 
-async function setupServerUserToken(app: Express) {
+async function setupServerClaimed() {
   SaveServerCredentials({
     serverId: mockValues.serverId,
     serverKey: mockValues.validKey,
   });
+}
 
-  const ret = await request(app)
-    .post("/getToken")
-    .send({ userToken: mockValues.validUserToken });
+async function setupServerUserToken() {
+  setupServerClaimed();
+  const ret = await exportedTypes.GetTokenPost({
+    userToken: mockValues.validUserToken,
+  });
 
-  if (!ret.body.ok || !ret.headers["authorization"]) {
+  if (!exportedTypes.HasUserToken()) {
     throw new Error(
-      "Error setting up server to generate user token:\n " +
-        JSON.stringify(ret.body)
+      "Error setting up server to generate user token:\n " + JSON.stringify(ret)
     );
   }
-  serverUserToken = ret.headers["authorization"].split(" ")[1];
+  serverUserToken = exportedTypes.GetUserToken();
 }
 
 function serverTokenHeader() {
@@ -360,12 +367,12 @@ function getUserId() {
   return tokenVerification.data.id;
 }
 
-function expiredTokenHeader() {
+function getExpiredToken() {
   const expiredToken = jwt.sign({}, mockValues.validKey, {
     expiresIn: 0,
   });
 
-  return { Authorization: "Bearer " + expiredToken };
+  return expiredToken;
 }
 
 function randomTokenHeader() {
@@ -389,6 +396,29 @@ function testWarning(dbPhoto: Photo) {
   expect(warning.data.photosDeleted[0].id).toBe(dbPhoto.id);
 }
 
+function getDataFromRet<T extends { ok: boolean; data?: any }>(o: T) {
+  type DataType = T extends { data: infer S } ? S : never;
+
+  if (!o.ok) {
+    throw new Error("getDataFromRet: ok is false, cannot get data");
+  }
+  return o.data as DataType;
+}
+
+function expectToBeOk<T extends { ok: boolean }>(o: T) {
+  expect(o.ok).toBe(true);
+}
+
+function expectToNotBeOk<T extends { ok: boolean }>(o: T) {
+  expect(o.ok).toBe(false);
+}
+
+function expectErrorCodeToBe<
+  T extends { ok: boolean; errorCode?: exportedTypes.ErrorCodes }
+>(o: T, errorCode: exportedTypes.ErrorCodes) {
+  expect(o.errorCode).toBe(errorCode);
+}
+
 export {
   addPhoto,
   addNPhotos,
@@ -403,10 +433,11 @@ export {
   waitForPhotoTransferToFinish,
   defaultPhoto,
   testReturnedToken,
+  setupServerClaimed,
   setupServerUserToken,
   serverUserToken,
   serverTokenHeader,
-  expiredTokenHeader,
+  getExpiredToken,
   randomTokenHeader,
   getPhotoFromDb,
   testPhotosExistInDbAndDisk,
@@ -414,4 +445,8 @@ export {
   deletePhotoFromDisk,
   getUserId,
   testWarning,
+  getDataFromRet,
+  expectToBeOk,
+  expectToNotBeOk,
+  expectErrorCodeToBe,
 };

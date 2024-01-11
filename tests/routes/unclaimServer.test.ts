@@ -3,14 +3,16 @@ import { mockModules } from "@tests/helpers/mockModules";
 mockModules();
 
 import { describe, expect, it } from "@jest/globals";
-import request from "supertest";
+
 import { Express } from "express";
+import * as exportedTypes from "@src/api/export/exportedTypes";
 
 import { initServer, stopServer } from "@src/server/server";
 
 import * as sac from "@tests/helpers/setupAndCleanup";
 
 import { GetServerConfigData } from "@src/modules/serverDataManager";
+import { expectToBeOk } from "@tests/helpers/functions";
 
 describe("Test 'unclaimServer' endpoint", () => {
   let app: Express;
@@ -32,11 +34,10 @@ describe("Test 'unclaimServer' endpoint", () => {
   });
 
   it("Should return ok if unclaimed a valid server", async () => {
-    const ret = await request(app).post("/unclaimServer").send({});
+    const ret = await exportedTypes.UnclaimServerPost();
 
-    expect(ret.statusCode).toBe(200);
-    expect(ret.body.ok).toBe(true);
-    expect(ret.body.warning).toBe(false);
+    expectToBeOk(ret);
+    expect(ret.warning).toBe(false);
 
     const serverData = GetServerConfigData();
 

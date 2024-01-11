@@ -3,18 +3,20 @@ import { mockModules } from "@tests/helpers/mockModules";
 mockModules();
 
 import { describe, expect, it } from "@jest/globals";
-import request from "supertest";
+
 import { Express } from "express";
+import * as exportedTypes from "@src/api/export/exportedTypes";
 
 import { initServer, stopServer } from "@src/server/server";
 import * as sac from "@tests/helpers/setupAndCleanup";
 
-import { getUserId, serverTokenHeader } from "@tests/helpers/functions";
-import { SetLastWarningForUser } from "@src/modules/warningsManager";
 import {
-  WarningPhotosNotOnDiskDeletedType,
-  APIPhoto,
-} from "@src/api/export/exportedTypes";
+  expectToBeOk,
+  getDataFromRet,
+  getUserId,
+} from "@tests/helpers/functions";
+import { SetLastWarningForUser } from "@src/modules/warningsManager";
+import { WarningPhotosNotOnDiskDeletedType } from "@src/api/export/exportedTypes";
 
 describe("Test 'getLastWarning' endpoint", () => {
   let app: Express;
@@ -36,21 +38,18 @@ describe("Test 'getLastWarning' endpoint", () => {
   });
 
   it("Should return null when no warnings are stored", async () => {
-    const ret = await request(app)
-      .post("/getLastWarning")
-      .set(serverTokenHeader())
-      .send({});
+    const ret = await exportedTypes.GetLastWarningPost();
 
-    expect(ret.statusCode).toBe(200);
-    expect(ret.body.ok).toBe(true);
-    expect(ret.body.warning).toBe(false);
-    expect(ret.body).toHaveProperty("data");
-    expect(ret.body.data).toHaveProperty("warning");
-    expect(ret.body.data.warning).toBeNull();
+    expectToBeOk(ret);
+    expect(ret.warning).toBe(false);
+    const data = getDataFromRet(ret);
+
+    expect(data).toHaveProperty("warning");
+    expect(data.warning).toBeNull();
   });
 
   it("Should return the warning when a warning is are stored", async () => {
-    const photoMissing: APIPhoto = {
+    const photoMissing = {
       id: "",
       meta: {
         name: "",
@@ -72,16 +71,12 @@ describe("Test 'getLastWarning' endpoint", () => {
     };
     SetLastWarningForUser(getUserId(), warning);
 
-    const ret = await request(app)
-      .post("/getLastWarning")
-      .set(serverTokenHeader())
-      .send({});
+    const ret = await exportedTypes.GetLastWarningPost();
+    expectToBeOk(ret);
+    expect(ret.warning).toBe(false);
+    const data = getDataFromRet(ret);
 
-    expect(ret.statusCode).toBe(200);
-    expect(ret.body.ok).toBe(true);
-    expect(ret.body.warning).toBe(false);
-    expect(ret.body).toHaveProperty("data");
-    expect(ret.body.data).toHaveProperty("warning");
-    expect(ret.body.data.warning).toEqual(warning);
+    expect(data).toHaveProperty("warning");
+    expect(data.warning).toEqual(warning);
   });
 });
