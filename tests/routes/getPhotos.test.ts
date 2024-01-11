@@ -22,7 +22,7 @@ import {
   testWarning,
 } from "@tests/helpers/functions";
 import { serverTokenHeader } from "@tests/helpers/functions";
-import { PhotoTypes } from "@src/types/photoType";
+import { PhotoTypes } from "@src/api/export/exportedTypes";
 
 describe("Test 'getPhotos' endpoint", () => {
   let app: Express;

@@ -1,10 +1,10 @@
-import { Photo } from "@src/types/photoType";
+import { AddPhotoType } from "@src/db/sequelizeDb";
 
 export type FilesWaitingType = {
   received: number;
   dataParts: Map<number, string>;
   image64Len: number;
-  photo: Photo;
+  photo: AddPhotoType;
   timeout: NodeJS.Timeout;
 };
 

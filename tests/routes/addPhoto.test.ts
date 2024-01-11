@@ -23,7 +23,7 @@ import {
   testWarning,
 } from "@tests/helpers/functions";
 import { serverTokenHeader } from "@tests/helpers/functions";
-import { PhotoTypes } from "@src/types/photoType";
+
 import {
   GetLastWarningForUser,
   HasWarningForUser,

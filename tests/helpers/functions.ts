@@ -19,11 +19,12 @@ import {
 } from "@src/modules/serverDataManager";
 
 import * as mockValues from "@src/modules/__mocks__/backendRequestsMockValues";
-import { Photo, PhotoTypes } from "@src/types/photoType";
+import { Photo } from "@src/db/sequelizeDb";
 import {
   GetLastWarningForUser,
   HasWarningForUser,
 } from "@src/modules/warningsManager";
+import { PhotoTypes } from "@src/api/export/exportedTypes";
 
 let serverUserToken = "";
 

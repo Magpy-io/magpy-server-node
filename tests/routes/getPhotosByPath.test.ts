@@ -22,7 +22,7 @@ import {
   testWarning,
 } from "@tests/helpers/functions";
 import { serverTokenHeader } from "@tests/helpers/functions";
-import { PhotoTypes } from "@src/types/photoType";
+import { PhotoTypes } from "@src/api/export/exportedTypes";
 
 describe("Test 'getPhotosByPath' endpoint", () => {
   let app: Express;
@@ -55,7 +55,7 @@ describe("Test 'getPhotosByPath' endpoint", () => {
       );
       const photosData = photosAdded.map((photo) => {
         return {
-          path: photo.clientPath,
+          path: photo.clientPaths[0].path,
           size: photo.fileSize,
           date: photo.date,
         };

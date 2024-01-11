@@ -5,7 +5,7 @@ import { addServerImagePaths } from "@src/modules/diskFilesNaming";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import { v4 as uuid } from "uuid";
 import { postPhotoPartTimeout } from "@src/config/config";
-import { Photo } from "@src/types/photoType";
+
 import checkUserToken from "@src/middleware/checkUserToken";
 
 import {
@@ -34,8 +34,7 @@ const callback = async (req: Request, res: Response) => {
 
     const requestPhoto: AddPhotoInitRequestData = req.body;
 
-    const photo: Photo = {
-      id: "",
+    const photo = {
       name: requestPhoto.name,
       fileSize: requestPhoto.fileSize,
       width: requestPhoto.width,
@@ -43,6 +42,7 @@ const callback = async (req: Request, res: Response) => {
       date: requestPhoto.date,
       syncDate: "",
       clientPath: requestPhoto.path,
+      deviceUniqueId: requestPhoto.deviceUniqueId,
       serverPath: "",
       serverCompressedPath: "",
       serverThumbnailPath: "",

@@ -1,7 +1,7 @@
 import { Sequelize, DataTypes } from "sequelize";
 import { hashLen } from "@src/config/config";
 
-const modelName = "Image";
+const modelName = "image";
 
 const modelDefinition = {
   id: {
@@ -31,10 +31,6 @@ const modelDefinition = {
     type: DataTypes.DATE,
     allowNull: false,
   },
-  clientPath: {
-    type: DataTypes.STRING,
-    allowNull: false,
-  },
   serverPath: {
     type: DataTypes.STRING,
     allowNull: false,
@@ -58,13 +54,23 @@ const modelDefinition = {
 };
 
 const modelOptions = {
-  indexes: [
-    { fields: ["date"] },
-    { fields: ["clientPath"] },
-    { fields: ["syncDate"] },
-  ],
+  indexes: [{ fields: ["date"] }, { fields: ["syncDate"] }],
 };
 
 export function createImageModel(sequelize: Sequelize) {
   return sequelize.define(modelName, modelDefinition, modelOptions);
+}
+
+export interface PhotoDB {
+  id: string;
+  name: string;
+  fileSize: number;
+  width: number;
+  height: number;
+  date: string;
+  syncDate: string;
+  serverPath: string;
+  serverCompressedPath: string;
+  serverThumbnailPath: string;
+  hash: string;
 }

@@ -7,8 +7,16 @@ import {
   isPhotoOnDisk,
   removePhotoVariationsFromDisk,
 } from "@src/modules/diskManager";
-import { Photo } from "@src/types/photoType";
+import { Photo } from "@src/db/sequelizeDb";
 import { SetLastWarningForUser } from "./warningsManager";
+
+function notNull<T>(value: T): value is NonNullable<T> {
+  return value !== null;
+}
+
+export function filterNull<T>(arr: T[]) {
+  return arr.filter(notNull);
+}
 
 export function timeout(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));

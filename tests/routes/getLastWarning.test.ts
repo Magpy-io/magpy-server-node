@@ -60,7 +60,7 @@ describe("Test 'getLastWarning' endpoint", () => {
         date: "",
         syncDate: "",
         serverPath: "",
-        clientPath: "",
+        clientPaths: [],
       },
       image64: "",
     };

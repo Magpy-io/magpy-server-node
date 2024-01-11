@@ -208,7 +208,14 @@ export type ServerResponseError<Errors> = {
 
 export type EndpointMethodsResponseType<T, U> = T | ServerResponseError<U>;
 
-export type PhotoTypes = "data" | "thumbnail" | "compressed" | "original";
+export const PhotoTypesArray = [
+  "data",
+  "thumbnail",
+  "compressed",
+  "original",
+] as const;
+
+export type PhotoTypes = (typeof PhotoTypesArray)[number];
 
 export type APIPhoto = {
   id: string;
@@ -220,7 +227,7 @@ export type APIPhoto = {
     date: string;
     syncDate: string;
     serverPath: string;
-    clientPath: string;
+    clientPaths: Array<{ deviceUniqueId: string; path: string }>;
   };
   image64: string;
 };
@@ -377,6 +384,7 @@ export async function GetPhotoPartByIdPost(
 export type GetPhotosByPathRequestData = {
   photosData: Array<{ path: string; size: number; date: string }>;
   photoType: PhotoTypes;
+  deviceUniqueId: string;
 };
 
 export type GetPhotosByPathResponseData = ServerResponseData<{
@@ -453,6 +461,7 @@ export type AddPhotoRequestData = {
   path: string;
   date: string;
   image64: string;
+  deviceUniqueId: string;
 };
 
 export type AddPhotoResponseData = ServerResponseData<{
@@ -492,6 +501,7 @@ export type AddPhotoInitRequestData = {
   path: string;
   date: string;
   image64Len: number;
+  deviceUniqueId: string;
 };
 
 export type AddPhotoInitResponseData = ServerResponseData<{
@@ -530,11 +540,19 @@ export type AddPhotoPartRequestData = {
   photoPart: string;
 };
 
-export type AddPhotoPartResponseData = ServerResponseData<{
-  lenReceived: number;
-  lenWaiting: number;
-  photo: APIPhoto;
-}>;
+export type AddPhotoPartResponseData = ServerResponseData<
+  | {
+      lenReceived: number;
+      lenWaiting: number;
+      done: false;
+    }
+  | {
+      lenReceived: number;
+      lenWaiting: number;
+      done: true;
+      photo: APIPhoto;
+    }
+>;
 
 export type AddPhotoPartResponseErrorTypes =
   | ErrorPhotoSizeExceeded
@@ -567,6 +585,7 @@ export async function AddPhotoPartPost(
 export type UpdatePhotoPathRequestData = {
   id: string;
   path: string;
+  deviceUniqueId: string;
 };
 
 export type UpdatePhotoPathResponseData = ServerResponseMessage;

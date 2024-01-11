@@ -5,24 +5,34 @@ import sharp from "sharp";
 import { GetStorageFolderPath } from "@src/modules/serverDataManager";
 import * as path from "path";
 
-import {
-  MAX_PIXELS_IN_IMAGE,
-  MAX_PIXELS_IN_IMAGE_BIGGER,
-} from "@src/config/config";
-import { isValidPhotoType, Photo, PhotoTypes } from "@src/types/photoType";
+import * as config from "@src/config/config";
+import { isValidPhotoType } from "@src/types/photoType";
 
-export async function addPhotoToDisk(photo: Photo, base64: string) {
+import { PhotoTypes } from "@src/api/export/exportedTypes";
+
+interface AddPhotoParamType {
+  width: number;
+  height: number;
+  serverPath: string;
+  serverCompressedPath: string;
+  serverThumbnailPath: string;
+}
+
+export async function addPhotoToDisk<T extends AddPhotoParamType>(
+  photo: T,
+  base64: string
+) {
   await createFolder(path.parse(photo.serverPath).dir);
 
   const factorTmp = Math.sqrt(
-    (photo.width * photo.height) / MAX_PIXELS_IN_IMAGE
+    (photo.width * photo.height) / config.MAX_PIXELS_IN_IMAGE
   );
   const factor = factorTmp > 1 ? factorTmp : 1;
   const newWidth = Math.round(photo.width / factor);
   const newHeight = Math.round(photo.height / factor);
 
   const factor2Tmp = Math.sqrt(
-    (photo.width * photo.height) / MAX_PIXELS_IN_IMAGE_BIGGER
+    (photo.width * photo.height) / config.MAX_PIXELS_IN_IMAGE_BIGGER
   );
   const factor2 = factor2Tmp > 1 ? factor2Tmp : 1;
   const newWidth2 = Math.round(photo.width / factor2);
@@ -52,7 +62,9 @@ export async function addPhotoToDisk(photo: Photo, base64: string) {
   return;
 }
 
-export async function removePhotoFromDisk(photo: Photo) {
+export async function removePhotoFromDisk<T extends AddPhotoParamType>(
+  photo: T
+) {
   try {
     await fs.rm(photo.serverPath, { force: true });
   } catch (err: any) {
@@ -62,7 +74,9 @@ export async function removePhotoFromDisk(photo: Photo) {
   await removePhotoVariationsFromDisk(photo);
 }
 
-export async function removePhotoVariationsFromDisk(photo: Photo) {
+export async function removePhotoVariationsFromDisk<
+  T extends AddPhotoParamType
+>(photo: T) {
   try {
     await fs.rm(photo.serverThumbnailPath, { force: true });
   } catch (err: any) {
@@ -77,7 +91,10 @@ export async function removePhotoVariationsFromDisk(photo: Photo) {
   }
 }
 
-export async function getPhotoFromDisk(photo: Photo, photoType: PhotoTypes) {
+export async function getPhotoFromDisk<T extends AddPhotoParamType>(
+  photo: T,
+  photoType: PhotoTypes
+) {
   if (!isValidPhotoType(photoType)) {
     throw new Error(
       `getPhotoFromDisk: invalid photoType: ${photoType}, should be one of "thumbnail", "compressed" or "original"`
@@ -123,7 +140,17 @@ export async function clearImagesDisk() {
   }
 }
 
-export async function isPhotoOnDisk(photo: Photo) {
+export async function clearDbFile() {
+  try {
+    const pathDir = config.sqliteDbFile;
+    await fs.rm(pathDir, { force: true, recursive: true });
+  } catch (err) {
+    console.error(err);
+    throw err;
+  }
+}
+
+export async function isPhotoOnDisk<T extends AddPhotoParamType>(photo: T) {
   const originalExists = await pathExists(photo.serverPath);
   const compressedExists = await pathExists(photo.serverCompressedPath);
   const thumbnailExists = await pathExists(photo.serverThumbnailPath);

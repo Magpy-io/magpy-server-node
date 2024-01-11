@@ -19,3 +19,9 @@ export async function ClearModules() {
   await clearFilesWaiting();
   ClearAllWarnings();
 }
+
+export async function ClearModulesKeepServerConfig() {
+  SetPath("");
+  await clearFilesWaiting();
+  ClearAllWarnings();
+}

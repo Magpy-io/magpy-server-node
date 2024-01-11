@@ -6,7 +6,7 @@ import { addPhotoToDisk } from "@src/modules/diskManager";
 import { addServerImagePaths } from "@src/modules/diskFilesNaming";
 import { hashFile } from "@src/modules/hashing";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
-import { Photo } from "@src/types/photoType";
+
 import checkUserToken from "@src/middleware/checkUserToken";
 import {
   AddPhotoRequestData,
@@ -34,27 +34,25 @@ const callback = async (req: Request, res: Response) => {
 
     const requestPhoto: AddPhotoRequestData = req.body;
 
-    const photo: Photo = {
-      id: "",
+    const photo = {
       name: requestPhoto.name,
       fileSize: requestPhoto.fileSize,
       width: requestPhoto.width,
       height: requestPhoto.height,
       date: requestPhoto.date,
-      syncDate: "",
+      syncDate: new Date(Date.now()).toJSON(),
       clientPath: requestPhoto.path,
+      deviceUniqueId: requestPhoto.deviceUniqueId,
       serverPath: "",
       serverCompressedPath: "",
       serverThumbnailPath: "",
       hash: "",
     };
 
-    console.log("Photo does not exist in server.");
-    console.log("Creating syncDate, photoPath and the photo hash.");
-    photo.syncDate = new Date(Date.now()).toJSON();
     await addServerImagePaths(photo);
     photo.hash = hashFile(requestPhoto.image64);
     console.log("Adding photo to db.");
+
     const dbPhoto = await addPhotoToDB(photo);
 
     console.log("Photo added successfully to db.");
@@ -63,6 +61,7 @@ const callback = async (req: Request, res: Response) => {
       await addPhotoToDisk(dbPhoto, requestPhoto.image64);
     } catch (err) {
       console.log("Could not add photo to disk, removing photo from db");
+      console.log(dbPhoto);
       await deletePhotoByIdFromDB(dbPhoto.id);
       throw err;
     }

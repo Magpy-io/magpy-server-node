@@ -21,7 +21,6 @@ import {
 } from "@tests/helpers/functions";
 import FilesWaiting from "@src/modules/waitingFiles";
 import { serverTokenHeader } from "@tests/helpers/functions";
-import { PhotoTypes } from "@src/types/photoType";
 
 describe("Test 'addPhotoInit' endpoint", () => {
   let app: Express;

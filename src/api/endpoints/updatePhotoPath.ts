@@ -32,7 +32,7 @@ const callback = async (req: Request, res: Response) => {
     throw new Error("UserId is not defined.");
   }
 
-  const { id, path }: UpdatePhotoPathRequestData = req.body;
+  const { id, path, deviceUniqueId }: UpdatePhotoPathRequestData = req.body;
 
   try {
     console.log(`Searching in db for photo with id: ${id}`);
@@ -60,7 +60,7 @@ const callback = async (req: Request, res: Response) => {
 
       console.log("Photo path does not exist in db");
       console.log("Updating path in db");
-      await updatePhotoClientPathById(id, path);
+      await updatePhotoClientPathById(id, path, deviceUniqueId);
 
       console.log("Photo updated successfully.");
       console.log("Sending response message.");

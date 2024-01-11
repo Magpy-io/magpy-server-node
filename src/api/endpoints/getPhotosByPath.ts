@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
 import { getPhotosByClientPathAndSizeAndDateFromDB } from "@src/db/sequelizeDb";
-import { PhotoTypes, isValidPhotoType } from "@src/types/photoType";
+import { isValidPhotoType } from "@src/types/photoType";
 import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 import { getPhotoFromDisk } from "@src/modules/diskManager";
 import checkUserToken from "@src/middleware/checkUserToken";
@@ -35,10 +35,17 @@ const callback = async (req: Request, res: Response) => {
       throw new Error("UserId is not defined.");
     }
 
-    const { photosData, photoType }: GetPhotosByPathRequestData = req.body;
+    const {
+      photosData,
+      photoType,
+      deviceUniqueId,
+    }: GetPhotosByPathRequestData = req.body;
 
     console.log("Getting photos from db with paths from request.");
-    const photos = await getPhotosByClientPathAndSizeAndDateFromDB(photosData);
+    const photos = await getPhotosByClientPathAndSizeAndDateFromDB(
+      photosData,
+      deviceUniqueId
+    );
     console.log("Received response from db.");
 
     const ret = await filterPhotosExistAndDeleteMissing(photos);

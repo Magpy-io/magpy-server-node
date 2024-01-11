@@ -1,6 +1,6 @@
 // IMPORTS
 import { Response } from "express";
-import { Photo } from "@src/types/photoType";
+import { Photo } from "@src/db/sequelizeDb";
 import { APIPhoto } from "@src/api/export/exportedTypes";
 import { ErrorCodes } from "@src/api/export/exportedTypes";
 
@@ -106,7 +106,7 @@ function createPhotoObject(dbPhoto: Photo, image64?: string): APIPhoto {
       date: dbPhoto.date,
       syncDate: dbPhoto.syncDate,
       serverPath: dbPhoto.serverPath,
-      clientPath: dbPhoto.clientPath,
+      clientPaths: dbPhoto.clientPaths,
     },
     image64: image64 ? image64 : "",
   };

@@ -25,7 +25,7 @@ import {
 } from "@tests/helpers/functions";
 import * as dbFunction from "@src/db/sequelizeDb";
 import { pathExists } from "@src/modules/diskManager";
-import { PhotoTypes } from "@src/types/photoType";
+
 import {
   AddWarningPhotosDeleted,
   checkPhotoExistsAndDeleteMissing,
@@ -34,6 +34,7 @@ import {
   GetLastWarningForUser,
   HasWarningForUser,
 } from "@src/modules/warningsManager";
+import { PhotoTypes } from "@src/api/export/exportedTypes";
 
 describe("Test 'checkPhotoExistsAndDeleteMissing' function", () => {
   let app: Express;

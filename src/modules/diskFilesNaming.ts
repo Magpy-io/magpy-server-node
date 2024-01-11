@@ -1,10 +1,14 @@
-import { Photo } from "@src/types/photoType";
 import * as path from "path";
 
 import { GetStorageFolderPath } from "@src/modules/serverDataManager";
 import { pathExists, createFolder } from "@src/modules/diskManager";
+import { Photo } from "@src/db/sequelizeDb";
 
-async function createServerImageName(photo: Photo) {
+type createServerImageNameInputType = { name: string; syncDate: string };
+
+async function createServerImageName<T extends createServerImageNameInputType>(
+  photo: T
+) {
   const dirPath = GetStorageFolderPath();
   const nameParsed = path.parse(photo.name);
   const serverFileName = createBaseName(photo) + nameParsed.ext;
@@ -14,7 +18,9 @@ async function createServerImageName(photo: Photo) {
   return await getFirstAvailableFileName(filePath);
 }
 
-async function createServerImageThumbnailName(photo: Photo) {
+async function createServerImageThumbnailName<
+  T extends createServerImageNameInputType
+>(photo: T) {
   const dirPath = GetStorageFolderPath();
   const nameParsed = path.parse(photo.name);
   const serverFileName = createBaseName(photo) + "_thumbnail" + nameParsed.ext;
@@ -24,7 +30,9 @@ async function createServerImageThumbnailName(photo: Photo) {
   return await getFirstAvailableFileName(filePath);
 }
 
-async function createServerImageCompressedName(photo: Photo) {
+async function createServerImageCompressedName<
+  T extends createServerImageNameInputType
+>(photo: T) {
   const dirPath = GetStorageFolderPath();
   const nameParsed = path.parse(photo.name);
   const serverFileName = createBaseName(photo) + "_compressed" + nameParsed.ext;
@@ -34,7 +42,7 @@ async function createServerImageCompressedName(photo: Photo) {
   return await getFirstAvailableFileName(filePath);
 }
 
-function createBaseName(photo: Photo) {
+function createBaseName<T extends createServerImageNameInputType>(photo: T) {
   const nameParsed = path.parse(photo.name);
 
   const date = photo.syncDate;
@@ -42,7 +50,14 @@ function createBaseName(photo: Photo) {
   return `Ants_${nameParsed.name}_${dateFormated}`;
 }
 
-async function addServerImagePaths(photo: Photo) {
+type AddServerImagePathsInputType = {
+  serverPath: string;
+  serverCompressedPath: string;
+  serverThumbnailPath: string;
+};
+async function addServerImagePaths<
+  T extends AddServerImagePathsInputType & createServerImageNameInputType
+>(photo: T) {
   photo.serverPath = await createServerImageName(photo);
   photo.serverCompressedPath = await createServerImageCompressedName(photo);
   photo.serverThumbnailPath = await createServerImageThumbnailName(photo);
