@@ -212,6 +212,10 @@ async function addPhotoToDB(photo: AddPhotoType): Promise<Photo> {
   try {
     const image = await ImageModel.create(dbPhoto);
 
+    if (!image) {
+      throw new Error("Error adding photo to db");
+    }
+
     let device = await getDeviceFromDB(photo.deviceUniqueId);
 
     if (!device) {
@@ -222,7 +226,7 @@ async function addPhotoToDB(photo: AddPhotoType): Promise<Photo> {
     }
 
     if (!device) {
-      throw new Error("Error adding photo to db");
+      throw new Error("Error adding device to db");
     }
 
     const clientPath = await ClientPathModel.create({
@@ -232,8 +236,8 @@ async function addPhotoToDB(photo: AddPhotoType): Promise<Photo> {
       deviceId: device.dataValues.id,
     });
 
-    if (!image || !clientPath) {
-      throw new Error("Error adding photo to db");
+    if (!clientPath) {
+      throw new Error("Error adding clientPath to db");
     }
 
     return {
