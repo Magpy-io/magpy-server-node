@@ -188,7 +188,7 @@ async function getPhotoByClientPathAndSizeAndDateFromDB(
       );
     }
 
-    if (images.length == 1) {
+    if (images.length >= 1) {
       return images[0];
     } else {
       return null;
