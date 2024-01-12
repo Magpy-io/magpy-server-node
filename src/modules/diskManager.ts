@@ -56,9 +56,9 @@ export async function addPhotoToDisk<T extends AddPhotoParamType>(
       console.error(err);
       throw err;
     });
-  await fs.writeFile(photo.serverPath, buff);
-  await fs.writeFile(photo.serverCompressedPath, data2);
-  await fs.writeFile(photo.serverThumbnailPath, data1);
+  await fs.writeFile(photo.serverPath, buff, { flag: "wx" });
+  await fs.writeFile(photo.serverCompressedPath, data2, { flag: "wx" });
+  await fs.writeFile(photo.serverThumbnailPath, data1, { flag: "wx" });
   return;
 }
 
