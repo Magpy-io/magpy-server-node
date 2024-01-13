@@ -27,6 +27,7 @@ import {
   addPhotoWithMultiplePaths,
   testPhotoMetaAndIdWithAdditionalPaths,
   defaultPhotoSecondPath,
+  generateDate,
 } from "@tests/helpers/functions";
 import { PhotoTypes } from "@src/api/export/exportedTypes";
 
@@ -95,7 +96,7 @@ describe("Test 'getPhotosByPath' endpoint", () => {
       const photosData = Array(testData.n)
         .fill("")
         .map((_, i) => {
-          return { path: "path" + i.toString(), size: 0, date: "" };
+          return { path: "path" + i.toString(), size: 0, date: generateDate() };
         });
 
       const ret = await exportedTypes.GetPhotosByPathPost({
@@ -129,7 +130,7 @@ describe("Test 'getPhotosByPath' endpoint", () => {
         size: dbPhoto.fileSize,
         date: dbPhoto.date.toJSON(),
       },
-      { path: "path2", size: 0, date: "" },
+      { path: "path2", size: 0, date: generateDate() },
     ];
 
     const ret = await exportedTypes.GetPhotosByPathPost({

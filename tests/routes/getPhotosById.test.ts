@@ -22,6 +22,7 @@ import {
   deletePhotoFromDisk,
   testWarning,
   expectToBeOk,
+  generateId,
   getDataFromRet,
   addPhotoWithMultiplePaths,
   testPhotoMetaAndIdWithAdditionalPaths,
@@ -79,7 +80,7 @@ describe("Test 'getPhotosById' endpoint", () => {
     async (testData) => {
       const ids = Array(testData.n)
         .fill("")
-        .map((_, i) => "id" + i.toString());
+        .map(() => generateId());
 
       const ret = await exportedTypes.GetPhotosByIdPost({
         ids: ids,
@@ -102,7 +103,7 @@ describe("Test 'getPhotosById' endpoint", () => {
   it("Should return 2 photos, the first exists and the second does not, after adding 1 photo and requesting 2", async () => {
     const photoAddedData = await addPhoto();
 
-    const ids = [photoAddedData.id, "id2"];
+    const ids = [photoAddedData.id, generateId()];
 
     const ret = await exportedTypes.GetPhotosByIdPost({
       ids: ids,

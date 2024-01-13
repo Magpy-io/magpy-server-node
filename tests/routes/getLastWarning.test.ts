@@ -48,7 +48,7 @@ describe("Test 'getLastWarning' endpoint", () => {
     expect(data.warning).toBeNull();
   });
 
-  it("Should return the warning when a warning is are stored", async () => {
+  it("Should return the warning when a warning is stored", async () => {
     const photoMissing = {
       id: "",
       meta: {

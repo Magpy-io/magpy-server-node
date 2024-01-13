@@ -1,11 +1,10 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
 import { addPhotoToDB, deletePhotoByIdFromDB } from "@src/db/sequelizeDb";
-
+import Joi from "joi";
 import { addPhotoToDisk } from "@src/modules/diskManager";
 import { addServerImagePaths } from "@src/modules/diskFilesNaming";
 import { hashFile } from "@src/modules/hashing";
-import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
 
 import checkUserToken from "@src/middleware/checkUserToken";
 import {
@@ -21,10 +20,11 @@ const endpoint = "/addPhoto";
 const callback = async (req: Request, res: Response) => {
   try {
     console.log("Checking request parameters.");
-    if (checkBodyParamsMissing(req)) {
+    const { error } = RequestDataShema.validate(req.body);
+    if (error) {
       console.log("Bad request parameters");
       console.log("Sending response message");
-      return responseFormatter.sendFailedBadRequest(res);
+      return responseFormatter.sendFailedBadRequest(res, error.message);
     }
     console.log("Request parameters ok.");
 
@@ -77,17 +77,16 @@ const callback = async (req: Request, res: Response) => {
   }
 };
 
-function checkBodyParamsMissing(req: Request) {
-  if (checkReqBodyAttributeMissing(req, "name", "string")) return true;
-  if (checkReqBodyAttributeMissing(req, "fileSize", "number")) return true;
-  if (checkReqBodyAttributeMissing(req, "width", "number")) return true;
-  if (checkReqBodyAttributeMissing(req, "height", "number")) return true;
-  if (checkReqBodyAttributeMissing(req, "path", "string")) return true;
-  if (checkReqBodyAttributeMissing(req, "date", "Date")) return true;
-  if (checkReqBodyAttributeMissing(req, "image64", "string")) return true;
-
-  return false;
-}
+const RequestDataShema = Joi.object({
+  name: Joi.string(),
+  fileSize: Joi.number().integer(),
+  width: Joi.number().integer(),
+  height: Joi.number().integer(),
+  path: Joi.string(),
+  date: Joi.string().isoDate(),
+  image64: Joi.string().base64(),
+  deviceUniqueId: Joi.string(),
+}).options({ presence: "required" });
 
 export default {
   endpoint: endpoint,

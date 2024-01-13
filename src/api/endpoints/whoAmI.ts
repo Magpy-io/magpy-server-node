@@ -3,6 +3,8 @@ import responseFormatter from "@src/api/responseFormatter";
 
 import checkUserToken from "@src/middleware/checkUserToken";
 
+import Joi from "joi";
+
 import { WhoAmIResponseData } from "@src/api/export/exportedTypes";
 
 const sendResponse =
@@ -12,6 +14,13 @@ const sendResponse =
 const endpoint = "/whoami";
 const callback = async (req: Request, res: Response) => {
   try {
+    const { error } = RequestDataShema.validate(req.body);
+    if (error) {
+      console.log("Bad request parameters");
+      console.log("Sending response message");
+      return responseFormatter.sendFailedBadRequest(res, error.message);
+    }
+
     if (!req.userId) {
       throw new Error("UserId is not defined.");
     }
@@ -27,6 +36,8 @@ const callback = async (req: Request, res: Response) => {
     return responseFormatter.sendErrorMessage(res);
   }
 };
+
+const RequestDataShema = Joi.object({}).options({ presence: "required" });
 
 export default {
   endpoint: endpoint,

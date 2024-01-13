@@ -18,6 +18,7 @@ import {
   getPhotoFromDb,
   deletePhotoFromDisk,
   testWarning,
+  generateId,
   getDataFromRet,
   expectErrorCodeToBe,
   expectToBeOk,
@@ -87,7 +88,7 @@ describe("Test 'getPhotoPartById' endpoint", () => {
 
   it("Should return ID_NOT_FOUND error if requesting a photo that does not exist", async () => {
     const ret = await exportedTypes.GetPhotoPartByIdPost({
-      id: "id",
+      id: generateId(),
       part: 0,
     });
 

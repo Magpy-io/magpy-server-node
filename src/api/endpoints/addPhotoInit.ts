@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
 import FilesWaiting from "@src/modules/waitingFiles";
 import { addServerImagePaths } from "@src/modules/diskFilesNaming";
-import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
+import Joi from "joi";
 import { v4 as uuid } from "uuid";
 import { postPhotoPartTimeout } from "@src/config/config";
 
@@ -21,10 +21,11 @@ const endpoint = "/addPhotoInit";
 const callback = async (req: Request, res: Response) => {
   try {
     console.log("Checking request parameters.");
-    if (checkBodyParamsMissing(req)) {
+    const { error } = RequestDataShema.validate(req.body);
+    if (error) {
       console.log("Bad request parameters");
       console.log("Sending response message");
-      return responseFormatter.sendFailedBadRequest(res);
+      return responseFormatter.sendFailedBadRequest(res, error.message);
     }
     console.log("Request parameters ok.");
 
@@ -75,17 +76,16 @@ const callback = async (req: Request, res: Response) => {
   }
 };
 
-function checkBodyParamsMissing(req: Request) {
-  if (checkReqBodyAttributeMissing(req, "name", "string")) return true;
-  if (checkReqBodyAttributeMissing(req, "fileSize", "number")) return true;
-  if (checkReqBodyAttributeMissing(req, "width", "number")) return true;
-  if (checkReqBodyAttributeMissing(req, "height", "number")) return true;
-  if (checkReqBodyAttributeMissing(req, "path", "string")) return true;
-  if (checkReqBodyAttributeMissing(req, "date", "Date")) return true;
-  if (checkReqBodyAttributeMissing(req, "image64Len", "number")) return true;
-
-  return false;
-}
+const RequestDataShema = Joi.object({
+  name: Joi.string(),
+  fileSize: Joi.number().integer(),
+  width: Joi.number().integer(),
+  height: Joi.number().integer(),
+  path: Joi.string(),
+  date: Joi.string().isoDate(),
+  image64Len: Joi.number(),
+  deviceUniqueId: Joi.string(),
+}).options({ presence: "required" });
 
 export default {
   endpoint: endpoint,

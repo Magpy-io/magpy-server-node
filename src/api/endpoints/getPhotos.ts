@@ -1,9 +1,8 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
-import { isValidPhotoType } from "@src/types/photoType";
 import { getPhotosFromDB } from "@src/db/sequelizeDb";
 import { getPhotoFromDisk } from "@src/modules/diskManager";
-import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
+import Joi from "joi";
 import checkUserToken from "@src/middleware/checkUserToken";
 import {
   AddWarningPhotosDeleted,
@@ -12,6 +11,7 @@ import {
 import {
   GetPhotosRequestData,
   GetPhotosResponseData,
+  PhotoTypesArray,
 } from "@src/api/export/exportedTypes";
 
 const sendResponse =
@@ -21,11 +21,11 @@ const sendResponse =
 const endpoint = "/getPhotos";
 const callback = async (req: Request, res: Response) => {
   try {
-    console.log("Checking request parameters.");
-    if (checkBodyParamsMissing(req)) {
+    const { error } = RequestDataShema.validate(req.body);
+    if (error) {
       console.log("Bad request parameters");
       console.log("Sending response message");
-      return responseFormatter.sendFailedBadRequest(res);
+      return responseFormatter.sendFailedBadRequest(res, error.message);
     }
     console.log("Request parameters ok.");
 
@@ -90,14 +90,11 @@ const callback = async (req: Request, res: Response) => {
   }
 };
 
-function checkBodyParamsMissing(req: Request) {
-  if (checkReqBodyAttributeMissing(req, "number", "number")) return true;
-  if (checkReqBodyAttributeMissing(req, "offset", "number")) return true;
-  if (checkReqBodyAttributeMissing(req, "photoType", "string")) return true;
-  if (!isValidPhotoType(req.body.photoType)) return true;
-
-  return false;
-}
+const RequestDataShema = Joi.object({
+  number: Joi.number().integer(),
+  offset: Joi.number().integer(),
+  photoType: Joi.string().valid(...PhotoTypesArray),
+}).options({ presence: "required" });
 
 export default {
   endpoint: endpoint,

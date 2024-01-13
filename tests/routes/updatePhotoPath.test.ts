@@ -12,7 +12,6 @@ import { initServer, stopServer } from "@src/server/server";
 import * as sac from "@tests/helpers/setupAndCleanup";
 
 import {
-  addNPhotos,
   addPhoto,
   defaultPhoto,
   defaultPhotoSecondPath,
@@ -20,6 +19,7 @@ import {
   expectErrorCodeToBe,
   expectToBeOk,
   expectToNotBeOk,
+  generateId,
   getPhotoById,
   getPhotoFromDb,
   testPhotoMetaAndId,
@@ -70,7 +70,7 @@ describe("Test 'updatePhotoPath' endpoint", () => {
 
   it("Should return error ID_NOT_FOUND when request id not in db", async () => {
     const ret = await exportedTypes.UpdatePhotoPathPost({
-      id: "id",
+      id: generateId(),
       path: "newPath",
       deviceUniqueId: defaultPhoto.deviceUniqueId,
     });

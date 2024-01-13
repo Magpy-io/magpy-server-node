@@ -6,6 +6,8 @@ import checkConnexionLocal from "@src/middleware/checkConnexionLocal";
 import checkServerHasValidCredentials from "@src/middleware/checkServerHasValidCredentials";
 import { SaveServerName } from "@src/modules/serverDataManager";
 
+import Joi from "joi";
+
 import {
   UpdateServerNameRequestData,
   UpdateServerNameResponseData,
@@ -18,6 +20,13 @@ const sendResponse =
 const endpoint = "/updateServerName";
 const callback = async (req: Request, res: Response) => {
   try {
+    const { error } = RequestDataShema.validate(req.body);
+    if (error) {
+      console.log("Bad request parameters");
+      console.log("Sending response message");
+      return responseFormatter.sendFailedBadRequest(res, error.message);
+    }
+
     const { name }: UpdateServerNameRequestData = req.body;
 
     if (!name) {
@@ -30,6 +39,15 @@ const callback = async (req: Request, res: Response) => {
       return responseFormatter.sendFailedMessage(
         res,
         "Name too short or too long",
+        "INVALID_NAME"
+      );
+    }
+
+    if (!/^[a-zA-Z0-9 \-_]+$/.test(name)) {
+      console.log("Invalid name");
+      return responseFormatter.sendFailedMessage(
+        res,
+        "Name can only contain alphanumeric characters, whitespaces, -, and _",
         "INVALID_NAME"
       );
     }
@@ -49,6 +67,10 @@ const callback = async (req: Request, res: Response) => {
     return responseFormatter.sendErrorMessage(res);
   }
 };
+
+const RequestDataShema = Joi.object({
+  name: Joi.string().optional(),
+}).options({ presence: "required" });
 
 export default {
   endpoint: endpoint,

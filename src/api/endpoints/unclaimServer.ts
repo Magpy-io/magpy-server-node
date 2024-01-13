@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
-
+import Joi from "joi";
 import { ClearServerCredentials } from "@src/modules/serverDataManager";
 import {
   DeleteServerPost,
@@ -18,6 +18,13 @@ const sendResponse =
 const endpoint = "/unclaimServer";
 const callback = async (req: Request, res: Response) => {
   try {
+    const { error } = RequestDataShema.validate(req.body);
+    if (error) {
+      console.log("Bad request parameters");
+      console.log("Sending response message");
+      return responseFormatter.sendFailedBadRequest(res, error.message);
+    }
+
     if (req.hasValidCredentials) {
       let ret: DeleteServerResponseType | undefined;
       try {
@@ -43,6 +50,8 @@ const callback = async (req: Request, res: Response) => {
     return responseFormatter.sendErrorMessage(res);
   }
 };
+
+const RequestDataShema = Joi.object({}).options({ presence: "required" });
 
 export default {
   endpoint: endpoint,

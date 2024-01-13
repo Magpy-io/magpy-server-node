@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
 import { getPhotoByIdFromDB, deletePhotoByIdFromDB } from "@src/db/sequelizeDb";
 import { removePhotoFromDisk } from "@src/modules/diskManager";
-import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
+import Joi from "joi";
 import checkUserToken from "@src/middleware/checkUserToken";
 import {
   DeletePhotosByIdRequestData,
@@ -17,10 +17,11 @@ const endpoint = "/deletePhotosById";
 const callback = async (req: Request, res: Response) => {
   try {
     console.log("Checking request parameters.");
-    if (checkReqBodyAttributeMissing(req, "ids", "Array string")) {
+    const { error } = RequestDataShema.validate(req.body);
+    if (error) {
       console.log("Bad request parameters");
       console.log("Sending response message");
-      return responseFormatter.sendFailedBadRequest(res);
+      return responseFormatter.sendFailedBadRequest(res, error.message);
     }
     console.log("Request parameters ok.");
 
@@ -46,6 +47,10 @@ const callback = async (req: Request, res: Response) => {
     return responseFormatter.sendErrorMessage(res);
   }
 };
+
+const RequestDataShema = Joi.object({
+  ids: Joi.array().items(Joi.string().uuid({ version: "uuidv4" })),
+}).options({ presence: "required" });
 
 export default {
   endpoint: endpoint,

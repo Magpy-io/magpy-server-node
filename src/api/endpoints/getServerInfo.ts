@@ -6,6 +6,8 @@ import checkConnexionLocal from "@src/middleware/checkConnexionLocal";
 import checkServerHasValidCredentials from "@src/middleware/checkServerHasValidCredentials";
 import { GetServerConfigData } from "@src/modules/serverDataManager";
 
+import Joi from "joi";
+
 import { GetServerInfoResponseData } from "@src/api/export/exportedTypes";
 
 const sendResponse =
@@ -15,6 +17,13 @@ const sendResponse =
 const endpoint = "/getServerInfo";
 const callback = async (req: Request, res: Response) => {
   try {
+    const { error } = RequestDataShema.validate(req.body);
+    if (error) {
+      console.log("Bad request parameters");
+      console.log("Sending response message");
+      return responseFormatter.sendFailedBadRequest(res, error.message);
+    }
+
     const serverDataConfig = GetServerConfigData();
 
     const responseJson: {
@@ -49,6 +58,8 @@ const callback = async (req: Request, res: Response) => {
     return responseFormatter.sendErrorMessage(res);
   }
 };
+
+const RequestDataShema = Joi.object({}).options({ presence: "required" });
 
 export default {
   endpoint: endpoint,

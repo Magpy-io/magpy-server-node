@@ -2,7 +2,7 @@ import { expect } from "@jest/globals";
 
 import { validate } from "uuid";
 import jwt from "jsonwebtoken";
-
+import { v4 as uuid } from "uuid";
 import { photoImage64 } from "@tests/helpers/imageBase64";
 import { postPhotoPartTimeout } from "@src/config/config";
 import { timeout } from "@src/modules/functions";
@@ -37,12 +37,12 @@ const defaultPhoto = {
   path: "/path/to/image.jpg",
   date: "2022-12-11T17:05:21.396Z",
   image64: photoImage64,
-  deviceUniqueId: "0123456789",
+  deviceUniqueId: "fe2e61bd-31e2-4896-b121-1124fa561344",
 };
 
 const defaultPhotoSecondPath = {
   path: "/new/path/to/image.jpg",
-  deviceUniqueId: "newDeviceUniqueId",
+  deviceUniqueId: "6b065dcf-782b-4203-8b59-06d81242fac0",
 };
 
 async function addPhoto(data?: {
@@ -427,6 +427,14 @@ async function addPhotoWithMultiplePaths() {
   return addedPhotoData;
 }
 
+function generateId() {
+  return uuid();
+}
+
+function generateDate() {
+  return new Date().toJSON();
+}
+
 export {
   addPhoto,
   addNPhotos,
@@ -460,4 +468,6 @@ export {
   expectToNotBeOk,
   expectErrorCodeToBe,
   addPhotoWithMultiplePaths,
+  generateId,
+  generateDate,
 };

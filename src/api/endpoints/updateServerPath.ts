@@ -5,7 +5,7 @@ import checkConnexionLocal from "@src/middleware/checkConnexionLocal";
 
 import { SaveStorageFolderPath } from "@src/modules/serverDataManager";
 import { folderHasRights, pathExists } from "@src/modules/diskManager";
-
+import Joi from "joi";
 import { isAbsolutePath } from "@src/modules/functions";
 
 import {
@@ -20,6 +20,13 @@ const sendResponse =
 const endpoint = "/updateServerPath";
 const callback = async (req: Request, res: Response) => {
   try {
+    const { error } = RequestDataShema.validate(req.body);
+    if (error) {
+      console.log("Bad request parameters");
+      console.log("Sending response message");
+      return responseFormatter.sendFailedBadRequest(res, error.message);
+    }
+
     const { path }: UpdateServerPathRequestData = req.body;
 
     if (!path) {
@@ -62,6 +69,10 @@ const callback = async (req: Request, res: Response) => {
     return responseFormatter.sendErrorMessage(res);
   }
 };
+
+const RequestDataShema = Joi.object({
+  path: Joi.string().optional(),
+}).options({ presence: "required" });
 
 export default {
   endpoint: endpoint,

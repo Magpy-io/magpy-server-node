@@ -17,6 +17,7 @@ import {
   checkPhotoExists,
   testPhotoNotInDbNorDisk,
   getPhotoFromDb,
+  generateId,
   deletePhotoFromDisk,
   getDataFromRet,
   expectToBeOk,
@@ -77,7 +78,7 @@ describe("Test 'deletePhotosById' endpoint", () => {
     async (p: { n: number }) => {
       const ids = Array(p.n)
         .fill("")
-        .map((_, i) => "id" + i.toString());
+        .map(() => generateId());
 
       const ret = await exportedTypes.DeletePhotosByIdPost({
         ids: ids,
@@ -92,7 +93,7 @@ describe("Test 'deletePhotosById' endpoint", () => {
 
   it("Should delete and return a single id when removing 2 ids, 1 exists and the other does not", async () => {
     const addedPhotoData = await addPhoto();
-    const ids = [addedPhotoData.id, "id2"];
+    const ids = [addedPhotoData.id, generateId()];
 
     const ret = await exportedTypes.DeletePhotosByIdPost({
       ids: ids,

@@ -36,22 +36,32 @@ describe("Test 'updateServerName' endpoint", () => {
     await sac.afterEach();
   });
 
-  it("Should return ok when changing the server name", async () => {
-    const ret = await exportedTypes.UpdateServerNamePost({ name: "newName" });
+  it.each([
+    { name: "newName" },
+    { name: "newName with spaces" },
+    { name: "newName with special chars _ -" },
+  ])(
+    "Should return ok when changing the server name to $name",
+    async (testData) => {
+      const ret = await exportedTypes.UpdateServerNamePost({
+        name: testData.name,
+      });
 
-    expectToBeOk(ret);
-    expect(ret.warning).toBe(false);
+      expectToBeOk(ret);
+      expect(ret.warning).toBe(false);
 
-    const serverName = GetServerName();
+      const serverName = GetServerName();
 
-    expect(serverName).toBe("newName");
-  });
+      expect(serverName).toBe(testData.name);
+    }
+  );
 
   it.each([
     { name: "ab" },
     {
       name: "12345678901234567890123456789012345678901234567890123456789012345678901",
     },
+    { name: "abc!" },
   ])(
     "Should return error INVALID_NAME when using the name : $name",
     async (testData) => {

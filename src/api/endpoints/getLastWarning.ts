@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
-
+import Joi from "joi";
 import checkUserToken from "@src/middleware/checkUserToken";
 import { GetLastWarningForUser } from "@src/modules/warningsManager";
 
@@ -13,6 +13,13 @@ const sendResponse =
 const endpoint = "/getLastWarning";
 const callback = async (req: Request, res: Response) => {
   try {
+    const { error } = RequestDataShema.validate(req.body);
+    if (error) {
+      console.log("Bad request parameters");
+      console.log("Sending response message");
+      return responseFormatter.sendFailedBadRequest(res, error.message);
+    }
+
     if (!req.userId) {
       throw new Error("UserId is not defined.");
     }
@@ -32,6 +39,7 @@ const callback = async (req: Request, res: Response) => {
   }
 };
 
+const RequestDataShema = Joi.object({}).options({ presence: "required" });
 export default {
   endpoint: endpoint,
   callback: callback,

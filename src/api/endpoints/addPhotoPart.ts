@@ -5,7 +5,7 @@ import { addPhotoToDB, deletePhotoByIdFromDB } from "@src/db/sequelizeDb";
 import FilesWaiting, { FilesWaitingType } from "@src/modules/waitingFiles";
 import { addPhotoToDisk } from "@src/modules/diskManager";
 import { hashFile } from "@src/modules/hashing";
-import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
+import Joi from "joi";
 import { postPhotoPartTimeout } from "@src/config/config";
 import checkUserToken from "@src/middleware/checkUserToken";
 import {
@@ -21,10 +21,11 @@ const endpoint = "/addPhotoPart";
 const callback = async (req: Request, res: Response) => {
   try {
     console.log("Checking request parameters.");
-    if (checkBodyParamsMissing(req)) {
+    const { error } = RequestDataShema.validate(req.body);
+    if (error) {
       console.log("Bad request parameters");
       console.log("Sending response message");
-      return responseFormatter.sendFailedBadRequest(res);
+      return responseFormatter.sendFailedBadRequest(res, error.message);
     }
 
     if (!req.userId) {
@@ -149,13 +150,14 @@ const callback = async (req: Request, res: Response) => {
   }
 };
 
-function checkBodyParamsMissing(req: Request) {
-  if (checkReqBodyAttributeMissing(req, "id", "string")) return true;
-  if (checkReqBodyAttributeMissing(req, "partNumber", "number")) return true;
-  if (checkReqBodyAttributeMissing(req, "partSize", "number")) return true;
-  if (checkReqBodyAttributeMissing(req, "photoPart", "string")) return true;
-  return false;
-}
+const RequestDataShema = Joi.object({
+  id: Joi.string().uuid({
+    version: "uuidv4",
+  }),
+  partNumber: Joi.number().integer(),
+  partSize: Joi.number().integer(),
+  photoPart: Joi.string(),
+}).options({ presence: "required" });
 
 function arePartsValid(parts: Map<number, string>) {
   const totalNumberOfParts = parts.size;

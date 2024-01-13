@@ -5,7 +5,6 @@ mockModules();
 import { describe, expect, it } from "@jest/globals";
 
 import { Express } from "express";
-import * as exportedTypes from "@src/api/export/exportedTypes";
 
 import { initServer, stopServer } from "@src/server/server";
 
@@ -24,6 +23,7 @@ import {
   testPhotoNotInDbNorDisk,
   getUserId,
   getPhotoById,
+  generateId,
 } from "@tests/helpers/functions";
 import * as dbFunction from "@src/db/sequelizeDb";
 import { pathExists } from "@src/modules/diskManager";
@@ -78,7 +78,7 @@ describe("Test 'checkPhotoExistsAndDeleteMissing' function", () => {
 
   it("Should return false if photo does not exist in db nor disk", async () => {
     const ret = await checkPhotoExistsAndDeleteMissing({
-      id: "id",
+      id: generateId(),
     });
 
     expect(ret.exists).toBe(false);

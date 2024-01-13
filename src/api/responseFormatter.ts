@@ -71,8 +71,8 @@ async function sendFailedMessage(
   return await res.status(400).json(jsonResponse);
 }
 
-async function sendFailedBadRequest(res: Response) {
-  let jsonResponse = formatError("Bad request", "BAD_REQUEST", false);
+async function sendFailedBadRequest(res: Response, message: string) {
+  let jsonResponse = formatError(message, "BAD_REQUEST", false);
   return await res.status(400).json(jsonResponse);
 }
 

@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
-import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
+import Joi from "joi";
 import {
   registerServerPost,
   getServerTokenPost,
@@ -33,10 +33,11 @@ const endpoint = "/claimServer";
 const callback = async (req: Request, res: Response) => {
   try {
     console.log("Checking request parameters.");
-    if (checkBodyParamsMissing(req)) {
+    const { error } = RequestDataShema.validate(req.body);
+    if (error) {
       console.log("Bad request parameters");
       console.log("Sending response message");
-      return responseFormatter.sendFailedBadRequest(res);
+      return responseFormatter.sendFailedBadRequest(res, error.message);
     }
     console.log("Request parameters ok.");
 
@@ -136,11 +137,9 @@ const callback = async (req: Request, res: Response) => {
   }
 };
 
-function checkBodyParamsMissing(req: Request) {
-  if (checkReqBodyAttributeMissing(req, "userToken", "string")) return true;
-
-  return false;
-}
+const RequestDataShema = Joi.object({
+  userToken: Joi.string(),
+}).options({ presence: "required" });
 
 export default {
   endpoint: endpoint,

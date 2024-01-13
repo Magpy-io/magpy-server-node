@@ -19,6 +19,7 @@ import {
   testPhotosExistInDbAndDisk,
   getDataFromRet,
   expectErrorCodeToBe,
+  generateId,
   testPhotoOriginal,
   expectToBeOk,
   expectToNotBeOk,
@@ -122,7 +123,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
   it("Should return error PHOTO_TRANSFER_NOT_FOUND if no transfer was started and sended part", async () => {
     const ret = await exportedTypes.AddPhotoPartPost({
-      id: "id",
+      id: generateId(),
       partNumber: 0,
       partSize: imageBase64Parts.photoLenPart1,
       photoPart: imageBase64Parts.photoImage64Part1,

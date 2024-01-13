@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
 import { updatePhotoClientPathById } from "@src/db/sequelizeDb";
 
-import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
+import Joi from "joi";
 import checkUserToken from "@src/middleware/checkUserToken";
 import {
   AddWarningPhotosDeleted,
@@ -20,11 +20,11 @@ const sendResponse =
 // updatePhotoPath : updates the path of a photo in db
 const endpoint = "/updatePhotoPath";
 const callback = async (req: Request, res: Response) => {
-  console.log("Checking request parameters.");
-  if (checkBodyParamsMissing(req)) {
+  const { error } = RequestDataShema.validate(req.body);
+  if (error) {
     console.log("Bad request parameters");
     console.log("Sending response message");
-    return responseFormatter.sendFailedBadRequest(res);
+    return responseFormatter.sendFailedBadRequest(res, error.message);
   }
   console.log("Request parameters ok.");
 
@@ -75,12 +75,11 @@ const callback = async (req: Request, res: Response) => {
   }
 };
 
-function checkBodyParamsMissing(req: Request) {
-  if (checkReqBodyAttributeMissing(req, "id", "string")) return true;
-  if (checkReqBodyAttributeMissing(req, "path", "string")) return true;
-
-  return false;
-}
+const RequestDataShema = Joi.object({
+  id: Joi.string().uuid({ version: "uuidv4" }),
+  path: Joi.string(),
+  deviceUniqueId: Joi.string().uuid({ version: "uuidv4" }),
+}).options({ presence: "required" });
 
 export default {
   endpoint: endpoint,

@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
 import { getPhotosByClientPathAndSizeAndDateFromDB } from "@src/db/sequelizeDb";
-import { isValidPhotoType } from "@src/types/photoType";
-import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
+
+import Joi from "joi";
 import { getPhotoFromDisk } from "@src/modules/diskManager";
 import checkUserToken from "@src/middleware/checkUserToken";
 import {
@@ -14,6 +14,7 @@ import {
   APIPhoto,
   GetPhotosByPathRequestData,
   GetPhotosByPathResponseData,
+  PhotoTypesArray,
 } from "@src/api/export/exportedTypes";
 
 const sendResponse =
@@ -24,10 +25,11 @@ const endpoint = "/getPhotosByPath";
 const callback = async (req: Request, res: Response) => {
   try {
     console.log("Checking request parameters.");
-    if (checkBodyParamsMissing(req)) {
+    const { error } = RequestDataShema.validate(req.body);
+    if (error) {
       console.log("Bad request parameters");
       console.log("Sending response message");
-      return responseFormatter.sendFailedBadRequest(res);
+      return responseFormatter.sendFailedBadRequest(res, error.message);
     }
     console.log("Request parameters ok.");
 
@@ -99,13 +101,17 @@ const callback = async (req: Request, res: Response) => {
   }
 };
 
-function checkBodyParamsMissing(req: Request) {
-  if (checkReqBodyAttributeMissing(req, "photosData", "Array")) return true;
-  if (checkReqBodyAttributeMissing(req, "photoType", "string")) return true;
-  if (!isValidPhotoType(req.body.photoType)) return true;
-
-  return false;
-}
+const RequestDataShema = Joi.object({
+  photosData: Joi.array().items(
+    Joi.object({
+      path: Joi.string(),
+      date: Joi.string().isoDate(),
+      size: Joi.number().integer(),
+    }).options({ presence: "required" })
+  ),
+  photoType: Joi.string().valid(...PhotoTypesArray),
+  deviceUniqueId: Joi.string().uuid({ version: "uuidv4" }),
+}).options({ presence: "required" });
 
 export default {
   endpoint: endpoint,

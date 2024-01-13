@@ -10,7 +10,7 @@ function JsonParsingErrorHandler(
 ) {
   console.log("Error parsing json body");
   console.log("Sending response message");
-  responseFormatter.sendFailedBadRequest(res);
+  responseFormatter.sendFailedBadRequest(res, "Error parsing json body");
 }
 
 export default JsonParsingErrorHandler;

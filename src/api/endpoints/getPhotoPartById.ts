@@ -3,7 +3,7 @@ import responseFormatter from "@src/api/responseFormatter";
 import { getPhotoByIdFromDB } from "@src/db/sequelizeDb";
 import { getPhotoFromDisk } from "@src/modules/diskManager";
 
-import { checkReqBodyAttributeMissing } from "@src/modules/checkAttibutesMissing";
+import Joi from "joi";
 import { getNumberOfParts, getPartN } from "@src/modules/stringHelper";
 import checkUserToken from "@src/middleware/checkUserToken";
 import {
@@ -24,10 +24,11 @@ const endpoint = "/getPhotoPartById";
 const callback = async (req: Request, res: Response) => {
   try {
     console.log("Checking request parameters.");
-    if (checkReqBodyAttributeMissing(req, "id", "string")) {
+    const { error } = RequestDataShema.validate(req.body);
+    if (error) {
       console.log("Bad request parameters");
       console.log("Sending response message");
-      return responseFormatter.sendFailedBadRequest(res);
+      return responseFormatter.sendFailedBadRequest(res, error.message);
     }
     console.log("Request parameters ok.");
 
@@ -37,13 +38,7 @@ const callback = async (req: Request, res: Response) => {
       throw new Error("UserId is not defined.");
     }
 
-    const id: string = requestParameters.id;
-    let partNumber = 0;
-    if (!checkReqBodyAttributeMissing(req, "part", "number")) {
-      partNumber = requestParameters.part;
-    }
-
-    console.log(`id: ${requestParameters.id}, partNumber: ${partNumber}`);
+    const { id, part } = requestParameters;
 
     console.log("Checking photo exists");
 
@@ -82,24 +77,24 @@ const callback = async (req: Request, res: Response) => {
 
       const totalNbOfParts = getNumberOfParts(image64);
 
-      if (0 <= partNumber && partNumber < totalNbOfParts) {
-        const part = getPartN(image64, partNumber);
+      if (0 <= part && part < totalNbOfParts) {
+        const ImagePart = getPartN(image64, part);
         const jsonResponse = {
-          photo: responseFormatter.createPhotoObject(dbPhoto, part),
-          part: partNumber,
+          photo: responseFormatter.createPhotoObject(dbPhoto, ImagePart),
+          part: part,
           totalNbOfParts: totalNbOfParts,
         };
         return sendResponse(res, jsonResponse);
       } else {
         console.log(
-          `Part number ${partNumber} must be between 0 and ${
+          `Part number ${part} must be between 0 and ${
             totalNbOfParts - 1
           } included`
         );
         console.log("Sending response message.");
         return responseFormatter.sendFailedMessage(
           res,
-          `Part number ${partNumber} must be between 0 and ${
+          `Part number ${part} must be between 0 and ${
             totalNbOfParts - 1
           } included`,
           "INVALID_PART_NUMBER"
@@ -112,6 +107,12 @@ const callback = async (req: Request, res: Response) => {
   }
 };
 
+const RequestDataShema = Joi.object({
+  id: Joi.string().uuid({
+    version: "uuidv4",
+  }),
+  part: Joi.number().integer(),
+}).options({ presence: "required" });
 export default {
   endpoint: endpoint,
   callback: callback,
