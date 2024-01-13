@@ -28,8 +28,6 @@ type ErrorTypes =
   | UnclaimServerResponseErrorTypes;
 
 export default function ServerConfig() {
-  const [hasChanges, setHasChanges] = useState(false);
-
   const [data, setData] = useState<GetServerInfoResponseType>();
   const [failedRequests, setFailedRequests] = useState<
     ServerResponseError<ErrorTypes>[]

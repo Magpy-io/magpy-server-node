@@ -6,7 +6,7 @@
   "version": "1.0.0",
   "main": "dist/src/main.js",
   "scripts": {
-    "start": "yarn build:server && electron-forge start",
+    "start": "yarn build:all && electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
     "start:dev": "yarn start:server",

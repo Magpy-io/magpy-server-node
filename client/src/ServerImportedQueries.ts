@@ -5,7 +5,7 @@ export function SetPath(path_p: string) {
     throw new Error("path_p parameter must be astring");
   }
 
-  if (path_p[path_p.length - 1] != "/") {
+  if (path_p[path_p.length - 1] !== "/") {
     path_p += "/";
   }
 
