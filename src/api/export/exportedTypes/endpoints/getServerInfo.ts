@@ -13,18 +13,18 @@ import { getPathWithEndpoint } from "../PathManager";
 
 export type RequestData = void;
 
-export type ResponseData = ServerResponseData<{
+export type ResponseData = {
   storagePath: string;
   serverName: string;
   owner: { name: string; email: string } | null;
-}>;
+};
 
 export type ResponseErrorTypes =
   | ErrorsNotFromLocal
   | ErrorBackendServerUnreachable;
 
 export type ResponseType = EndpointMethodsResponseType<
-  ResponseData,
+  ServerResponseData<ResponseData>,
   ResponseErrorTypes
 >;
 

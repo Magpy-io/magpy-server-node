@@ -17,7 +17,7 @@ export type RequestData = {
   userToken: string;
 };
 
-export type ResponseData = ServerResponseMessage;
+export type ResponseData = string;
 
 export type ResponseErrorTypes =
   | ErrorBackendServerUnreachable
@@ -26,7 +26,7 @@ export type ResponseErrorTypes =
   | ErrorAuthorizationBackendExpired;
 
 export type ResponseType = EndpointMethodsResponseType<
-  ResponseData,
+  ServerResponseMessage,
   ResponseErrorTypes
 >;
 

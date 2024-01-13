@@ -22,7 +22,7 @@ export type RequestData = {
   deviceUniqueId: string;
 };
 
-export type ResponseData = ServerResponseMessage;
+export type ResponseData = string;
 
 export type ResponseErrorTypes =
   | ErrorIdNotFound
@@ -30,7 +30,7 @@ export type ResponseErrorTypes =
   | ErrorsAuthorization;
 
 export type ResponseType = EndpointMethodsResponseType<
-  ResponseData,
+  ServerResponseMessage,
   ResponseErrorTypes
 >;
 

@@ -23,14 +23,14 @@ export type RequestData = {
   deviceUniqueId: string;
 };
 
-export type ResponseData = ServerResponseData<{
+export type ResponseData = {
   photo: APIPhoto;
-}>;
+};
 
 export type ResponseErrorTypes = ErrorServerNotClaimed | ErrorsAuthorization;
 
 export type ResponseType = EndpointMethodsResponseType<
-  ResponseData,
+  ServerResponseData<ResponseData>,
   ResponseErrorTypes
 >;
 

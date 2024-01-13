@@ -14,7 +14,7 @@ import { getPathWithEndpoint } from "../PathManager";
 
 export type RequestData = { name?: string };
 
-export type ResponseData = ServerResponseMessage;
+export type ResponseData = string;
 
 export type ResponseErrorTypes =
   | ErrorInvalidName
@@ -22,7 +22,7 @@ export type ResponseErrorTypes =
   | ErrorBackendServerUnreachable;
 
 export type ResponseType = EndpointMethodsResponseType<
-  ResponseData,
+  ServerResponseMessage,
   ResponseErrorTypes
 >;
 

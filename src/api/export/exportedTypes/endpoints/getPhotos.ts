@@ -18,16 +18,16 @@ export type RequestData = {
   photoType: PhotoTypes;
 };
 
-export type ResponseData = ServerResponseData<{
+export type ResponseData = {
   endReached: boolean;
   number: number;
   photos: APIPhoto[];
-}>;
+};
 
 export type ResponseErrorTypes = ErrorServerNotClaimed | ErrorsAuthorization;
 
 export type ResponseType = EndpointMethodsResponseType<
-  ResponseData,
+  ServerResponseData<ResponseData>,
   ResponseErrorTypes
 >;
 

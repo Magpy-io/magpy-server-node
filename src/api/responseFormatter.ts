@@ -6,19 +6,12 @@ import { ErrorCodes } from "@src/api/export/exportedTypes/ErrorTypes";
 
 function getCustomSendResponse<T>() {
   // get the type of the data parameter of type T
-  type DataType = T extends { data: infer D } ? D : never;
 
-  type Message = T extends { message: string } ? string : never;
-
-  return async function (
-    res: Response,
-    data: DataType | Message,
-    warning: boolean = false
-  ) {
+  return async function (res: Response, data: T, warning: boolean = false) {
     if (typeof data == "string") {
       return await sendSuccessfulMessage(res, data, warning);
     } else {
-      return await sendResponse<DataType>(res, data, warning);
+      return await sendResponse<T>(res, data, warning);
     }
   };
 }

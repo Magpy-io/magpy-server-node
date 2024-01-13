@@ -16,14 +16,14 @@ export type RequestData = {
   ids: string[];
 };
 
-export type ResponseData = ServerResponseData<{
+export type ResponseData = {
   deletedIds: string[];
-}>;
+};
 
 export type ResponseErrorTypes = ErrorServerNotClaimed | ErrorsAuthorization;
 
 export type ResponseType = EndpointMethodsResponseType<
-  ResponseData,
+  ServerResponseData<ResponseData>,
   ResponseErrorTypes
 >;
 

@@ -13,14 +13,14 @@ import {
 
 export type RequestData = void;
 
-export type ResponseData = ServerResponseData<{
+export type ResponseData = {
   number: number;
-}>;
+};
 
 export type ResponseErrorTypes = ErrorServerNotClaimed | ErrorsAuthorization;
 
 export type ResponseType = EndpointMethodsResponseType<
-  ResponseData,
+  ServerResponseData<ResponseData>,
   ResponseErrorTypes
 >;
 

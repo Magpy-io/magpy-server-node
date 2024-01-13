@@ -13,14 +13,14 @@ import { getPathWithEndpoint } from "../PathManager";
 
 export type RequestData = void;
 
-export type ResponseData = ServerResponseMessage;
+export type ResponseData = string;
 
 export type ResponseErrorTypes =
   | ErrorsNotFromLocal
   | ErrorBackendServerUnreachable;
 
 export type ResponseType = EndpointMethodsResponseType<
-  ResponseData,
+  ServerResponseMessage,
   ResponseErrorTypes
 >;
 

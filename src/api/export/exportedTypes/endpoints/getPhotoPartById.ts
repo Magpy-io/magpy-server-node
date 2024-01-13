@@ -22,11 +22,11 @@ export type RequestData = {
   part: number;
 };
 
-export type ResponseData = ServerResponseData<{
+export type ResponseData = {
   photo: APIPhoto;
   part: number;
   totalNbOfParts: number;
-}>;
+};
 
 export type ResponseErrorTypes =
   | ErrorInvalidPartNumber
@@ -35,7 +35,7 @@ export type ResponseErrorTypes =
   | ErrorsAuthorization;
 
 export type ResponseType = EndpointMethodsResponseType<
-  ResponseData,
+  ServerResponseData<ResponseData>,
   ResponseErrorTypes
 >;
 

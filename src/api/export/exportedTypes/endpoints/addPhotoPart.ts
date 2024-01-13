@@ -26,7 +26,7 @@ export type RequestData = {
   photoPart: string;
 };
 
-export type ResponseData = ServerResponseData<
+export type ResponseData =
   | {
       lenReceived: number;
       lenWaiting: number;
@@ -37,8 +37,7 @@ export type ResponseData = ServerResponseData<
       lenWaiting: number;
       done: true;
       photo: APIPhoto;
-    }
->;
+    };
 
 export type ResponseErrorTypes =
   | ErrorPhotoSizeExceeded
@@ -48,7 +47,7 @@ export type ResponseErrorTypes =
   | ErrorsAuthorization;
 
 export type ResponseType = EndpointMethodsResponseType<
-  ResponseData,
+  ServerResponseData<ResponseData>,
   ResponseErrorTypes
 >;
 

@@ -14,7 +14,7 @@ import { getPathWithEndpoint } from "../PathManager";
 
 export type RequestData = { path?: string };
 
-export type ResponseData = ServerResponseMessage;
+export type ResponseData = string;
 
 export type ResponseErrorTypes =
   | ErrorPathFolderDoesNotExist
@@ -22,7 +22,7 @@ export type ResponseErrorTypes =
   | ErrorsNotFromLocal;
 
 export type ResponseType = EndpointMethodsResponseType<
-  ResponseData,
+  ServerResponseMessage,
   ResponseErrorTypes
 >;
 

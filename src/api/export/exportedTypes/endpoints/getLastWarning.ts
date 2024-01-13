@@ -15,14 +15,14 @@ import { WarningDataTypes } from "../WarningsManager";
 
 export type RequestData = void;
 
-export type ResponseData = ServerResponseData<{
+export type ResponseData = {
   warning: WarningDataTypes | null;
-}>;
+};
 
 export type ResponseErrorTypes = ErrorServerNotClaimed | ErrorsAuthorization;
 
 export type ResponseType = EndpointMethodsResponseType<
-  ResponseData,
+  ServerResponseData<ResponseData>,
   ResponseErrorTypes
 >;
 

@@ -18,18 +18,18 @@ export type RequestData = {
   deviceUniqueId: string;
 };
 
-export type ResponseData = ServerResponseData<{
+export type ResponseData = {
   number: number;
   photos: Array<
     | { path: string; exists: false }
     | { path: string; exists: true; photo: APIPhoto }
   >;
-}>;
+};
 
 export type ResponseErrorTypes = ErrorServerNotClaimed | ErrorsAuthorization;
 
 export type ResponseType = EndpointMethodsResponseType<
-  ResponseData,
+  ServerResponseData<ResponseData>,
   ResponseErrorTypes
 >;
 
