@@ -5,10 +5,10 @@ import checkUserToken from "@src/middleware/checkUserToken";
 
 import Joi from "joi";
 
-import { WhoAmIResponseData } from "@src/api/export/exportedTypes";
+import { WhoAmI } from "@src/api/export/exportedTypes";
 
 const sendResponse =
-  responseFormatter.getCustomSendResponse<WhoAmIResponseData>();
+  responseFormatter.getCustomSendResponse<WhoAmI.ResponseData>();
 
 // whoAmI : checks user token is valid
 const endpoint = "/whoami";

@@ -5,7 +5,7 @@ mockModules();
 import { describe, expect, it } from "@jest/globals";
 
 import { Express } from "express";
-import * as exportedTypes from "@src/api/export/exportedTypes";
+import { AddPhotoInit, AddPhotoPart } from "@src/api/export/exportedTypes";
 
 import { initServer, stopServer } from "@src/server/server";
 
@@ -51,7 +51,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };
 
-    const retInit = await exportedTypes.AddPhotoInitPost(requestPhoto);
+    const retInit = await AddPhotoInit.Post(requestPhoto);
 
     if (!retInit.ok) {
       throw "Error starting photo transfer";
@@ -60,7 +60,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
     const id = getDataFromRet(retInit).id;
     expect(FilesWaiting.size).toBe(1);
 
-    let ret = await exportedTypes.AddPhotoPartPost({
+    let ret = await AddPhotoPart.Post({
       id: id,
       partNumber: 0,
       partSize: imageBase64Parts.photoLenPart1,
@@ -75,7 +75,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
     expect(data.lenWaiting).toBe(imageBase64Parts.photoLen);
     expect(data.lenReceived).toBe(imageBase64Parts.photoLenPart1);
 
-    ret = await exportedTypes.AddPhotoPartPost({
+    ret = await AddPhotoPart.Post({
       id: id,
       partNumber: 1,
       partSize: imageBase64Parts.photoLenPart2,
@@ -92,7 +92,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
       imageBase64Parts.photoLenPart1 + imageBase64Parts.photoLenPart2
     );
 
-    ret = await exportedTypes.AddPhotoPartPost({
+    ret = await AddPhotoPart.Post({
       id: id,
       partNumber: 2,
       partSize: imageBase64Parts.photoLenPart3,
@@ -122,7 +122,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
   });
 
   it("Should return error PHOTO_TRANSFER_NOT_FOUND if no transfer was started and sended part", async () => {
-    const ret = await exportedTypes.AddPhotoPartPost({
+    const ret = await AddPhotoPart.Post({
       id: generateId(),
       partNumber: 0,
       partSize: imageBase64Parts.photoLenPart1,
@@ -138,7 +138,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };
 
-    const retInit = await exportedTypes.AddPhotoInitPost(requestPhoto);
+    const retInit = await AddPhotoInit.Post(requestPhoto);
 
     if (!retInit.ok) {
       throw "Error starting photo transfer";
@@ -152,7 +152,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     expect(FilesWaiting.size).toBe(0);
 
-    const ret = await exportedTypes.AddPhotoPartPost({
+    const ret = await AddPhotoPart.Post({
       id: id,
       partNumber: 0,
       partSize: imageBase64Parts.photoLenPart1,
@@ -171,7 +171,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };
 
-    const retInit = await exportedTypes.AddPhotoInitPost(requestPhoto);
+    const retInit = await AddPhotoInit.Post(requestPhoto);
 
     if (!retInit.ok) {
       throw "Error starting photo transfer";
@@ -181,7 +181,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     const id = getDataFromRet(retInit).id;
 
-    let ret = await exportedTypes.AddPhotoPartPost({
+    let ret = await AddPhotoPart.Post({
       id: id,
       partNumber: 0,
       partSize: imageBase64Parts.photoLenPart1,
@@ -190,7 +190,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     expectToBeOk(ret);
 
-    ret = await exportedTypes.AddPhotoPartPost({
+    ret = await AddPhotoPart.Post({
       id: id,
       partNumber: 1,
       partSize: imageBase64Parts.photoLenPart1,
@@ -199,7 +199,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     expectToBeOk(ret);
 
-    ret = await exportedTypes.AddPhotoPartPost({
+    ret = await AddPhotoPart.Post({
       id: id,
       partNumber: 2,
       partSize: imageBase64Parts.photoLenPart1,
@@ -217,7 +217,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };
 
-    const retInit = await exportedTypes.AddPhotoInitPost(requestPhoto);
+    const retInit = await AddPhotoInit.Post(requestPhoto);
 
     if (!retInit.ok) {
       throw "Error starting photo transfer";
@@ -225,7 +225,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     const id = getDataFromRet(retInit).id;
 
-    const ret = await exportedTypes.AddPhotoPartPost({
+    const ret = await AddPhotoPart.Post({
       id: id,
       partNumber: 0,
       partSize: imageBase64Parts.photoLenPart1 + 1,
@@ -241,7 +241,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };
 
-    const retInit = await exportedTypes.AddPhotoInitPost(requestPhoto);
+    const retInit = await AddPhotoInit.Post(requestPhoto);
 
     if (!retInit.ok) {
       throw "Error starting photo transfer";
@@ -251,7 +251,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     expect(FilesWaiting.size).toBe(1);
 
-    let ret = await exportedTypes.AddPhotoPartPost({
+    let ret = await AddPhotoPart.Post({
       id: id,
       partNumber: 0,
       partSize: imageBase64Parts.photoLenPart1,
@@ -260,7 +260,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     expectToBeOk(ret);
 
-    ret = await exportedTypes.AddPhotoPartPost({
+    ret = await AddPhotoPart.Post({
       id: id,
       partNumber: 1,
       partSize: imageBase64Parts.photoLenPart2,
@@ -269,7 +269,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     expectToBeOk(ret);
 
-    ret = await exportedTypes.AddPhotoPartPost({
+    ret = await AddPhotoPart.Post({
       id: id,
       partNumber: 3,
       partSize: imageBase64Parts.photoLenPart3,

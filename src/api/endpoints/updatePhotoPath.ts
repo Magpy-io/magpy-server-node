@@ -9,13 +9,10 @@ import {
   checkPhotoExistsAndDeleteMissing,
 } from "@src/modules/functions";
 
-import {
-  UpdatePhotoPathRequestData,
-  UpdatePhotoPathResponseData,
-} from "@src/api/export/exportedTypes";
+import { UpdatePhotoPath } from "@src/api/export/exportedTypes";
 
 const sendResponse =
-  responseFormatter.getCustomSendResponse<UpdatePhotoPathResponseData>();
+  responseFormatter.getCustomSendResponse<UpdatePhotoPath.ResponseData>();
 
 // updatePhotoPath : updates the path of a photo in db
 const endpoint = "/updatePhotoPath";
@@ -32,7 +29,7 @@ const callback = async (req: Request, res: Response) => {
     throw new Error("UserId is not defined.");
   }
 
-  const { id, path, deviceUniqueId }: UpdatePhotoPathRequestData = req.body;
+  const { id, path, deviceUniqueId }: UpdatePhotoPath.RequestData = req.body;
 
   try {
     console.log(`Searching in db for photo with id: ${id}`);

@@ -9,10 +9,10 @@ import {
 import checkConnexionLocal from "@src/middleware/checkConnexionLocal";
 import checkServerHasValidCredentials from "@src/middleware/checkServerHasValidCredentials";
 
-import { UnclaimServerResponseData } from "@src/api/export/exportedTypes";
+import { UnclaimServer } from "@src/api/export/exportedTypes";
 
 const sendResponse =
-  responseFormatter.getCustomSendResponse<UnclaimServerResponseData>();
+  responseFormatter.getCustomSendResponse<UnclaimServer.ResponseData>();
 
 // unclaimServer : removes server's credentials
 const endpoint = "/unclaimServer";

@@ -4,13 +4,10 @@ import { getPhotoByIdFromDB, deletePhotoByIdFromDB } from "@src/db/sequelizeDb";
 import { removePhotoFromDisk } from "@src/modules/diskManager";
 import Joi from "joi";
 import checkUserToken from "@src/middleware/checkUserToken";
-import {
-  DeletePhotosByIdRequestData,
-  DeletePhotosByIdResponseData,
-} from "@src/api/export/exportedTypes";
+import { DeletePhotosById } from "@src/api/export/exportedTypes";
 
 const sendResponse =
-  responseFormatter.getCustomSendResponse<DeletePhotosByIdResponseData>();
+  responseFormatter.getCustomSendResponse<DeletePhotosById.ResponseData>();
 
 // deletePhotosById: deletes photos from server by id
 const endpoint = "/deletePhotosById";
@@ -25,7 +22,7 @@ const callback = async (req: Request, res: Response) => {
     }
     console.log("Request parameters ok.");
 
-    const requestParameters: DeletePhotosByIdRequestData = req.body;
+    const requestParameters: DeletePhotosById.RequestData = req.body;
 
     const ids: string[] = requestParameters.ids;
 

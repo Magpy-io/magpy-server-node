@@ -8,13 +8,10 @@ import { folderHasRights, pathExists } from "@src/modules/diskManager";
 import Joi from "joi";
 import { isAbsolutePath } from "@src/modules/functions";
 
-import {
-  UpdateServerPathRequestData,
-  UpdateServerPathResponseData,
-} from "@src/api/export/exportedTypes";
+import { UpdateServerPath } from "@src/api/export/exportedTypes";
 
 const sendResponse =
-  responseFormatter.getCustomSendResponse<UpdateServerPathResponseData>();
+  responseFormatter.getCustomSendResponse<UpdateServerPath.ResponseData>();
 
 // updateServerPath : sets server name
 const endpoint = "/updateServerPath";
@@ -27,7 +24,7 @@ const callback = async (req: Request, res: Response) => {
       return responseFormatter.sendFailedBadRequest(res, error.message);
     }
 
-    const { path }: UpdateServerPathRequestData = req.body;
+    const { path }: UpdateServerPath.RequestData = req.body;
 
     if (!path) {
       console.log("Nothing to update, sending response");

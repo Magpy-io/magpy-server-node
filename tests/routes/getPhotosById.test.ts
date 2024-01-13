@@ -5,7 +5,7 @@ mockModules();
 import { describe, expect, it } from "@jest/globals";
 
 import { Express } from "express";
-import * as exportedTypes from "@src/api/export/exportedTypes";
+import { GetPhotosById } from "@src/api/export/exportedTypes";
 
 import { initServer, stopServer } from "@src/server/server";
 
@@ -28,7 +28,7 @@ import {
   testPhotoMetaAndIdWithAdditionalPaths,
   defaultPhotoSecondPath,
 } from "@tests/helpers/functions";
-import { PhotoTypes } from "@src/api/export/exportedTypes";
+import { PhotoTypes } from "@src/api/export/exportedTypes/Types";
 
 describe("Test 'getPhotosById' endpoint", () => {
   let app: Express;
@@ -56,7 +56,7 @@ describe("Test 'getPhotosById' endpoint", () => {
 
       const ids = addedPhotosData.map((e) => e.id);
 
-      const ret = await exportedTypes.GetPhotosByIdPost({
+      const ret = await GetPhotosById.Post({
         ids: ids,
         photoType: "data",
       });
@@ -82,7 +82,7 @@ describe("Test 'getPhotosById' endpoint", () => {
         .fill("")
         .map(() => generateId());
 
-      const ret = await exportedTypes.GetPhotosByIdPost({
+      const ret = await GetPhotosById.Post({
         ids: ids,
         photoType: "data",
       });
@@ -105,7 +105,7 @@ describe("Test 'getPhotosById' endpoint", () => {
 
     const ids = [photoAddedData.id, generateId()];
 
-    const ret = await exportedTypes.GetPhotosByIdPost({
+    const ret = await GetPhotosById.Post({
       ids: ids,
       photoType: "data",
     });
@@ -138,7 +138,7 @@ describe("Test 'getPhotosById' endpoint", () => {
     async (testData) => {
       const photoAddedData = await addPhoto();
 
-      const ret = await exportedTypes.GetPhotosByIdPost({
+      const ret = await GetPhotosById.Post({
         ids: [photoAddedData.id],
         photoType: testData.photoType,
       });
@@ -177,7 +177,7 @@ describe("Test 'getPhotosById' endpoint", () => {
       const photo = await getPhotoFromDb(addedPhotoData.id);
       await deletePhotoFromDisk(photo, testData.photoType);
 
-      const ret = await exportedTypes.GetPhotosByIdPost({
+      const ret = await GetPhotosById.Post({
         ids: [addedPhotoData.id],
         photoType: "data",
       });
@@ -199,7 +199,7 @@ describe("Test 'getPhotosById' endpoint", () => {
   it("Should return a photo with multiple paths when requested photo has multiple paths", async () => {
     const addedPhotoData = await addPhotoWithMultiplePaths();
 
-    const ret = await exportedTypes.GetPhotosByIdPost({
+    const ret = await GetPhotosById.Post({
       ids: [addedPhotoData.id],
       photoType: "data",
     });

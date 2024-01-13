@@ -8,13 +8,10 @@ import { SaveServerName } from "@src/modules/serverDataManager";
 
 import Joi from "joi";
 
-import {
-  UpdateServerNameRequestData,
-  UpdateServerNameResponseData,
-} from "@src/api/export/exportedTypes";
+import { UpdateServerName } from "@src/api/export/exportedTypes";
 
 const sendResponse =
-  responseFormatter.getCustomSendResponse<UpdateServerNameResponseData>();
+  responseFormatter.getCustomSendResponse<UpdateServerName.ResponseData>();
 
 // updateServerName : sets server name
 const endpoint = "/updateServerName";
@@ -27,7 +24,7 @@ const callback = async (req: Request, res: Response) => {
       return responseFormatter.sendFailedBadRequest(res, error.message);
     }
 
-    const { name }: UpdateServerNameRequestData = req.body;
+    const { name }: UpdateServerName.RequestData = req.body;
 
     if (!name) {
       console.log("Nothing to update, sending response");

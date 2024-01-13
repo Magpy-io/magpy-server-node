@@ -6,8 +6,9 @@ import { describe, expect, it } from "@jest/globals";
 
 import { Express } from "express";
 import * as exportedTypes from "@src/api/export/exportedTypes";
-import request from "supertest";
+import { SetUserToken } from "@src/api/export/exportedTypes/UserTokenManager";
 
+import request from "supertest";
 import { initServer, stopServer } from "@src/server/server";
 
 import * as sac from "@tests/helpers/setupAndCleanup";
@@ -22,17 +23,17 @@ const endpointsToTestInvalidToken: Array<{
   endpoint: string;
   func: (...args: any[]) => Promise<any>;
 }> = [
-  { endpoint: "addPhoto", func: exportedTypes.AddPhotoPost },
-  { endpoint: "addPhotoInit", func: exportedTypes.AddPhotoInitPost },
-  { endpoint: "addPhotoPart", func: exportedTypes.AddPhotoPartPost },
-  { endpoint: "deletePhotosById", func: exportedTypes.DeletePhotosByIdPost },
-  { endpoint: "getPhotoPartById", func: exportedTypes.GetPhotoPartByIdPost },
-  { endpoint: "getNumberPhotos", func: exportedTypes.GetNumberPhotosPost },
-  { endpoint: "getPhotos", func: exportedTypes.GetPhotosPost },
-  { endpoint: "getPhotosById", func: exportedTypes.GetPhotosByIdPost },
-  { endpoint: "getPhotosByPath", func: exportedTypes.GetPhotosByPathPost },
-  { endpoint: "updatePhotoPath", func: exportedTypes.UpdatePhotoPathPost },
-  { endpoint: "whoAmI", func: exportedTypes.WhoAmIPost },
+  { endpoint: "addPhoto", func: exportedTypes.AddPhoto.Post },
+  { endpoint: "addPhotoInit", func: exportedTypes.AddPhotoInit.Post },
+  { endpoint: "addPhotoPart", func: exportedTypes.AddPhotoPart.Post },
+  { endpoint: "deletePhotosById", func: exportedTypes.DeletePhotosById.Post },
+  { endpoint: "getPhotoPartById", func: exportedTypes.GetPhotoPartById.Post },
+  { endpoint: "getNumberPhotos", func: exportedTypes.GetNumberPhotos.Post },
+  { endpoint: "getPhotos", func: exportedTypes.GetPhotos.Post },
+  { endpoint: "getPhotosById", func: exportedTypes.GetPhotosById.Post },
+  { endpoint: "getPhotosByPath", func: exportedTypes.GetPhotosByPath.Post },
+  { endpoint: "updatePhotoPath", func: exportedTypes.UpdatePhotoPath.Post },
+  { endpoint: "whoAmI", func: exportedTypes.WhoAmI.Post },
 ];
 
 describe("Test endpoints return error when invalid token", () => {
@@ -70,7 +71,7 @@ describe("Test endpoints return error when invalid token", () => {
   it.each(endpointsToTestInvalidToken)(
     "Should return error AUTHORIZATION_FAILED when invalid token is added for endpoint $endpoint",
     async (p) => {
-      exportedTypes.SetUserToken("invalidToken");
+      SetUserToken("invalidToken");
       const ret = await p.func();
 
       expectToNotBeOk(ret);
@@ -81,7 +82,7 @@ describe("Test endpoints return error when invalid token", () => {
   it.each(endpointsToTestInvalidToken)(
     "Should return error AUTHORIZATION_EXPIRED when expired token is used for endpoint $endpoint",
     async (p) => {
-      exportedTypes.SetUserToken(getExpiredToken());
+      SetUserToken(getExpiredToken());
       const ret = await p.func();
 
       expectToNotBeOk(ret);

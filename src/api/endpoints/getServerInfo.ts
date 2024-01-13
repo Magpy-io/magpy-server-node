@@ -8,10 +8,10 @@ import { GetServerConfigData } from "@src/modules/serverDataManager";
 
 import Joi from "joi";
 
-import { GetServerInfoResponseData } from "@src/api/export/exportedTypes";
+import { GetServerInfo } from "@src/api/export/exportedTypes";
 
 const sendResponse =
-  responseFormatter.getCustomSendResponse<GetServerInfoResponseData>();
+  responseFormatter.getCustomSendResponse<GetServerInfo.ResponseData>();
 
 // getServerInfo : gets information about the server
 const endpoint = "/getServerInfo";

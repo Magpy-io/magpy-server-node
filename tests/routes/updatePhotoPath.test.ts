@@ -5,7 +5,7 @@ mockModules();
 import { describe, expect, it } from "@jest/globals";
 
 import { Express } from "express";
-import * as exportedTypes from "@src/api/export/exportedTypes";
+import { UpdatePhotoPath } from "@src/api/export/exportedTypes";
 
 import { initServer, stopServer } from "@src/server/server";
 
@@ -50,7 +50,7 @@ describe("Test 'updatePhotoPath' endpoint", () => {
   it("Should change the path of an existing photo", async () => {
     const addedPhotoData = await addPhoto();
 
-    const ret = await exportedTypes.UpdatePhotoPathPost({
+    const ret = await UpdatePhotoPath.Post({
       id: addedPhotoData.id,
       path: "newPath",
       deviceUniqueId: defaultPhoto.deviceUniqueId,
@@ -69,7 +69,7 @@ describe("Test 'updatePhotoPath' endpoint", () => {
   });
 
   it("Should return error ID_NOT_FOUND when request id not in db", async () => {
-    const ret = await exportedTypes.UpdatePhotoPathPost({
+    const ret = await UpdatePhotoPath.Post({
       id: generateId(),
       path: "newPath",
       deviceUniqueId: defaultPhoto.deviceUniqueId,
@@ -85,7 +85,7 @@ describe("Test 'updatePhotoPath' endpoint", () => {
     const photo = await getPhotoFromDb(addedPhotoData.id);
     await deletePhotoFromDisk(photo, "compressed");
 
-    const ret = await exportedTypes.UpdatePhotoPathPost({
+    const ret = await UpdatePhotoPath.Post({
       id: addedPhotoData.id,
       path: addedPhotoData.path,
       deviceUniqueId: defaultPhoto.deviceUniqueId,
@@ -101,7 +101,7 @@ describe("Test 'updatePhotoPath' endpoint", () => {
   it("Should change the path of an existing photo if new path is for new device", async () => {
     const addedPhotoData = await addPhoto();
 
-    const ret = await exportedTypes.UpdatePhotoPathPost({
+    const ret = await UpdatePhotoPath.Post({
       id: addedPhotoData.id,
       path: defaultPhotoSecondPath.path,
       deviceUniqueId: defaultPhotoSecondPath.deviceUniqueId,
@@ -131,7 +131,7 @@ describe("Test 'updatePhotoPath' endpoint", () => {
 
     expect(await countDevicesInDB()).toBe(2);
 
-    const ret = await exportedTypes.UpdatePhotoPathPost({
+    const ret = await UpdatePhotoPath.Post({
       id: addedPhotoData.id,
       path: defaultPhotoSecondPath.path,
       deviceUniqueId: defaultPhotoSecondPath.deviceUniqueId,

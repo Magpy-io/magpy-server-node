@@ -4,10 +4,10 @@ import Joi from "joi";
 import checkUserToken from "@src/middleware/checkUserToken";
 import { GetLastWarningForUser } from "@src/modules/warningsManager";
 
-import { GetLastWarningResponseData } from "@src/api/export/exportedTypes";
+import { GetLastWarning } from "@src/api/export/exportedTypes";
 
 const sendResponse =
-  responseFormatter.getCustomSendResponse<GetLastWarningResponseData>();
+  responseFormatter.getCustomSendResponse<GetLastWarning.ResponseData>();
 
 // getLastWarning : returns last generated warning for this user
 const endpoint = "/getLastWarning";

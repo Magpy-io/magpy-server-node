@@ -5,7 +5,7 @@ mockModules();
 import { describe, expect, it } from "@jest/globals";
 
 import { Express } from "express";
-import * as exportedTypes from "@src/api/export/exportedTypes";
+import { GetToken, UnclaimServer } from "@src/api/export/exportedTypes";
 
 import * as mockValues from "@src/modules/__mocks__/backendRequestsMockValues";
 
@@ -39,7 +39,7 @@ describe("Test 'claimServer' endpoint", () => {
   });
 
   it("Should return a valid token when asking a claimed server", async () => {
-    const ret = await exportedTypes.GetTokenPost({
+    const ret = await GetToken.Post({
       userToken: mockValues.validUserToken,
     });
 
@@ -50,7 +50,7 @@ describe("Test 'claimServer' endpoint", () => {
   });
 
   it("Should return error AUTHORIZATION_BACKEND_FAILED when using invalid user token", async () => {
-    const ret = await exportedTypes.GetTokenPost({
+    const ret = await GetToken.Post({
       userToken: mockValues.invalidUserToken,
     });
 
@@ -59,7 +59,7 @@ describe("Test 'claimServer' endpoint", () => {
   });
 
   it("Should return error AUTHORIZATION_BACKEND_EXPIRED when using an expired user token", async () => {
-    const ret = await exportedTypes.GetTokenPost({
+    const ret = await GetToken.Post({
       userToken: mockValues.expiredUserToken,
     });
 
@@ -68,9 +68,9 @@ describe("Test 'claimServer' endpoint", () => {
   });
 
   it("Should return error SERVER_NOT_CLAIMED when requesting a server not claimed", async () => {
-    await exportedTypes.UnclaimServerPost();
+    await UnclaimServer.Post();
 
-    const ret = await exportedTypes.GetTokenPost({
+    const ret = await GetToken.Post({
       userToken: mockValues.validUserToken,
     });
 
@@ -79,7 +79,7 @@ describe("Test 'claimServer' endpoint", () => {
   });
 
   it("Should return error USER_NOT_ALLOWED when requesting a server not owned by user", async () => {
-    const ret = await exportedTypes.GetTokenPost({
+    const ret = await GetToken.Post({
       userToken: mockValues.validUserToken2,
     });
 
@@ -90,7 +90,7 @@ describe("Test 'claimServer' endpoint", () => {
   it("Should return error BACKEND_SERVER_UNREACHABLE when claiming a server but backend unreachable", async () => {
     mockValues.failNextRequestServerUnreachable();
 
-    const ret = await exportedTypes.GetTokenPost({
+    const ret = await GetToken.Post({
       userToken: mockValues.validUserToken,
     });
 
@@ -101,7 +101,7 @@ describe("Test 'claimServer' endpoint", () => {
   it("Should return error SERVER_ERROR when claiming a server but receiving unexpected error from backend", async () => {
     mockValues.failNextRequest();
 
-    const ret = await exportedTypes.GetTokenPost({
+    const ret = await GetToken.Post({
       userToken: mockValues.validUserToken,
     });
 

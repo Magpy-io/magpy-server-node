@@ -5,7 +5,7 @@ mockModules();
 import { describe, expect, it } from "@jest/globals";
 
 import { Express } from "express";
-import * as exportedTypes from "@src/api/export/exportedTypes";
+import { UpdateServerPath } from "@src/api/export/exportedTypes";
 
 import { createFolder } from "@src/modules/diskManager";
 
@@ -44,7 +44,7 @@ describe("Test 'updateServerPath' endpoint", () => {
     const photosPath = GetPathFromRoot("/pathToPhotos");
 
     await createFolder(photosPath);
-    const ret = await exportedTypes.UpdateServerPathPost({ path: photosPath });
+    const ret = await UpdateServerPath.Post({ path: photosPath });
 
     expectToBeOk(ret);
     expect(ret.warning).toBe(false);
@@ -57,7 +57,7 @@ describe("Test 'updateServerPath' endpoint", () => {
   it("Should return error PATH_FOLDER_DOES_NOT_EXIST when using a folder that does not exist", async () => {
     const serverPathBefore = GetStorageFolderPath();
 
-    const ret = await exportedTypes.UpdateServerPathPost({
+    const ret = await UpdateServerPath.Post({
       path: GetPathFromRoot("/nonExistingPath"),
     });
 

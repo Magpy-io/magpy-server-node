@@ -11,13 +11,10 @@ import {
   checkPhotoExistsAndDeleteMissing,
 } from "@src/modules/functions";
 
-import {
-  GetPhotoPartByIdRequestData,
-  GetPhotoPartByIdResponseData,
-} from "@src/api/export/exportedTypes";
+import { GetPhotoPartById } from "@src/api/export/exportedTypes";
 
 const sendResponse =
-  responseFormatter.getCustomSendResponse<GetPhotoPartByIdResponseData>();
+  responseFormatter.getCustomSendResponse<GetPhotoPartById.ResponseData>();
 
 // getPhotoPartById : returns a part of a photo by id.
 const endpoint = "/getPhotoPartById";
@@ -32,7 +29,7 @@ const callback = async (req: Request, res: Response) => {
     }
     console.log("Request parameters ok.");
 
-    const requestParameters: GetPhotoPartByIdRequestData = req.body;
+    const requestParameters: GetPhotoPartById.RequestData = req.body;
 
     if (!req.userId) {
       throw new Error("UserId is not defined.");

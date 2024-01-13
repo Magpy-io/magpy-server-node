@@ -1,8 +1,8 @@
 // IMPORTS
 import { Response } from "express";
 import { Photo } from "@src/db/sequelizeDb";
-import { APIPhoto } from "@src/api/export/exportedTypes";
-import { ErrorCodes } from "@src/api/export/exportedTypes";
+import { APIPhoto } from "@src/api/export/exportedTypes/Types";
+import { ErrorCodes } from "@src/api/export/exportedTypes/ErrorTypes";
 
 function getCustomSendResponse<T>() {
   // get the type of the data parameter of type T

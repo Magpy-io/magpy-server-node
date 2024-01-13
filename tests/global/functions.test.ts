@@ -11,16 +11,10 @@ import { initServer, stopServer } from "@src/server/server";
 import * as sac from "@tests/helpers/setupAndCleanup";
 
 import {
-  addNPhotos,
   addPhoto,
-  testPhotoOriginal,
-  testPhotoCompressed,
-  testPhotoThumbnail,
-  testPhotoData,
   deletePhotoFromDisk,
   getPhotoFromDb,
   testPhotosExistInDbAndDisk,
-  testPhotoNotInDbNorDisk,
   getUserId,
   getPhotoById,
   generateId,
@@ -36,7 +30,7 @@ import {
   GetLastWarningForUser,
   HasWarningForUser,
 } from "@src/modules/warningsManager";
-import { PhotoTypes } from "@src/api/export/exportedTypes";
+import { PhotoTypes } from "@src/api/export/exportedTypes/Types";
 
 describe("Test 'checkPhotoExistsAndDeleteMissing' function", () => {
   let app: Express;

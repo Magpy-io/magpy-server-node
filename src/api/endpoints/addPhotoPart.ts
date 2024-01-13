@@ -8,13 +8,10 @@ import { hashFile } from "@src/modules/hashing";
 import Joi from "joi";
 import { postPhotoPartTimeout } from "@src/config/config";
 import checkUserToken from "@src/middleware/checkUserToken";
-import {
-  AddPhotoPartRequestData,
-  AddPhotoPartResponseData,
-} from "@src/api/export/exportedTypes";
+import { AddPhotoPart } from "@src/api/export/exportedTypes";
 
 const sendResponse =
-  responseFormatter.getCustomSendResponse<AddPhotoPartResponseData>();
+  responseFormatter.getCustomSendResponse<AddPhotoPart.ResponseData>();
 
 // addPhotoPart : adds a part of a photo to the server
 const endpoint = "/addPhotoPart";
@@ -32,7 +29,7 @@ const callback = async (req: Request, res: Response) => {
       throw new Error("UserId is not defined.");
     }
 
-    const partReceived: AddPhotoPartRequestData = req.body;
+    const partReceived: AddPhotoPart.RequestData = req.body;
 
     if (partReceived.partSize != partReceived.photoPart.length) {
       console.log("Bad request parameters");

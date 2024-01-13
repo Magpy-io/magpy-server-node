@@ -7,13 +7,10 @@ import { addServerImagePaths } from "@src/modules/diskFilesNaming";
 import { hashFile } from "@src/modules/hashing";
 
 import checkUserToken from "@src/middleware/checkUserToken";
-import {
-  AddPhotoRequestData,
-  AddPhotoResponseData,
-} from "@src/api/export/exportedTypes";
+import { AddPhoto } from "@src/api/export/exportedTypes";
 
 const sendResponse =
-  responseFormatter.getCustomSendResponse<AddPhotoResponseData>();
+  responseFormatter.getCustomSendResponse<AddPhoto.ResponseData>();
 
 // addPhoto : adds a photo to the server
 const endpoint = "/addPhoto";
@@ -32,7 +29,7 @@ const callback = async (req: Request, res: Response) => {
       throw new Error("UserId is not defined.");
     }
 
-    const requestPhoto: AddPhotoRequestData = req.body;
+    const requestPhoto: AddPhoto.RequestData = req.body;
 
     const photo = {
       name: requestPhoto.name,

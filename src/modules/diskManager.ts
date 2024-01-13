@@ -8,7 +8,7 @@ import * as path from "path";
 import * as config from "@src/config/config";
 import { isValidPhotoType } from "@src/types/photoType";
 
-import { PhotoTypes } from "@src/api/export/exportedTypes";
+import { PhotoTypes } from "@src/api/export/exportedTypes/Types";
 
 interface AddPhotoParamType {
   width: number;

@@ -5,7 +5,7 @@ mockModules();
 import { describe, expect, it } from "@jest/globals";
 
 import { Express } from "express";
-import * as exportedTypes from "@src/api/export/exportedTypes";
+import { AddPhotoInit } from "@src/api/export/exportedTypes";
 import { validate } from "uuid";
 
 import { initServer, stopServer } from "@src/server/server";
@@ -44,7 +44,7 @@ describe("Test 'addPhotoInit' endpoint", () => {
     const { image64: _, ...photo } = defaultPhoto;
     const requestPhoto = { ...photo, image64Len: 132148 };
 
-    const ret = await exportedTypes.AddPhotoInitPost(requestPhoto);
+    const ret = await AddPhotoInit.Post(requestPhoto);
 
     expectToBeOk(ret);
     expect(ret.warning).toBe(false);

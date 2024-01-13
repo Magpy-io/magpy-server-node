@@ -8,13 +8,10 @@ import { postPhotoPartTimeout } from "@src/config/config";
 
 import checkUserToken from "@src/middleware/checkUserToken";
 
-import {
-  AddPhotoInitRequestData,
-  AddPhotoInitResponseData,
-} from "@src/api/export/exportedTypes";
+import { AddPhotoInit } from "@src/api/export/exportedTypes";
 
 const sendResponse =
-  responseFormatter.getCustomSendResponse<AddPhotoInitResponseData>();
+  responseFormatter.getCustomSendResponse<AddPhotoInit.ResponseData>();
 
 // addPhotoInit : initializes the transfer of a photo to the server
 const endpoint = "/addPhotoInit";
@@ -33,7 +30,7 @@ const callback = async (req: Request, res: Response) => {
       throw new Error("UserId is not defined.");
     }
 
-    const requestPhoto: AddPhotoInitRequestData = req.body;
+    const requestPhoto: AddPhotoInit.RequestData = req.body;
 
     const photo = {
       name: requestPhoto.name,

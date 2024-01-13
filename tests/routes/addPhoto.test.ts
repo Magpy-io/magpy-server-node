@@ -5,7 +5,7 @@ mockModules();
 import { describe, expect, it } from "@jest/globals";
 
 import { Express } from "express";
-import * as exportedTypes from "@src/api/export/exportedTypes";
+import { AddPhoto } from "@src/api/export/exportedTypes";
 
 import * as sac from "@tests/helpers/setupAndCleanup";
 
@@ -44,7 +44,7 @@ describe("Test 'addPhoto' endpoint", () => {
     "Should add $times photos when called $times times with same photo",
     async (testData) => {
       for (let i = 0; i < testData.times; i++) {
-        const ret = await exportedTypes.AddPhotoPost(defaultPhoto);
+        const ret = await AddPhoto.Post(defaultPhoto);
 
         expectToBeOk(ret);
         expect(ret.warning).toBe(false);
@@ -61,9 +61,9 @@ describe("Test 'addPhoto' endpoint", () => {
   );
 
   it("Should add 2 photos and create 2 devices when called twice with diferent deviceUniqueIds", async () => {
-    await exportedTypes.AddPhotoPost(defaultPhoto);
+    await AddPhoto.Post(defaultPhoto);
 
-    const ret = await exportedTypes.AddPhotoPost({
+    const ret = await AddPhoto.Post({
       ...defaultPhoto,
       deviceUniqueId: "newDeviceUniqueId",
     });

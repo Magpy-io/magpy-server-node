@@ -5,7 +5,7 @@ mockModules();
 import { describe, expect, it } from "@jest/globals";
 
 import { Express } from "express";
-import * as exportedTypes from "@src/api/export/exportedTypes";
+import { GetPhotoPartById } from "@src/api/export/exportedTypes";
 
 import { initServer, stopServer } from "@src/server/server";
 
@@ -28,7 +28,7 @@ import {
   defaultPhotoSecondPath,
 } from "@tests/helpers/functions";
 
-import { PhotoTypes } from "@src/api/export/exportedTypes";
+import { PhotoTypes } from "@src/api/export/exportedTypes/Types";
 
 describe("Test 'getPhotoPartById' endpoint", () => {
   let app: Express;
@@ -52,7 +52,7 @@ describe("Test 'getPhotoPartById' endpoint", () => {
   it("Should return all parts of a photo and combine to match the original photo added", async () => {
     const addedPhotoData = await addPhoto();
 
-    const ret = await exportedTypes.GetPhotoPartByIdPost({
+    const ret = await GetPhotoPartById.Post({
       id: addedPhotoData.id,
       part: 0,
     });
@@ -69,7 +69,7 @@ describe("Test 'getPhotoPartById' endpoint", () => {
     parts.push(data.photo.image64);
 
     for (let i = 1; i < totalNumberOfParts; i++) {
-      const reti = await exportedTypes.GetPhotoPartByIdPost({
+      const reti = await GetPhotoPartById.Post({
         id: addedPhotoData.id,
         part: i,
       });
@@ -87,7 +87,7 @@ describe("Test 'getPhotoPartById' endpoint", () => {
   });
 
   it("Should return ID_NOT_FOUND error if requesting a photo that does not exist", async () => {
-    const ret = await exportedTypes.GetPhotoPartByIdPost({
+    const ret = await GetPhotoPartById.Post({
       id: generateId(),
       part: 0,
     });
@@ -101,7 +101,7 @@ describe("Test 'getPhotoPartById' endpoint", () => {
     async (testParameter) => {
       const addedPhotoData = await addPhoto();
 
-      const ret = await exportedTypes.GetPhotoPartByIdPost({
+      const ret = await GetPhotoPartById.Post({
         id: addedPhotoData.id,
         part: testParameter.n,
       });
@@ -125,7 +125,7 @@ describe("Test 'getPhotoPartById' endpoint", () => {
       const photo = await getPhotoFromDb(addedPhotoData.id);
       await deletePhotoFromDisk(photo, testData.photoType);
 
-      const ret = await exportedTypes.GetPhotoPartByIdPost({
+      const ret = await GetPhotoPartById.Post({
         id: addedPhotoData.id,
         part: 0,
       });
@@ -141,7 +141,7 @@ describe("Test 'getPhotoPartById' endpoint", () => {
   it("Should return a photo with multiple paths when requested photo has multiple paths", async () => {
     const addedPhotoData = await addPhotoWithMultiplePaths();
 
-    const ret = await exportedTypes.GetPhotoPartByIdPost({
+    const ret = await GetPhotoPartById.Post({
       id: addedPhotoData.id,
       part: 0,
     });

@@ -5,7 +5,7 @@ mockModules();
 import { describe, expect, it } from "@jest/globals";
 
 import { Express } from "express";
-import * as exportedTypes from "@src/api/export/exportedTypes";
+import { DeletePhotosById } from "@src/api/export/exportedTypes";
 
 import { initServer, stopServer } from "@src/server/server";
 
@@ -51,7 +51,7 @@ describe("Test 'deletePhotosById' endpoint", () => {
 
       const photos = await Promise.all(ids.map((id) => getPhotoFromDb(id)));
 
-      const ret = await exportedTypes.DeletePhotosByIdPost({
+      const ret = await DeletePhotosById.Post({
         ids: ids,
       });
 
@@ -80,7 +80,7 @@ describe("Test 'deletePhotosById' endpoint", () => {
         .fill("")
         .map(() => generateId());
 
-      const ret = await exportedTypes.DeletePhotosByIdPost({
+      const ret = await DeletePhotosById.Post({
         ids: ids,
       });
 
@@ -95,7 +95,7 @@ describe("Test 'deletePhotosById' endpoint", () => {
     const addedPhotoData = await addPhoto();
     const ids = [addedPhotoData.id, generateId()];
 
-    const ret = await exportedTypes.DeletePhotosByIdPost({
+    const ret = await DeletePhotosById.Post({
       ids: ids,
     });
 
@@ -113,7 +113,7 @@ describe("Test 'deletePhotosById' endpoint", () => {
 
     const ids = [addedPhotosData[0].id];
 
-    const ret = await exportedTypes.DeletePhotosByIdPost({
+    const ret = await DeletePhotosById.Post({
       ids: ids,
     });
     expectToBeOk(ret);
@@ -136,7 +136,7 @@ describe("Test 'deletePhotosById' endpoint", () => {
 
     await deletePhotoFromDisk(photo, "thumbnail");
 
-    const ret = await exportedTypes.DeletePhotosByIdPost({
+    const ret = await DeletePhotosById.Post({
       ids: [id],
     });
 
@@ -154,7 +154,7 @@ describe("Test 'deletePhotosById' endpoint", () => {
   it("Should delete all clientPaths associated with photo when deleted", async () => {
     const addedPhotoData = await addPhoto();
 
-    await exportedTypes.DeletePhotosByIdPost({
+    await DeletePhotosById.Post({
       ids: [addedPhotoData.id],
     });
 

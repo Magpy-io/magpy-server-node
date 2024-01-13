@@ -5,7 +5,7 @@ mockModules();
 import { describe, expect, it } from "@jest/globals";
 
 import { Express } from "express";
-import * as exportedTypes from "@src/api/export/exportedTypes";
+import { GetPhotosByPath } from "@src/api/export/exportedTypes";
 
 import { initServer, stopServer } from "@src/server/server";
 
@@ -29,7 +29,7 @@ import {
   defaultPhotoSecondPath,
   generateDate,
 } from "@tests/helpers/functions";
-import { PhotoTypes } from "@src/api/export/exportedTypes";
+import { PhotoTypes } from "@src/api/export/exportedTypes/Types";
 
 describe("Test 'getPhotosByPath' endpoint", () => {
   let app: Express;
@@ -68,7 +68,7 @@ describe("Test 'getPhotosByPath' endpoint", () => {
         };
       });
 
-      const ret = await exportedTypes.GetPhotosByPathPost({
+      const ret = await GetPhotosByPath.Post({
         photosData: photosData,
         photoType: "data",
         deviceUniqueId: defaultPhoto.deviceUniqueId,
@@ -99,7 +99,7 @@ describe("Test 'getPhotosByPath' endpoint", () => {
           return { path: "path" + i.toString(), size: 0, date: generateDate() };
         });
 
-      const ret = await exportedTypes.GetPhotosByPathPost({
+      const ret = await GetPhotosByPath.Post({
         photosData: photosData,
         photoType: "data",
         deviceUniqueId: defaultPhoto.deviceUniqueId,
@@ -133,7 +133,7 @@ describe("Test 'getPhotosByPath' endpoint", () => {
       { path: "path2", size: 0, date: generateDate() },
     ];
 
-    const ret = await exportedTypes.GetPhotosByPathPost({
+    const ret = await GetPhotosByPath.Post({
       photosData: photosData,
       photoType: "data",
       deviceUniqueId: defaultPhoto.deviceUniqueId,
@@ -177,7 +177,7 @@ describe("Test 'getPhotosByPath' endpoint", () => {
         },
       ];
 
-      const ret = await exportedTypes.GetPhotosByPathPost({
+      const ret = await GetPhotosByPath.Post({
         photosData: photosData,
         photoType: testData.photoType,
         deviceUniqueId: defaultPhoto.deviceUniqueId,
@@ -226,7 +226,7 @@ describe("Test 'getPhotosByPath' endpoint", () => {
         },
       ];
 
-      const ret = await exportedTypes.GetPhotosByPathPost({
+      const ret = await GetPhotosByPath.Post({
         photosData: photosData,
         photoType: "data",
         deviceUniqueId: defaultPhoto.deviceUniqueId,
@@ -259,7 +259,7 @@ describe("Test 'getPhotosByPath' endpoint", () => {
       },
     ];
 
-    const ret = await exportedTypes.GetPhotosByPathPost({
+    const ret = await GetPhotosByPath.Post({
       photosData: photosData,
       photoType: "data",
       deviceUniqueId: defaultPhoto.deviceUniqueId,

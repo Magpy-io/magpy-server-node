@@ -1,4 +1,4 @@
-import { WarningDataTypes } from "@src/api/export/exportedTypes";
+import { WarningDataTypes } from "@src/api/export/exportedTypes/WarningsManager";
 
 const warnings = new Map<string, WarningDataTypes>();
 

@@ -12,7 +12,20 @@ import { pathExists } from "@src/modules/diskManager";
 
 import * as dbFunction from "@src/db/sequelizeDb";
 
-import * as exportedTypes from "@src/api/export/exportedTypes";
+import {
+  AddPhoto,
+  GetPhotosById,
+  GetToken,
+  UpdatePhotoPath,
+  GetNumberPhotos,
+} from "@src/api/export/exportedTypes";
+
+import {
+  GetUserToken,
+  HasUserToken,
+} from "@src/api/export/exportedTypes/UserTokenManager";
+import { PhotoTypes, APIPhoto } from "@src/api/export/exportedTypes/Types";
+import { ErrorCodes } from "@src/api/export/exportedTypes/ErrorTypes";
 
 import {
   GetServerConfigData,
@@ -25,7 +38,6 @@ import {
   GetLastWarningForUser,
   HasWarningForUser,
 } from "@src/modules/warningsManager";
-import { PhotoTypes } from "@src/api/export/exportedTypes";
 
 let serverUserToken = "";
 
@@ -55,7 +67,7 @@ async function addPhoto(data?: {
   image64?: string;
   deviceUniqueId?: string;
 }) {
-  const ret = await exportedTypes.AddPhotoPost({
+  const ret = await AddPhoto.Post({
     name: data?.name ?? defaultPhoto.name,
     fileSize: data?.fileSize ?? defaultPhoto.fileSize,
     width: data?.width ?? defaultPhoto.width,
@@ -125,7 +137,7 @@ async function testPhotoNotInDbNorDisk(photo: Photo) {
   expect(thumbnailExists).toBe(false);
 }
 
-async function testPhotosExistInDbAndDisk(photo: exportedTypes.APIPhoto) {
+async function testPhotosExistInDbAndDisk(photo: APIPhoto) {
   const dbPhoto = await dbFunction.getPhotoByIdFromDB(photo.id);
 
   expect(dbPhoto).toBeTruthy();
@@ -154,14 +166,14 @@ type testPhotoMetaAndIdDataType = {
 };
 
 function testPhotoMetaAndId(
-  photo: exportedTypes.APIPhoto,
+  photo: APIPhoto,
   data?: testPhotoMetaAndIdDataType
 ) {
   testPhotoMetaAndIdWithAdditionalPaths(photo, [], data);
 }
 
 function testPhotoMetaAndIdWithAdditionalPaths(
-  photo: exportedTypes.APIPhoto,
+  photo: APIPhoto,
   additionalPaths: { path: string; deviceUniqueId: string }[],
   data?: testPhotoMetaAndIdDataType
 ) {
@@ -203,7 +215,7 @@ function testPhotoMetaAndIdWithAdditionalPaths(
 }
 
 function testPhotoOriginal(
-  photo?: exportedTypes.APIPhoto,
+  photo?: APIPhoto,
   data?: testPhotoMetaAndIdDataType,
   image64?: string
 ) {
@@ -216,7 +228,7 @@ function testPhotoOriginal(
 }
 
 function testPhotoCompressed(
-  photo: exportedTypes.APIPhoto,
+  photo: APIPhoto,
   data?: testPhotoMetaAndIdDataType,
   image64?: string
 ) {
@@ -228,7 +240,7 @@ function testPhotoCompressed(
 }
 
 function testPhotoThumbnail(
-  photo: exportedTypes.APIPhoto,
+  photo: APIPhoto,
   data?: testPhotoMetaAndIdDataType,
   image64?: string
 ) {
@@ -239,17 +251,14 @@ function testPhotoThumbnail(
   );
 }
 
-function testPhotoData(
-  photo: exportedTypes.APIPhoto,
-  data?: testPhotoMetaAndIdDataType
-) {
+function testPhotoData(photo: APIPhoto, data?: testPhotoMetaAndIdDataType) {
   testPhotoMetaAndId(photo, data);
 
   expect(photo.image64).toBe("");
 }
 
 async function checkPhotoExists(id: string) {
-  const ret = await exportedTypes.GetPhotosByIdPost({
+  const ret = await GetPhotosById.Post({
     ids: [id],
     photoType: "data",
   });
@@ -262,7 +271,7 @@ async function checkPhotoExists(id: string) {
 }
 
 async function getPhotoById(id: string, photoType?: PhotoTypes) {
-  const ret = await exportedTypes.GetPhotosByIdPost({
+  const ret = await GetPhotosById.Post({
     ids: [id],
     photoType: photoType ?? "data",
   });
@@ -279,7 +288,7 @@ async function getPhotoById(id: string, photoType?: PhotoTypes) {
 }
 
 async function getNumberPhotos() {
-  const ret = await exportedTypes.GetNumberPhotosPost();
+  const ret = await GetNumberPhotos.Post();
 
   if (!ret.ok) {
     throw "Error checking photo exists";
@@ -301,9 +310,9 @@ function testReturnedToken() {
     );
   }
 
-  expect(exportedTypes.HasUserToken()).toBe(true);
+  expect(HasUserToken()).toBe(true);
 
-  const userTokenRetured = exportedTypes.GetUserToken();
+  const userTokenRetured = GetUserToken();
 
   const tokenVerification = verifyUserToken(
     userTokenRetured,
@@ -324,16 +333,16 @@ async function setupServerClaimed() {
 
 async function setupServerUserToken() {
   setupServerClaimed();
-  const ret = await exportedTypes.GetTokenPost({
+  const ret = await GetToken.Post({
     userToken: mockValues.validUserToken,
   });
 
-  if (!exportedTypes.HasUserToken()) {
+  if (!HasUserToken()) {
     throw new Error(
       "Error setting up server to generate user token:\n " + JSON.stringify(ret)
     );
   }
-  serverUserToken = exportedTypes.GetUserToken();
+  serverUserToken = GetUserToken();
 }
 
 function serverTokenHeader() {
@@ -409,16 +418,17 @@ function expectToNotBeOk<T extends { ok: boolean }>(o: T) {
   expect(o.ok).toBe(false);
 }
 
-function expectErrorCodeToBe<
-  T extends { ok: boolean; errorCode?: exportedTypes.ErrorCodes }
->(o: T, errorCode: exportedTypes.ErrorCodes) {
+function expectErrorCodeToBe<T extends { ok: boolean; errorCode?: ErrorCodes }>(
+  o: T,
+  errorCode: ErrorCodes
+) {
   expect(o.errorCode).toBe(errorCode);
 }
 
 async function addPhotoWithMultiplePaths() {
   const addedPhotoData = await addPhoto();
 
-  await exportedTypes.UpdatePhotoPathPost({
+  await UpdatePhotoPath.Post({
     id: addedPhotoData.id,
     path: defaultPhotoSecondPath.path,
     deviceUniqueId: defaultPhotoSecondPath.deviceUniqueId,

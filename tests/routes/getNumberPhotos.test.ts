@@ -5,7 +5,7 @@ mockModules();
 import { describe, expect, it } from "@jest/globals";
 
 import { Express } from "express";
-import * as exportedTypes from "@src/api/export/exportedTypes";
+import { GetNumberPhotos } from "@src/api/export/exportedTypes";
 
 import { initServer, stopServer } from "@src/server/server";
 
@@ -41,7 +41,7 @@ describe("Test 'getNumberPhotos' endpoint", () => {
     async (p: { n: number }) => {
       await addNPhotos(p.n);
 
-      const ret = await exportedTypes.GetNumberPhotosPost();
+      const ret = await GetNumberPhotos.Post();
 
       expectToBeOk(ret);
       expect(ret.warning).toBe(false);

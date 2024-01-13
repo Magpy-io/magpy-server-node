@@ -18,15 +18,12 @@ import {
   SaveServerCredentials,
 } from "@src/modules/serverDataManager";
 
-import {
-  ClaimServerRequestData,
-  ClaimServerResponseData,
-} from "@src/api/export/exportedTypes";
+import { ClaimServer } from "@src/api/export/exportedTypes";
 
 import checkServerIsClaimed from "@src/middleware/checkServerIsClaimed";
 
 const sendResponse =
-  responseFormatter.getCustomSendResponse<ClaimServerResponseData>();
+  responseFormatter.getCustomSendResponse<ClaimServer.ResponseData>();
 
 // claimServer : creates server in backend and sets the requesting user as it's owner
 const endpoint = "/claimServer";
@@ -41,7 +38,7 @@ const callback = async (req: Request, res: Response) => {
     }
     console.log("Request parameters ok.");
 
-    const requestParameters: ClaimServerRequestData = req.body;
+    const requestParameters: ClaimServer.RequestData = req.body;
 
     const myIp = await getMyIp();
 

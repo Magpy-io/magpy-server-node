@@ -10,15 +10,11 @@ import {
   filterPhotosExistAndDeleteMissing,
 } from "@src/modules/functions";
 
-import {
-  APIPhoto,
-  GetPhotosByPathRequestData,
-  GetPhotosByPathResponseData,
-  PhotoTypesArray,
-} from "@src/api/export/exportedTypes";
+import { GetPhotosByPath } from "@src/api/export/exportedTypes";
+import { APIPhoto, PhotoTypesArray } from "@src/api/export/exportedTypes/Types";
 
 const sendResponse =
-  responseFormatter.getCustomSendResponse<GetPhotosByPathResponseData>();
+  responseFormatter.getCustomSendResponse<GetPhotosByPath.ResponseData>();
 
 // getPhotosByPath : returns array of photos by their paths.
 const endpoint = "/getPhotosByPath";
@@ -41,7 +37,7 @@ const callback = async (req: Request, res: Response) => {
       photosData,
       photoType,
       deviceUniqueId,
-    }: GetPhotosByPathRequestData = req.body;
+    }: GetPhotosByPath.RequestData = req.body;
 
     console.log("Getting photos from db with paths from request.");
     const photos = await getPhotosByClientPathAndSizeAndDateFromDB(

@@ -5,7 +5,7 @@ mockModules();
 import { describe, expect, it } from "@jest/globals";
 
 import { Express } from "express";
-import * as exportedTypes from "@src/api/export/exportedTypes";
+import { UpdateServerName } from "@src/api/export/exportedTypes";
 
 import { initServer, stopServer } from "@src/server/server";
 import * as sac from "@tests/helpers/setupAndCleanup";
@@ -43,7 +43,7 @@ describe("Test 'updateServerName' endpoint", () => {
   ])(
     "Should return ok when changing the server name to $name",
     async (testData) => {
-      const ret = await exportedTypes.UpdateServerNamePost({
+      const ret = await UpdateServerName.Post({
         name: testData.name,
       });
 
@@ -66,7 +66,7 @@ describe("Test 'updateServerName' endpoint", () => {
     "Should return error INVALID_NAME when using the name : $name",
     async (testData) => {
       const serverNameBefore = GetServerName();
-      const ret = await exportedTypes.UpdateServerNamePost({
+      const ret = await UpdateServerName.Post({
         name: testData.name,
       });
 

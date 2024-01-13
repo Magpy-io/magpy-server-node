@@ -5,10 +5,10 @@ import { numberPhotosFromDB } from "@src/db/sequelizeDb";
 import Joi from "joi";
 import checkUserToken from "@src/middleware/checkUserToken";
 
-import { GetNumberPhotosResponseData } from "@src/api/export/exportedTypes";
+import { GetNumberPhotos } from "@src/api/export/exportedTypes";
 
 const sendResponse =
-  responseFormatter.getCustomSendResponse<GetNumberPhotosResponseData>();
+  responseFormatter.getCustomSendResponse<GetNumberPhotos.ResponseData>();
 
 // getNumberPhotos : return the number of photos in the server.
 const endpoint = "/getNumberPhotos";
