@@ -193,6 +193,8 @@ export type ServerResponseMessage = {
   warning: boolean;
 };
 
+export type DataTypeFrom<T> = T extends { data: infer D } ? D : never;
+
 export type ServerResponseData<T> = {
   ok: true;
   data: T;
