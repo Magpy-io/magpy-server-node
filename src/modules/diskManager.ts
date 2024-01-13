@@ -24,32 +24,28 @@ export async function addPhotoToDisk<T extends AddPhotoParamType>(
 ) {
   await createFolder(path.parse(photo.serverPath).dir);
 
-  const factorTmp = Math.sqrt(
-    (photo.width * photo.height) / config.MAX_PIXELS_IN_IMAGE
+  const factorForThumbnail = Math.sqrt(
+    (photo.width * photo.height) / config.MAX_PIXELS_IN_THUMBNAIL
   );
-  const factor = factorTmp > 1 ? factorTmp : 1;
-  const newWidth = Math.round(photo.width / factor);
-  const newHeight = Math.round(photo.height / factor);
+  const widthThumbnail = Math.round(photo.width / factorForThumbnail);
 
-  const factor2Tmp = Math.sqrt(
-    (photo.width * photo.height) / config.MAX_PIXELS_IN_IMAGE_BIGGER
+  const factorForCompressed = Math.sqrt(
+    (photo.width * photo.height) / config.MAX_PIXELS_IN_COMPRESSED
   );
-  const factor2 = factor2Tmp > 1 ? factor2Tmp : 1;
-  const newWidth2 = Math.round(photo.width / factor2);
-  const newHeight2 = Math.round(photo.height / factor2);
+  const withCompressed = Math.round(photo.width / factorForCompressed);
 
   let buff = Buffer.from(base64, "base64");
 
-  const data1 = await sharp(buff)
-    .resize({ width: newWidth, height: newHeight })
+  const dataThumbnail = await sharp(buff)
+    .resize({ width: widthThumbnail, withoutEnlargement: true })
     .jpeg({ quality: 70 })
     .toBuffer()
     .catch((err) => {
       console.error(err);
       throw err;
     });
-  const data2 = await sharp(buff)
-    .resize({ width: newWidth2, height: newHeight2 })
+  const dataCompressed = await sharp(buff)
+    .resize({ width: withCompressed, withoutEnlargement: true })
     .jpeg({ quality: 70 })
     .toBuffer()
     .catch((err) => {
@@ -57,8 +53,10 @@ export async function addPhotoToDisk<T extends AddPhotoParamType>(
       throw err;
     });
   await fs.writeFile(photo.serverPath, buff, { flag: "wx" });
-  await fs.writeFile(photo.serverCompressedPath, data2, { flag: "wx" });
-  await fs.writeFile(photo.serverThumbnailPath, data1, { flag: "wx" });
+  await fs.writeFile(photo.serverThumbnailPath, dataThumbnail, { flag: "wx" });
+  await fs.writeFile(photo.serverCompressedPath, dataCompressed, {
+    flag: "wx",
+  });
   return;
 }
 

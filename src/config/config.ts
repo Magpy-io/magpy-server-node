@@ -5,8 +5,8 @@ const hashLen = 32;
 const getPhotoPartSize = 100000; //char in base64
 const jwtUserExp = "1d";
 
-const MAX_PIXELS_IN_IMAGE = 40000;
-const MAX_PIXELS_IN_IMAGE_BIGGER = 200000;
+const MAX_PIXELS_IN_THUMBNAIL = 40000;
+const MAX_PIXELS_IN_COMPRESSED = 200000;
 
 const backend_host = "http://127.0.0.1";
 const backend_port = 8001;
@@ -50,8 +50,8 @@ export {
   sqliteDbFile,
   postPhotoPartTimeout,
   getPhotoPartSize,
-  MAX_PIXELS_IN_IMAGE,
-  MAX_PIXELS_IN_IMAGE_BIGGER,
+  MAX_PIXELS_IN_THUMBNAIL,
+  MAX_PIXELS_IN_COMPRESSED,
   serverDataFile,
   jwtUserExp,
   serverName,
