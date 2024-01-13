@@ -5,7 +5,7 @@ export function SetPath(path_p: string) {
     throw new Error("path_p parameter must be astring");
   }
 
-  if (path_p[path_p.length - 1] !== "/") {
+  if (path_p[path_p.length - 1] != "/") {
     path_p += "/";
   }
 
@@ -112,6 +112,10 @@ const routes = {
     checkPathExists();
     return path + "updateServerPath/";
   },
+  getLastWarning: () => {
+    checkPathExists();
+    return path + "getLastWarning/";
+  },
 };
 
 type ErrorBadRequest = "BAD_REQUEST";
@@ -119,7 +123,6 @@ type ErrorServerError = "SERVER_ERROR";
 type ErrorAuthorizationBackendFailed = "AUTHORIZATION_BACKEND_FAILED";
 type ErrorAuthorizationBackendExpired = "AUTHORIZATION_BACKEND_EXPIRED";
 type ErrorBackendServerUnreachable = "BACKEND_SERVER_UNREACHABLE";
-type ErrorPathExists = "PATH_EXISTS";
 type ErrorIdNotFound = "ID_NOT_FOUND";
 type ErrorUserNotAllowed = "USER_NOT_ALLOWED";
 type ErrorServerNotClaimed = "SERVER_NOT_CLAIMED";
@@ -127,7 +130,6 @@ type ErrorInvalidPartNumber = "INVALID_PART_NUMBER";
 type ErrorServerAlreadyClaimed = "SERVER_ALREADY_CLAIMED";
 type ErrorPhotoTransferNotFound = "PHOTO_TRANSFER_NOT_FOUND";
 type ErrorMissingParts = "MISSING_PARTS";
-type ErrorPhotoExists = "PHOTO_EXISTS";
 type ErrorPhotoSizeExceeded = "PHOTO_SIZE_EXCEEDED";
 type ErrorAuthorizationMissing = "AUTHORIZATION_MISSING";
 type ErrorAuthorizationWrongFormat = "AUTHORIZATION_WRONG_FORMAT";
@@ -136,6 +138,8 @@ type ErrorAuthorizationExpired = "AUTHORIZATION_EXPIRED";
 type ErrorCouldNotGetRequestAddress = "COULD_NOT_GET_REQUEST_ADDRESS";
 type ErrorRequestNotFromLoopback = "REQUEST_NOT_FROM_LOOPBACK";
 type ErrorPathAccessDenied = "PATH_ACCESS_DENIED";
+type ErrorPathFolderDoesNotExist = "PATH_FOLDER_DOES_NOT_EXIST";
+type ErrorInvalidName = "INVALID_NAME";
 
 type ErrorsNotFromLocal =
   | ErrorCouldNotGetRequestAddress
@@ -147,27 +151,73 @@ type ErrorsAuthorization =
   | ErrorAuthorizationExpired
   | ErrorAuthorizationWrongFormat;
 
+export type ErrorCodes =
+  | ErrorBadRequest
+  | ErrorServerError
+  | ErrorAuthorizationBackendFailed
+  | ErrorAuthorizationBackendExpired
+  | ErrorBackendServerUnreachable
+  | ErrorIdNotFound
+  | ErrorUserNotAllowed
+  | ErrorServerNotClaimed
+  | ErrorInvalidPartNumber
+  | ErrorServerAlreadyClaimed
+  | ErrorPhotoTransferNotFound
+  | ErrorMissingParts
+  | ErrorPhotoSizeExceeded
+  | ErrorAuthorizationMissing
+  | ErrorAuthorizationWrongFormat
+  | ErrorAuthorizationFailed
+  | ErrorAuthorizationExpired
+  | ErrorCouldNotGetRequestAddress
+  | ErrorRequestNotFromLoopback
+  | ErrorPathAccessDenied
+  | ErrorPathFolderDoesNotExist
+  | ErrorInvalidName;
+
+export type WarningFormat<Code, Data> = { code: Code; data: Data };
+
+export type WarningDataTypes = WarningPhotosNotOnDiskDeletedType;
+
+export type WarningPhotosNotOnDiskDeletedDataType = {
+  photosDeleted: Array<APIPhoto>;
+};
+export type WarningPhotosNotOnDiskDeletedType = WarningFormat<
+  "PHOTOS_NOT_ON_DISK_DELETED",
+  WarningPhotosNotOnDiskDeletedDataType
+>;
+
 export type ServerResponseMessage = {
   ok: true;
   message: string;
+  warning: boolean;
 };
 
 export type ServerResponseData<T> = {
   ok: true;
   data: T;
+  warning: boolean;
 };
 
 export type ServerResponseError<Errors> = {
   ok: false;
   message: string;
   errorCode: Errors | ErrorBadRequest | ErrorServerError;
+  warning: boolean;
 };
 
 export type EndpointMethodsResponseType<T, U> = T | ServerResponseError<U>;
 
-export type PhotoTypes = "data" | "thumbnail" | "compressed" | "original";
+export const PhotoTypesArray = [
+  "data",
+  "thumbnail",
+  "compressed",
+  "original",
+] as const;
 
-export type Photo = {
+export type PhotoTypes = (typeof PhotoTypesArray)[number];
+
+export type APIPhoto = {
   id: string;
   meta: {
     name: string;
@@ -177,7 +227,7 @@ export type Photo = {
     date: string;
     syncDate: string;
     serverPath: string;
-    clientPath: string;
+    clientPaths: Array<{ deviceUniqueId: string; path: string }>;
   };
   image64: string;
 };
@@ -224,7 +274,7 @@ export type GetPhotosRequestData = {
 export type GetPhotosResponseData = ServerResponseData<{
   endReached: boolean;
   number: number;
-  photos: Photo[];
+  photos: APIPhoto[];
 }>;
 
 export type GetPhotosResponseErrorTypes =
@@ -261,7 +311,8 @@ export type GetPhotosByIdRequestData = {
 export type GetPhotosByIdResponseData = ServerResponseData<{
   number: number;
   photos: Array<
-    { id: string; exists: false } | { id: string; exists: true; photo: Photo }
+    | { id: string; exists: false }
+    | { id: string; exists: true; photo: APIPhoto }
   >;
 }>;
 
@@ -297,7 +348,7 @@ export type GetPhotoPartByIdRequestData = {
 };
 
 export type GetPhotoPartByIdResponseData = ServerResponseData<{
-  photo: Photo;
+  photo: APIPhoto;
   part: number;
   totalNbOfParts: number;
 }>;
@@ -331,15 +382,16 @@ export async function GetPhotoPartByIdPost(
 
 // GetPhotosByPath
 export type GetPhotosByPathRequestData = {
-  paths: string[];
+  photosData: Array<{ path: string; size: number; date: string }>;
   photoType: PhotoTypes;
+  deviceUniqueId: string;
 };
 
 export type GetPhotosByPathResponseData = ServerResponseData<{
-  number: string;
+  number: number;
   photos: Array<
     | { path: string; exists: false }
-    | { path: string; exists: true; photo: Photo }
+    | { path: string; exists: true; photo: APIPhoto }
   >;
 }>;
 
@@ -409,14 +461,14 @@ export type AddPhotoRequestData = {
   path: string;
   date: string;
   image64: string;
+  deviceUniqueId: string;
 };
 
 export type AddPhotoResponseData = ServerResponseData<{
-  photo: Photo;
+  photo: APIPhoto;
 }>;
 
 export type AddPhotoResponseErrorTypes =
-  | ErrorPhotoExists
   | ErrorServerNotClaimed
   | ErrorsAuthorization;
 
@@ -449,6 +501,7 @@ export type AddPhotoInitRequestData = {
   path: string;
   date: string;
   image64Len: number;
+  deviceUniqueId: string;
 };
 
 export type AddPhotoInitResponseData = ServerResponseData<{
@@ -456,7 +509,6 @@ export type AddPhotoInitResponseData = ServerResponseData<{
 }>;
 
 export type AddPhotoInitResponseErrorTypes =
-  | ErrorPhotoExists
   | ErrorServerNotClaimed
   | ErrorsAuthorization;
 
@@ -488,17 +540,24 @@ export type AddPhotoPartRequestData = {
   photoPart: string;
 };
 
-export type AddPhotoPartResponseData = ServerResponseData<{
-  lenReceived: string;
-  lenWaiting: string;
-  photo: Photo;
-}>;
+export type AddPhotoPartResponseData = ServerResponseData<
+  | {
+      lenReceived: number;
+      lenWaiting: number;
+      done: false;
+    }
+  | {
+      lenReceived: number;
+      lenWaiting: number;
+      done: true;
+      photo: APIPhoto;
+    }
+>;
 
 export type AddPhotoPartResponseErrorTypes =
   | ErrorPhotoSizeExceeded
   | ErrorMissingParts
   | ErrorPhotoTransferNotFound
-  | ErrorPhotoExists
   | ErrorServerNotClaimed
   | ErrorsAuthorization;
 
@@ -526,13 +585,13 @@ export async function AddPhotoPartPost(
 export type UpdatePhotoPathRequestData = {
   id: string;
   path: string;
+  deviceUniqueId: string;
 };
 
 export type UpdatePhotoPathResponseData = ServerResponseMessage;
 
 export type UpdatePhotoPathResponseErrorTypes =
   | ErrorIdNotFound
-  | ErrorPathExists
   | ErrorServerNotClaimed
   | ErrorsAuthorization;
 
@@ -694,7 +753,6 @@ export type GetServerInfoResponseType = EndpointMethodsResponseType<
 export async function GetServerInfoPost(
   data: GetServerInfoRequestData
 ): Promise<GetServerInfoResponseType> {
-  console.log("routes.getServerInfo()", routes.getServerInfo());
   try {
     const response = await axios.post(routes.getServerInfo(), data);
     return response.data;
@@ -709,6 +767,7 @@ export type UpdateServerNameRequestData = { name?: string };
 export type UpdateServerNameResponseData = ServerResponseMessage;
 
 export type UpdateServerNameResponseErrorTypes =
+  | ErrorInvalidName
   | ErrorsNotFromLocal
   | ErrorBackendServerUnreachable;
 
@@ -734,6 +793,7 @@ export type UpdateServerPathRequestData = { path?: string };
 export type UpdateServerPathResponseData = ServerResponseMessage;
 
 export type UpdateServerPathResponseErrorTypes =
+  | ErrorPathFolderDoesNotExist
   | ErrorPathAccessDenied
   | ErrorsNotFromLocal;
 
@@ -747,6 +807,38 @@ export async function UpdateServerPathPost(
 ): Promise<UpdateServerPathResponseType> {
   try {
     const response = await axios.post(routes.updateServerPath(), data);
+    return response.data;
+  } catch (err: any) {
+    return handleAxiosError(err);
+  }
+}
+
+// GetLastWarning
+export type GetLastWarningRequestData = void;
+
+export type GetLastWarningResponseData = ServerResponseData<{
+  warning: WarningDataTypes | null;
+}>;
+
+export type GetLastWarningResponseErrorTypes =
+  | ErrorServerNotClaimed
+  | ErrorsAuthorization;
+
+export type GetLastWarningResponseType = EndpointMethodsResponseType<
+  GetLastWarningResponseData,
+  GetLastWarningResponseErrorTypes
+>;
+
+export async function GetLastWarningPost(
+  data: GetLastWarningRequestData
+): Promise<GetLastWarningResponseType> {
+  verifyHasUserToken();
+  try {
+    const response = await axios.post(
+      routes.getLastWarning(),
+      data,
+      userAuthorizationObject()
+    );
     return response.data;
   } catch (err: any) {
     return handleAxiosError(err);
