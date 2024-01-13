@@ -40,6 +40,11 @@ const defaultPhoto = {
   deviceUniqueId: "0123456789",
 };
 
+const defaultPhotoSecondPath = {
+  path: "/new/path/to/image.jpg",
+  deviceUniqueId: "newDeviceUniqueId",
+};
+
 async function addPhoto(data?: {
   path?: string;
   name?: string;
@@ -137,18 +142,28 @@ async function testPhotosExistInDbAndDisk(photo: exportedTypes.APIPhoto) {
   expect(thumbnailExists).toBe(true);
 }
 
+type testPhotoMetaAndIdDataType = {
+  deviceUniqueId?: string;
+  path?: string;
+  name?: string;
+  fileSize?: number;
+  width?: number;
+  height?: number;
+  date?: string;
+  id?: string;
+};
+
 function testPhotoMetaAndId(
   photo: exportedTypes.APIPhoto,
-  data?: {
-    deviceUniqueId?: string;
-    path?: string;
-    name?: string;
-    fileSize?: number;
-    width?: number;
-    height?: number;
-    date?: string;
-    id?: string;
-  }
+  data?: testPhotoMetaAndIdDataType
+) {
+  testPhotoMetaAndIdWithAdditionalPaths(photo, [], data);
+}
+
+function testPhotoMetaAndIdWithAdditionalPaths(
+  photo: exportedTypes.APIPhoto,
+  additionalPaths: { path: string; deviceUniqueId: string }[],
+  data?: testPhotoMetaAndIdDataType
 ) {
   const validID = validate(photo.id);
   expect(validID).toBe(true);
@@ -156,12 +171,6 @@ function testPhotoMetaAndId(
   if (data?.id) {
     expect(photo.id).toBe(data.id);
   }
-
-  expect(photo.meta.clientPaths.length).toBe(1);
-  expect(photo.meta.clientPaths[0].deviceUniqueId).toBe(
-    data?.deviceUniqueId ?? defaultPhoto.deviceUniqueId
-  );
-  expect(photo.meta.clientPaths[0].path).toBe(data?.path ?? defaultPhoto.path);
 
   expect(photo.meta.name).toBe(data?.name ?? defaultPhoto.name);
   expect(photo.meta.fileSize).toBe(data?.fileSize ?? defaultPhoto.fileSize);
@@ -172,19 +181,30 @@ function testPhotoMetaAndId(
   // Less than 10 seconds (arbitrary duration to test it's recent) since photo added
   const sync = new Date(photo.meta.syncDate);
   expect(Date.now() - sync.getTime()).toBeLessThan(10000);
+
+  //test paths
+
+  const pathsToTest = [
+    {
+      path: data?.path ?? defaultPhoto.path,
+      deviceUniqueId: data?.deviceUniqueId ?? defaultPhoto.deviceUniqueId,
+    },
+    ...additionalPaths,
+  ];
+
+  expect(photo.meta.clientPaths.length).toBe(pathsToTest.length);
+
+  for (let i = 0; i < pathsToTest.length; i++) {
+    expect(photo.meta.clientPaths[i].path).toBe(pathsToTest[i].path);
+    expect(photo.meta.clientPaths[i].deviceUniqueId).toBe(
+      pathsToTest[i].deviceUniqueId
+    );
+  }
 }
 
 function testPhotoOriginal(
   photo?: exportedTypes.APIPhoto,
-  data?: {
-    path?: string;
-    name?: string;
-    fileSize?: number;
-    width?: number;
-    height?: number;
-    date?: string;
-    id?: string;
-  },
+  data?: testPhotoMetaAndIdDataType,
   image64?: string
 ) {
   if (!photo) {
@@ -197,15 +217,7 @@ function testPhotoOriginal(
 
 function testPhotoCompressed(
   photo: exportedTypes.APIPhoto,
-  data?: {
-    path?: string;
-    name?: string;
-    fileSize?: number;
-    width?: number;
-    height?: number;
-    date?: string;
-    id?: string;
-  },
+  data?: testPhotoMetaAndIdDataType,
   image64?: string
 ) {
   testPhotoMetaAndId(photo, data);
@@ -217,15 +229,7 @@ function testPhotoCompressed(
 
 function testPhotoThumbnail(
   photo: exportedTypes.APIPhoto,
-  data?: {
-    path?: string;
-    name?: string;
-    fileSize?: number;
-    width?: number;
-    height?: number;
-    date?: string;
-    id?: string;
-  },
+  data?: testPhotoMetaAndIdDataType,
   image64?: string
 ) {
   testPhotoMetaAndId(photo, data);
@@ -237,15 +241,7 @@ function testPhotoThumbnail(
 
 function testPhotoData(
   photo: exportedTypes.APIPhoto,
-  data?: {
-    path?: string;
-    name?: string;
-    fileSize?: number;
-    width?: number;
-    height?: number;
-    date?: string;
-    id?: string;
-  }
+  data?: testPhotoMetaAndIdDataType
 ) {
   testPhotoMetaAndId(photo, data);
 
@@ -419,6 +415,18 @@ function expectErrorCodeToBe<
   expect(o.errorCode).toBe(errorCode);
 }
 
+async function addPhotoWithMultiplePaths() {
+  const addedPhotoData = await addPhoto();
+
+  await exportedTypes.UpdatePhotoPathPost({
+    id: addedPhotoData.id,
+    path: defaultPhotoSecondPath.path,
+    deviceUniqueId: defaultPhotoSecondPath.deviceUniqueId,
+  });
+
+  return addedPhotoData;
+}
+
 export {
   addPhoto,
   addNPhotos,
@@ -429,9 +437,11 @@ export {
   checkPhotoExists,
   getPhotoById,
   testPhotoMetaAndId,
+  testPhotoMetaAndIdWithAdditionalPaths,
   getNumberPhotos,
   waitForPhotoTransferToFinish,
   defaultPhoto,
+  defaultPhotoSecondPath,
   testReturnedToken,
   setupServerClaimed,
   setupServerUserToken,
@@ -449,4 +459,5 @@ export {
   expectToBeOk,
   expectToNotBeOk,
   expectErrorCodeToBe,
+  addPhotoWithMultiplePaths,
 };

@@ -21,6 +21,7 @@ import {
   getDataFromRet,
   expectToBeOk,
 } from "@tests/helpers/functions";
+import { getAllClientPathsByImageIdFromDB } from "@src/db/sequelizeDb";
 
 describe("Test 'deletePhotosById' endpoint", () => {
   let app: Express;
@@ -147,5 +148,18 @@ describe("Test 'deletePhotosById' endpoint", () => {
     expect(photoExists).toBe(false);
 
     await testPhotoNotInDbNorDisk(photo);
+  });
+
+  it("Should delete all clientPaths associated with photo when deleted", async () => {
+    const addedPhotoData = await addPhoto();
+
+    await exportedTypes.DeletePhotosByIdPost({
+      ids: [addedPhotoData.id],
+    });
+
+    const clientPaths = await getAllClientPathsByImageIdFromDB(
+      addedPhotoData.id
+    );
+    expect(clientPaths.length).toBe(0);
   });
 });

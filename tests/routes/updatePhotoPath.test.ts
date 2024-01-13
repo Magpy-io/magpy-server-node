@@ -15,6 +15,7 @@ import {
   addNPhotos,
   addPhoto,
   defaultPhoto,
+  defaultPhotoSecondPath,
   deletePhotoFromDisk,
   expectErrorCodeToBe,
   expectToBeOk,
@@ -22,8 +23,10 @@ import {
   getPhotoById,
   getPhotoFromDb,
   testPhotoMetaAndId,
+  testPhotoMetaAndIdWithAdditionalPaths,
   testWarning,
 } from "@tests/helpers/functions";
+import { countDevicesInDB } from "@src/db/sequelizeDb";
 
 describe("Test 'updatePhotoPath' endpoint", () => {
   let app: Express;
@@ -44,7 +47,7 @@ describe("Test 'updatePhotoPath' endpoint", () => {
     await sac.afterEach();
   });
 
-  it("Should change the path of photo after adding the photo", async () => {
+  it("Should change the path of an existing photo", async () => {
     const addedPhotoData = await addPhoto();
 
     const ret = await exportedTypes.UpdatePhotoPathPost({
@@ -93,5 +96,53 @@ describe("Test 'updatePhotoPath' endpoint", () => {
     expectErrorCodeToBe(ret, "ID_NOT_FOUND");
 
     testWarning(photo);
+  });
+
+  it("Should change the path of an existing photo if new path is for new device", async () => {
+    const addedPhotoData = await addPhoto();
+
+    const ret = await exportedTypes.UpdatePhotoPathPost({
+      id: addedPhotoData.id,
+      path: defaultPhotoSecondPath.path,
+      deviceUniqueId: defaultPhotoSecondPath.deviceUniqueId,
+    });
+
+    expectToBeOk(ret);
+
+    const photo = await getPhotoById(addedPhotoData.id);
+
+    if (!photo) {
+      throw new Error();
+    }
+
+    testPhotoMetaAndIdWithAdditionalPaths(photo, [defaultPhotoSecondPath]);
+  });
+
+  it("Should change the path of an existing photo and not create a new device if the device exists already", async () => {
+    expect(await countDevicesInDB()).toBe(0);
+
+    const addedPhotoData = await addPhoto();
+
+    expect(await countDevicesInDB()).toBe(1);
+
+    await addPhoto({
+      deviceUniqueId: defaultPhotoSecondPath.deviceUniqueId,
+    });
+
+    expect(await countDevicesInDB()).toBe(2);
+
+    const ret = await exportedTypes.UpdatePhotoPathPost({
+      id: addedPhotoData.id,
+      path: defaultPhotoSecondPath.path,
+      deviceUniqueId: defaultPhotoSecondPath.deviceUniqueId,
+    });
+
+    const photo = await getPhotoById(addedPhotoData.id);
+
+    if (!photo) {
+      throw new Error();
+    }
+    expect(await countDevicesInDB()).toBe(2);
+    testPhotoMetaAndIdWithAdditionalPaths(photo, [defaultPhotoSecondPath]);
   });
 });

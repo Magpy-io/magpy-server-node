@@ -46,7 +46,6 @@ describe("Test 'addPhotoPart' endpoint", () => {
   });
 
   it("Should add the photo after sending all the parts of a photo", async () => {
-    //delete photo.image64;
     const { image64: _, ...photo } = defaultPhoto;
 
     const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };
@@ -134,7 +133,6 @@ describe("Test 'addPhotoPart' endpoint", () => {
   });
 
   it("Should return error PHOTO_TRANSFER_NOT_FOUND if started transfer and sended part too late", async () => {
-    //delete photo.image64;
     const { image64: _, ...photo } = defaultPhoto;
 
     const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };
@@ -168,7 +166,6 @@ describe("Test 'addPhotoPart' endpoint", () => {
   });
 
   it("Should return error PHOTO_SIZE_EXCEEDED if sended more data in parts than needed", async () => {
-    //delete photo.image64;
     const { image64: _, ...photo } = defaultPhoto;
 
     const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };
@@ -215,7 +212,6 @@ describe("Test 'addPhotoPart' endpoint", () => {
   });
 
   it("Should return error BAD_REQUEST if partSize not equal to photoPart length", async () => {
-    //delete photo.image64;
     const { image64: _, ...photo } = defaultPhoto;
 
     const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };
@@ -240,7 +236,6 @@ describe("Test 'addPhotoPart' endpoint", () => {
   });
 
   it("Should return error MISSING_PARTS if added all parts but a number is missing", async () => {
-    //delete photo.image64;
     const { image64: _, ...photo } = defaultPhoto;
 
     const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };

@@ -40,18 +40,46 @@ describe("Test 'addPhoto' endpoint", () => {
     await sac.afterEach();
   });
 
-  it("Should add 1 photo when called", async () => {
-    const ret = await exportedTypes.AddPhotoPost(defaultPhoto);
+  it.each([{ times: 1 }, { times: 2 }, { times: 3 }])(
+    "Should add $times photos when called $times times with same photo",
+    async (testData) => {
+      for (let i = 0; i < testData.times; i++) {
+        const ret = await exportedTypes.AddPhotoPost(defaultPhoto);
+
+        expectToBeOk(ret);
+        expect(ret.warning).toBe(false);
+
+        const data = getDataFromRet(ret);
+        testPhotoMetaAndId(data.photo);
+        await testPhotosExistInDbAndDisk(data.photo);
+
+        const getPhoto = await getPhotoById(data.photo.id, "original");
+        expect(getPhoto).toBeTruthy();
+        testPhotoOriginal(getPhoto, { id: data.photo.id });
+      }
+    }
+  );
+
+  it("Should add 2 photos and create 2 devices when called twice with diferent deviceUniqueIds", async () => {
+    await exportedTypes.AddPhotoPost(defaultPhoto);
+
+    const ret = await exportedTypes.AddPhotoPost({
+      ...defaultPhoto,
+      deviceUniqueId: "newDeviceUniqueId",
+    });
 
     expectToBeOk(ret);
     expect(ret.warning).toBe(false);
 
     const data = getDataFromRet(ret);
-    testPhotoMetaAndId(data.photo);
+    testPhotoMetaAndId(data.photo, { deviceUniqueId: "newDeviceUniqueId" });
     await testPhotosExistInDbAndDisk(data.photo);
 
     const getPhoto = await getPhotoById(data.photo.id, "original");
     expect(getPhoto).toBeTruthy();
-    testPhotoOriginal(getPhoto, { id: data.photo.id });
+    testPhotoOriginal(getPhoto, {
+      id: data.photo.id,
+      deviceUniqueId: "newDeviceUniqueId",
+    });
   });
 });

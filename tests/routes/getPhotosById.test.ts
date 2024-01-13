@@ -23,6 +23,9 @@ import {
   testWarning,
   expectToBeOk,
   getDataFromRet,
+  addPhotoWithMultiplePaths,
+  testPhotoMetaAndIdWithAdditionalPaths,
+  defaultPhotoSecondPath,
 } from "@tests/helpers/functions";
 import { PhotoTypes } from "@src/api/export/exportedTypes";
 
@@ -47,7 +50,7 @@ describe("Test 'getPhotosById' endpoint", () => {
 
   it.each([{ n: 0 }, { n: 1 }, { n: 2 }])(
     "Should return $n photos all existing after adding $n photos and requesting $n photo ids",
-    async (testData: { n: number }) => {
+    async (testData) => {
       const addedPhotosData = await addNPhotos(testData.n);
 
       const ids = addedPhotosData.map((e) => e.id);
@@ -73,7 +76,7 @@ describe("Test 'getPhotosById' endpoint", () => {
 
   it.each([{ n: 0 }, { n: 1 }, { n: 2 }])(
     "Should return $n photos all not existing after adding no photos and requesting $n photo ids",
-    async (testData: { n: number }) => {
+    async (testData) => {
       const ids = Array(testData.n)
         .fill("")
         .map((_, i) => "id" + i.toString());
@@ -166,8 +169,8 @@ describe("Test 'getPhotosById' endpoint", () => {
   ];
 
   it.each(testDataArrayPhotoType)(
-    "Should return photo does not exist if a photo exists on db but its $photoType is not on disk",
-    async (testData: { photoType: PhotoTypes }) => {
+    "Should return photo does not exist with a warning if a photo exists on db but its $photoType is not on disk",
+    async (testData) => {
       const addedPhotoData = await addPhoto();
 
       const photo = await getPhotoFromDb(addedPhotoData.id);
@@ -191,4 +194,28 @@ describe("Test 'getPhotosById' endpoint", () => {
       testWarning(photo);
     }
   );
+
+  it("Should return a photo with multiple paths when requested photo has multiple paths", async () => {
+    const addedPhotoData = await addPhotoWithMultiplePaths();
+
+    const ret = await exportedTypes.GetPhotosByIdPost({
+      ids: [addedPhotoData.id],
+      photoType: "data",
+    });
+
+    expectToBeOk(ret);
+    expect(ret.warning).toBe(false);
+    const data = getDataFromRet(ret);
+
+    expect(data.photos[0].exists).toBe(true);
+    expect(data.photos[0].id).toBe(addedPhotoData.id);
+
+    if (!data.photos[0].exists) {
+      throw new Error();
+    }
+
+    testPhotoMetaAndIdWithAdditionalPaths(data.photos[0].photo, [
+      defaultPhotoSecondPath,
+    ]);
+  });
 });

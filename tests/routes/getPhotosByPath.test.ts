@@ -24,6 +24,9 @@ import {
   defaultPhoto,
   expectToBeOk,
   getDataFromRet,
+  addPhotoWithMultiplePaths,
+  testPhotoMetaAndIdWithAdditionalPaths,
+  defaultPhotoSecondPath,
 } from "@tests/helpers/functions";
 import { PhotoTypes } from "@src/api/export/exportedTypes";
 
@@ -241,4 +244,39 @@ describe("Test 'getPhotosByPath' endpoint", () => {
       testWarning(photo);
     }
   );
+
+  it("Should return a photo with multiple paths when requested photo has multiple paths", async () => {
+    const addedPhotoData = await addPhotoWithMultiplePaths();
+
+    const photo = await getPhotoFromDb(addedPhotoData.id);
+
+    const photosData = [
+      {
+        path: addedPhotoData.path,
+        size: photo.fileSize,
+        date: photo.date.toJSON(),
+      },
+    ];
+
+    const ret = await exportedTypes.GetPhotosByPathPost({
+      photosData: photosData,
+      photoType: "data",
+      deviceUniqueId: defaultPhoto.deviceUniqueId,
+    });
+
+    expectToBeOk(ret);
+    expect(ret.warning).toBe(false);
+    const data = getDataFromRet(ret);
+
+    expect(data.photos[0].exists).toBe(true);
+    expect(data.photos[0].path).toBe(photosData[0].path);
+
+    if (!data.photos[0].exists) {
+      throw new Error();
+    }
+
+    testPhotoMetaAndIdWithAdditionalPaths(data.photos[0].photo, [
+      defaultPhotoSecondPath,
+    ]);
+  });
 });

@@ -23,6 +23,9 @@ import {
   testWarning,
   expectToBeOk,
   getDataFromRet,
+  addPhotoWithMultiplePaths,
+  testPhotoMetaAndIdWithAdditionalPaths,
+  defaultPhotoSecondPath,
 } from "@tests/helpers/functions";
 import { PhotoTypes } from "@src/api/export/exportedTypes";
 
@@ -171,4 +174,24 @@ describe("Test 'getPhotos' endpoint", () => {
       testWarning(photo);
     }
   );
+
+  it("Should return a photo with multiple paths when requested photo has multiple paths", async () => {
+    await addPhotoWithMultiplePaths();
+
+    const ret = await exportedTypes.GetPhotosPost({
+      number: 1,
+      offset: 0,
+      photoType: "data",
+    });
+
+    expectToBeOk(ret);
+    expect(ret.warning).toBe(false);
+    const data = getDataFromRet(ret);
+
+    expect(data.photos.length).toBe(1);
+
+    testPhotoMetaAndIdWithAdditionalPaths(data.photos[0], [
+      defaultPhotoSecondPath,
+    ]);
+  });
 });

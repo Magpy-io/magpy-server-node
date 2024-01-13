@@ -22,6 +22,9 @@ import {
   expectErrorCodeToBe,
   expectToBeOk,
   expectToNotBeOk,
+  addPhotoWithMultiplePaths,
+  testPhotoMetaAndIdWithAdditionalPaths,
+  defaultPhotoSecondPath,
 } from "@tests/helpers/functions";
 
 import { PhotoTypes } from "@src/api/export/exportedTypes";
@@ -133,4 +136,19 @@ describe("Test 'getPhotoPartById' endpoint", () => {
       testWarning(photo);
     }
   );
+
+  it("Should return a photo with multiple paths when requested photo has multiple paths", async () => {
+    const addedPhotoData = await addPhotoWithMultiplePaths();
+
+    const ret = await exportedTypes.GetPhotoPartByIdPost({
+      id: addedPhotoData.id,
+      part: 0,
+    });
+
+    expectToBeOk(ret);
+    expect(ret.warning).toBe(false);
+    const data = getDataFromRet(ret);
+
+    testPhotoMetaAndIdWithAdditionalPaths(data.photo, [defaultPhotoSecondPath]);
+  });
 });

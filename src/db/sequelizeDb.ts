@@ -111,6 +111,12 @@ async function getDeviceFromDB(deviceUniqueId: string) {
   return device;
 }
 
+async function countDevicesInDB() {
+  const count = await DeviceModel.count();
+
+  return count;
+}
+
 async function getPhotoByClientPathFromDB(
   photoPath: string,
   deviceUniqueId: string
@@ -465,6 +471,16 @@ async function updatePhotoClientPathById(
   }
 }
 
+async function getAllClientPathsByImageIdFromDB(imageId: string) {
+  const clientPaths = (
+    await ClientPathModel.findAll({
+      where: { imageId: imageId },
+    })
+  ).map((e) => e.dataValues);
+
+  return clientPaths;
+}
+
 async function clearDB() {
   assertDbOpen();
   try {
@@ -508,6 +524,7 @@ export {
   closeDb,
   clearDB,
   getDeviceFromDB,
+  countDevicesInDB,
   getPhotoByClientPathFromDB,
   addPhotoToDB,
   numberPhotosFromDB,
@@ -518,4 +535,5 @@ export {
   getPhotosByIdFromDB,
   updatePhotoClientPathById,
   getPhotosByClientPathAndSizeAndDateFromDB,
+  getAllClientPathsByImageIdFromDB,
 };
