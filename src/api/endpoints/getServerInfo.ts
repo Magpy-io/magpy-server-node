@@ -13,8 +13,6 @@ import { GetServerInfo } from "@src/api/export/exportedTypes";
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetServerInfo.ResponseData>();
 
-// getServerInfo : gets information about the server
-const endpoint = "/getServerInfo";
 const callback = async (req: Request, res: Response) => {
   try {
     const { error } = RequestDataShema.validate(req.body);
@@ -62,7 +60,7 @@ const callback = async (req: Request, res: Response) => {
 const RequestDataShema = Joi.object({}).options({ presence: "required" });
 
 export default {
-  endpoint: endpoint,
+  endpoint: GetServerInfo.endpoint,
   callback: callback,
   method: "post",
   middleWare: [checkConnexionLocal, checkServerHasValidCredentials],

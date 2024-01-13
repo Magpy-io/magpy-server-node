@@ -22,8 +22,6 @@ import { GetToken } from "@src/api/export/exportedTypes";
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetToken.ResponseData>();
 
-// getToken : creates and sends a user token that can be used to the the user's photos
-const endpoint = "/getToken";
 const callback = async (req: Request, res: Response) => {
   try {
     const { error } = RequestDataShema.validate(req.body);
@@ -134,7 +132,7 @@ const RequestDataShema = Joi.object({
 }).options({ presence: "required" });
 
 export default {
-  endpoint: endpoint,
+  endpoint: GetToken.endpoint,
   callback: callback,
   method: "post",
   middleWare: checkServerIsClaimed,

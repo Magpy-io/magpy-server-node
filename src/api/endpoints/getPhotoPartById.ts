@@ -16,8 +16,6 @@ import { GetPhotoPartById } from "@src/api/export/exportedTypes";
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetPhotoPartById.ResponseData>();
 
-// getPhotoPartById : returns a part of a photo by id.
-const endpoint = "/getPhotoPartById";
 const callback = async (req: Request, res: Response) => {
   try {
     console.log("Checking request parameters.");
@@ -110,8 +108,9 @@ const RequestDataShema = Joi.object({
   }),
   part: Joi.number().integer(),
 }).options({ presence: "required" });
+
 export default {
-  endpoint: endpoint,
+  endpoint: GetPhotoPartById.endpoint,
   callback: callback,
   method: "post",
   middleWare: checkUserToken,

@@ -14,8 +14,6 @@ import { PhotoTypesArray } from "@src/api/export/exportedTypes/Types";
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetPhotos.ResponseData>();
 
-// getPhotos : returns "number" photos starting from "offset".
-const endpoint = "/getPhotos";
 const callback = async (req: Request, res: Response) => {
   try {
     const { error } = RequestDataShema.validate(req.body);
@@ -94,7 +92,7 @@ const RequestDataShema = Joi.object({
 }).options({ presence: "required" });
 
 export default {
-  endpoint: endpoint,
+  endpoint: GetPhotos.endpoint,
   callback: callback,
   method: "post",
   middleWare: checkUserToken,

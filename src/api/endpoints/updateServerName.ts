@@ -13,8 +13,6 @@ import { UpdateServerName } from "@src/api/export/exportedTypes";
 const sendResponse =
   responseFormatter.getCustomSendResponse<UpdateServerName.ResponseData>();
 
-// updateServerName : sets server name
-const endpoint = "/updateServerName";
 const callback = async (req: Request, res: Response) => {
   try {
     const { error } = RequestDataShema.validate(req.body);
@@ -70,7 +68,7 @@ const RequestDataShema = Joi.object({
 }).options({ presence: "required" });
 
 export default {
-  endpoint: endpoint,
+  endpoint: UpdateServerName.endpoint,
   callback: callback,
   method: "post",
   middleWare: [checkConnexionLocal, checkServerHasValidCredentials],

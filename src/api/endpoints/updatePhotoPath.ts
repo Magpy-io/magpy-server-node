@@ -14,8 +14,6 @@ import { UpdatePhotoPath } from "@src/api/export/exportedTypes";
 const sendResponse =
   responseFormatter.getCustomSendResponse<UpdatePhotoPath.ResponseData>();
 
-// updatePhotoPath : updates the path of a photo in db
-const endpoint = "/updatePhotoPath";
 const callback = async (req: Request, res: Response) => {
   const { error } = RequestDataShema.validate(req.body);
   if (error) {
@@ -79,7 +77,7 @@ const RequestDataShema = Joi.object({
 }).options({ presence: "required" });
 
 export default {
-  endpoint: endpoint,
+  endpoint: UpdatePhotoPath.endpoint,
   callback: callback,
   method: "post",
   middleWare: checkUserToken,

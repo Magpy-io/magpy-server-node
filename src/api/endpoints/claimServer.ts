@@ -25,8 +25,6 @@ import checkServerIsClaimed from "@src/middleware/checkServerIsClaimed";
 const sendResponse =
   responseFormatter.getCustomSendResponse<ClaimServer.ResponseData>();
 
-// claimServer : creates server in backend and sets the requesting user as it's owner
-const endpoint = "/claimServer";
 const callback = async (req: Request, res: Response) => {
   try {
     console.log("Checking request parameters.");
@@ -139,7 +137,7 @@ const RequestDataShema = Joi.object({
 }).options({ presence: "required" });
 
 export default {
-  endpoint: endpoint,
+  endpoint: ClaimServer.endpoint,
   callback: callback,
   method: "post",
   middleWare: checkServerIsClaimed,

@@ -32,13 +32,14 @@ function loadEndpoints(app: any) {
         console.log(endpoint);
         callback(req, res);
       };
+      const endpointFormatted = "/" + endpoint;
       if (!middleWare) {
-        app[method](endpoint, callbackWithLogging);
+        app[method](endpointFormatted, callbackWithLogging);
       } else {
         if (middleWare instanceof Array) {
-          app[method](endpoint, ...middleWare, callbackWithLogging);
+          app[method](endpointFormatted, ...middleWare, callbackWithLogging);
         } else {
-          app[method](endpoint, middleWare, callbackWithLogging);
+          app[method](endpointFormatted, middleWare, callbackWithLogging);
         }
       }
     }

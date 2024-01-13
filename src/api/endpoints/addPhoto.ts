@@ -12,8 +12,6 @@ import { AddPhoto } from "@src/api/export/exportedTypes";
 const sendResponse =
   responseFormatter.getCustomSendResponse<AddPhoto.ResponseData>();
 
-// addPhoto : adds a photo to the server
-const endpoint = "/addPhoto";
 const callback = async (req: Request, res: Response) => {
   try {
     console.log("Checking request parameters.");
@@ -86,7 +84,7 @@ const RequestDataShema = Joi.object({
 }).options({ presence: "required" });
 
 export default {
-  endpoint: endpoint,
+  endpoint: AddPhoto.endpoint,
   callback: callback,
   method: "post",
   middleWare: checkUserToken,

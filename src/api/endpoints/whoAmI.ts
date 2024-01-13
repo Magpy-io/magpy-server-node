@@ -10,8 +10,6 @@ import { WhoAmI } from "@src/api/export/exportedTypes";
 const sendResponse =
   responseFormatter.getCustomSendResponse<WhoAmI.ResponseData>();
 
-// whoAmI : checks user token is valid
-const endpoint = "/whoami";
 const callback = async (req: Request, res: Response) => {
   try {
     const { error } = RequestDataShema.validate(req.body);
@@ -40,7 +38,7 @@ const callback = async (req: Request, res: Response) => {
 const RequestDataShema = Joi.object({}).options({ presence: "required" });
 
 export default {
-  endpoint: endpoint,
+  endpoint: WhoAmI.endpoint,
   callback: callback,
   method: "post",
   middleWare: checkUserToken,

@@ -13,8 +13,6 @@ import { UpdateServerPath } from "@src/api/export/exportedTypes";
 const sendResponse =
   responseFormatter.getCustomSendResponse<UpdateServerPath.ResponseData>();
 
-// updateServerPath : sets server name
-const endpoint = "/updateServerPath";
 const callback = async (req: Request, res: Response) => {
   try {
     const { error } = RequestDataShema.validate(req.body);
@@ -72,7 +70,7 @@ const RequestDataShema = Joi.object({
 }).options({ presence: "required" });
 
 export default {
-  endpoint: endpoint,
+  endpoint: UpdateServerPath.endpoint,
   callback: callback,
   method: "post",
   middleWare: [checkConnexionLocal],

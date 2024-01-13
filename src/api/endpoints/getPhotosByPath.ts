@@ -16,8 +16,6 @@ import { APIPhoto, PhotoTypesArray } from "@src/api/export/exportedTypes/Types";
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetPhotosByPath.ResponseData>();
 
-// getPhotosByPath : returns array of photos by their paths.
-const endpoint = "/getPhotosByPath";
 const callback = async (req: Request, res: Response) => {
   try {
     console.log("Checking request parameters.");
@@ -110,7 +108,7 @@ const RequestDataShema = Joi.object({
 }).options({ presence: "required" });
 
 export default {
-  endpoint: endpoint,
+  endpoint: GetPhotosByPath.endpoint,
   callback: callback,
   method: "post",
   middleWare: checkUserToken,

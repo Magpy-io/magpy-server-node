@@ -13,8 +13,6 @@ import { AddPhotoPart } from "@src/api/export/exportedTypes";
 const sendResponse =
   responseFormatter.getCustomSendResponse<AddPhotoPart.ResponseData>();
 
-// addPhotoPart : adds a part of a photo to the server
-const endpoint = "/addPhotoPart";
 const callback = async (req: Request, res: Response) => {
   try {
     console.log("Checking request parameters.");
@@ -178,7 +176,7 @@ function joinParts(parts: Map<number, string>) {
 }
 
 export default {
-  endpoint: endpoint,
+  endpoint: AddPhotoPart.endpoint,
   callback: callback,
   method: "post",
   middleWare: checkUserToken,

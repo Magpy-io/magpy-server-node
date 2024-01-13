@@ -9,8 +9,6 @@ import { GetLastWarning } from "@src/api/export/exportedTypes";
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetLastWarning.ResponseData>();
 
-// getLastWarning : returns last generated warning for this user
-const endpoint = "/getLastWarning";
 const callback = async (req: Request, res: Response) => {
   try {
     const { error } = RequestDataShema.validate(req.body);
@@ -41,7 +39,7 @@ const callback = async (req: Request, res: Response) => {
 
 const RequestDataShema = Joi.object({}).options({ presence: "required" });
 export default {
-  endpoint: endpoint,
+  endpoint: GetLastWarning.endpoint,
   callback: callback,
   method: "post",
   middleWare: checkUserToken,

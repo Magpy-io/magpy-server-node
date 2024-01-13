@@ -17,8 +17,6 @@ import { GetPhotosById } from "@src/api/export/exportedTypes";
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetPhotosById.ResponseData>();
 
-// getPhotosById : returns array of photos by their ids.
-const endpoint = "/getPhotosById";
 const callback = async (req: Request, res: Response) => {
   try {
     const { error } = RequestDataShema.validate(req.body);
@@ -98,7 +96,7 @@ const RequestDataShema = Joi.object({
 }).options({ presence: "required" });
 
 export default {
-  endpoint: endpoint,
+  endpoint: GetPhotosById.endpoint,
   callback: callback,
   method: "post",
   middleWare: checkUserToken,

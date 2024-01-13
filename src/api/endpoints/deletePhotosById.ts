@@ -9,8 +9,6 @@ import { DeletePhotosById } from "@src/api/export/exportedTypes";
 const sendResponse =
   responseFormatter.getCustomSendResponse<DeletePhotosById.ResponseData>();
 
-// deletePhotosById: deletes photos from server by id
-const endpoint = "/deletePhotosById";
 const callback = async (req: Request, res: Response) => {
   try {
     console.log("Checking request parameters.");
@@ -50,7 +48,7 @@ const RequestDataShema = Joi.object({
 }).options({ presence: "required" });
 
 export default {
-  endpoint: endpoint,
+  endpoint: DeletePhotosById.endpoint,
   callback: callback,
   method: "post",
   middleWare: checkUserToken,

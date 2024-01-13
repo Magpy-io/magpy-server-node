@@ -10,8 +10,6 @@ import { GetNumberPhotos } from "@src/api/export/exportedTypes";
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetNumberPhotos.ResponseData>();
 
-// getNumberPhotos : return the number of photos in the server.
-const endpoint = "/getNumberPhotos";
 const callback = async (req: Request, res: Response) => {
   try {
     const { error } = RequestDataShema.validate(req.body);
@@ -37,7 +35,7 @@ const callback = async (req: Request, res: Response) => {
 
 const RequestDataShema = Joi.object({}).options({ presence: "required" });
 export default {
-  endpoint: endpoint,
+  endpoint: GetNumberPhotos.endpoint,
   callback: callback,
   method: "post",
   middleWare: checkUserToken,
