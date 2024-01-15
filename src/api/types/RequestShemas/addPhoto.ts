@@ -1,6 +1,6 @@
 import Joi from "joi";
 
-export const RequestDataShema = Joi.object({
+export const RequestSchema = Joi.object({
   name: Joi.string(),
   fileSize: Joi.number().integer(),
   width: Joi.number().integer(),
@@ -9,4 +9,6 @@ export const RequestDataShema = Joi.object({
   date: Joi.string().isoDate(),
   image64: Joi.string().base64(),
   deviceUniqueId: Joi.string(),
-}).options({ presence: "required" });
+})
+  .options({ presence: "required" })
+  .meta({ className: "RequestData" });

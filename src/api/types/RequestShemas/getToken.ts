@@ -1,5 +1,7 @@
 import Joi from "joi";
 
-export const RequestDataShema = Joi.object({
+export const RequestSchema = Joi.object({
   userToken: Joi.string(),
-}).options({ presence: "required" });
+})
+  .options({ presence: "required" })
+  .meta({ className: "RequestData" });

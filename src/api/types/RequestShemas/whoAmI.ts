@@ -1,5 +1,7 @@
 import Joi from "joi";
 
-export const RequestDataShema = Joi.object({}).options({
-  presence: "required",
-});
+export const RequestSchema = Joi.object({})
+  .options({
+    presence: "required",
+  })
+  .meta({ className: "RequestData" });

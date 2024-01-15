@@ -1,7 +1,7 @@
 import Joi from "joi";
 import { PhotoTypesArray } from "../Types";
 
-export const RequestDataShema = Joi.object({
+export const RequestSchema = Joi.object({
   photosData: Joi.array().items(
     Joi.object({
       path: Joi.string(),
@@ -11,4 +11,6 @@ export const RequestDataShema = Joi.object({
   ),
   photoType: Joi.string().valid(...PhotoTypesArray),
   deviceUniqueId: Joi.string().uuid({ version: "uuidv4" }),
-}).options({ presence: "required" });
+})
+  .options({ presence: "required" })
+  .meta({ className: "RequestData" });
