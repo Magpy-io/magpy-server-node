@@ -5,12 +5,12 @@ const fs = require("mz/fs");
 
 function getEndpoints() {
   const endpoints: any = [];
-  fs.readdirSync(__dirname + "/endpoints").forEach(function (file: any) {
+  fs.readdirSync(__dirname + "/callbacks").forEach(function (file: any) {
     const split = file.split(".");
 
     //only .js and .ts files
     if (split[split.length - 1] == "ts" || split[split.length - 1] == "js") {
-      endpoints.push(require("@src/api/endpoints/" + file).default);
+      endpoints.push(require("@src/api/callbacks/" + file).default);
     }
   });
   return endpoints;
