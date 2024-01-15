@@ -4,7 +4,7 @@ import { getPhotoByIdFromDB, deletePhotoByIdFromDB } from "@src/db/sequelizeDb";
 import { removePhotoFromDisk } from "@src/modules/diskManager";
 import Joi from "joi";
 import checkUserToken from "@src/middleware/checkUserToken";
-import { DeletePhotosById } from "@src/api/types";
+import { DeletePhotosById } from "@src/api/Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<DeletePhotosById.ResponseData>();

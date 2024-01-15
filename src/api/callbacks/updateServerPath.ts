@@ -8,7 +8,7 @@ import { folderHasRights, pathExists } from "@src/modules/diskManager";
 import Joi from "joi";
 import { isAbsolutePath } from "@src/modules/functions";
 
-import { UpdateServerPath } from "@src/api/types";
+import { UpdateServerPath } from "@src/api/Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<UpdateServerPath.ResponseData>();

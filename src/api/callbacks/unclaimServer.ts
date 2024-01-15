@@ -9,7 +9,7 @@ import {
 import checkConnexionLocal from "@src/middleware/checkConnexionLocal";
 import checkServerHasValidCredentials from "@src/middleware/checkServerHasValidCredentials";
 
-import { UnclaimServer } from "@src/api/types";
+import { UnclaimServer } from "@src/api/Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<UnclaimServer.ResponseData>();

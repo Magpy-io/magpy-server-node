@@ -8,7 +8,7 @@ import { postPhotoPartTimeout } from "@src/config/config";
 
 import checkUserToken from "@src/middleware/checkUserToken";
 
-import { AddPhotoInit } from "@src/api/types";
+import { AddPhotoInit } from "@src/api/Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<AddPhotoInit.ResponseData>();

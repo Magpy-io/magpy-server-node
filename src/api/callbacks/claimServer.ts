@@ -18,7 +18,7 @@ import {
   SaveServerCredentials,
 } from "@src/modules/serverDataManager";
 
-import { ClaimServer } from "@src/api/types";
+import { ClaimServer } from "@src/api/Types";
 
 import checkServerIsClaimed from "@src/middleware/checkServerIsClaimed";
 

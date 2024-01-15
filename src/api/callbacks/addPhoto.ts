@@ -7,7 +7,7 @@ import { addServerImagePaths } from "@src/modules/diskFilesNaming";
 import { hashFile } from "@src/modules/hashing";
 
 import checkUserToken from "@src/middleware/checkUserToken";
-import { AddPhoto } from "@src/api/types";
+import { AddPhoto } from "@src/api/Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<AddPhoto.ResponseData>();

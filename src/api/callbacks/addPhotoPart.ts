@@ -8,7 +8,7 @@ import { hashFile } from "@src/modules/hashing";
 import Joi from "joi";
 import { postPhotoPartTimeout } from "@src/config/config";
 import checkUserToken from "@src/middleware/checkUserToken";
-import { AddPhotoPart } from "@src/api/types";
+import { AddPhotoPart } from "@src/api/Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<AddPhotoPart.ResponseData>();

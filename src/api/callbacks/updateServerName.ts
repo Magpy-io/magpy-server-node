@@ -8,7 +8,7 @@ import { SaveServerName } from "@src/modules/serverDataManager";
 
 import Joi from "joi";
 
-import { UpdateServerName } from "@src/api/types";
+import { UpdateServerName } from "@src/api/Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<UpdateServerName.ResponseData>();

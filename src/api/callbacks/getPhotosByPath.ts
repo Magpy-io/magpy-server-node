@@ -10,8 +10,7 @@ import {
   filterPhotosExistAndDeleteMissing,
 } from "@src/modules/functions";
 
-import { GetPhotosByPath } from "@src/api/types";
-import { PhotoTypesArray, APIPhoto } from "@src/api/types/Types";
+import { GetPhotosByPath, APIPhoto } from "@src/api/Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetPhotosByPath.ResponseData>();

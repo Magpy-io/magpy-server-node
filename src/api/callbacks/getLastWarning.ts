@@ -4,7 +4,7 @@ import Joi from "joi";
 import checkUserToken from "@src/middleware/checkUserToken";
 import { GetLastWarningForUser } from "@src/modules/warningsManager";
 
-import { GetLastWarning } from "@src/api/types";
+import { GetLastWarning } from "@src/api/Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetLastWarning.ResponseData>();

@@ -11,7 +11,7 @@ import {
   checkPhotoExistsAndDeleteMissing,
 } from "@src/modules/functions";
 
-import { GetPhotoPartById } from "@src/api/types";
+import { GetPhotoPartById } from "@src/api/Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetPhotoPartById.ResponseData>();

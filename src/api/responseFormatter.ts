@@ -1,9 +1,9 @@
 // IMPORTS
 import { Response } from "express";
 import { Photo } from "@src/db/sequelizeDb";
-import { APIPhoto } from "@src/api/types/Types";
-import { ResponseTypeFrom } from "@src/api/types/ApiGlobalTypes";
-import { ErrorCodes } from "@src/api/types/ErrorTypes";
+import { APIPhoto } from "@src/api/Types";
+import { ResponseTypeFrom } from "@src/api/Types/ApiGlobalTypes";
+import { ErrorCodes } from "@src/api/Types/ErrorTypes";
 
 function getCustomSendResponse<T>() {
   return async function (res: Response, data: T, warning: boolean = false) {

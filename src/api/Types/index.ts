@@ -17,4 +17,4 @@ export * as UpdateServerName from "./EndpointsApi/updateServerName";
 export * as UpdateServerPath from "./EndpointsApi/updateServerPath";
 export * as WhoAmI from "./EndpointsApi/whoAmI";
 
-export * as Types from "./Types";
+export * from "./Types";

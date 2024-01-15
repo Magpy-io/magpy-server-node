@@ -11,8 +11,7 @@ import {
   filterPhotosExistAndDeleteMissing,
 } from "@src/modules/functions";
 
-import { GetPhotosById } from "@src/api/types";
-import { PhotoTypesArray, APIPhoto } from "@src/api/types/Types";
+import { GetPhotosById, APIPhoto } from "@src/api/Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetPhotosById.ResponseData>();

@@ -8,8 +8,7 @@ import {
   AddWarningPhotosDeleted,
   filterPhotosAndDeleteMissing,
 } from "@src/modules/functions";
-import { GetPhotos } from "@src/api/types";
-import { PhotoTypesArray } from "@src/api/types/Types";
+import { GetPhotos } from "@src/api/Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetPhotos.ResponseData>();

@@ -5,7 +5,7 @@ import checkUserToken from "@src/middleware/checkUserToken";
 
 import Joi from "joi";
 
-import { WhoAmI } from "@src/api/types";
+import { WhoAmI } from "@src/api/Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<WhoAmI.ResponseData>();

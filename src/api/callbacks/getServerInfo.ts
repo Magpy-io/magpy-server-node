@@ -8,7 +8,7 @@ import { GetServerConfigData } from "@src/modules/serverDataManager";
 
 import Joi from "joi";
 
-import { GetServerInfo } from "@src/api/types";
+import { GetServerInfo } from "@src/api/Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetServerInfo.ResponseData>();

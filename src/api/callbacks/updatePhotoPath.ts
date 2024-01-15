@@ -9,7 +9,7 @@ import {
   checkPhotoExistsAndDeleteMissing,
 } from "@src/modules/functions";
 
-import { UpdatePhotoPath } from "@src/api/types";
+import { UpdatePhotoPath } from "@src/api/Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<UpdatePhotoPath.ResponseData>();

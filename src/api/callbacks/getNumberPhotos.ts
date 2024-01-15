@@ -5,7 +5,7 @@ import { numberPhotosFromDB } from "@src/db/sequelizeDb";
 import Joi from "joi";
 import checkUserToken from "@src/middleware/checkUserToken";
 
-import { GetNumberPhotos } from "@src/api/types";
+import { GetNumberPhotos } from "@src/api/Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetNumberPhotos.ResponseData>();

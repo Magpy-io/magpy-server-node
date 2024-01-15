@@ -1,4 +1,4 @@
-import { PhotoTypes, PhotoTypesArray } from "@src/api/types/Types";
+import { PhotoTypes, PhotoTypesArray } from "@src/api/Types";
 
 function isValidPhotoType(photoType_p: string): boolean {
   const photoType = PhotoTypesArray.find(

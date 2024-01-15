@@ -17,7 +17,7 @@ import { GetServerConfigData } from "@src/modules/serverDataManager";
 
 import { generateUserToken } from "@src/modules/tokenManagement";
 
-import { GetToken } from "@src/api/types";
+import { GetToken } from "@src/api/Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetToken.ResponseData>();
