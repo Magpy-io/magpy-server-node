@@ -1,4 +1,4 @@
-import { GetToken } from "../types/";
+import { GetToken } from "../Types/";
 import { GeneratePostRequest } from "../RequestsManager";
 
 export const Post = GeneratePostRequest<

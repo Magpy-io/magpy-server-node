@@ -1,4 +1,4 @@
-import { GetServerInfo } from "../types/";
+import { GetServerInfo } from "../Types/";
 import { GeneratePostRequest } from "../RequestsManager";
 
 export const Post = GeneratePostRequest<

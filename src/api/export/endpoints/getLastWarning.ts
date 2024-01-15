@@ -1,4 +1,4 @@
-import { GetLastWarning } from "../types/";
+import { GetLastWarning } from "../Types/";
 import { GeneratePostRequest } from "../RequestsManager";
 
 export const Post = GeneratePostRequest<

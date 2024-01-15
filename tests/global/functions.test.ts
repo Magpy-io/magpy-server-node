@@ -30,7 +30,7 @@ import {
   GetLastWarningForUser,
   HasWarningForUser,
 } from "@src/modules/warningsManager";
-import { PhotoTypes } from "@src/api/export/types/";
+import { PhotoTypes } from "@src/api/export/Types";
 
 describe("Test 'checkPhotoExistsAndDeleteMissing' function", () => {
   let app: Express;

@@ -1,4 +1,4 @@
-import { UpdateServerPath } from "../types/";
+import { UpdateServerPath } from "../Types/";
 import { GeneratePostRequest } from "../RequestsManager";
 
 export const Post = GeneratePostRequest<

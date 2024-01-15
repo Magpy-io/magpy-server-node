@@ -1,4 +1,4 @@
-import { UpdateServerName } from "../types/";
+import { UpdateServerName } from "../Types/";
 import { GeneratePostRequest } from "../RequestsManager";
 
 export const Post = GeneratePostRequest<

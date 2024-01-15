@@ -1,4 +1,4 @@
-import { GetPhotosById } from "../types/";
+import { GetPhotosById } from "../Types/";
 import { GeneratePostRequest } from "../RequestsManager";
 
 export const Post = GeneratePostRequest<

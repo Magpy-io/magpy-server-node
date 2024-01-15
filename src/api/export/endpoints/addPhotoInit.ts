@@ -1,4 +1,4 @@
-import { AddPhotoInit } from "../types/";
+import { AddPhotoInit } from "../Types/";
 import { GeneratePostRequest } from "../RequestsManager";
 
 export const Post = GeneratePostRequest<

@@ -1,4 +1,4 @@
-import { ServerResponseError } from "./types/ApiGlobalTypes";
+import { ServerResponseError } from "./Types/ApiGlobalTypes";
 
 export class ErrorBackendUnreachable extends Error {
   constructor() {

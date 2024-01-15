@@ -1,4 +1,4 @@
-import { WhoAmI } from "../types/";
+import { WhoAmI } from "../Types/";
 import { GeneratePostRequest } from "../RequestsManager";
 
 export const Post = GeneratePostRequest<

@@ -17,7 +17,7 @@ export * as UpdateServerName from "./endpoints/updateServerName";
 export * as UpdateServerPath from "./endpoints/updateServerPath";
 export * as WhoAmI from "./endpoints/whoAmI";
 
-export * as Types from "./types";
+export * as Types from "./Types";
 export * as UserTokenManager from "./UserTokenManager";
 
 export { SetPath, GetPath } from "./PathManager";

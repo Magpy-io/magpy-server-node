@@ -1,4 +1,4 @@
-import { DeletePhotosById } from "../types/";
+import { DeletePhotosById } from "../Types/";
 import { GeneratePostRequest } from "../RequestsManager";
 
 export const Post = GeneratePostRequest<

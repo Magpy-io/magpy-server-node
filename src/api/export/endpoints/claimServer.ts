@@ -1,4 +1,4 @@
-import { ClaimServer } from "../types/";
+import { ClaimServer } from "../Types/";
 import { GeneratePostRequest } from "../RequestsManager";
 
 export const Post = GeneratePostRequest<

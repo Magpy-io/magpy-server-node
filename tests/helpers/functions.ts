@@ -18,14 +18,11 @@ import {
   GetToken,
   UpdatePhotoPath,
   GetNumberPhotos,
-} from "@src/api/export/exportedTypes";
+} from "@src/api/export/";
 
-import {
-  GetUserToken,
-  HasUserToken,
-} from "@src/api/export/exportedTypes/UserTokenManager";
-import { PhotoTypes, APIPhoto } from "@src/api/export/exportedTypes/Types";
-import { ErrorCodes } from "@src/api/export/exportedTypes/ErrorTypes";
+import { GetUserToken, HasUserToken } from "@src/api/export/UserTokenManager";
+import { PhotoTypes, APIPhoto } from "@src/api/export/Types";
+import { ErrorCodes } from "@src/api/export/Types/ErrorTypes";
 
 import {
   GetServerConfigData,

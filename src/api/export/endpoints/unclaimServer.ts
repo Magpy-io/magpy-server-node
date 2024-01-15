@@ -1,4 +1,4 @@
-import { UnclaimServer } from "../types/";
+import { UnclaimServer } from "../Types/";
 import { GeneratePostRequest } from "../RequestsManager";
 
 export const Post = GeneratePostRequest<

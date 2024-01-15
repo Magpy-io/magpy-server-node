@@ -8,7 +8,7 @@ import {
   verifyHasUserToken,
 } from "./UserTokenManager";
 import { ResponseTypeFrom } from "../Types/ApiGlobalTypes";
-import { TokenAuthentification } from "./types/Types";
+import { TokenAuthentification } from "./Types/Types";
 
 function GeneratePostWithAuth<RequestData, ResponseData, ResponseErrorTypes>(
   endpointPath: string
