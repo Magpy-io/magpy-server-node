@@ -5,7 +5,7 @@ mockModules();
 import { describe, expect, it } from "@jest/globals";
 
 import { Express } from "express";
-import { GetToken, UnclaimServer } from "@src/api/export/exportedTypes";
+import { GetToken, UnclaimServer } from "@src/api/export";
 
 import * as mockValues from "@src/modules/__mocks__/backendRequestsMockValues";
 
@@ -68,7 +68,7 @@ describe("Test 'claimServer' endpoint", () => {
   });
 
   it("Should return error SERVER_NOT_CLAIMED when requesting a server not claimed", async () => {
-    await UnclaimServer.Post();
+    await UnclaimServer.Post({});
 
     const ret = await GetToken.Post({
       userToken: mockValues.validUserToken,

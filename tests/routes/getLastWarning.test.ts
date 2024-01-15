@@ -5,7 +5,7 @@ mockModules();
 import { describe, expect, it } from "@jest/globals";
 
 import { Express } from "express";
-import { GetLastWarning } from "@src/api/export/exportedTypes";
+import { GetLastWarning } from "@src/api/export";
 
 import { initServer, stopServer } from "@src/server/server";
 import * as sac from "@tests/helpers/setupAndCleanup";
@@ -16,7 +16,7 @@ import {
   getUserId,
 } from "@tests/helpers/functions";
 import { SetLastWarningForUser } from "@src/modules/warningsManager";
-import { WarningPhotosNotOnDiskDeletedType } from "@src/api/export/exportedTypes/WarningsManager";
+import { WarningPhotosNotOnDiskDeletedType } from "@src/api/export/Types/WarningTypes";
 
 describe("Test 'getLastWarning' endpoint", () => {
   let app: Express;
@@ -38,7 +38,7 @@ describe("Test 'getLastWarning' endpoint", () => {
   });
 
   it("Should return null when no warnings are stored", async () => {
-    const ret = await GetLastWarning.Post();
+    const ret = await GetLastWarning.Post({});
 
     expectToBeOk(ret);
     expect(ret.warning).toBe(false);
@@ -71,7 +71,7 @@ describe("Test 'getLastWarning' endpoint", () => {
     };
     SetLastWarningForUser(getUserId(), warning);
 
-    const ret = await GetLastWarning.Post();
+    const ret = await GetLastWarning.Post({});
     expectToBeOk(ret);
     expect(ret.warning).toBe(false);
     const data = getDataFromRet(ret);

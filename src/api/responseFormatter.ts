@@ -1,18 +1,13 @@
 // IMPORTS
 import { Response } from "express";
 import { Photo } from "@src/db/sequelizeDb";
-import { APIPhoto } from "@src/api/export/exportedTypes/Types";
-import { ErrorCodes } from "@src/api/export/exportedTypes/ErrorTypes";
+import { APIPhoto } from "@src/api/Types";
+import { ResponseTypeFrom } from "@src/api/Types/ApiGlobalTypes";
+import { ErrorCodes } from "@src/api/Types/ErrorTypes";
 
 function getCustomSendResponse<T>() {
-  // get the type of the data parameter of type T
-
   return async function (res: Response, data: T, warning: boolean = false) {
-    if (typeof data == "string") {
-      return await sendSuccessfulMessage(res, data, warning);
-    } else {
-      return await sendResponse<T>(res, data, warning);
-    }
+    return await sendResponse(res, data, warning);
   };
 }
 
@@ -21,7 +16,7 @@ async function sendResponse<T>(
   data: T,
   warning: boolean = false
 ) {
-  let jsonResponse = {
+  let jsonResponse: ResponseTypeFrom<T, any> = {
     ok: true,
     data,
     warning,
@@ -30,21 +25,11 @@ async function sendResponse<T>(
   return await res.status(200).json(jsonResponse);
 }
 
-async function sendSuccessfulMessage(
-  res: Response,
-  message: string,
+function formatError(
+  msg: string,
+  code: ErrorCodes,
   warning: boolean = false
-) {
-  let jsonResponse = {
-    ok: true,
-    message,
-    warning,
-  };
-
-  return await res.status(200).json(jsonResponse);
-}
-
-function formatError(msg: string, code: ErrorCodes, warning: boolean = false) {
+): ResponseTypeFrom<any, ErrorCodes> {
   return {
     ok: false,
     message: msg,

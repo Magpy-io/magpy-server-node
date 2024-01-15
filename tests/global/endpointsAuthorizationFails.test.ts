@@ -5,8 +5,8 @@ mockModules();
 import { describe, expect, it } from "@jest/globals";
 
 import { Express } from "express";
-import * as exportedTypes from "@src/api/export/exportedTypes";
-import { SetUserToken } from "@src/api/export/exportedTypes/UserTokenManager";
+import * as exportedTypes from "@src/api/export";
+import { SetUserToken } from "@src/api/export/UserTokenManager";
 
 import request from "supertest";
 import { initServer, stopServer } from "@src/server/server";

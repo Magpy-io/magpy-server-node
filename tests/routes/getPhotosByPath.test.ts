@@ -5,7 +5,7 @@ mockModules();
 import { describe, expect, it } from "@jest/globals";
 
 import { Express } from "express";
-import { GetPhotosByPath } from "@src/api/export/exportedTypes";
+import { GetPhotosByPath } from "@src/api/export";
 
 import { initServer, stopServer } from "@src/server/server";
 
@@ -29,7 +29,7 @@ import {
   defaultPhotoSecondPath,
   generateDate,
 } from "@tests/helpers/functions";
-import { PhotoTypes } from "@src/api/export/exportedTypes/Types";
+import { PhotoTypes } from "@src/api/export/Types";
 
 describe("Test 'getPhotosByPath' endpoint", () => {
   let app: Express;

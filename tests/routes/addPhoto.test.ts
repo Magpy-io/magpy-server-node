@@ -5,7 +5,7 @@ mockModules();
 import { describe, expect, it } from "@jest/globals";
 
 import { Express } from "express";
-import { AddPhoto } from "@src/api/export/exportedTypes";
+import { AddPhoto } from "@src/api/export";
 
 import * as sac from "@tests/helpers/setupAndCleanup";
 

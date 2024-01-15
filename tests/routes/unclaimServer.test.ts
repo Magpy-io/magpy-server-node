@@ -5,7 +5,7 @@ mockModules();
 import { describe, expect, it } from "@jest/globals";
 
 import { Express } from "express";
-import { UnclaimServer } from "@src/api/export/exportedTypes";
+import { UnclaimServer } from "@src/api/export";
 
 import { initServer, stopServer } from "@src/server/server";
 
@@ -34,7 +34,7 @@ describe("Test 'unclaimServer' endpoint", () => {
   });
 
   it("Should return ok if unclaimed a valid server", async () => {
-    const ret = await UnclaimServer.Post();
+    const ret = await UnclaimServer.Post({});
 
     expectToBeOk(ret);
     expect(ret.warning).toBe(false);

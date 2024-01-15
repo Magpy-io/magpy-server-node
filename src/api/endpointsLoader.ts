@@ -1,20 +1,24 @@
 import { generateMiddlewareFromShema } from "@src/middleware/checkValidRequestParameters";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
 const fs = require("mz/fs");
 
 function getEndpoints() {
   const endpoints: any = [];
-  fs.readdirSync(__dirname + "/endpoints").forEach(function (file: any) {
+  fs.readdirSync(__dirname + "/callbacks").forEach(function (file: any) {
     const split = file.split(".");
 
     //only .js and .ts files
     if (split[split.length - 1] == "ts" || split[split.length - 1] == "js") {
-      endpoints.push(require("@src/api/endpoints/" + file).default);
+      endpoints.push(require("@src/api/callbacks/" + file).default);
     }
   });
   return endpoints;
 }
+
+type MiddleWareType = (req: Request, res: Response, next: NextFunction) => {};
+
+type MiddleWareArray = MiddleWareType[];
 
 function loadEndpoints(app: any) {
   const endpoints = getEndpoints();
@@ -27,9 +31,12 @@ function loadEndpoints(app: any) {
       requestShema,
     }: {
       endpoint: string;
-      callback: any;
+      callback: (
+        req: Request,
+        res: Response
+      ) => Promise<Response<any, Record<string, any>>>;
       method: string;
-      middleWare: any;
+      middleWare?: MiddleWareType | MiddleWareArray;
       requestShema: Joi.ObjectSchema;
     }) => {
       const reqParamValidationMiddleware =
@@ -41,7 +48,7 @@ function loadEndpoints(app: any) {
       };
       const endpointFormatted = "/" + endpoint;
 
-      let middleWareArray;
+      let middleWareArray: MiddleWareArray;
 
       if (middleWare) {
         if (middleWare instanceof Array) {
