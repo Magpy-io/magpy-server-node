@@ -13,14 +13,16 @@
     "build": "yarn build:server",
     "start:all": "yarn build:all && electron-forge start",
     "start:server": "yarn build:server && node ./dist/src/index.js",
-    "build:server": "yarn types && rimraf ./dist && tsc",
+    "build:server": "rimraf ./dist && tsc",
     "build:client": "cd client; yarn build; cd ..",
     "build:all": "yarn build:client && yarn build:server",
-    "clean": "yarn build:server && node ./dist/src/clearImages.js",
+    "clear:images": "yarn build:server && node ./dist/src/clearImages.js",
     "test": "yarn build:server && cross-env NODE_ENV=test jest --verbose=true --silent --collect-coverage --testTimeout=10000",
     "test:v": "yarn build:server && cross-env NODE_ENV=test jest --verbose=true --collect-coverage --testTimeout=10000",
-    "types": "ts-node ./src/CreateTypes.ts",
-    "types:copy": "ts-node ./src/CopyEndpointTypesToExport.ts"
+    "types:generate": "ts-node ./src/CreateTypes.ts",
+    "types:copy": "ts-node ./src/CopyEndpointTypesToExport.ts",
+    "clean:types": "rimraf ./src/api/export/types && rimraf ./src/api/types/RequestTypes",
+    "types": "yarn clean:types && yarn types:generate && yarn types:copy"
   },
   "dependencies": {
     "@sequelize/core": "^7.0.0-alpha.29",
