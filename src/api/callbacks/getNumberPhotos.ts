@@ -27,6 +27,7 @@ const callback = async (req: Request, res: Response) => {
 };
 
 const RequestDataShema = Joi.object({}).options({ presence: "required" });
+
 export default {
   endpoint: GetNumberPhotos.endpoint,
   callback: callback,
