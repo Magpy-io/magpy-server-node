@@ -1,5 +1,5 @@
 import { generateMiddlewareFromShema } from "@src/middleware/checkValidRequestParameters";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
 const fs = require("mz/fs");
 
@@ -16,6 +16,10 @@ function getEndpoints() {
   return endpoints;
 }
 
+type MiddleWareType = (req: Request, res: Response, next: NextFunction) => {};
+
+type MiddleWareArray = MiddleWareType[];
+
 function loadEndpoints(app: any) {
   const endpoints = getEndpoints();
   endpoints.forEach(
@@ -27,9 +31,12 @@ function loadEndpoints(app: any) {
       requestShema,
     }: {
       endpoint: string;
-      callback: any;
+      callback: (
+        req: Request,
+        res: Response
+      ) => Promise<Response<any, Record<string, any>>>;
       method: string;
-      middleWare: any;
+      middleWare?: MiddleWareType | MiddleWareArray;
       requestShema: Joi.ObjectSchema;
     }) => {
       const reqParamValidationMiddleware =
@@ -41,7 +48,7 @@ function loadEndpoints(app: any) {
       };
       const endpointFormatted = "/" + endpoint;
 
-      let middleWareArray;
+      let middleWareArray: MiddleWareArray;
 
       if (middleWare) {
         if (middleWare instanceof Array) {
