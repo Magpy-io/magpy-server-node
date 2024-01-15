@@ -24,14 +24,6 @@ const sendResponse =
 
 const callback = async (req: Request, res: Response) => {
   try {
-    const { error } = RequestDataShema.validate(req.body);
-    if (error) {
-      console.log("Bad request parameters");
-      console.log("Sending response message");
-      return responseFormatter.sendFailedBadRequest(res, error.message);
-    }
-    console.log("Request parameters ok.");
-
     const requestParameters: GetToken.RequestData = req.body;
 
     const backendUserToken = requestParameters.userToken;
@@ -136,4 +128,5 @@ export default {
   callback: callback,
   method: "post",
   middleWare: checkServerIsClaimed,
+  requestShema: RequestDataShema,
 };

@@ -12,13 +12,6 @@ const sendResponse =
 
 const callback = async (req: Request, res: Response) => {
   try {
-    const { error } = RequestDataShema.validate(req.body);
-    if (error) {
-      console.log("Bad request parameters");
-      console.log("Sending response message");
-      return responseFormatter.sendFailedBadRequest(res, error.message);
-    }
-
     console.log("Getting number of photos in db.");
     const nb = await numberPhotosFromDB();
     console.log(`Number of photos found in db: ${nb}.`);
@@ -39,4 +32,5 @@ export default {
   callback: callback,
   method: "post",
   middleWare: checkUserToken,
+  requestShema: RequestDataShema,
 };

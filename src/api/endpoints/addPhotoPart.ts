@@ -15,14 +15,6 @@ const sendResponse =
 
 const callback = async (req: Request, res: Response) => {
   try {
-    console.log("Checking request parameters.");
-    const { error } = RequestDataShema.validate(req.body);
-    if (error) {
-      console.log("Bad request parameters");
-      console.log("Sending response message");
-      return responseFormatter.sendFailedBadRequest(res, error.message);
-    }
-
     if (!req.userId) {
       throw new Error("UserId is not defined.");
     }
@@ -180,4 +172,5 @@ export default {
   callback: callback,
   method: "post",
   middleWare: checkUserToken,
+  requestShema: RequestDataShema,
 };

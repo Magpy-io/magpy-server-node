@@ -15,13 +15,6 @@ const sendResponse =
 
 const callback = async (req: Request, res: Response) => {
   try {
-    const { error } = RequestDataShema.validate(req.body);
-    if (error) {
-      console.log("Bad request parameters");
-      console.log("Sending response message");
-      return responseFormatter.sendFailedBadRequest(res, error.message);
-    }
-
     const { name }: UpdateServerName.RequestData = req.body;
 
     if (!name) {
@@ -72,4 +65,5 @@ export default {
   callback: callback,
   method: "post",
   middleWare: [checkConnexionLocal, checkServerHasValidCredentials],
+  requestShema: RequestDataShema,
 };
