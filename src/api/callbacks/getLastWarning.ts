@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
-import Joi from "joi";
+
 import checkUserToken from "@src/middleware/checkUserToken";
 import { GetLastWarningForUser } from "@src/modules/warningsManager";
 

@@ -2,7 +2,6 @@ import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
 import { numberPhotosFromDB } from "@src/db/sequelizeDb";
 
-import Joi from "joi";
 import checkUserToken from "@src/middleware/checkUserToken";
 
 import { GetNumberPhotos } from "@src/api/Types";

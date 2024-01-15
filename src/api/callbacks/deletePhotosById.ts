@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
 import { getPhotoByIdFromDB, deletePhotoByIdFromDB } from "@src/db/sequelizeDb";
 import { removePhotoFromDisk } from "@src/modules/diskManager";
-import Joi from "joi";
+
 import checkUserToken from "@src/middleware/checkUserToken";
 import { DeletePhotosById } from "@src/api/Types";
 

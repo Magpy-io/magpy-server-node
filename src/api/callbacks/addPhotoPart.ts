@@ -5,7 +5,7 @@ import { addPhotoToDB, deletePhotoByIdFromDB } from "@src/db/sequelizeDb";
 import FilesWaiting, { FilesWaitingType } from "@src/modules/waitingFiles";
 import { addPhotoToDisk } from "@src/modules/diskManager";
 import { hashFile } from "@src/modules/hashing";
-import Joi from "joi";
+
 import { postPhotoPartTimeout } from "@src/config/config";
 import checkUserToken from "@src/middleware/checkUserToken";
 import { AddPhotoPart } from "@src/api/Types";

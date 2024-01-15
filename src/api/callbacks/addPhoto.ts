@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
 import { addPhotoToDB, deletePhotoByIdFromDB } from "@src/db/sequelizeDb";
-import Joi from "joi";
+
 import { addPhotoToDisk } from "@src/modules/diskManager";
 import { addServerImagePaths } from "@src/modules/diskFilesNaming";
 import { hashFile } from "@src/modules/hashing";

@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
 import { getPhotosFromDB } from "@src/db/sequelizeDb";
 import { getPhotoFromDisk } from "@src/modules/diskManager";
-import Joi from "joi";
+
 import checkUserToken from "@src/middleware/checkUserToken";
 import {
   AddWarningPhotosDeleted,

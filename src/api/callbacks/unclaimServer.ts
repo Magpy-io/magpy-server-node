@@ -1,6 +1,6 @@
 import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
-import Joi from "joi";
+
 import { ClearServerCredentials } from "@src/modules/serverDataManager";
 import {
   DeleteServerPost,

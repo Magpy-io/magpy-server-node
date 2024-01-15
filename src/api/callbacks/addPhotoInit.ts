@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import responseFormatter from "@src/api/responseFormatter";
 import FilesWaiting from "@src/modules/waitingFiles";
 import { addServerImagePaths } from "@src/modules/diskFilesNaming";
-import Joi from "joi";
+
 import { v4 as uuid } from "uuid";
 import { postPhotoPartTimeout } from "@src/config/config";
 

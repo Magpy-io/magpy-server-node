@@ -3,7 +3,6 @@ import responseFormatter from "@src/api/responseFormatter";
 import { getPhotoByIdFromDB } from "@src/db/sequelizeDb";
 import { getPhotoFromDisk } from "@src/modules/diskManager";
 
-import Joi from "joi";
 import { getNumberOfParts, getPartN } from "@src/modules/stringHelper";
 import checkUserToken from "@src/middleware/checkUserToken";
 import {

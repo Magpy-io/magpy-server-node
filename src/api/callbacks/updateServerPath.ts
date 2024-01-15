@@ -5,7 +5,7 @@ import checkConnexionLocal from "@src/middleware/checkConnexionLocal";
 
 import { SaveStorageFolderPath } from "@src/modules/serverDataManager";
 import { folderHasRights, pathExists } from "@src/modules/diskManager";
-import Joi from "joi";
+
 import { isAbsolutePath } from "@src/modules/functions";
 
 import { UpdateServerPath } from "@src/api/Types";

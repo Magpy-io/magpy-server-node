@@ -3,8 +3,6 @@ import responseFormatter from "@src/api/responseFormatter";
 
 import checkUserToken from "@src/middleware/checkUserToken";
 
-import Joi from "joi";
-
 import { WhoAmI } from "@src/api/Types";
 
 const sendResponse =

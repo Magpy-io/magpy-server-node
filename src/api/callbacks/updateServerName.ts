@@ -6,8 +6,6 @@ import checkConnexionLocal from "@src/middleware/checkConnexionLocal";
 import checkServerHasValidCredentials from "@src/middleware/checkServerHasValidCredentials";
 import { SaveServerName } from "@src/modules/serverDataManager";
 
-import Joi from "joi";
-
 import { UpdateServerName } from "@src/api/Types";
 
 const sendResponse =
