@@ -137,15 +137,6 @@ const callback = async (req: Request, res: Response) => {
   }
 };
 
-const RequestDataShema = Joi.object({
-  id: Joi.string().uuid({
-    version: "uuidv4",
-  }),
-  partNumber: Joi.number().integer(),
-  partSize: Joi.number().integer(),
-  photoPart: Joi.string(),
-}).options({ presence: "required" });
-
 function arePartsValid(parts: Map<number, string>) {
   const totalNumberOfParts = parts.size;
 
@@ -172,5 +163,5 @@ export default {
   callback: callback,
   method: "post",
   middleWare: checkUserToken,
-  requestShema: RequestDataShema,
+  requestShema: AddPhotoPart.RequestSchema,
 };

@@ -82,15 +82,10 @@ const callback = async (req: Request, res: Response) => {
   }
 };
 
-const RequestDataShema = Joi.object({
-  ids: Joi.array().items(Joi.string().uuid({ version: "uuidv4" })),
-  photoType: Joi.string().valid(...PhotoTypesArray),
-}).options({ presence: "required" });
-
 export default {
   endpoint: GetPhotosById.endpoint,
   callback: callback,
   method: "post",
   middleWare: checkUserToken,
-  requestShema: RequestDataShema,
+  requestShema: GetPhotosById.RequestSchema,
 };

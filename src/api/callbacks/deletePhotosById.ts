@@ -34,14 +34,10 @@ const callback = async (req: Request, res: Response) => {
   }
 };
 
-const RequestDataShema = Joi.object({
-  ids: Joi.array().items(Joi.string().uuid({ version: "uuidv4" })),
-}).options({ presence: "required" });
-
 export default {
   endpoint: DeletePhotosById.endpoint,
   callback: callback,
   method: "post",
   middleWare: checkUserToken,
-  requestShema: RequestDataShema,
+  requestShema: DeletePhotosById.RequestSchema,
 };

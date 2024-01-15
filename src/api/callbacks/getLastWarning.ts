@@ -30,12 +30,10 @@ const callback = async (req: Request, res: Response) => {
   }
 };
 
-const RequestDataShema = Joi.object({}).options({ presence: "required" });
-
 export default {
   endpoint: GetLastWarning.endpoint,
   callback: callback,
   method: "post",
   middleWare: checkUserToken,
-  requestShema: RequestDataShema,
+  requestShema: GetLastWarning.RequestSchema,
 };

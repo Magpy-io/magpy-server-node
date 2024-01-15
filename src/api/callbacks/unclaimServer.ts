@@ -42,12 +42,10 @@ const callback = async (req: Request, res: Response) => {
   }
 };
 
-const RequestDataShema = Joi.object({}).options({ presence: "required" });
-
 export default {
   endpoint: UnclaimServer.endpoint,
   callback: callback,
   method: "post",
   middleWare: [checkConnexionLocal, checkServerHasValidCredentials],
-  requestShema: RequestDataShema,
+  requestShema: UnclaimServer.RequestSchema,
 };

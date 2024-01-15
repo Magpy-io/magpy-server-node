@@ -123,14 +123,10 @@ const callback = async (req: Request, res: Response) => {
   }
 };
 
-const RequestDataShema = Joi.object({
-  userToken: Joi.string(),
-}).options({ presence: "required" });
-
 export default {
   endpoint: ClaimServer.endpoint,
   callback: callback,
   method: "post",
   middleWare: checkServerIsClaimed,
-  requestShema: RequestDataShema,
+  requestShema: ClaimServer.RequestSchema,
 };
