@@ -75,7 +75,12 @@ export function GeneratePostRequest<
   RequestData,
   ResponseData,
   ResponseErrorTypes
->(endpointPath: string, tokenAuth: TokenAuthentification) {
+>(
+  endpointPath: string,
+  tokenAuth: TokenAuthentification
+): (
+  data: RequestData
+) => Promise<ResponseTypeFrom<ResponseData, ResponseErrorTypes>> {
   switch (tokenAuth) {
     case "yes":
       return GeneratePostWithAuth<
