@@ -5,7 +5,7 @@ mockModules();
 import { describe, expect, it } from "@jest/globals";
 
 import { Express } from "express";
-import { UpdateServerPath } from "@src/api/export/exportedTypes";
+import { UpdateServerPath } from "@src/api/export";
 
 import { createFolder } from "@src/modules/diskManager";
 

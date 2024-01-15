@@ -285,7 +285,7 @@ async function getPhotoById(id: string, photoType?: PhotoTypes) {
 }
 
 async function getNumberPhotos() {
-  const ret = await GetNumberPhotos.Post();
+  const ret = await GetNumberPhotos.Post({});
 
   if (!ret.ok) {
     throw "Error checking photo exists";

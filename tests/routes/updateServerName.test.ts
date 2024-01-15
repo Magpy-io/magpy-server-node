@@ -5,7 +5,7 @@ mockModules();
 import { describe, expect, it } from "@jest/globals";
 
 import { Express } from "express";
-import { UpdateServerName } from "@src/api/export/exportedTypes";
+import { UpdateServerName } from "@src/api/export";
 
 import { initServer, stopServer } from "@src/server/server";
 import * as sac from "@tests/helpers/setupAndCleanup";

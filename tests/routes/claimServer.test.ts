@@ -5,7 +5,7 @@ mockModules();
 import { describe, expect, it } from "@jest/globals";
 
 import { Express } from "express";
-import { ClaimServer } from "@src/api/export/exportedTypes";
+import { ClaimServer } from "@src/api/export";
 
 import * as mockValues from "@src/modules/__mocks__/backendRequestsMockValues";
 

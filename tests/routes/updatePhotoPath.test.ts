@@ -5,7 +5,7 @@ mockModules();
 import { describe, expect, it } from "@jest/globals";
 
 import { Express } from "express";
-import { UpdatePhotoPath } from "@src/api/export/exportedTypes";
+import { UpdatePhotoPath } from "@src/api/export";
 
 import { initServer, stopServer } from "@src/server/server";
 
