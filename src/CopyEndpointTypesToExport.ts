@@ -4,8 +4,8 @@ import fs from "fs/promises";
 
 async function copyFiles(): Promise<void> {
   try {
-    const inputPath = "./src/api/types/";
-    const outputPath = "./src/api/export/types/";
+    const inputPath = "./src/api/Types/";
+    const outputPath = "./src/api/export/Types/";
 
     await fs.rm(outputPath, { force: true, recursive: true });
 

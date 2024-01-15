@@ -4,8 +4,8 @@ import { join, parse } from "path";
 import fs from "fs/promises";
 
 async function types(): Promise<void> {
-  const inputPath = "./src/api/types/EndpointsApi";
-  const outputPath = "./src/api/types/RequestTypes";
+  const inputPath = "./src/api/Types/EndpointsApi";
+  const outputPath = "./src/api/Types/RequestTypes";
   const inputPathAbsolute = join(process.cwd(), inputPath);
   const outputPathAbsolute = join(process.cwd(), outputPath);
 
