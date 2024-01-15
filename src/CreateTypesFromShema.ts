@@ -1,17 +1,35 @@
 import { convertFromDirectory } from "joi-to-typescript";
 import { glob } from "glob";
-import { join } from "path";
+import { join, parse } from "path";
 import fs from "fs/promises";
 
 async function types(): Promise<void> {
-  const inputPath = "./src/api/types/RequestShemas";
+  const inputPath = "./src/api/types/EndpointsApi";
   const outputPath = "./src/api/types/RequestTypes";
+  const inputPathAbsolute = join(process.cwd(), inputPath);
+  const outputPathAbsolute = join(process.cwd(), outputPath);
 
-  // const tsfiles = await glob(join(outputPath, "/**/*.ts"));
+  console.log(join(inputPathAbsolute, "/**/*.ts"));
+  const tsfiles = await glob(join(inputPathAbsolute, "/**/*.ts"), {
+    absolute: true,
+    nodir: true,
+  });
 
-  // for (let tsfile in tsfiles) {
-  //   await fs.writeFile(tsfile, "export {}");
-  // }
+  await fs.rm(outputPath, { force: true, recursive: true });
+
+  for (let tsfile of tsfiles) {
+    const fileName = parse(tsfile).base;
+    let dir = parse(tsfile).dir;
+    let pathRecursive = "";
+    while (dir != inputPathAbsolute) {
+      pathRecursive = join(parse(dir).base, pathRecursive);
+      dir = parse(dir).dir;
+    }
+
+    const newFileName = join(outputPathAbsolute, pathRecursive, fileName);
+    await fs.mkdir(parse(newFileName).dir, { recursive: true });
+    await fs.writeFile(newFileName, "export {}");
+  }
 
   // eslint-disable-next-line no-console
   console.log("Running joi-to-typescript...");
