@@ -19,7 +19,8 @@
     "clean": "yarn build:server && node ./dist/src/clearImages.js",
     "test": "yarn build:server && cross-env NODE_ENV=test jest --verbose=true --silent --collect-coverage --testTimeout=10000",
     "test:v": "yarn build:server && cross-env NODE_ENV=test jest --verbose=true --collect-coverage --testTimeout=10000",
-    "types": "ts-node ./src/CreateTypesFromShema.ts"
+    "types": "ts-node ./src/CreateTypes.ts",
+    "types:copy": "ts-node ./src/CopyEndpointTypesToExport.ts"
   },
   "dependencies": {
     "@sequelize/core": "^7.0.0-alpha.29",

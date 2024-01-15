@@ -9,7 +9,6 @@ async function types(): Promise<void> {
   const inputPathAbsolute = join(process.cwd(), inputPath);
   const outputPathAbsolute = join(process.cwd(), outputPath);
 
-  console.log(join(inputPathAbsolute, "/**/*.ts"));
   const tsfiles = await glob(join(inputPathAbsolute, "/**/*.ts"), {
     absolute: true,
     nodir: true,
@@ -17,6 +16,9 @@ async function types(): Promise<void> {
 
   await fs.rm(outputPath, { force: true, recursive: true });
 
+  // Type files are imported before being created, creating empty modules for all types
+  // to be able to execute the joi-to-typescript script, all files will be overwritten
+  // once the types are generated
   for (let tsfile of tsfiles) {
     const fileName = parse(tsfile).base;
     let dir = parse(tsfile).dir;
