@@ -1,5 +1,3 @@
-import { glob } from "glob";
-import { join, parse } from "path";
 import fs from "fs/promises";
 
 async function copyFiles(): Promise<void> {

@@ -1,5 +1,5 @@
 import { Sequelize, DataTypes } from "sequelize";
-import { hashLen } from "@src/config/config";
+import { hashLen } from "../config/config";
 
 const modelName = "image";
 

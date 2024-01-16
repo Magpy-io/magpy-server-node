@@ -1,4 +1,4 @@
-import { AddPhotoType } from "@src/db/sequelizeDb";
+import { AddPhotoType } from "../db/sequelizeDb";
 
 export type FilesWaitingType = {
   received: number;

@@ -1,16 +1,16 @@
 import { Request, Response } from "express";
-import responseFormatter from "@src/api/responseFormatter";
-import { getPhotoByIdFromDB } from "@src/db/sequelizeDb";
-import { getPhotoFromDisk } from "@src/modules/diskManager";
+import responseFormatter from "../responseFormatter";
+import { getPhotoByIdFromDB } from "../../db/sequelizeDb";
+import { getPhotoFromDisk } from "../../modules/diskManager";
 
-import { getNumberOfParts, getPartN } from "@src/modules/stringHelper";
-import checkUserToken from "@src/middleware/checkUserToken";
+import { getNumberOfParts, getPartN } from "../../modules/stringHelper";
+import checkUserToken from "../../middleware/checkUserToken";
 import {
   AddWarningPhotosDeleted,
   checkPhotoExistsAndDeleteMissing,
-} from "@src/modules/functions";
+} from "../../modules/functions";
 
-import { GetPhotoPartById } from "@src/api/Types";
+import { GetPhotoPartById } from "../Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetPhotoPartById.ResponseData>();

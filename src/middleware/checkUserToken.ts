@@ -1,14 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 
-import responseFormatter from "@src/api/responseFormatter";
-
-import { combineMiddleware } from "@src/modules/functions";
-
-import checkServerIsClaimed from "@src/middleware/checkServerIsClaimed";
-
-import verifyAuthorizationHeader from "@src/middleware/verifyAuthorizationHeader";
-
-import { verifyUserToken } from "@src/modules/tokenManagement";
+import responseFormatter from "../api/responseFormatter";
+import { combineMiddleware } from "../modules/functions";
+import checkServerIsClaimed from "./checkServerIsClaimed";
+import verifyAuthorizationHeader from "./verifyAuthorizationHeader";
+import { verifyUserToken } from "../modules/tokenManagement";
 
 async function checkUserToken(req: Request, res: Response, next: NextFunction) {
   try {

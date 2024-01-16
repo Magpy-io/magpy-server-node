@@ -1,15 +1,15 @@
 import { Request, Response } from "express";
-import responseFormatter from "@src/api/responseFormatter";
+import responseFormatter from "../responseFormatter";
 
-import { ClearServerCredentials } from "@src/modules/serverDataManager";
+import { ClearServerCredentials } from "../../modules/serverDataManager";
 import {
   DeleteServerPost,
   DeleteServerResponseType,
-} from "@src/modules/backendImportedQueries";
-import checkConnexionLocal from "@src/middleware/checkConnexionLocal";
-import checkServerHasValidCredentials from "@src/middleware/checkServerHasValidCredentials";
+} from "../../modules/backendImportedQueries";
+import checkConnexionLocal from "../../middleware/checkConnexionLocal";
+import checkServerHasValidCredentials from "../../middleware/checkServerHasValidCredentials";
 
-import { UnclaimServer } from "@src/api/Types";
+import { UnclaimServer } from "../Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<UnclaimServer.ResponseData>();

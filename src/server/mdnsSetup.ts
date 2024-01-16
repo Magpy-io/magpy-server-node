@@ -1,5 +1,5 @@
-import { serverNameMdnsPrefix, port } from "@src/config/config";
-import { GetServerName } from "@src/modules/serverDataManager";
+import { serverNameMdnsPrefix, port } from "../config/config";
+import { GetServerName } from "../modules/serverDataManager";
 import mdns from "mdns";
 
 let advert: any;

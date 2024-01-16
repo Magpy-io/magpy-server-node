@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 
-import checkServerHasCredentials from "@src/middleware/checkServerHasCredentials";
+import checkServerHasCredentials from "./checkServerHasCredentials";
 
-import responseFormatter from "@src/api/responseFormatter";
+import responseFormatter from "../api/responseFormatter";
 
-import { combineMiddleware } from "@src/modules/functions";
+import { combineMiddleware } from "../modules/functions";
 
 import {
   getServerInfoPost,
@@ -14,9 +14,9 @@ import {
   GetServerTokenResponseType,
   GetServerInfoResponseType,
   ErrorBackendUnreachable,
-} from "@src/modules/backendImportedQueries";
+} from "../modules/backendImportedQueries";
 
-import { SaveServerCredentials } from "@src/modules/serverDataManager";
+import { SaveServerCredentials } from "../modules/serverDataManager";
 
 async function checkServerHasValidCredentials(
   req: Request,

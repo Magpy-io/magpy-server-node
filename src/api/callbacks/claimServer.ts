@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import responseFormatter from "@src/api/responseFormatter";
+import responseFormatter from "../responseFormatter";
 
 import {
   registerServerPost,
@@ -9,18 +9,18 @@ import {
   GetServerToken,
   SetUserToken,
   ErrorBackendUnreachable,
-} from "@src/modules/backendImportedQueries";
+} from "../../modules/backendImportedQueries";
 import { randomBytes } from "crypto";
-import { getMyIp } from "@src/modules/getMyIp";
+import { getMyIp } from "../../modules/getMyIp";
 
 import {
   GetServerName,
   SaveServerCredentials,
-} from "@src/modules/serverDataManager";
+} from "../../modules/serverDataManager";
 
-import { ClaimServer } from "@src/api/Types";
+import { ClaimServer } from "../Types";
 
-import checkServerIsClaimed from "@src/middleware/checkServerIsClaimed";
+import checkServerIsClaimed from "../../middleware/checkServerIsClaimed";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<ClaimServer.ResponseData>();

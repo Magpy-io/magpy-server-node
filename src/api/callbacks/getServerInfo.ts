@@ -1,12 +1,12 @@
 import { Request, Response } from "express";
-import responseFormatter from "@src/api/responseFormatter";
+import responseFormatter from "../responseFormatter";
 
-import { getServerInfoPost } from "@src/modules/backendImportedQueries";
-import checkConnexionLocal from "@src/middleware/checkConnexionLocal";
-import checkServerHasValidCredentials from "@src/middleware/checkServerHasValidCredentials";
-import { GetServerConfigData } from "@src/modules/serverDataManager";
+import { getServerInfoPost } from "../../modules/backendImportedQueries";
+import checkConnexionLocal from "../../middleware/checkConnexionLocal";
+import checkServerHasValidCredentials from "../../middleware/checkServerHasValidCredentials";
+import { GetServerConfigData } from "../../modules/serverDataManager";
 
-import { GetServerInfo } from "@src/api/Types";
+import { GetServerInfo } from "../Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetServerInfo.ResponseData>();

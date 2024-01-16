@@ -1,10 +1,10 @@
-import { SetPath } from "@src/modules/backendImportedQueries";
-import * as config from "@src/config/config";
+import { SetPath } from "../modules/backendImportedQueries";
+import * as config from "./config";
 
-import { LoadConfigFile } from "@src/modules/serverDataManager";
-import { clearFilesWaiting } from "@src/server/server";
-import { ClearAllWarnings } from "@src/modules/warningsManager";
-import { ClearServerDataFile } from "@src/modules/serverDataManager/serverDataFileManager";
+import { LoadConfigFile } from "../modules/serverDataManager";
+import { clearFilesWaiting } from "../server/server";
+import { ClearAllWarnings } from "../modules/warningsManager";
+import { ClearServerDataFile } from "../modules/serverDataManager/serverDataFileManager";
 
 export async function InitModules() {
   SetPath(config.backend_host + ":" + config.backend_port);

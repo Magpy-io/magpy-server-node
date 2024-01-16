@@ -1,7 +1,7 @@
-import { InitModules } from "@src/config/configModules";
-import { initServer } from "@src/server/server";
-import { openAndInitDB } from "@src/db/sequelizeDb";
-import { startMdns } from "@src/server/mdnsSetup";
+import { InitModules } from "./config/configModules";
+import { initServer } from "./server/server";
+import { openAndInitDB } from "./db/sequelizeDb";
+import { startMdns } from "./server/mdnsSetup";
 
 export async function main() {
   await InitModules();

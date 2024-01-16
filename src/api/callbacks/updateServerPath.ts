@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
-import responseFormatter from "@src/api/responseFormatter";
+import responseFormatter from "../responseFormatter";
 
-import checkConnexionLocal from "@src/middleware/checkConnexionLocal";
+import checkConnexionLocal from "../../middleware/checkConnexionLocal";
 
-import { SaveStorageFolderPath } from "@src/modules/serverDataManager";
-import { folderHasRights, pathExists } from "@src/modules/diskManager";
+import { SaveStorageFolderPath } from "../../modules/serverDataManager";
+import { folderHasRights, pathExists } from "../../modules/diskManager";
 
-import { isAbsolutePath } from "@src/modules/functions";
+import { isAbsolutePath } from "../../modules/functions";
 
-import { UpdateServerPath } from "@src/api/Types";
+import { UpdateServerPath } from "../Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<UpdateServerPath.ResponseData>();

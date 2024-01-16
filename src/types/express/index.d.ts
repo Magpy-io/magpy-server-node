@@ -1,4 +1,4 @@
-import { ServerData } from "@src/modules/serverDataManager";
+import { ServerData } from "../../modules/serverDataManager";
 export {};
 
 declare global {

@@ -1,10 +1,10 @@
 import { Request, Response, NextFunction } from "express";
 
-import responseFormatter from "@src/api/responseFormatter";
+import responseFormatter from "../api/responseFormatter";
 
-import checkServerHasValidCredentials from "@src/middleware/checkServerHasValidCredentials";
-import { combineMiddleware } from "@src/modules/functions";
-import { getServerInfoPost } from "@src/modules/backendImportedQueries";
+import checkServerHasValidCredentials from "./checkServerHasValidCredentials";
+import { combineMiddleware } from "../modules/functions";
+import { getServerInfoPost } from "../modules/backendImportedQueries";
 
 async function checkServerIsClaimed(
   req: Request,

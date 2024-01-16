@@ -1,10 +1,13 @@
 import { Request, Response } from "express";
-import responseFormatter from "@src/api/responseFormatter";
-import { getPhotoByIdFromDB, deletePhotoByIdFromDB } from "@src/db/sequelizeDb";
-import { removePhotoFromDisk } from "@src/modules/diskManager";
+import responseFormatter from "../responseFormatter";
+import {
+  getPhotoByIdFromDB,
+  deletePhotoByIdFromDB,
+} from "../../db/sequelizeDb";
+import { removePhotoFromDisk } from "../../modules/diskManager";
 
-import checkUserToken from "@src/middleware/checkUserToken";
-import { DeletePhotosById } from "@src/api/Types";
+import checkUserToken from "../../middleware/checkUserToken";
+import { DeletePhotosById } from "../Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<DeletePhotosById.ResponseData>();

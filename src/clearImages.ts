@@ -1,15 +1,12 @@
-// Setting up module-alias
-require("module-alias/register");
-
 // IMPORTS
 import dotenv from "dotenv";
 dotenv.config();
 
-import { clearImagesDisk, clearDbFile } from "@src/modules/diskManager";
+import { clearImagesDisk, clearDbFile } from "./modules/diskManager";
 import {
   InitModules,
   ClearModulesKeepServerConfig,
-} from "@src/config/configModules";
+} from "./config/configModules";
 
 async function ResetServer() {
   await InitModules();

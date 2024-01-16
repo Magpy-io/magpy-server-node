@@ -2,13 +2,13 @@ import { Sequelize } from "sequelize";
 import { v4 as uuid } from "uuid";
 import * as path from "path";
 
-import { createFolder } from "@src/modules/diskManager";
-import { sqliteDbFile } from "@src/config/config";
+import { createFolder } from "../modules/diskManager";
+import { sqliteDbFile } from "../config/config";
 
-import { createImageModel, PhotoDB } from "@src/db/Image.model";
-import { createClientPathModel, ClientPathDB } from "@src/db/ClientPath.model";
-import { createDevicesModel, DeviceDB } from "@src/db/Devices.model";
-import { filterNull } from "@src/modules/functions";
+import { createImageModel, PhotoDB } from "./Image.model";
+import { createClientPathModel, ClientPathDB } from "./ClientPath.model";
+import { createDevicesModel, DeviceDB } from "./Devices.model";
+import { filterNull } from "../modules/functions";
 
 let sequelize: Sequelize | null = null;
 

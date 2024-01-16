@@ -1,6 +1,6 @@
-import { GetServerConfigData } from "@src/modules/serverDataManager";
+import { GetServerConfigData } from "./serverDataManager";
 import jwt from "jsonwebtoken";
-import { jwtUserExp } from "@src/config/config";
+import { jwtUserExp } from "../config/config";
 
 export type TokenUserData = { id: string };
 

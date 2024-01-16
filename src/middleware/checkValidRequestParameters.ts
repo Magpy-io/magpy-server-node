@@ -1,9 +1,7 @@
 import { Request, Response, NextFunction } from "express";
-
-import responseFormatter from "@src/api/responseFormatter";
-
-import { GetServerConfigData } from "@src/modules/serverDataManager";
 import Joi from "joi";
+
+import responseFormatter from "../api/responseFormatter";
 
 function generateMiddlewareFromShema(shema: Joi.ObjectSchema) {
   return async function checkValidRequestParameters(

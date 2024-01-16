@@ -1,7 +1,7 @@
 // IMPORTS
 import fs from "fs/promises";
-import { createFolder, pathExists } from "@src/modules/diskManager";
-import * as config from "@src/config/config";
+import { createFolder, pathExists } from "../diskManager";
+import * as config from "../../config/config";
 import * as path from "path";
 import { ServerData } from "./ServerDataType";
 import { ServerDataDefault, SaveServerDataToCache } from "./serverDataCached";

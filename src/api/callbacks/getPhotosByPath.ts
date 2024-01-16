@@ -1,15 +1,15 @@
 import { Request, Response } from "express";
-import responseFormatter from "@src/api/responseFormatter";
-import { getPhotosByClientPathAndSizeAndDateFromDB } from "@src/db/sequelizeDb";
+import responseFormatter from "../responseFormatter";
+import { getPhotosByClientPathAndSizeAndDateFromDB } from "../../db/sequelizeDb";
 
-import { getPhotoFromDisk } from "@src/modules/diskManager";
-import checkUserToken from "@src/middleware/checkUserToken";
+import { getPhotoFromDisk } from "../../modules/diskManager";
+import checkUserToken from "../../middleware/checkUserToken";
 import {
   AddWarningPhotosDeleted,
   filterPhotosExistAndDeleteMissing,
-} from "@src/modules/functions";
+} from "../../modules/functions";
 
-import { GetPhotosByPath, APIPhoto } from "@src/api/Types";
+import { GetPhotosByPath, APIPhoto } from "../Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetPhotosByPath.ResponseData>();

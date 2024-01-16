@@ -1,5 +1,5 @@
 import { ServerData } from "./ServerDataType";
-import * as config from "@src/config/config";
+import * as config from "../../config/config";
 
 export const ServerDataDefault: ServerData = {
   storageFolderPath: config.rootPath,

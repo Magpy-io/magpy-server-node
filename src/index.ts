@@ -1,6 +1,3 @@
-// Setting up module-alias
-require("module-alias/register");
-
 // IMPORTS
 import dotenv from "dotenv";
 dotenv.config();

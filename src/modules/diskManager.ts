@@ -2,13 +2,13 @@
 import fs from "fs/promises";
 import { Buffer } from "buffer";
 import sharp from "sharp";
-import { GetStorageFolderPath } from "@src/modules/serverDataManager";
+import { GetStorageFolderPath } from "./serverDataManager";
 import * as path from "path";
 
-import * as config from "@src/config/config";
-import { isValidPhotoType } from "@src/types/photoType";
+import * as config from "../config/config";
+import { isValidPhotoType } from "../types/photoType";
 
-import { PhotoTypes } from "@src/api/Types";
+import { PhotoTypes } from "../api/Types";
 
 interface AddPhotoParamType {
   width: number;

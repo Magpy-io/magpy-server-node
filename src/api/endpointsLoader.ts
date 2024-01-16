@@ -1,4 +1,4 @@
-import { generateMiddlewareFromShema } from "@src/middleware/checkValidRequestParameters";
+import { generateMiddlewareFromShema } from "../middleware/checkValidRequestParameters";
 import { NextFunction, Request, Response } from "express";
 import Joi from "joi";
 const fs = require("mz/fs");
@@ -10,7 +10,7 @@ function getEndpoints() {
 
     //only .js and .ts files
     if (split[split.length - 1] == "ts" || split[split.length - 1] == "js") {
-      endpoints.push(require("@src/api/callbacks/" + file).default);
+      endpoints.push(require("./callbacks/" + file).default);
     }
   });
   return endpoints;

@@ -1,11 +1,11 @@
 // IMPORTS
 import express, { Express } from "express";
 
-import loadEndpoints from "@src/api/endpointsLoader";
-import jsonParsingErrorHandler from "@src/middleware/jsonParsingErrorHandler";
-import FilesWaiting from "@src/modules/waitingFiles";
+import loadEndpoints from "../api/endpointsLoader";
+import jsonParsingErrorHandler from "../middleware/jsonParsingErrorHandler";
+import FilesWaiting from "../modules/waitingFiles";
 import path from "path";
-import * as config from "@src/config/config"
+import * as config from "../config/config";
 
 let app: Express;
 let server: any;

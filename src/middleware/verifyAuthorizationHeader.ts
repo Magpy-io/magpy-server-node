@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 
-import responseFormatter from "@src/api/responseFormatter";
+import responseFormatter from "../api/responseFormatter";
 
 const verifyAuthorizationHeader = async (
   req: Request,

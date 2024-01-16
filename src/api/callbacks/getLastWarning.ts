@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import responseFormatter from "@src/api/responseFormatter";
+import responseFormatter from "../responseFormatter";
 
-import checkUserToken from "@src/middleware/checkUserToken";
-import { GetLastWarningForUser } from "@src/modules/warningsManager";
+import checkUserToken from "../../middleware/checkUserToken";
+import { GetLastWarningForUser } from "../../modules/warningsManager";
 
-import { GetLastWarning } from "@src/api/Types";
+import { GetLastWarning } from "../Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetLastWarning.ResponseData>();

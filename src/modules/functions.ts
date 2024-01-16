@@ -1,13 +1,10 @@
 import bcrypt from "bcryptjs";
 import { isAbsolute } from "path";
 import { platform } from "os";
-import { deletePhotoByIdFromDB, getPhotoByIdFromDB } from "@src/db/sequelizeDb";
-import responseFormatter from "@src/api/responseFormatter";
-import {
-  isPhotoOnDisk,
-  removePhotoVariationsFromDisk,
-} from "@src/modules/diskManager";
-import { Photo } from "@src/db/sequelizeDb";
+import { deletePhotoByIdFromDB, getPhotoByIdFromDB } from "../db/sequelizeDb";
+import responseFormatter from "../api/responseFormatter";
+import { isPhotoOnDisk, removePhotoVariationsFromDisk } from "./diskManager";
+import { Photo } from "../db/sequelizeDb";
 import { SetLastWarningForUser } from "./warningsManager";
 
 function notNull<T>(value: T): value is NonNullable<T> {

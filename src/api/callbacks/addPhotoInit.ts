@@ -1,14 +1,14 @@
 import { Request, Response } from "express";
-import responseFormatter from "@src/api/responseFormatter";
-import FilesWaiting from "@src/modules/waitingFiles";
-import { addServerImagePaths } from "@src/modules/diskFilesNaming";
+import responseFormatter from "../responseFormatter";
+import FilesWaiting from "../../modules/waitingFiles";
+import { addServerImagePaths } from "../../modules/diskFilesNaming";
 
 import { v4 as uuid } from "uuid";
-import { postPhotoPartTimeout } from "@src/config/config";
+import { postPhotoPartTimeout } from "../../config/config";
 
-import checkUserToken from "@src/middleware/checkUserToken";
+import checkUserToken from "../../middleware/checkUserToken";
 
-import { AddPhotoInit } from "@src/api/Types";
+import { AddPhotoInit } from "../Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<AddPhotoInit.ResponseData>();

@@ -1,13 +1,13 @@
 import { Request, Response } from "express";
-import responseFormatter from "@src/api/responseFormatter";
-import { addPhotoToDB, deletePhotoByIdFromDB } from "@src/db/sequelizeDb";
+import responseFormatter from "../responseFormatter";
+import { addPhotoToDB, deletePhotoByIdFromDB } from "../../db/sequelizeDb";
 
-import { addPhotoToDisk } from "@src/modules/diskManager";
-import { addServerImagePaths } from "@src/modules/diskFilesNaming";
-import { hashFile } from "@src/modules/hashing";
+import { addPhotoToDisk } from "../../modules/diskManager";
+import { addServerImagePaths } from "../../modules/diskFilesNaming";
+import { hashFile } from "../../modules/hashing";
 
-import checkUserToken from "@src/middleware/checkUserToken";
-import { AddPhoto } from "@src/api/Types";
+import checkUserToken from "../../middleware/checkUserToken";
+import { AddPhoto } from "../Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<AddPhoto.ResponseData>();

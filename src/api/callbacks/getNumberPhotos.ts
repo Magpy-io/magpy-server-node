@@ -1,10 +1,10 @@
 import { Request, Response } from "express";
-import responseFormatter from "@src/api/responseFormatter";
-import { numberPhotosFromDB } from "@src/db/sequelizeDb";
+import responseFormatter from "../responseFormatter";
+import { numberPhotosFromDB } from "../../db/sequelizeDb";
 
-import checkUserToken from "@src/middleware/checkUserToken";
+import checkUserToken from "../../middleware/checkUserToken";
 
-import { GetNumberPhotos } from "@src/api/Types";
+import { GetNumberPhotos } from "../Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetNumberPhotos.ResponseData>();

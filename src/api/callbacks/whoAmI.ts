@@ -1,9 +1,9 @@
 import { Request, Response } from "express";
-import responseFormatter from "@src/api/responseFormatter";
+import responseFormatter from "../responseFormatter";
 
-import checkUserToken from "@src/middleware/checkUserToken";
+import checkUserToken from "../../middleware/checkUserToken";
 
-import { WhoAmI } from "@src/api/Types";
+import { WhoAmI } from "../Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<WhoAmI.ResponseData>();

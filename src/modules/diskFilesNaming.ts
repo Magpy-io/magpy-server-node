@@ -1,8 +1,7 @@
 import * as path from "path";
 
-import { GetStorageFolderPath } from "@src/modules/serverDataManager";
-import { pathExists, createFolder } from "@src/modules/diskManager";
-import { Photo } from "@src/db/sequelizeDb";
+import { GetStorageFolderPath } from "./serverDataManager";
+import { pathExists, createFolder } from "./diskManager";
 
 type createServerImageNameInputType = { name: string; syncDate: string };
 

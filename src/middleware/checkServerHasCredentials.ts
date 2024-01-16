@@ -1,8 +1,8 @@
 import { Request, Response, NextFunction } from "express";
 
-import responseFormatter from "@src/api/responseFormatter";
+import responseFormatter from "../api/responseFormatter";
 
-import { GetServerConfigData } from "@src/modules/serverDataManager";
+import { GetServerConfigData } from "../modules/serverDataManager";
 
 async function checkServerHasCredentials(
   req: Request,
