@@ -7,14 +7,12 @@ import responseFormatter from "../api/responseFormatter";
 import { combineMiddleware } from "../modules/functions";
 
 import {
-  getServerInfoPost,
-  getServerTokenPost,
-  SetServerToken,
+  GetServerInfo,
   GetServerToken,
-  GetServerTokenResponseType,
-  GetServerInfoResponseType,
-  ErrorBackendUnreachable,
-} from "../modules/backendImportedQueries";
+  TokenManager,
+} from "../modules/BackendQueries";
+
+import { ErrorBackendUnreachable } from "../modules/BackendQueries/ExceptionsManager";
 
 import { SaveServerCredentials } from "../modules/serverDataManager";
 
@@ -30,10 +28,10 @@ async function checkServerHasValidCredentials(
     if (serverData?.serverToken) {
       console.log("server token found");
 
-      let ret: GetServerInfoResponseType;
+      let ret: GetServerInfo.ResponseType;
       try {
-        SetServerToken(serverData.serverToken);
-        ret = await getServerInfoPost();
+        TokenManager.SetServerToken(serverData.serverToken);
+        ret = await GetServerInfo.Post();
       } catch (err) {
         if (err instanceof ErrorBackendUnreachable) {
           console.log("Error requesting backend server");
@@ -66,9 +64,9 @@ async function checkServerHasValidCredentials(
     if (serverData?.serverId && serverData?.serverKey) {
       console.log("server credentials found");
 
-      let ret: GetServerTokenResponseType;
+      let ret: GetServerToken.ResponseType;
       try {
-        ret = await getServerTokenPost({
+        ret = await GetServerToken.Post({
           id: serverData.serverId,
           key: serverData.serverKey,
         });
@@ -93,7 +91,7 @@ async function checkServerHasValidCredentials(
         }
       } else {
         console.log("server claimed, it has valid credentials");
-        const serverToken = GetServerToken();
+        const serverToken = TokenManager.GetServerToken();
 
         console.log("saving server token");
         await SaveServerCredentials({

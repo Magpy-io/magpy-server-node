@@ -1,4 +1,4 @@
-import { SetPath } from "../modules/backendImportedQueries";
+import { SetPath } from "../modules/BackendQueries";
 import * as config from "./config";
 
 import { LoadConfigFile } from "../modules/serverDataManager";

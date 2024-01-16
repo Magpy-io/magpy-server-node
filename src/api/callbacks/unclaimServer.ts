@@ -2,10 +2,7 @@ import { Request, Response } from "express";
 import responseFormatter from "../responseFormatter";
 
 import { ClearServerCredentials } from "../../modules/serverDataManager";
-import {
-  DeleteServerPost,
-  DeleteServerResponseType,
-} from "../../modules/backendImportedQueries";
+import { DeleteServer } from "../../modules/BackendQueries";
 import checkConnexionLocal from "../../middleware/checkConnexionLocal";
 import checkServerHasValidCredentials from "../../middleware/checkServerHasValidCredentials";
 
@@ -21,9 +18,9 @@ const callback = async (
 ) => {
   try {
     if (req.hasValidCredentials) {
-      let ret: DeleteServerResponseType | undefined;
+      let ret: DeleteServer.ResponseType | undefined;
       try {
-        ret = await DeleteServerPost();
+        ret = await DeleteServer.Post();
       } catch (err) {
         console.error("error deleting server from backend");
         console.error(err);

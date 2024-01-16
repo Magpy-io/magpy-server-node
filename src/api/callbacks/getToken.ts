@@ -2,15 +2,11 @@ import { Request, Response } from "express";
 import responseFormatter from "../responseFormatter";
 
 import {
-  getServerInfoPost,
-  GetServerInfoResponseType,
-  whoAmIPost,
-  WhoAmIResponseType,
-  SetUserToken,
-  SetServerToken,
-  ErrorBackendUnreachable,
-} from "../../modules/backendImportedQueries";
-
+  GetServerInfo,
+  WhoAmI,
+  TokenManager,
+} from "../../modules/BackendQueries";
+import { ErrorBackendUnreachable } from "../../modules/BackendQueries/ExceptionsManager";
 import checkServerIsClaimed from "../../middleware/checkServerIsClaimed";
 
 import { GetServerConfigData } from "../../modules/serverDataManager";
@@ -41,10 +37,10 @@ const callback = async (
       );
     }
 
-    let retUser: WhoAmIResponseType;
+    let retUser: WhoAmI.ResponseType;
     try {
-      SetUserToken(backendUserToken);
-      retUser = await whoAmIPost();
+      TokenManager.SetUserToken(backendUserToken);
+      retUser = await WhoAmI.Post();
     } catch (err) {
       if (err instanceof ErrorBackendUnreachable) {
         console.error("Error requesting backend server");
@@ -80,10 +76,10 @@ const callback = async (
       throw new Error("Should have server token");
     }
 
-    let retServer: GetServerInfoResponseType;
+    let retServer: GetServerInfo.ResponseType;
     try {
-      SetServerToken(serverData.serverToken);
-      retServer = await getServerInfoPost();
+      TokenManager.SetServerToken(serverData.serverToken);
+      retServer = await GetServerInfo.Post();
     } catch (err) {
       if (err instanceof ErrorBackendUnreachable) {
         console.error("Error requesting backend server");

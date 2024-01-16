@@ -2,14 +2,11 @@ import { Request, Response } from "express";
 import responseFormatter from "../responseFormatter";
 
 import {
-  registerServerPost,
-  getServerTokenPost,
-  GetServerTokenResponseType,
-  RegisterServerResponseType,
+  RegisterServer,
   GetServerToken,
-  SetUserToken,
-  ErrorBackendUnreachable,
-} from "../../modules/backendImportedQueries";
+  TokenManager,
+} from "../../modules/BackendQueries";
+import { ErrorBackendUnreachable } from "../../modules/BackendQueries/ExceptionsManager";
 import { randomBytes } from "crypto";
 import { getMyIp } from "../../modules/getMyIp";
 
@@ -48,10 +45,10 @@ const callback = async (
 
     const keyGenerated = randomBytes(32).toString("hex");
 
-    let ret: RegisterServerResponseType;
+    let ret: RegisterServer.ResponseType;
     try {
-      SetUserToken(userToken);
-      ret = await registerServerPost({
+      TokenManager.SetUserToken(userToken);
+      ret = await RegisterServer.Post({
         name: GetServerName(),
         ipAddress: myIp,
         serverKey: keyGenerated,
@@ -90,9 +87,9 @@ const callback = async (
     const id = ret.data.server._id;
     console.log("server registered, got id: " + id);
 
-    let ret1: GetServerTokenResponseType;
+    let ret1: GetServerToken.ResponseType;
     try {
-      ret1 = await getServerTokenPost({ id: id, key: keyGenerated });
+      ret1 = await GetServerToken.Post({ id: id, key: keyGenerated });
     } catch (err) {
       if (err instanceof ErrorBackendUnreachable) {
         console.error("Error requesting backend server");
@@ -110,7 +107,7 @@ const callback = async (
 
     console.log("got server token, saving to local");
 
-    const serverToken = GetServerToken();
+    const serverToken = TokenManager.GetServerToken();
 
     await SaveServerCredentials({
       serverId: id,

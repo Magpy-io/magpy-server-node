@@ -4,7 +4,7 @@ import responseFormatter from "../api/responseFormatter";
 
 import checkServerHasValidCredentials from "./checkServerHasValidCredentials";
 import { combineMiddleware } from "../modules/functions";
-import { getServerInfoPost } from "../modules/backendImportedQueries";
+import { GetServerInfo } from "../modules/BackendQueries";
 
 async function checkServerIsClaimed(
   req: Request,
@@ -20,7 +20,7 @@ async function checkServerIsClaimed(
       return;
     }
 
-    const ret = await getServerInfoPost();
+    const ret = await GetServerInfo.Post();
 
     if (!ret.ok) {
       throw new Error("Error retrieving server info. " + JSON.stringify(ret));

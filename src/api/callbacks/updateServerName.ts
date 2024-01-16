@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import responseFormatter from "../responseFormatter";
 
-import { UpdateServerDataPost } from "../../modules/backendImportedQueries";
+import { UpdateServerData } from "../../modules/BackendQueries";
 import checkConnexionLocal from "../../middleware/checkConnexionLocal";
 import checkServerHasValidCredentials from "../../middleware/checkServerHasValidCredentials";
 import { SaveServerName } from "../../modules/serverDataManager";
@@ -45,7 +45,7 @@ const callback = async (
     await SaveServerName(name);
 
     if (req.hasValidCredentials) {
-      const ret = await UpdateServerDataPost({ name: name });
+      const ret = await UpdateServerData.Post({ name: name });
 
       if (!ret.ok) {
         throw new Error("Error saving server name. " + JSON.stringify(ret));

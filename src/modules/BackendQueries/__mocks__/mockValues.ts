@@ -1,4 +1,4 @@
-import { ErrorBackendUnreachable } from "../backendImportedQueries";
+import { ErrorBackendUnreachable } from "../ExceptionsManager";
 
 const userId = "userId";
 const userId2 = "userId2";

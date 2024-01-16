@@ -1,7 +1,7 @@
 import { Request, Response } from "express";
 import responseFormatter from "../responseFormatter";
 
-import { getServerInfoPost } from "../../modules/backendImportedQueries";
+import { GetServerInfo as BackendGetServerInfo } from "../../modules/BackendQueries";
 import checkConnexionLocal from "../../middleware/checkConnexionLocal";
 import checkServerHasValidCredentials from "../../middleware/checkServerHasValidCredentials";
 import { GetServerConfigData } from "../../modules/serverDataManager";
@@ -30,7 +30,7 @@ const callback = async (
     };
 
     if (req.hasValidCredentials) {
-      const ret = await getServerInfoPost();
+      const ret = await BackendGetServerInfo.Post();
 
       if (!ret.ok) {
         throw new Error("Error retrieving server info. " + JSON.stringify(ret));
