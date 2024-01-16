@@ -4,7 +4,7 @@
   "description": "Description",
   "license": "MIT",
   "version": "1.0.0",
-  "main": "dist/main.js",
+  "main": "dist/src/main.js",
   "scripts": {
     "start": "yarn start:server",
     "build": "yarn build:server",

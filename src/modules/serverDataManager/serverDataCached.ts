@@ -13,6 +13,5 @@ export function GetServerDataFromCache() {
 }
 
 export function SaveServerDataToCache(data: ServerDataType) {
-  console.log(data);
   serverData = data;
 }

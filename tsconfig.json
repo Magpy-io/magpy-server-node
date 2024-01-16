@@ -112,6 +112,6 @@
       "@tests/*": ["./tests/*"]
     }
   },
-  "include": ["src/**/*.ts", "src/**/*.js"],
+  "include": ["src/**/*.ts", "src/**/*.js", "tests/**/*.ts"],
   "exclude": ["node_modules", "<node_internals>/**"]
 }
