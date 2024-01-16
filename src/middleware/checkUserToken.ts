@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 
 import responseFormatter from "../api/responseFormatter";
 import { combineMiddleware } from "../modules/functions";
-import checkServerIsClaimed from "./checkServerIsClaimed";
+import checkServerHasCredentials from "./checkServerHasCredentials";
 import verifyAuthorizationHeader from "./verifyAuthorizationHeader";
 import { verifyUserToken } from "../modules/tokenManagement";
 
@@ -59,7 +59,7 @@ async function checkUserToken(req: Request, res: Response, next: NextFunction) {
 }
 
 export default combineMiddleware([
-  checkServerIsClaimed,
+  checkServerHasCredentials,
   verifyAuthorizationHeader,
   checkUserToken,
 ]);
