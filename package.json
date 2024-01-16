@@ -21,7 +21,7 @@
     "test:v": "yarn build:server && cross-env NODE_ENV=test jest --verbose=true --collect-coverage --testTimeout=10000",
     "types:generate": "ts-node ./src/CreateTypes.ts",
     "types:copy": "ts-node ./src/CopyEndpointTypesToExport.ts",
-    "clean:types": "rimraf ./src/api/export/types && rimraf ./src/api/types/RequestTypes",
+    "clean:types": "rimraf ./src/api/export/Types && rimraf ./src/api/Types/RequestTypes",
     "types": "yarn clean:types && yarn types:generate && yarn types:copy"
   },
   "dependencies": {

@@ -68,7 +68,7 @@ describe("Test 'claimServer' endpoint", () => {
   });
 
   it("Should return error SERVER_NOT_CLAIMED when requesting a server not claimed", async () => {
-    await UnclaimServer.Post({});
+    await UnclaimServer.Post();
 
     const ret = await GetToken.Post({
       userToken: mockValues.validUserToken,

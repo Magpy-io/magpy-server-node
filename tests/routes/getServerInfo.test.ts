@@ -39,7 +39,7 @@ describe("Test 'getServerInfo' endpoint", () => {
   });
 
   it("Should return the default server info", async () => {
-    const ret = await GetServerInfo.Post({});
+    const ret = await GetServerInfo.Post();
 
     expectToBeOk(ret);
     expect(ret.warning).toBe(false);
@@ -64,7 +64,7 @@ describe("Test 'getServerInfo' endpoint", () => {
     await SaveStorageFolderPath("newPath");
     await SaveServerName("newName");
 
-    const ret = await GetServerInfo.Post({});
+    const ret = await GetServerInfo.Post();
 
     expectToBeOk(ret);
     const data = getDataFromRet(ret);
@@ -74,9 +74,9 @@ describe("Test 'getServerInfo' endpoint", () => {
   });
 
   it("Should return owner null for an unclaimed server", async () => {
-    await UnclaimServer.Post({});
+    await UnclaimServer.Post();
 
-    const ret = await GetServerInfo.Post({});
+    const ret = await GetServerInfo.Post();
 
     expectToBeOk(ret);
     const data = getDataFromRet(ret);

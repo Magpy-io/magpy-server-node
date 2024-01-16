@@ -71,6 +71,15 @@ function GeneratePostSetAuth<RequestData, ResponseData, ResponseErrorTypes>(
   return PostFunction;
 }
 
+type FunctionType<RequestData, ResponseData, ResponseErrorTypes> =
+  {} extends RequestData
+    ? (
+        data?: RequestData
+      ) => Promise<ResponseTypeFrom<ResponseData, ResponseErrorTypes>>
+    : (
+        data: RequestData
+      ) => Promise<ResponseTypeFrom<ResponseData, ResponseErrorTypes>>;
+
 export function GeneratePostRequest<
   RequestData,
   ResponseData,
@@ -78,9 +87,7 @@ export function GeneratePostRequest<
 >(
   endpointPath: string,
   tokenAuth: TokenAuthentification
-): (
-  data: RequestData
-) => Promise<ResponseTypeFrom<ResponseData, ResponseErrorTypes>> {
+): FunctionType<RequestData, ResponseData, ResponseErrorTypes> {
   switch (tokenAuth) {
     case "yes":
       return GeneratePostWithAuth<

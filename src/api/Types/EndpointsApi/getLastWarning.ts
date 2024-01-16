@@ -7,7 +7,7 @@ export type ResponseData = {
   warning: WarningDataTypes | null;
 };
 
-export const RequestSchema = Joi.object({})
+export const RequestSchema = Joi.object()
   .options({
     presence: "required",
   })

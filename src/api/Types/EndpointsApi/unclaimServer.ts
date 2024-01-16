@@ -7,7 +7,7 @@ import { TokenAuthentification } from "../Types";
 
 export type ResponseData = string;
 
-export const RequestSchema = Joi.object({})
+export const RequestSchema = Joi.object()
   .options({
     presence: "required",
   })

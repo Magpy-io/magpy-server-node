@@ -38,7 +38,7 @@ describe("Test 'getLastWarning' endpoint", () => {
   });
 
   it("Should return null when no warnings are stored", async () => {
-    const ret = await GetLastWarning.Post({});
+    const ret = await GetLastWarning.Post();
 
     expectToBeOk(ret);
     expect(ret.warning).toBe(false);
@@ -71,7 +71,7 @@ describe("Test 'getLastWarning' endpoint", () => {
     };
     SetLastWarningForUser(getUserId(), warning);
 
-    const ret = await GetLastWarning.Post({});
+    const ret = await GetLastWarning.Post();
     expectToBeOk(ret);
     expect(ret.warning).toBe(false);
     const data = getDataFromRet(ret);

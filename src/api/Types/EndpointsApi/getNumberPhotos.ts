@@ -6,7 +6,7 @@ export type ResponseData = {
   number: number;
 };
 
-export const RequestSchema = Joi.object({})
+export const RequestSchema = Joi.object()
   .options({
     presence: "required",
   })

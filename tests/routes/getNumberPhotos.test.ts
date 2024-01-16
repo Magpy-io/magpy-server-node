@@ -41,7 +41,7 @@ describe("Test 'getNumberPhotos' endpoint", () => {
     async (p: { n: number }) => {
       await addNPhotos(p.n);
 
-      const ret = await GetNumberPhotos.Post({});
+      const ret = await GetNumberPhotos.Post();
 
       expectToBeOk(ret);
       expect(ret.warning).toBe(false);

@@ -33,7 +33,7 @@ describe("Test 'whoAmI' endpoint", () => {
   });
 
   it("Should ok if valid user token", async () => {
-    const ret = await WhoAmI.Post({});
+    const ret = await WhoAmI.Post();
 
     expectToBeOk(ret);
     expect(ret.warning).toBe(false);

@@ -11,7 +11,7 @@ export type ResponseData = {
   owner: { name: string; email: string } | null;
 };
 
-export const RequestSchema = Joi.object({})
+export const RequestSchema = Joi.object()
   .options({
     presence: "required",
   })
