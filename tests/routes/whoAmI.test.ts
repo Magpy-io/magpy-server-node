@@ -10,7 +10,7 @@ import { WhoAmI } from "@src/api/export";
 import { initServer, stopServer } from "@src/server/server";
 import * as sac from "@tests/helpers/setupAndCleanup";
 
-import * as mockValues from "@src/modules/__mocks__/backendRequestsMockValues";
+import * as mockValues from "@src/modules/BackendQueries/__mocks__/mockValues";
 import { expectToBeOk, getDataFromRet } from "@tests/helpers/functions";
 
 describe("Test 'whoAmI' endpoint", () => {

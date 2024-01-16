@@ -29,7 +29,7 @@ import {
   SaveServerCredentials,
 } from "@src/modules/serverDataManager";
 
-import * as mockValues from "@src/modules/__mocks__/backendRequestsMockValues";
+import * as mockValues from "@src/modules/BackendQueries/__mocks__/mockValues";
 import { Photo } from "@src/db/sequelizeDb";
 import {
   GetLastWarningForUser,

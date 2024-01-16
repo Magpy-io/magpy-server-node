@@ -7,7 +7,7 @@ import { describe, expect, it } from "@jest/globals";
 import { Express } from "express";
 import { GetToken, UnclaimServer } from "@src/api/export";
 
-import * as mockValues from "@src/modules/__mocks__/backendRequestsMockValues";
+import * as mockValues from "@src/modules/BackendQueries/__mocks__/mockValues";
 
 import { initServer, stopServer } from "@src/server/server";
 
