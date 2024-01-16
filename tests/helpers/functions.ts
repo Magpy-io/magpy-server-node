@@ -316,9 +316,12 @@ function testReturnedToken() {
     serverData.serverKey
   );
   expect(tokenVerification.ok).toBe(true);
-  expect(
-    (tokenVerification as typeof tokenVerification & { ok: true }).data.id
-  ).toBeDefined();
+
+  if (!tokenVerification.ok) {
+    throw new Error("");
+  }
+
+  expect(tokenVerification.data.id).toBeDefined();
 }
 
 async function setupServerClaimed() {

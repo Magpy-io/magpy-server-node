@@ -1,7 +1,5 @@
 import { ErrorBadRequest, ErrorServerError } from "./ErrorTypes";
 
-export type DataTypeFrom<T> = T extends { data: infer D } ? D : never;
-
 export type ServerResponseData<T> = {
   ok: true;
   data: T;
