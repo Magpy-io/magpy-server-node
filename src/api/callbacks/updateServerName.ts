@@ -11,9 +11,13 @@ import { UpdateServerName } from "../Types";
 const sendResponse =
   responseFormatter.getCustomSendResponse<UpdateServerName.ResponseData>();
 
-const callback = async (req: Request, res: Response) => {
+const callback = async (
+  req: Request,
+  res: Response,
+  body: UpdateServerName.RequestData
+) => {
   try {
-    const { name }: UpdateServerName.RequestData = req.body;
+    const { name } = body;
 
     if (!name) {
       console.log("Nothing to update, sending response");

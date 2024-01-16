@@ -11,7 +11,11 @@ import { GetServerInfo } from "../Types";
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetServerInfo.ResponseData>();
 
-const callback = async (req: Request, res: Response) => {
+const callback = async (
+  req: Request,
+  res: Response,
+  body: GetServerInfo.RequestData
+) => {
   try {
     const serverDataConfig = GetServerConfigData();
 

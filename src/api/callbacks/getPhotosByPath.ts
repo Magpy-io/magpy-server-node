@@ -14,17 +14,17 @@ import { GetPhotosByPath, APIPhoto } from "../Types";
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetPhotosByPath.ResponseData>();
 
-const callback = async (req: Request, res: Response) => {
+const callback = async (
+  req: Request,
+  res: Response,
+  body: GetPhotosByPath.RequestData
+) => {
   try {
     if (!req.userId) {
       throw new Error("UserId is not defined.");
     }
 
-    const {
-      photosData,
-      photoType,
-      deviceUniqueId,
-    }: GetPhotosByPath.RequestData = req.body;
+    const { photosData, photoType, deviceUniqueId } = body;
 
     console.log("Getting photos from db with paths from request.");
     const photos = await getPhotosByClientPathAndSizeAndDateFromDB(

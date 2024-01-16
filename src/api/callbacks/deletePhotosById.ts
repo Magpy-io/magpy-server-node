@@ -12,11 +12,13 @@ import { DeletePhotosById } from "../Types";
 const sendResponse =
   responseFormatter.getCustomSendResponse<DeletePhotosById.ResponseData>();
 
-const callback = async (req: Request, res: Response) => {
+const callback = async (
+  req: Request,
+  res: Response,
+  body: DeletePhotosById.RequestData
+) => {
   try {
-    const requestParameters: DeletePhotosById.RequestData = req.body;
-
-    const ids: string[] = requestParameters.ids;
+    const ids: string[] = body.ids;
 
     const removedIds = [];
     for (const id of ids) {

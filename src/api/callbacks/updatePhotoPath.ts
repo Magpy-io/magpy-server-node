@@ -13,12 +13,16 @@ import { UpdatePhotoPath } from "../Types";
 const sendResponse =
   responseFormatter.getCustomSendResponse<UpdatePhotoPath.ResponseData>();
 
-const callback = async (req: Request, res: Response) => {
+const callback = async (
+  req: Request,
+  res: Response,
+  body: UpdatePhotoPath.RequestData
+) => {
   if (!req.userId) {
     throw new Error("UserId is not defined.");
   }
 
-  const { id, path, deviceUniqueId }: UpdatePhotoPath.RequestData = req.body;
+  const { id, path, deviceUniqueId } = body;
 
   try {
     console.log(`Searching in db for photo with id: ${id}`);

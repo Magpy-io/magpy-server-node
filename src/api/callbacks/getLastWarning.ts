@@ -9,7 +9,11 @@ import { GetLastWarning } from "../Types";
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetLastWarning.ResponseData>();
 
-const callback = async (req: Request, res: Response) => {
+const callback = async (
+  req: Request,
+  res: Response,
+  body: GetLastWarning.RequestData
+) => {
   try {
     if (!req.userId) {
       throw new Error("UserId is not defined.");

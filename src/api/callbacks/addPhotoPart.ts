@@ -13,15 +13,17 @@ import { AddPhotoPart } from "../Types";
 const sendResponse =
   responseFormatter.getCustomSendResponse<AddPhotoPart.ResponseData>();
 
-const callback = async (req: Request, res: Response) => {
+const callback = async (
+  req: Request,
+  res: Response,
+  body: AddPhotoPart.RequestData
+) => {
   try {
     if (!req.userId) {
       throw new Error("UserId is not defined.");
     }
 
-    const partReceived: AddPhotoPart.RequestData = req.body;
-
-    if (partReceived.partSize != partReceived.photoPart.length) {
+    if (body.partSize != body.photoPart.length) {
       console.log("Bad request parameters");
       console.log("Sending response message");
       return responseFormatter.sendFailedMessage(
@@ -31,21 +33,21 @@ const callback = async (req: Request, res: Response) => {
       );
     }
 
-    if (!FilesWaiting.has(partReceived.id)) {
-      console.log(`No photo transfer for id ${partReceived.id} was found.`);
+    if (!FilesWaiting.has(body.id)) {
+      console.log(`No photo transfer for id ${body.id} was found.`);
       console.log("Sending response message.");
       return responseFormatter.sendFailedMessage(
         res,
-        `No photo transfer for id ${partReceived.id} was found.`,
+        `No photo transfer for id ${body.id} was found.`,
         "PHOTO_TRANSFER_NOT_FOUND"
       );
     }
 
-    console.log(`Photo transfer for id ${partReceived.id} found.`);
+    console.log(`Photo transfer for id ${body.id} found.`);
 
-    const photoWaiting = FilesWaiting.get(partReceived.id)!;
-    photoWaiting.received += partReceived.partSize;
-    photoWaiting.dataParts.set(partReceived.partNumber, partReceived.photoPart);
+    const photoWaiting = FilesWaiting.get(body.id)!;
+    photoWaiting.received += body.partSize;
+    photoWaiting.dataParts.set(body.partNumber, body.photoPart);
 
     if (photoWaiting.received < photoWaiting.image64Len) {
       console.log("Photo part added.");
@@ -53,9 +55,9 @@ const callback = async (req: Request, res: Response) => {
 
       clearTimeout(photoWaiting.timeout);
       photoWaiting.timeout = setTimeout(() => {
-        console.log(`Photo transfer for id ${partReceived.id} timed out.`);
-        console.log(`Deleting pending transfer for id ${partReceived.id}`);
-        FilesWaiting.delete(partReceived.id);
+        console.log(`Photo transfer for id ${body.id} timed out.`);
+        console.log(`Deleting pending transfer for id ${body.id}`);
+        FilesWaiting.delete(body.id);
       }, postPhotoPartTimeout);
 
       console.log("Sending response message.");
@@ -71,9 +73,9 @@ const callback = async (req: Request, res: Response) => {
         `Transfered data (${photoWaiting.received}) exceeds initial image size (${photoWaiting.image64Len}).`
       );
 
-      console.log(`Deleting pending transfer for id ${partReceived.id}`);
+      console.log(`Deleting pending transfer for id ${body.id}`);
       clearTimeout(photoWaiting.timeout);
-      FilesWaiting.delete(partReceived.id);
+      FilesWaiting.delete(body.id);
 
       console.log("Sending response message.");
       return responseFormatter.sendFailedMessage(
@@ -88,9 +90,9 @@ const callback = async (req: Request, res: Response) => {
     clearTimeout(photoWaiting.timeout);
 
     if (!arePartsValid(photoWaiting.dataParts)) {
-      console.log(`Deleting pending transfer for id ${partReceived.id}`);
+      console.log(`Deleting pending transfer for id ${body.id}`);
       clearTimeout(photoWaiting.timeout);
-      FilesWaiting.delete(partReceived.id);
+      FilesWaiting.delete(body.id);
 
       console.log("Sending response message.");
       return responseFormatter.sendFailedMessage(
@@ -105,8 +107,8 @@ const callback = async (req: Request, res: Response) => {
     const hash = hashFile(image64);
     photoWaiting.photo.hash = hash;
 
-    console.log(`Deleting pending transfer for id ${partReceived.id}`);
-    FilesWaiting.delete(partReceived.id);
+    console.log(`Deleting pending transfer for id ${body.id}`);
+    FilesWaiting.delete(body.id);
 
     const dbPhoto = await addPhotoToDB(photoWaiting.photo);
 

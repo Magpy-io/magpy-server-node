@@ -13,19 +13,17 @@ import { GetPhotos } from "../Types";
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetPhotos.ResponseData>();
 
-const callback = async (req: Request, res: Response) => {
+const callback = async (
+  req: Request,
+  res: Response,
+  body: GetPhotos.RequestData
+) => {
   try {
     if (!req.userId) {
       throw new Error("UserId is not defined.");
     }
 
-    console.log(
-      `number: ${req.body.number}, offset: ${req.body.offset}, type: ${req.body.photoType}`
-    );
-
-    const requestParameters: GetPhotos.RequestData = req.body;
-
-    const { number, offset, photoType } = requestParameters;
+    const { number, offset, photoType } = body;
 
     console.log(`Getting ${number} photos with offset ${offset} from db.`);
     const { photos, endReached } = await getPhotosFromDB(number, offset);

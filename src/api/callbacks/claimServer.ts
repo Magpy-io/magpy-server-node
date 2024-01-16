@@ -25,13 +25,15 @@ import checkServerIsClaimed from "../../middleware/checkServerIsClaimed";
 const sendResponse =
   responseFormatter.getCustomSendResponse<ClaimServer.ResponseData>();
 
-const callback = async (req: Request, res: Response) => {
+const callback = async (
+  req: Request,
+  res: Response,
+  body: ClaimServer.RequestData
+) => {
   try {
-    const requestParameters: ClaimServer.RequestData = req.body;
-
     const myIp = await getMyIp();
 
-    const { userToken } = requestParameters;
+    const { userToken } = body;
 
     if (req.isClaimed) {
       console.log("server already claimed, it has valid token");

@@ -15,15 +15,17 @@ import { GetPhotoPartById } from "../Types";
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetPhotoPartById.ResponseData>();
 
-const callback = async (req: Request, res: Response) => {
+const callback = async (
+  req: Request,
+  res: Response,
+  body: GetPhotoPartById.RequestData
+) => {
   try {
-    const requestParameters: GetPhotoPartById.RequestData = req.body;
-
     if (!req.userId) {
       throw new Error("UserId is not defined.");
     }
 
-    const { id, part } = requestParameters;
+    const { id, part } = body;
 
     console.log("Checking photo exists");
 

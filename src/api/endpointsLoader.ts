@@ -33,7 +33,8 @@ function loadEndpoints(app: any) {
       endpoint: string;
       callback: (
         req: Request,
-        res: Response
+        res: Response,
+        body: any
       ) => Promise<Response<any, Record<string, any>>>;
       method: string;
       middleWare?: MiddleWareType | MiddleWareArray;
@@ -42,9 +43,9 @@ function loadEndpoints(app: any) {
       const reqParamValidationMiddleware =
         generateMiddlewareFromShema(requestShema);
 
-      const callbackWithLogging = (req: Request, res: Response) => {
+      const callbackFormated = (req: Request, res: Response) => {
         console.log(endpoint);
-        callback(req, res);
+        callback(req, res, req.body);
       };
       const endpointFormatted = "/" + endpoint;
 
@@ -63,7 +64,7 @@ function loadEndpoints(app: any) {
       // execute parameter validation just before endpoint callback
       middleWareArray.push(reqParamValidationMiddleware);
 
-      app[method](endpointFormatted, ...middleWareArray, callbackWithLogging);
+      app[method](endpointFormatted, ...middleWareArray, callbackFormated);
     }
   );
 }

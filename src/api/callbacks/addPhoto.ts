@@ -12,23 +12,25 @@ import { AddPhoto } from "../Types";
 const sendResponse =
   responseFormatter.getCustomSendResponse<AddPhoto.ResponseData>();
 
-const callback = async (req: Request, res: Response) => {
+const callback = async (
+  req: Request,
+  res: Response,
+  body: AddPhoto.RequestData
+) => {
   try {
     if (!req.userId) {
       throw new Error("UserId is not defined.");
     }
 
-    const requestPhoto: AddPhoto.RequestData = req.body;
-
     const photo = {
-      name: requestPhoto.name,
-      fileSize: requestPhoto.fileSize,
-      width: requestPhoto.width,
-      height: requestPhoto.height,
-      date: requestPhoto.date,
+      name: body.name,
+      fileSize: body.fileSize,
+      width: body.width,
+      height: body.height,
+      date: body.date,
       syncDate: new Date(Date.now()).toJSON(),
-      clientPath: requestPhoto.path,
-      deviceUniqueId: requestPhoto.deviceUniqueId,
+      clientPath: body.path,
+      deviceUniqueId: body.deviceUniqueId,
       serverPath: "",
       serverCompressedPath: "",
       serverThumbnailPath: "",
@@ -36,7 +38,7 @@ const callback = async (req: Request, res: Response) => {
     };
 
     await addServerImagePaths(photo);
-    photo.hash = hashFile(requestPhoto.image64);
+    photo.hash = hashFile(body.image64);
     console.log("Adding photo to db.");
 
     const dbPhoto = await addPhotoToDB(photo);
@@ -44,7 +46,7 @@ const callback = async (req: Request, res: Response) => {
     console.log("Photo added successfully to db.");
     try {
       console.log("Adding photo to disk.");
-      await addPhotoToDisk(dbPhoto, requestPhoto.image64);
+      await addPhotoToDisk(dbPhoto, body.image64);
     } catch (err) {
       console.log("Could not add photo to disk, removing photo from db");
       console.log(dbPhoto);

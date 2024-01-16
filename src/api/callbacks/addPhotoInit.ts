@@ -13,23 +13,25 @@ import { AddPhotoInit } from "../Types";
 const sendResponse =
   responseFormatter.getCustomSendResponse<AddPhotoInit.ResponseData>();
 
-const callback = async (req: Request, res: Response) => {
+const callback = async (
+  req: Request,
+  res: Response,
+  body: AddPhotoInit.RequestData
+) => {
   try {
     if (!req.userId) {
       throw new Error("UserId is not defined.");
     }
 
-    const requestPhoto: AddPhotoInit.RequestData = req.body;
-
     const photo = {
-      name: requestPhoto.name,
-      fileSize: requestPhoto.fileSize,
-      width: requestPhoto.width,
-      height: requestPhoto.height,
-      date: requestPhoto.date,
+      name: body.name,
+      fileSize: body.fileSize,
+      width: body.width,
+      height: body.height,
+      date: body.date,
       syncDate: "",
-      clientPath: requestPhoto.path,
-      deviceUniqueId: requestPhoto.deviceUniqueId,
+      clientPath: body.path,
+      deviceUniqueId: body.deviceUniqueId,
       serverPath: "",
       serverCompressedPath: "",
       serverThumbnailPath: "",
@@ -38,7 +40,7 @@ const callback = async (req: Request, res: Response) => {
 
     console.log("Photo does not exist in server.");
     console.log("Creating syncDate and photoPath.");
-    const image64Len = requestPhoto.image64Len;
+    const image64Len = body.image64Len;
     photo.syncDate = new Date(Date.now()).toJSON();
     await addServerImagePaths(photo);
     const id = uuid();

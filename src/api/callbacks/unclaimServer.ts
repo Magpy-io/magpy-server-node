@@ -14,7 +14,11 @@ import { UnclaimServer } from "../Types";
 const sendResponse =
   responseFormatter.getCustomSendResponse<UnclaimServer.ResponseData>();
 
-const callback = async (req: Request, res: Response) => {
+const callback = async (
+  req: Request,
+  res: Response,
+  body: UnclaimServer.RequestData
+) => {
   try {
     if (req.hasValidCredentials) {
       let ret: DeleteServerResponseType | undefined;

@@ -15,13 +15,17 @@ import { GetPhotosById, APIPhoto } from "../Types";
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetPhotosById.ResponseData>();
 
-const callback = async (req: Request, res: Response) => {
+const callback = async (
+  req: Request,
+  res: Response,
+  body: GetPhotosById.RequestData
+) => {
   try {
     if (!req.userId) {
       throw new Error("UserId is not defined.");
     }
 
-    const { ids, photoType }: GetPhotosById.RequestData = req.body;
+    const { ids, photoType } = body;
 
     console.log(`Getting ${ids.length} photos from db.`);
     const photos = await getPhotosByIdFromDB(ids);

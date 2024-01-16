@@ -22,11 +22,13 @@ import { GetToken } from "../Types";
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetToken.ResponseData>();
 
-const callback = async (req: Request, res: Response) => {
+const callback = async (
+  req: Request,
+  res: Response,
+  body: GetToken.RequestData
+) => {
   try {
-    const requestParameters: GetToken.RequestData = req.body;
-
-    const backendUserToken = requestParameters.userToken;
+    const backendUserToken = body.userToken;
 
     const serverData = GetServerConfigData();
 

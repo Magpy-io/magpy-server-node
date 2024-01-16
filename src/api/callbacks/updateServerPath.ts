@@ -8,14 +8,18 @@ import { folderHasRights, pathExists } from "../../modules/diskManager";
 
 import { isAbsolutePath } from "../../modules/functions";
 
-import { UpdateServerPath } from "../Types";
+import { UpdatePhotoPath, UpdateServerPath } from "../Types";
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<UpdateServerPath.ResponseData>();
 
-const callback = async (req: Request, res: Response) => {
+const callback = async (
+  req: Request,
+  res: Response,
+  body: UpdateServerPath.RequestData
+) => {
   try {
-    const { path }: UpdateServerPath.RequestData = req.body;
+    const { path } = body;
 
     if (!path) {
       console.log("Nothing to update, sending response");
