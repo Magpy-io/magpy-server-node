@@ -1,17 +1,18 @@
-import { ServerData } from "./ServerDataType";
+import { ServerDataType } from "./ServerDataType";
 import * as config from "../../config/config";
 
-export const ServerDataDefault: ServerData = {
+export const ServerDataDefault: ServerDataType = {
   storageFolderPath: config.rootPath,
   serverName: config.serverName,
 };
 
-let serverData: ServerData = ServerDataDefault;
+let serverData: ServerDataType = ServerDataDefault;
 
 export function GetServerDataFromCache() {
   return serverData;
 }
 
-export function SaveServerDataToCache(data: ServerData) {
+export function SaveServerDataToCache(data: ServerDataType) {
+  console.log(data);
   serverData = data;
 }

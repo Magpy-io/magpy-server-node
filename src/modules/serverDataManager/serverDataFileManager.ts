@@ -3,8 +3,8 @@ import fs from "fs/promises";
 import { createFolder, pathExists } from "../diskManager";
 import * as config from "../../config/config";
 import * as path from "path";
-import { ServerData } from "./ServerDataType";
-import { ServerDataDefault, SaveServerDataToCache } from "./serverDataCached";
+import { ServerDataType, ServerDataSchema } from "./ServerDataType";
+import { SaveServerDataToCache, ServerDataDefault } from "./serverDataCached";
 
 let configLoadedFromFile = false;
 
@@ -17,7 +17,7 @@ export async function LoadConfigFile() {
   configLoadedFromFile = true;
 }
 
-export async function SaveServerDataFile(data: ServerData) {
+export async function SaveServerDataFile(data: ServerDataType) {
   await CreateFileIfDoesNotExist();
 
   await fs.writeFile(config.serverDataFile, JSON.stringify(data));
@@ -42,13 +42,19 @@ async function getServerDataFromFile(): Promise<any> {
 
     return JSON.parse(buffer.toString());
   } catch (err) {
-    console.error("Error reading ServerData");
-    throw err;
+    console.error("Error reading ServerData, overwriting server data");
+    return {};
   }
 }
 
-function AddServerDataIfMissing(data: any): ServerData {
-  return { ...ServerDataDefault, ...data };
+function AddServerDataIfMissing(data: any): ServerDataType {
+  const { error, value } = ServerDataSchema.validate(data);
+
+  if (!error) {
+    return value;
+  }
+
+  return ServerDataDefault;
 }
 
 async function CreateFileIfDoesNotExist() {

@@ -1,4 +1,4 @@
-import { ServerData } from "./ServerDataType";
+import { ServerDataType } from "./ServerDataType";
 import {
   GetServerDataFromCache,
   SaveServerDataToCache,
@@ -16,7 +16,7 @@ export function GetServerConfigData() {
   return GetServerDataFromCache();
 }
 
-export async function SetServerConfigData(data: ServerData) {
+export async function SetServerConfigData(data: ServerDataType) {
   SaveServerDataToCache(data);
   await SaveServerDataFile(data);
 }
