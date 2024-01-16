@@ -16,3 +16,4 @@
 out/
 /src/api/export/Types/
 /src/api/Types/RequestTypes
+/src/modules/BackendQueries
