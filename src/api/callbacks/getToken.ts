@@ -107,7 +107,7 @@ const callback = async (
     console.log("user has access to server, generating token");
 
     const userToken = generateUserToken(retUser.data.user._id);
-    res.set("Authorization", "Bearer " + userToken);
+    res.set("x-authorization", "Bearer " + userToken);
 
     console.log("sending response");
     return sendResponse(res, "Token generated successfully");

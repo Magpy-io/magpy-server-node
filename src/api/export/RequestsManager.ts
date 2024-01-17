@@ -6,7 +6,7 @@ import {
   SetUserToken,
   userAuthorizationObject,
   verifyHasUserToken,
-} from "./UserTokenManager";
+} from "./TokenManager";
 import { ResponseTypeFrom } from "../Types/ApiGlobalTypes";
 import { TokenAuthentification } from "./Types/Types";
 

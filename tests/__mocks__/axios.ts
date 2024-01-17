@@ -26,7 +26,7 @@ export default {
     }
     return {
       data: ret.body,
-      headers: { authorization: ret.headers["authorization"] },
+      headers: { "x-authorization": ret.headers["x-authorization"] },
     };
   },
 };

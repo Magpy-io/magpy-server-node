@@ -20,7 +20,7 @@ import {
   GetNumberPhotos,
 } from "@src/api/export/";
 
-import { GetUserToken, HasUserToken } from "@src/api/export/UserTokenManager";
+import { GetUserToken, HasUserToken } from "@src/api/export/TokenManager";
 import { PhotoTypes, APIPhoto } from "@src/api/export/Types";
 import { ErrorCodes } from "@src/api/export/Types/ErrorTypes";
 
@@ -345,13 +345,6 @@ async function setupServerUserToken() {
   serverUserToken = GetUserToken();
 }
 
-function serverTokenHeader() {
-  if (serverUserToken) {
-    return { Authorization: "Bearer " + serverUserToken };
-  }
-  throw new Error("No serverUserToken to use in serverTokenHeader()");
-}
-
 function getUserId() {
   if (!serverUserToken) {
     throw new Error("No serverUserToken to use in getUserId()");
@@ -381,7 +374,7 @@ function getExpiredToken() {
 }
 
 function randomTokenHeader() {
-  return { Authorization: "Bearer serverUserToken" };
+  return { "x-authorization": "Bearer serverUserToken" };
 }
 
 function testWarning(dbPhoto: Photo) {
@@ -464,7 +457,6 @@ export {
   setupServerClaimed,
   setupServerUserToken,
   serverUserToken,
-  serverTokenHeader,
   getExpiredToken,
   randomTokenHeader,
   getPhotoFromDb,

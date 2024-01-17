@@ -9,9 +9,9 @@ const verifyAuthorizationHeader = async (
 ) => {
   try {
     console.log("#VerifyAuthorizationHeader middleware");
-    const bearerHeader = req.headers["authorization"];
+    const bearerHeader = req.headers["x-authorization"];
 
-    if (!bearerHeader) {
+    if (!bearerHeader || typeof bearerHeader != "string") {
       console.log("Error : No authorization header");
       responseFormatter.sendFailedMessage(
         res,
