@@ -8,8 +8,8 @@ const jwtUserExp = "1d";
 const MAX_PIXELS_IN_THUMBNAIL = 40000;
 const MAX_PIXELS_IN_COMPRESSED = 200000;
 
-const backend_host = "http://127.0.0.1";
-const backend_port = 8001;
+const backend_host = "http://opencloud-server.onrender.com";
+const backend_port = 80;
 
 const serverName = "MyLocalServer";
 const serverNameMdnsPrefix = "OpenCloudServer";
