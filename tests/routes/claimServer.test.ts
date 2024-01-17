@@ -9,7 +9,7 @@ import { ClaimServer } from "@src/api/export";
 
 import * as mockValues from "@src/modules/BackendQueries/__mocks__/mockValues";
 
-import * as mockValuesGetIp from "@src/modules/__mocks__/getMyIpMockValues";
+import * as mockValuesGetIp from "@src/modules/__mocks__/NetworkManagerMockValues";
 
 import { initServer, stopServer } from "@src/server/server";
 import { SaveServerCredentials } from "@src/modules/serverDataManager";

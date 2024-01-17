@@ -8,7 +8,11 @@ import {
 } from "../../modules/BackendQueries";
 import { ErrorBackendUnreachable } from "../../modules/BackendQueries/ExceptionsManager";
 import { randomBytes } from "crypto";
-import { getMyIp } from "../../modules/getMyIp";
+import {
+  getMyPublicIp,
+  getMyPrivateIp,
+  getMyPort,
+} from "../../modules/NetworkManager";
 
 import {
   GetServerName,
@@ -28,7 +32,9 @@ const callback = async (
   body: ClaimServer.RequestData
 ) => {
   try {
-    const myIp = await getMyIp();
+    const myIpPublic = await getMyPublicIp();
+    const myIpPrivate = await getMyPrivateIp();
+    const myPort = await getMyPort();
 
     const { userToken } = body;
 
@@ -50,7 +56,9 @@ const callback = async (
       TokenManager.SetUserToken(userToken);
       ret = await RegisterServer.Post({
         name: GetServerName(),
-        ipAddress: myIp,
+        ipAddressPublic: myIpPublic,
+        ipAddressPrivate: myIpPrivate,
+        port: myPort,
         serverKey: keyGenerated,
       });
     } catch (err) {
