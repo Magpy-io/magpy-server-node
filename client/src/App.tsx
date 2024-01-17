@@ -2,7 +2,7 @@ import "./App.css";
 import { Box } from "@mui/material";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import ServerConfig from "./Components/ServerConfig";
-import { SetPath } from "./ServerImportedQueries";
+import { SetPath } from "./ServerQueries";
 import { PATH } from "./config";
 
 const theme = createTheme({

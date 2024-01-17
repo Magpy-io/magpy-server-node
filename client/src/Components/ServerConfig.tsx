@@ -6,16 +6,12 @@ import ServerPathInput from "./ServerPathInput";
 import ServerOwner from "./ServerOwner";
 import SaveButton from "./SaveButton";
 import {
-  GetServerInfoPost,
-  GetServerInfoResponseType,
-  ServerResponseError,
-  UnclaimServerPost,
-  UnclaimServerResponseErrorTypes,
-  UpdateServerNamePost,
-  UpdateServerNameResponseErrorTypes,
-  UpdateServerPathPost,
-  UpdateServerPathResponseErrorTypes,
-} from "../ServerImportedQueries";
+  GetServerInfo,
+  UnclaimServer,
+  UpdateServerName,
+  UpdateServerPath,
+} from "../ServerQueries";
+import { ServerResponseError } from "../ServerQueries/Types/ApiGlobalTypes";
 
 export type Owner = {
   name: string;
@@ -23,12 +19,12 @@ export type Owner = {
 };
 
 type ErrorTypes =
-  | UpdateServerPathResponseErrorTypes
-  | UpdateServerNameResponseErrorTypes
-  | UnclaimServerResponseErrorTypes;
+  | UpdateServerPath.ResponseErrorTypes
+  | UpdateServerName.ResponseErrorTypes
+  | UnclaimServer.ResponseErrorTypes;
 
 export default function ServerConfig() {
-  const [data, setData] = useState<GetServerInfoResponseType>();
+  const [data, setData] = useState<GetServerInfo.ResponseType>();
   const [failedRequests, setFailedRequests] = useState<
     ServerResponseError<ErrorTypes>[]
   >([]);
@@ -39,7 +35,7 @@ export default function ServerConfig() {
 
   useEffect(() => {
     async function fetchData() {
-      const ret = await GetServerInfoPost();
+      const ret = await GetServerInfo.Post();
       setData(ret);
     }
     fetchData().catch((error) => console.log(error));
@@ -55,7 +51,7 @@ export default function ServerConfig() {
 
   const onClearOwner = async () => {
     console.log("clear owner");
-    const unclaimRes = await UnclaimServerPost().catch(console.log);
+    const unclaimRes = await UnclaimServer.Post().catch(console.log);
     if (unclaimRes && !unclaimRes.ok) {
       setFailedRequests((prev) => {
         prev.push(unclaimRes);
@@ -63,7 +59,7 @@ export default function ServerConfig() {
       });
     }
     if (unclaimRes && unclaimRes.ok) {
-      const ret = await GetServerInfoPost().catch(console.log);
+      const ret = await GetServerInfo.Post().catch(console.log);
       if (ret) setData(ret);
     }
   };
@@ -89,10 +85,10 @@ export default function ServerConfig() {
   }) => {
     console.log(data);
     if (data.name && data.path) {
-      const updateNameRes = await UpdateServerNamePost({
+      const updateNameRes = await UpdateServerName.Post({
         name: data.name,
       }).catch(console.log);
-      const updatePathRes = await UpdateServerPathPost({
+      const updatePathRes = await UpdateServerPath.Post({
         path: data.path,
       }).catch(console.log);
       console.log("updateNameRes", updateNameRes);

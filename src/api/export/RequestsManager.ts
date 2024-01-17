@@ -7,7 +7,7 @@ import {
   userAuthorizationObject,
   verifyHasUserToken,
 } from "./TokenManager";
-import { ResponseTypeFrom } from "../Types/ApiGlobalTypes";
+import { ResponseTypeFrom } from "./Types/ApiGlobalTypes";
 import { TokenAuthentification } from "./Types/Types";
 
 function GeneratePostWithAuth<RequestData, ResponseData, ResponseErrorTypes>(
