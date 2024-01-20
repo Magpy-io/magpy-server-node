@@ -1,4 +1,4 @@
-import { WarningDataTypes } from "../api/Types/WarningTypes";
+import { WarningDataTypes } from '../api/Types/WarningTypes';
 
 const warnings = new Map<string, WarningDataTypes>();
 
@@ -11,10 +11,7 @@ export function GetLastWarningForUser(userId: string) {
   return;
 }
 
-export function SetLastWarningForUser(
-  userId: string,
-  warning: WarningDataTypes
-) {
+export function SetLastWarningForUser(userId: string, warning: WarningDataTypes) {
   warnings.set(userId, warning);
 }
 

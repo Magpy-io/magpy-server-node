@@ -1,5 +1,6 @@
-import Joi from "joi";
-import { ServerDataDefault } from "./serverDataCached";
+import Joi from 'joi';
+
+import { ServerDataDefault } from './serverDataCached';
 
 export type ServerDataType = {
   serverId?: string;

@@ -1,10 +1,11 @@
 // IMPORTS
-import dotenv from "dotenv";
+import dotenv from 'dotenv';
+
+import { main } from './mainFunction';
+
 dotenv.config();
 
-import { main } from "./mainFunction";
-
-main().catch((err) => {
-  console.log("error init server");
+main().catch(err => {
+  console.log('error init server');
   console.log(err);
 });

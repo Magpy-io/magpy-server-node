@@ -7,6 +7,6 @@ export function failNextRequest() {
 export function checkFails() {
   if (shouldNextRequestFail) {
     shouldNextRequestFail = false;
-    throw new Error("Mock: Error getting my ip");
+    throw new Error('Mock: Error getting my ip');
   }
 }

@@ -1,6 +1,6 @@
-import { Sequelize, DataTypes } from "sequelize";
+import { DataTypes, Sequelize } from 'sequelize';
 
-const modelName = "clientPath";
+const modelName = 'clientPath';
 
 const modelDefinition = {
   id: {
@@ -17,7 +17,7 @@ const modelDefinition = {
 };
 
 const modelOptions = {
-  indexes: [{ fields: ["path"] }],
+  indexes: [{ fields: ['path'] }],
 };
 
 export function createClientPathModel(sequelize: Sequelize) {

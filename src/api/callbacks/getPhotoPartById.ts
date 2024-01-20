@@ -1,33 +1,27 @@
-import { Request, Response } from "express";
-import responseFormatter from "../responseFormatter";
-import { getPhotoByIdFromDB } from "../../db/sequelizeDb";
-import { getPhotoFromDisk } from "../../modules/diskManager";
+import { Request, Response } from 'express';
 
-import { getNumberOfParts, getPartN } from "../../modules/stringHelper";
-import checkUserToken from "../../middleware/checkUserToken";
+import { getPhotoByIdFromDB } from '../../db/sequelizeDb';
+import checkUserToken from '../../middleware/checkUserToken';
+import { getPhotoFromDisk } from '../../modules/diskManager';
 import {
   AddWarningPhotosDeleted,
   checkPhotoExistsAndDeleteMissing,
-} from "../../modules/functions";
+} from '../../modules/functions';
+import { getNumberOfParts, getPartN } from '../../modules/stringHelper';
+import { GetPhotoPartById } from '../Types';
+import responseFormatter from '../responseFormatter';
 
-import { GetPhotoPartById } from "../Types";
+const sendResponse = responseFormatter.getCustomSendResponse<GetPhotoPartById.ResponseData>();
 
-const sendResponse =
-  responseFormatter.getCustomSendResponse<GetPhotoPartById.ResponseData>();
-
-const callback = async (
-  req: Request,
-  res: Response,
-  body: GetPhotoPartById.RequestData
-) => {
+const callback = async (req: Request, res: Response, body: GetPhotoPartById.RequestData) => {
   try {
     if (!req.userId) {
-      throw new Error("UserId is not defined.");
+      throw new Error('UserId is not defined.');
     }
 
     const { id, part } = body;
 
-    console.log("Checking photo exists");
+    console.log('Checking photo exists');
 
     const ret = await checkPhotoExistsAndDeleteMissing({
       id: id,
@@ -38,29 +32,27 @@ const callback = async (
     }
 
     if (!ret.exists) {
-      console.log("Photo not found in db.");
-      console.log("Sending response message.");
+      console.log('Photo not found in db.');
+      console.log('Sending response message.');
       return responseFormatter.sendFailedMessage(
         res,
         `Photo with id: ${id} not found`,
-        "ID_NOT_FOUND",
-        warning
+        'ID_NOT_FOUND',
+        warning,
       );
     } else {
-      console.log("Photo found in db.");
+      console.log('Photo found in db.');
       console.log(`Getting photo with id = ${id} from db.`);
       const dbPhoto = await getPhotoByIdFromDB(id);
 
       if (!dbPhoto) {
-        throw new Error(
-          "getPhotoPartById: photo exists but cannot retrieve from db"
-        );
+        throw new Error('getPhotoPartById: photo exists but cannot retrieve from db');
       }
 
-      console.log("Retrieving photo from disk.");
-      const image64 = await getPhotoFromDisk(dbPhoto, "original");
-      console.log("Photo retrieved.");
-      console.log("Sending response data.");
+      console.log('Retrieving photo from disk.');
+      const image64 = await getPhotoFromDisk(dbPhoto, 'original');
+      console.log('Photo retrieved.');
+      console.log('Sending response data.');
 
       const totalNbOfParts = getNumberOfParts(image64);
 
@@ -74,17 +66,13 @@ const callback = async (
         return sendResponse(res, jsonResponse);
       } else {
         console.log(
-          `Part number ${part} must be between 0 and ${
-            totalNbOfParts - 1
-          } included`
+          `Part number ${part} must be between 0 and ${totalNbOfParts - 1} included`,
         );
-        console.log("Sending response message.");
+        console.log('Sending response message.');
         return responseFormatter.sendFailedMessage(
           res,
-          `Part number ${part} must be between 0 and ${
-            totalNbOfParts - 1
-          } included`,
-          "INVALID_PART_NUMBER"
+          `Part number ${part} must be between 0 and ${totalNbOfParts - 1} included`,
+          'INVALID_PART_NUMBER',
         );
       }
     }
@@ -97,7 +85,7 @@ const callback = async (
 export default {
   endpoint: GetPhotoPartById.endpoint,
   callback: callback,
-  method: "post",
+  method: 'post',
   middleWare: checkUserToken,
   requestShema: GetPhotoPartById.RequestSchema,
 };

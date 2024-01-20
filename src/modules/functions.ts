@@ -1,11 +1,12 @@
-import bcrypt from "bcryptjs";
-import { isAbsolute } from "path";
-import { platform } from "os";
-import { deletePhotoByIdFromDB, getPhotoByIdFromDB } from "../db/sequelizeDb";
-import responseFormatter from "../api/responseFormatter";
-import { isPhotoOnDisk, removePhotoVariationsFromDisk } from "./diskManager";
-import { Photo } from "../db/sequelizeDb";
-import { SetLastWarningForUser } from "./warningsManager";
+import bcrypt from 'bcryptjs';
+import { platform } from 'os';
+import { isAbsolute } from 'path';
+
+import responseFormatter from '../api/responseFormatter';
+import { deletePhotoByIdFromDB, getPhotoByIdFromDB } from '../db/sequelizeDb';
+import { Photo } from '../db/sequelizeDb';
+import { isPhotoOnDisk, removePhotoVariationsFromDisk } from './diskManager';
+import { SetLastWarningForUser } from './warningsManager';
 
 function notNull<T>(value: T): value is NonNullable<T> {
   return value !== null;
@@ -16,7 +17,7 @@ export function filterNull<T>(arr: T[]) {
 }
 
 export function timeout(ms: number) {
-  return new Promise((resolve) => setTimeout(resolve, ms));
+  return new Promise(resolve => setTimeout(resolve, ms));
 }
 
 export function combineMiddleware(mids: any) {
@@ -48,7 +49,7 @@ export function isAbsolutePath(path: string) {
 
   // isAbsolute tests positive for an absolute path but from the current drive, like '//folder'.
   // This function must return false in this case, the path must be completly absolute
-  if (platform() == "win32") {
+  if (platform() == 'win32') {
     absolute = absolute && testForDriveLetter.test(path);
   }
 
@@ -78,7 +79,7 @@ export async function checkPhotoExistsAndDeleteMissing(data: {
 
   if (!existsDisk) {
     console.error(
-      `Some variation of photo ${photo.serverPath} not found on disk, deleting the photo variations and removing it from db.`
+      `Some variation of photo ${photo.serverPath} not found on disk, deleting the photo variations and removing it from db.`,
     );
     await removePhotoVariationsFromDisk(photo);
     await deletePhotoByIdFromDB(photo.id);
@@ -115,9 +116,7 @@ export async function filterPhotosAndDeleteMissing(photos: Photo[]) {
  *
  * If any variation of a photo is missing from disk the photo entry from db is removed, and null is returned for that photo.
  */
-export async function filterPhotosExistAndDeleteMissing(
-  photos: Array<Photo | null>
-) {
+export async function filterPhotosExistAndDeleteMissing(photos: Array<Photo | null>) {
   const photosThatExist: Array<Photo | null> = [];
   const photosDeleted: Array<Photo> = [];
 
@@ -140,17 +139,12 @@ export async function filterPhotosExistAndDeleteMissing(
   return { photosThatExist, photosDeleted, warning: photosDeleted.length != 0 };
 }
 
-export function AddWarningPhotosDeleted(
-  photosDeleted: Photo[],
-  userid: string
-) {
-  console.log("Photos missing deleted, adding warning");
+export function AddWarningPhotosDeleted(photosDeleted: Photo[], userid: string) {
+  console.log('Photos missing deleted, adding warning');
   SetLastWarningForUser(userid, {
-    code: "PHOTOS_NOT_ON_DISK_DELETED",
+    code: 'PHOTOS_NOT_ON_DISK_DELETED',
     data: {
-      photosDeleted: photosDeleted.map((p) =>
-        responseFormatter.createPhotoObject(p)
-      ),
+      photosDeleted: photosDeleted.map(p => responseFormatter.createPhotoObject(p)),
     },
   });
 }

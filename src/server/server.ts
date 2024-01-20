@@ -1,11 +1,11 @@
 // IMPORTS
-import express, { Express } from "express";
+import express, { Express } from 'express';
+import path from 'path';
 
-import loadEndpoints from "../api/endpointsLoader";
-import jsonParsingErrorHandler from "../middleware/jsonParsingErrorHandler";
-import FilesWaiting from "../modules/waitingFiles";
-import path from "path";
-import * as config from "../config/config";
+import loadEndpoints from '../api/endpointsLoader';
+import * as config from '../config/config';
+import jsonParsingErrorHandler from '../middleware/jsonParsingErrorHandler';
+import FilesWaiting from '../modules/waitingFiles';
 
 let app: Express;
 let server: any;
@@ -15,26 +15,24 @@ async function initServer() {
 
   app.use(
     express.json({
-      limit: "50mb",
-    })
+      limit: '50mb',
+    }),
   );
 
   app.use(jsonParsingErrorHandler);
 
   loadEndpoints(app);
-  console.log("Endpoints loaded");
+  console.log('Endpoints loaded');
 
   // Serve static files from the React app
-  app.use(express.static(path.join(__dirname, "../../..", "client/build")));
+  app.use(express.static(path.join(__dirname, '../../..', 'client/build')));
 
   // Catch-all route to serve React app
-  app.get("*", (req, res) => {
-    res.sendFile(
-      path.join(__dirname, "../../..", "client/build", "index.html")
-    );
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(__dirname, '../../..', 'client/build', 'index.html'));
   });
 
-  return new Promise<Express>((resolve) => {
+  return new Promise<Express>(resolve => {
     server = app.listen(config.port, () => {
       console.log(`Server is listening on port ${config.port}`);
       resolve(app);
@@ -44,7 +42,7 @@ async function initServer() {
 
 function clearFilesWaiting() {
   const files = Array.from(FilesWaiting.values());
-  files.forEach((file) => {
+  files.forEach(file => {
     clearTimeout(file.timeout);
   });
   FilesWaiting.clear();

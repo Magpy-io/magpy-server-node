@@ -1,15 +1,14 @@
-import { ServerDataType } from "./ServerDataType";
+import { ServerDataType } from './ServerDataType';
 import {
   GetServerDataFromCache,
   SaveServerDataToCache,
   ServerDataDefault,
-} from "./serverDataCached";
-
+} from './serverDataCached';
 import {
   AssertConfigLoaded,
-  SaveServerDataFile,
   ClearServerDataFile,
-} from "./serverDataFileManager";
+  SaveServerDataFile,
+} from './serverDataFileManager';
 
 export function GetServerConfigData() {
   AssertConfigLoaded();
@@ -51,7 +50,7 @@ export function GetServerCredentials(): ServerCredentials {
 }
 
 export async function ClearServerCredentials() {
-  await SaveServerCredentials({ serverId: "", serverKey: "", serverToken: "" });
+  await SaveServerCredentials({ serverId: '', serverKey: '', serverToken: '' });
 }
 
 export async function SaveStorageFolderPath(pathStorageFolder: string) {

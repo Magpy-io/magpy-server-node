@@ -1,37 +1,28 @@
-import { Request, Response } from "express";
-import responseFormatter from "../responseFormatter";
-import { getPhotosByClientPathAndSizeAndDateFromDB } from "../../db/sequelizeDb";
+import { Request, Response } from 'express';
 
-import { getPhotoFromDisk } from "../../modules/diskManager";
-import checkUserToken from "../../middleware/checkUserToken";
+import { getPhotosByClientPathAndSizeAndDateFromDB } from '../../db/sequelizeDb';
+import checkUserToken from '../../middleware/checkUserToken';
+import { getPhotoFromDisk } from '../../modules/diskManager';
 import {
   AddWarningPhotosDeleted,
   filterPhotosExistAndDeleteMissing,
-} from "../../modules/functions";
+} from '../../modules/functions';
+import { APIPhoto, GetPhotosByPath } from '../Types';
+import responseFormatter from '../responseFormatter';
 
-import { GetPhotosByPath, APIPhoto } from "../Types";
+const sendResponse = responseFormatter.getCustomSendResponse<GetPhotosByPath.ResponseData>();
 
-const sendResponse =
-  responseFormatter.getCustomSendResponse<GetPhotosByPath.ResponseData>();
-
-const callback = async (
-  req: Request,
-  res: Response,
-  body: GetPhotosByPath.RequestData
-) => {
+const callback = async (req: Request, res: Response, body: GetPhotosByPath.RequestData) => {
   try {
     if (!req.userId) {
-      throw new Error("UserId is not defined.");
+      throw new Error('UserId is not defined.');
     }
 
     const { photosData, photoType, deviceUniqueId } = body;
 
-    console.log("Getting photos from db with paths from request.");
-    const photos = await getPhotosByClientPathAndSizeAndDateFromDB(
-      photosData,
-      deviceUniqueId
-    );
-    console.log("Received response from db.");
+    console.log('Getting photos from db with paths from request.');
+    const photos = await getPhotosByClientPathAndSizeAndDateFromDB(photosData, deviceUniqueId);
+    console.log('Received response from db.');
 
     const ret = await filterPhotosExistAndDeleteMissing(photos);
     const warning = ret.warning;
@@ -40,18 +31,18 @@ const callback = async (
     }
 
     let images64Promises;
-    if (photoType == "data") {
-      images64Promises = new Array(ret.photosThatExist.length).fill("");
+    if (photoType == 'data') {
+      images64Promises = new Array(ret.photosThatExist.length).fill('');
     } else {
       console.log(`Retrieving ${photoType} photos from disk.`);
-      images64Promises = ret.photosThatExist.map((photo) => {
-        if (!photo) return "";
+      images64Promises = ret.photosThatExist.map(photo => {
+        if (!photo) return '';
         return getPhotoFromDisk(photo, photoType);
       });
     }
     const images64 = await Promise.all(images64Promises);
 
-    console.log("Photos retrieved from disk if needed");
+    console.log('Photos retrieved from disk if needed');
 
     const photosResponse = ret.photosThatExist.map((photo, index) => {
       if (!photo)
@@ -60,10 +51,7 @@ const callback = async (
           exists: false;
         };
 
-      const photoWithImage64 = responseFormatter.createPhotoObject(
-        photo,
-        images64[index]
-      );
+      const photoWithImage64 = responseFormatter.createPhotoObject(photo, images64[index]);
       return {
         path: photosData[index].path,
         exists: true,
@@ -76,7 +64,7 @@ const callback = async (
       photos: photosResponse,
     };
 
-    console.log("Sending response data.");
+    console.log('Sending response data.');
     return sendResponse(res, jsonResponse, warning);
   } catch (err) {
     console.error(err);
@@ -87,7 +75,7 @@ const callback = async (
 export default {
   endpoint: GetPhotosByPath.endpoint,
   callback: callback,
-  method: "post",
+  method: 'post',
   middleWare: checkUserToken,
   requestShema: GetPhotosByPath.RequestSchema,
 };

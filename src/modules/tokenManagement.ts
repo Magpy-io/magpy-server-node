@@ -1,13 +1,14 @@
-import { GetServerConfigData } from "./serverDataManager";
-import jwt from "jsonwebtoken";
-import { jwtUserExp } from "../config/config";
+import jwt from 'jsonwebtoken';
+
+import { jwtUserExp } from '../config/config';
+import { GetServerConfigData } from './serverDataManager';
 
 export type TokenUserData = { id: string };
 
 export function generateUserToken(userId: string) {
   const serverData = GetServerConfigData();
   if (!serverData.serverKey) {
-    throw new Error("Server key not defined");
+    throw new Error('Server key not defined');
   }
 
   const tokenData: TokenUserData = { id: userId };
@@ -19,7 +20,7 @@ export function generateUserToken(userId: string) {
 
 export function verifyUserToken(
   token: string,
-  key: string
+  key: string,
 ):
   | {
       ok: true;
@@ -33,7 +34,7 @@ export function verifyUserToken(
 
   if (ret.ok) {
     if (!ret.data.id) {
-      return { ok: false, error: "TOKEN_NOT_A_USER_TOKEN" };
+      return { ok: false, error: 'TOKEN_NOT_A_USER_TOKEN' };
     }
   }
 
@@ -42,7 +43,7 @@ export function verifyUserToken(
 
 export function verifyToken(
   token: string,
-  key: string
+  key: string,
 ):
   | {
       ok: true;
@@ -56,23 +57,23 @@ export function verifyToken(
     const decoded = jwt.verify(token, key);
     return { ok: true, data: decoded };
   } catch (err: any) {
-    if (err.name == "TokenExpiredError") {
-      return { ok: false, error: "TOKEN_EXPIRED_ERROR" };
+    if (err.name == 'TokenExpiredError') {
+      return { ok: false, error: 'TOKEN_EXPIRED_ERROR' };
     }
-    if (err.name == "JsonWebTokenError") {
-      return { ok: false, error: "TOKEN_VERIFICATION_ERROR" };
+    if (err.name == 'JsonWebTokenError') {
+      return { ok: false, error: 'TOKEN_VERIFICATION_ERROR' };
     }
-    if (err.name == "SyntaxError") {
-      return { ok: false, error: "TOKEN_SYNTAX_ERROR" };
+    if (err.name == 'SyntaxError') {
+      return { ok: false, error: 'TOKEN_SYNTAX_ERROR' };
     }
 
-    return { ok: false, error: "UKNOWN_ERROR" };
+    return { ok: false, error: 'UKNOWN_ERROR' };
   }
 }
 
 export type ErrorTypes =
-  | "TOKEN_NOT_A_USER_TOKEN"
-  | "TOKEN_EXPIRED_ERROR"
-  | "TOKEN_VERIFICATION_ERROR"
-  | "TOKEN_SYNTAX_ERROR"
-  | "UKNOWN_ERROR";
+  | 'TOKEN_NOT_A_USER_TOKEN'
+  | 'TOKEN_EXPIRED_ERROR'
+  | 'TOKEN_VERIFICATION_ERROR'
+  | 'TOKEN_SYNTAX_ERROR'
+  | 'UKNOWN_ERROR';

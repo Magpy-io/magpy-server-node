@@ -1,27 +1,21 @@
-import { Request, Response } from "express";
-import responseFormatter from "../responseFormatter";
-import { numberPhotosFromDB } from "../../db/sequelizeDb";
+import { Request, Response } from 'express';
 
-import checkUserToken from "../../middleware/checkUserToken";
+import { numberPhotosFromDB } from '../../db/sequelizeDb';
+import checkUserToken from '../../middleware/checkUserToken';
+import { GetNumberPhotos } from '../Types';
+import responseFormatter from '../responseFormatter';
 
-import { GetNumberPhotos } from "../Types";
+const sendResponse = responseFormatter.getCustomSendResponse<GetNumberPhotos.ResponseData>();
 
-const sendResponse =
-  responseFormatter.getCustomSendResponse<GetNumberPhotos.ResponseData>();
-
-const callback = async (
-  req: Request,
-  res: Response,
-  body: GetNumberPhotos.RequestData
-) => {
+const callback = async (req: Request, res: Response, body: GetNumberPhotos.RequestData) => {
   try {
-    console.log("Getting number of photos in db.");
+    console.log('Getting number of photos in db.');
     const nb = await numberPhotosFromDB();
     console.log(`Number of photos found in db: ${nb}.`);
     const jsonResponse = {
       number: nb,
     };
-    console.log("Sending response data.");
+    console.log('Sending response data.');
     return sendResponse(res, jsonResponse);
   } catch (err) {
     console.error(err);
@@ -32,7 +26,7 @@ const callback = async (
 export default {
   endpoint: GetNumberPhotos.endpoint,
   callback: callback,
-  method: "post",
+  method: 'post',
   middleWare: checkUserToken,
   requestShema: GetNumberPhotos.RequestSchema,
 };

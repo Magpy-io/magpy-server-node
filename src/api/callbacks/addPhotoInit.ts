@@ -1,26 +1,19 @@
-import { Request, Response } from "express";
-import responseFormatter from "../responseFormatter";
-import FilesWaiting from "../../modules/waitingFiles";
-import { addServerImagePaths } from "../../modules/diskFilesNaming";
+import { Request, Response } from 'express';
+import { v4 as uuid } from 'uuid';
 
-import { v4 as uuid } from "uuid";
-import { postPhotoPartTimeout } from "../../config/config";
+import { postPhotoPartTimeout } from '../../config/config';
+import checkUserToken from '../../middleware/checkUserToken';
+import { addServerImagePaths } from '../../modules/diskFilesNaming';
+import FilesWaiting from '../../modules/waitingFiles';
+import { AddPhotoInit } from '../Types';
+import responseFormatter from '../responseFormatter';
 
-import checkUserToken from "../../middleware/checkUserToken";
+const sendResponse = responseFormatter.getCustomSendResponse<AddPhotoInit.ResponseData>();
 
-import { AddPhotoInit } from "../Types";
-
-const sendResponse =
-  responseFormatter.getCustomSendResponse<AddPhotoInit.ResponseData>();
-
-const callback = async (
-  req: Request,
-  res: Response,
-  body: AddPhotoInit.RequestData
-) => {
+const callback = async (req: Request, res: Response, body: AddPhotoInit.RequestData) => {
   try {
     if (!req.userId) {
-      throw new Error("UserId is not defined.");
+      throw new Error('UserId is not defined.');
     }
 
     const photo = {
@@ -29,17 +22,17 @@ const callback = async (
       width: body.width,
       height: body.height,
       date: body.date,
-      syncDate: "",
+      syncDate: '',
       clientPath: body.path,
       deviceUniqueId: body.deviceUniqueId,
-      serverPath: "",
-      serverCompressedPath: "",
-      serverThumbnailPath: "",
-      hash: "",
+      serverPath: '',
+      serverCompressedPath: '',
+      serverThumbnailPath: '',
+      hash: '',
     };
 
-    console.log("Photo does not exist in server.");
-    console.log("Creating syncDate and photoPath.");
+    console.log('Photo does not exist in server.');
+    console.log('Creating syncDate and photoPath.');
     const image64Len = body.image64Len;
     photo.syncDate = new Date(Date.now()).toJSON();
     await addServerImagePaths(photo);
@@ -56,7 +49,7 @@ const callback = async (
       }, postPhotoPartTimeout),
       photo: photo,
     });
-    console.log("Sending response message.");
+    console.log('Sending response message.');
     return sendResponse(res, { id: id });
   } catch (err) {
     console.error(err);
@@ -67,7 +60,7 @@ const callback = async (
 export default {
   endpoint: AddPhotoInit.endpoint,
   callback: callback,
-  method: "post",
+  method: 'post',
   middleWare: checkUserToken,
   requestShema: AddPhotoInit.RequestSchema,
 };

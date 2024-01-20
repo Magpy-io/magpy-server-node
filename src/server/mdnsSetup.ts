@@ -1,17 +1,14 @@
-import { serverNameMdnsPrefix, port } from "../config/config";
-import { GetServerName } from "../modules/serverDataManager";
-import mdns from "mdns";
+import mdns from 'mdns';
+
+import { port, serverNameMdnsPrefix } from '../config/config';
+import { GetServerName } from '../modules/serverDataManager';
 
 let advert: any;
 
 function startMdns() {
-  advert = mdns.createAdvertisement(
-    mdns.tcp("http"),
-    parseInt(port || "8000"),
-    {
-      name: serverNameMdnsPrefix + GetServerName(),
-    }
-  );
+  advert = mdns.createAdvertisement(mdns.tcp('http'), parseInt(port || '8000'), {
+    name: serverNameMdnsPrefix + GetServerName(),
+  });
   advert.start();
 }
 

@@ -1,26 +1,21 @@
-import { Request, Response } from "express";
-import responseFormatter from "../responseFormatter";
-import { getPhotosFromDB } from "../../db/sequelizeDb";
-import { getPhotoFromDisk } from "../../modules/diskManager";
+import { Request, Response } from 'express';
 
-import checkUserToken from "../../middleware/checkUserToken";
+import { getPhotosFromDB } from '../../db/sequelizeDb';
+import checkUserToken from '../../middleware/checkUserToken';
+import { getPhotoFromDisk } from '../../modules/diskManager';
 import {
   AddWarningPhotosDeleted,
   filterPhotosAndDeleteMissing,
-} from "../../modules/functions";
-import { GetPhotos } from "../Types";
+} from '../../modules/functions';
+import { GetPhotos } from '../Types';
+import responseFormatter from '../responseFormatter';
 
-const sendResponse =
-  responseFormatter.getCustomSendResponse<GetPhotos.ResponseData>();
+const sendResponse = responseFormatter.getCustomSendResponse<GetPhotos.ResponseData>();
 
-const callback = async (
-  req: Request,
-  res: Response,
-  body: GetPhotos.RequestData
-) => {
+const callback = async (req: Request, res: Response, body: GetPhotos.RequestData) => {
   try {
     if (!req.userId) {
-      throw new Error("UserId is not defined.");
+      throw new Error('UserId is not defined.');
     }
 
     const { number, offset, photoType } = body;
@@ -39,16 +34,16 @@ const callback = async (
     console.log(
       `${ret.photosThatExist?.length} photos exist in disk, ${
         photos?.length - ret.photosThatExist?.length
-      } photos were missing.`
+      } photos were missing.`,
     );
 
     let images64Promises;
 
-    if (photoType == "data") {
-      images64Promises = new Array(ret.photosThatExist.length).fill("");
+    if (photoType == 'data') {
+      images64Promises = new Array(ret.photosThatExist.length).fill('');
     } else {
       console.log(`Retrieving ${photoType} photos from disk.`);
-      images64Promises = ret.photosThatExist.map((photo) => {
+      images64Promises = ret.photosThatExist.map(photo => {
         return getPhotoFromDisk(photo, photoType);
       });
     }
@@ -59,14 +54,14 @@ const callback = async (
       return responseFormatter.createPhotoObject(photo, images64[index]);
     });
 
-    console.log("Photos retrieved from disk if needed.");
+    console.log('Photos retrieved from disk if needed.');
     const jsonResponse = {
       endReached: endReached,
       number: photosWithImage64.length,
       photos: photosWithImage64,
     };
 
-    console.log("Sending response data.");
+    console.log('Sending response data.');
     return sendResponse(res, jsonResponse, warning);
   } catch (err) {
     console.error(err);
@@ -77,7 +72,7 @@ const callback = async (
 export default {
   endpoint: GetPhotos.endpoint,
   callback: callback,
-  method: "post",
+  method: 'post',
   middleWare: checkUserToken,
   requestShema: GetPhotos.RequestSchema,
 };

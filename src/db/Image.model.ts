@@ -1,7 +1,8 @@
-import { Sequelize, DataTypes } from "sequelize";
-import { hashLen } from "../config/config";
+import { DataTypes, Sequelize } from 'sequelize';
 
-const modelName = "image";
+import { hashLen } from '../config/config';
+
+const modelName = 'image';
 
 const modelDefinition = {
   id: {
@@ -54,7 +55,7 @@ const modelDefinition = {
 };
 
 const modelOptions = {
-  indexes: [{ fields: ["date"] }, { fields: ["syncDate"] }],
+  indexes: [{ fields: ['date'] }, { fields: ['syncDate'] }],
 };
 
 export function createImageModel(sequelize: Sequelize) {

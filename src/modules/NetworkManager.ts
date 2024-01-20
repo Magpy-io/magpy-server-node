@@ -1,5 +1,6 @@
-const network = require("network");
-import * as config from "../config/config";
+import * as config from '../config/config';
+
+const network = require('network');
 
 export async function getMyPublicIp(): Promise<string> {
   return new Promise((resolve, reject) => {

@@ -1,21 +1,15 @@
-import { Request, Response } from "express";
-import responseFormatter from "../responseFormatter";
+import { Request, Response } from 'express';
 
-import { GetServerInfo as BackendGetServerInfo } from "../../modules/BackendQueries";
-import checkConnexionLocal from "../../middleware/checkConnexionLocal";
-import checkServerHasValidCredentials from "../../middleware/checkServerHasValidCredentials";
-import { GetServerConfigData } from "../../modules/serverDataManager";
+import checkConnexionLocal from '../../middleware/checkConnexionLocal';
+import checkServerHasValidCredentials from '../../middleware/checkServerHasValidCredentials';
+import { GetServerInfo as BackendGetServerInfo } from '../../modules/BackendQueries';
+import { GetServerConfigData } from '../../modules/serverDataManager';
+import { GetServerInfo } from '../Types';
+import responseFormatter from '../responseFormatter';
 
-import { GetServerInfo } from "../Types";
+const sendResponse = responseFormatter.getCustomSendResponse<GetServerInfo.ResponseData>();
 
-const sendResponse =
-  responseFormatter.getCustomSendResponse<GetServerInfo.ResponseData>();
-
-const callback = async (
-  req: Request,
-  res: Response,
-  body: GetServerInfo.RequestData
-) => {
+const callback = async (req: Request, res: Response, body: GetServerInfo.RequestData) => {
   try {
     const serverDataConfig = GetServerConfigData();
 
@@ -33,7 +27,7 @@ const callback = async (
       const ret = await BackendGetServerInfo.Post();
 
       if (!ret.ok) {
-        throw new Error("Error retrieving server info. " + JSON.stringify(ret));
+        throw new Error('Error retrieving server info. ' + JSON.stringify(ret));
       }
 
       if (ret.data.server.owner != null) {
@@ -55,7 +49,7 @@ const callback = async (
 export default {
   endpoint: GetServerInfo.endpoint,
   callback: callback,
-  method: "post",
+  method: 'post',
   middleWare: [checkConnexionLocal, checkServerHasValidCredentials],
   requestShema: GetServerInfo.RequestSchema,
 };

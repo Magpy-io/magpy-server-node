@@ -1,20 +1,15 @@
-import { Request, Response, NextFunction } from "express";
+import { NextFunction, Request, Response } from 'express';
 
-import responseFormatter from "../api/responseFormatter";
+import responseFormatter from '../api/responseFormatter';
+import { GetServerInfo } from '../modules/BackendQueries';
+import { combineMiddleware } from '../modules/functions';
+import checkServerHasValidCredentials from './checkServerHasValidCredentials';
 
-import checkServerHasValidCredentials from "./checkServerHasValidCredentials";
-import { combineMiddleware } from "../modules/functions";
-import { GetServerInfo } from "../modules/BackendQueries";
-
-async function checkServerIsClaimed(
-  req: Request,
-  res: Response,
-  next: NextFunction
-) {
+async function checkServerIsClaimed(req: Request, res: Response, next: NextFunction) {
   try {
-    console.log("#CheckServerIsClaimed middleware");
+    console.log('#CheckServerIsClaimed middleware');
     if (!req.hasValidCredentials) {
-      console.log("server is not claimed");
+      console.log('server is not claimed');
       req.isClaimed = false;
       next();
       return;
@@ -23,17 +18,17 @@ async function checkServerIsClaimed(
     const ret = await GetServerInfo.Post();
 
     if (!ret.ok) {
-      throw new Error("Error retrieving server info. " + JSON.stringify(ret));
+      throw new Error('Error retrieving server info. ' + JSON.stringify(ret));
     }
 
     if (ret.data.server.owner == null) {
-      console.log("server is not claimed");
+      console.log('server is not claimed');
       req.isClaimed = false;
       next();
       return;
     }
 
-    console.log("server is claimed");
+    console.log('server is claimed');
     req.isClaimed = true;
 
     next();
@@ -43,7 +38,4 @@ async function checkServerIsClaimed(
   }
 }
 
-export default combineMiddleware([
-  checkServerHasValidCredentials,
-  checkServerIsClaimed,
-]);
+export default combineMiddleware([checkServerHasValidCredentials, checkServerIsClaimed]);

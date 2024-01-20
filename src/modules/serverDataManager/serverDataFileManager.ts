@@ -1,10 +1,11 @@
 // IMPORTS
-import fs from "fs/promises";
-import { createFolder, pathExists } from "../diskManager";
-import * as config from "../../config/config";
-import * as path from "path";
-import { ServerDataType, ServerDataSchema } from "./ServerDataType";
-import { SaveServerDataToCache, ServerDataDefault } from "./serverDataCached";
+import fs from 'fs/promises';
+import * as path from 'path';
+
+import * as config from '../../config/config';
+import { createFolder, pathExists } from '../diskManager';
+import { ServerDataSchema, ServerDataType } from './ServerDataType';
+import { SaveServerDataToCache, ServerDataDefault } from './serverDataCached';
 
 let configLoadedFromFile = false;
 
@@ -31,7 +32,7 @@ export async function ClearServerDataFile() {
 export function AssertConfigLoaded() {
   if (!configLoadedFromFile) {
     throw new Error(
-      "You need to load config from file 'LoadConfigFile()' before getting or setting any parameters."
+      "You need to load config from file 'LoadConfigFile()' before getting or setting any parameters.",
     );
   }
 }
@@ -42,7 +43,7 @@ async function getServerDataFromFile(): Promise<any> {
 
     return JSON.parse(buffer.toString());
   } catch (err) {
-    console.error("Error reading ServerData, overwriting server data");
+    console.error('Error reading ServerData, overwriting server data');
     return {};
   }
 }

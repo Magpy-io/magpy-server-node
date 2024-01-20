@@ -1,5 +1,5 @@
-import { ServerDataType } from "./ServerDataType";
-import * as config from "../../config/config";
+import * as config from '../../config/config';
+import { ServerDataType } from './ServerDataType';
 
 export const ServerDataDefault: ServerDataType = {
   storageFolderPath: config.rootPath,

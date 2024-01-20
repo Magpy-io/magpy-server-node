@@ -1,9 +1,10 @@
 // IMPORTS
-import { Response } from "express";
-import { Photo } from "../db/sequelizeDb";
-import { APIPhoto } from "./Types";
-import { ResponseTypeFrom } from "./Types/ApiGlobalTypes";
-import { ErrorCodes } from "./Types/ErrorTypes";
+import { Response } from 'express';
+
+import { Photo } from '../db/sequelizeDb';
+import { APIPhoto } from './Types';
+import { ResponseTypeFrom } from './Types/ApiGlobalTypes';
+import { ErrorCodes } from './Types/ErrorTypes';
 
 function getCustomSendResponse<T>() {
   return async function (res: Response, data: T, warning: boolean = false) {
@@ -11,11 +12,7 @@ function getCustomSendResponse<T>() {
   };
 }
 
-async function sendResponse<T>(
-  res: Response,
-  data: T,
-  warning: boolean = false
-) {
+async function sendResponse<T>(res: Response, data: T, warning: boolean = false) {
   let jsonResponse: ResponseTypeFrom<T, any> = {
     ok: true,
     data,
@@ -28,7 +25,7 @@ async function sendResponse<T>(
 function formatError(
   msg: string,
   code: ErrorCodes,
-  warning: boolean = false
+  warning: boolean = false,
 ): ResponseTypeFrom<any, ErrorCodes> {
   return {
     ok: false,
@@ -42,7 +39,7 @@ async function sendFailedMessage(
   res: Response,
   msg: string,
   code: ErrorCodes,
-  warning: boolean = false
+  warning: boolean = false,
 ) {
   let jsonResponse = formatError(msg, code, warning);
 
@@ -50,24 +47,20 @@ async function sendFailedMessage(
 }
 
 async function sendFailedBadRequest(res: Response, message: string) {
-  let jsonResponse = formatError(message, "BAD_REQUEST", false);
+  let jsonResponse = formatError(message, 'BAD_REQUEST', false);
   return await res.status(400).json(jsonResponse);
 }
 
 async function sendErrorMessage(res: Response) {
-  let jsonResponse = formatError(
-    "Server internal error",
-    "SERVER_ERROR",
-    false
-  );
+  let jsonResponse = formatError('Server internal error', 'SERVER_ERROR', false);
   return await res.status(500).json(jsonResponse);
 }
 
 async function sendErrorBackEndServerUnreachable(res: Response) {
   let jsonResponse = formatError(
-    "Backend server unreachable",
-    "BACKEND_SERVER_UNREACHABLE",
-    false
+    'Backend server unreachable',
+    'BACKEND_SERVER_UNREACHABLE',
+    false,
   );
 
   return await res.status(500).json(jsonResponse);
@@ -86,7 +79,7 @@ function createPhotoObject(dbPhoto: Photo, image64?: string): APIPhoto {
       serverPath: dbPhoto.serverPath,
       clientPaths: dbPhoto.clientPaths,
     },
-    image64: image64 ? image64 : "",
+    image64: image64 ? image64 : '',
   };
 }
 

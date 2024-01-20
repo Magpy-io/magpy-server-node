@@ -1,6 +1,6 @@
-import { Sequelize, DataTypes } from "sequelize";
+import { DataTypes, Sequelize } from 'sequelize';
 
-const modelName = "device";
+const modelName = 'device';
 
 const modelDefinition = {
   id: {
@@ -18,7 +18,7 @@ const modelDefinition = {
 };
 
 const modelOptions = {
-  indexes: [{ fields: ["deviceUniqueId"] }],
+  indexes: [{ fields: ['deviceUniqueId'] }],
 };
 
 export function createDevicesModel(sequelize: Sequelize) {

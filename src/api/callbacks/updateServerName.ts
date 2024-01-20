@@ -1,44 +1,38 @@
-import { Request, Response } from "express";
-import responseFormatter from "../responseFormatter";
+import { Request, Response } from 'express';
 
-import { UpdateServerData } from "../../modules/BackendQueries";
-import checkConnexionLocal from "../../middleware/checkConnexionLocal";
-import checkServerHasValidCredentials from "../../middleware/checkServerHasValidCredentials";
-import { SaveServerName } from "../../modules/serverDataManager";
+import checkConnexionLocal from '../../middleware/checkConnexionLocal';
+import checkServerHasValidCredentials from '../../middleware/checkServerHasValidCredentials';
+import { UpdateServerData } from '../../modules/BackendQueries';
+import { SaveServerName } from '../../modules/serverDataManager';
+import { UpdateServerName } from '../Types';
+import responseFormatter from '../responseFormatter';
 
-import { UpdateServerName } from "../Types";
+const sendResponse = responseFormatter.getCustomSendResponse<UpdateServerName.ResponseData>();
 
-const sendResponse =
-  responseFormatter.getCustomSendResponse<UpdateServerName.ResponseData>();
-
-const callback = async (
-  req: Request,
-  res: Response,
-  body: UpdateServerName.RequestData
-) => {
+const callback = async (req: Request, res: Response, body: UpdateServerName.RequestData) => {
   try {
     const { name } = body;
 
     if (!name) {
-      console.log("Nothing to update, sending response");
-      return sendResponse(res, "Nothing to update");
+      console.log('Nothing to update, sending response');
+      return sendResponse(res, 'Nothing to update');
     }
 
     if (name.length < 3 || name.length > 70) {
-      console.log("Invalid name");
+      console.log('Invalid name');
       return responseFormatter.sendFailedMessage(
         res,
-        "Name too short or too long",
-        "INVALID_NAME"
+        'Name too short or too long',
+        'INVALID_NAME',
       );
     }
 
     if (!/^[a-zA-Z0-9 \-_]+$/.test(name)) {
-      console.log("Invalid name");
+      console.log('Invalid name');
       return responseFormatter.sendFailedMessage(
         res,
-        "Name can only contain alphanumeric characters, whitespaces, -, and _",
-        "INVALID_NAME"
+        'Name can only contain alphanumeric characters, whitespaces, -, and _',
+        'INVALID_NAME',
       );
     }
 
@@ -48,10 +42,10 @@ const callback = async (
       const ret = await UpdateServerData.Post({ name: name });
 
       if (!ret.ok) {
-        throw new Error("Error saving server name. " + JSON.stringify(ret));
+        throw new Error('Error saving server name. ' + JSON.stringify(ret));
       }
     }
-    return sendResponse(res, "Server name changed");
+    return sendResponse(res, 'Server name changed');
   } catch (err) {
     console.error(err);
     return responseFormatter.sendErrorMessage(res);
@@ -61,7 +55,7 @@ const callback = async (
 export default {
   endpoint: UpdateServerName.endpoint,
   callback: callback,
-  method: "post",
+  method: 'post',
   middleWare: [checkConnexionLocal, checkServerHasValidCredentials],
   requestShema: UpdateServerName.RequestSchema,
 };

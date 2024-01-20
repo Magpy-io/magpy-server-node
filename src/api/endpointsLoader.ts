@@ -1,16 +1,18 @@
-import { generateMiddlewareFromShema } from "../middleware/checkValidRequestParameters";
-import { NextFunction, Request, Response } from "express";
-import Joi from "joi";
-const fs = require("mz/fs");
+import { NextFunction, Request, Response } from 'express';
+import Joi from 'joi';
+
+import { generateMiddlewareFromShema } from '../middleware/checkValidRequestParameters';
+
+const fs = require('mz/fs');
 
 function getEndpoints() {
   const endpoints: any = [];
-  fs.readdirSync(__dirname + "/callbacks").forEach(function (file: any) {
-    const split = file.split(".");
+  fs.readdirSync(__dirname + '/callbacks').forEach(function (file: any) {
+    const split = file.split('.');
 
     //only .js and .ts files
-    if (split[split.length - 1] == "ts" || split[split.length - 1] == "js") {
-      endpoints.push(require("./callbacks/" + file).default);
+    if (split[split.length - 1] == 'ts' || split[split.length - 1] == 'js') {
+      endpoints.push(require('./callbacks/' + file).default);
     }
   });
   return endpoints;
@@ -34,20 +36,19 @@ function loadEndpoints(app: any) {
       callback: (
         req: Request,
         res: Response,
-        body: any
+        body: any,
       ) => Promise<Response<any, Record<string, any>>>;
       method: string;
       middleWare?: MiddleWareType | MiddleWareArray;
       requestShema: Joi.ObjectSchema;
     }) => {
-      const reqParamValidationMiddleware =
-        generateMiddlewareFromShema(requestShema);
+      const reqParamValidationMiddleware = generateMiddlewareFromShema(requestShema);
 
       const callbackFormated = (req: Request, res: Response) => {
         console.log(endpoint);
         callback(req, res, req.body);
       };
-      const endpointFormatted = "/" + endpoint;
+      const endpointFormatted = '/' + endpoint;
 
       let middleWareArray: MiddleWareArray;
 
@@ -65,7 +66,7 @@ function loadEndpoints(app: any) {
       middleWareArray.push(reqParamValidationMiddleware);
 
       app[method](endpointFormatted, ...middleWareArray, callbackFormated);
-    }
+    },
   );
 }
 

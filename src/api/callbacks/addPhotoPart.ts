@@ -1,45 +1,39 @@
-import { Request, Response } from "express";
+import { Request, Response } from 'express';
 
-import responseFormatter from "../responseFormatter";
-import { addPhotoToDB, deletePhotoByIdFromDB } from "../../db/sequelizeDb";
-import FilesWaiting, { FilesWaitingType } from "../../modules/waitingFiles";
-import { addPhotoToDisk } from "../../modules/diskManager";
-import { hashFile } from "../../modules/hashing";
+import { postPhotoPartTimeout } from '../../config/config';
+import { addPhotoToDB, deletePhotoByIdFromDB } from '../../db/sequelizeDb';
+import checkUserToken from '../../middleware/checkUserToken';
+import { addPhotoToDisk } from '../../modules/diskManager';
+import { hashFile } from '../../modules/hashing';
+import FilesWaiting, { FilesWaitingType } from '../../modules/waitingFiles';
+import { AddPhotoPart } from '../Types';
+import responseFormatter from '../responseFormatter';
 
-import { postPhotoPartTimeout } from "../../config/config";
-import checkUserToken from "../../middleware/checkUserToken";
-import { AddPhotoPart } from "../Types";
+const sendResponse = responseFormatter.getCustomSendResponse<AddPhotoPart.ResponseData>();
 
-const sendResponse =
-  responseFormatter.getCustomSendResponse<AddPhotoPart.ResponseData>();
-
-const callback = async (
-  req: Request,
-  res: Response,
-  body: AddPhotoPart.RequestData
-) => {
+const callback = async (req: Request, res: Response, body: AddPhotoPart.RequestData) => {
   try {
     if (!req.userId) {
-      throw new Error("UserId is not defined.");
+      throw new Error('UserId is not defined.');
     }
 
     if (body.partSize != body.photoPart.length) {
-      console.log("Bad request parameters");
-      console.log("Sending response message");
+      console.log('Bad request parameters');
+      console.log('Sending response message');
       return responseFormatter.sendFailedMessage(
         res,
-        "photoPart length and partSize do not match",
-        "BAD_REQUEST"
+        'photoPart length and partSize do not match',
+        'BAD_REQUEST',
       );
     }
 
     if (!FilesWaiting.has(body.id)) {
       console.log(`No photo transfer for id ${body.id} was found.`);
-      console.log("Sending response message.");
+      console.log('Sending response message.');
       return responseFormatter.sendFailedMessage(
         res,
         `No photo transfer for id ${body.id} was found.`,
-        "PHOTO_TRANSFER_NOT_FOUND"
+        'PHOTO_TRANSFER_NOT_FOUND',
       );
     }
 
@@ -50,8 +44,8 @@ const callback = async (
     photoWaiting.dataParts.set(body.partNumber, body.photoPart);
 
     if (photoWaiting.received < photoWaiting.image64Len) {
-      console.log("Photo part added.");
-      console.log("Reseting timeout.");
+      console.log('Photo part added.');
+      console.log('Reseting timeout.');
 
       clearTimeout(photoWaiting.timeout);
       photoWaiting.timeout = setTimeout(() => {
@@ -60,7 +54,7 @@ const callback = async (
         FilesWaiting.delete(body.id);
       }, postPhotoPartTimeout);
 
-      console.log("Sending response message.");
+      console.log('Sending response message.');
       return sendResponse(res, {
         lenReceived: photoWaiting.received,
         lenWaiting: photoWaiting.image64Len,
@@ -70,23 +64,23 @@ const callback = async (
 
     if (photoWaiting.received > photoWaiting.image64Len) {
       console.log(
-        `Transfered data (${photoWaiting.received}) exceeds initial image size (${photoWaiting.image64Len}).`
+        `Transfered data (${photoWaiting.received}) exceeds initial image size (${photoWaiting.image64Len}).`,
       );
 
       console.log(`Deleting pending transfer for id ${body.id}`);
       clearTimeout(photoWaiting.timeout);
       FilesWaiting.delete(body.id);
 
-      console.log("Sending response message.");
+      console.log('Sending response message.');
       return responseFormatter.sendFailedMessage(
         res,
         `Transfered data (${photoWaiting.received}) exceeds initial image size (${photoWaiting.image64Len}).`,
-        "PHOTO_SIZE_EXCEEDED"
+        'PHOTO_SIZE_EXCEEDED',
       );
     }
-    console.log("Full image received.");
+    console.log('Full image received.');
 
-    console.log("Removing timeout");
+    console.log('Removing timeout');
     clearTimeout(photoWaiting.timeout);
 
     if (!arePartsValid(photoWaiting.dataParts)) {
@@ -94,11 +88,11 @@ const callback = async (
       clearTimeout(photoWaiting.timeout);
       FilesWaiting.delete(body.id);
 
-      console.log("Sending response message.");
+      console.log('Sending response message.');
       return responseFormatter.sendFailedMessage(
         res,
         `Not all parts were found`,
-        "MISSING_PARTS"
+        'MISSING_PARTS',
       );
     }
 
@@ -112,26 +106,26 @@ const callback = async (
 
     const dbPhoto = await addPhotoToDB(photoWaiting.photo);
 
-    console.log("Photo added successfully to db.");
+    console.log('Photo added successfully to db.');
 
     try {
-      console.log("Adding photo to disk.");
+      console.log('Adding photo to disk.');
       await addPhotoToDisk(dbPhoto, image64);
     } catch (err) {
-      console.log("Could not add photo to disk, removing photo from db");
+      console.log('Could not add photo to disk, removing photo from db');
       await deletePhotoByIdFromDB(dbPhoto.id);
       throw err;
     }
 
-    console.log("Photo added to disk.");
+    console.log('Photo added to disk.');
 
     const jsonResponse = {
       lenReceived: photoWaiting.received,
       lenWaiting: photoWaiting.image64Len,
       done: true,
-      photo: responseFormatter.createPhotoObject(dbPhoto, ""),
+      photo: responseFormatter.createPhotoObject(dbPhoto, ''),
     };
-    console.log("Sending response message.");
+    console.log('Sending response message.');
     return sendResponse(res, jsonResponse);
   } catch (err) {
     console.error(err);
@@ -153,7 +147,7 @@ function arePartsValid(parts: Map<number, string>) {
 function joinParts(parts: Map<number, string>) {
   const totalNumberOfParts = parts.size;
 
-  let ret = "";
+  let ret = '';
   for (let i = 0; i < totalNumberOfParts; i++) {
     ret = ret.concat(parts.get(i) as string);
   }
@@ -163,7 +157,7 @@ function joinParts(parts: Map<number, string>) {
 export default {
   endpoint: AddPhotoPart.endpoint,
   callback: callback,
-  method: "post",
+  method: 'post',
   middleWare: checkUserToken,
   requestShema: AddPhotoPart.RequestSchema,
 };

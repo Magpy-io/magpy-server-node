@@ -1,36 +1,17 @@
-import { Request, Response } from "express";
-import responseFormatter from "../responseFormatter";
+import { randomBytes } from 'crypto';
+import { Request, Response } from 'express';
 
-import {
-  RegisterServer,
-  GetServerToken,
-  TokenManager,
-} from "../../modules/BackendQueries";
-import { ErrorBackendUnreachable } from "../../modules/BackendQueries/ExceptionsManager";
-import { randomBytes } from "crypto";
-import {
-  getMyPublicIp,
-  getMyPrivateIp,
-  getMyPort,
-} from "../../modules/NetworkManager";
+import checkServerIsClaimed from '../../middleware/checkServerIsClaimed';
+import { GetServerToken, RegisterServer, TokenManager } from '../../modules/BackendQueries';
+import { ErrorBackendUnreachable } from '../../modules/BackendQueries/ExceptionsManager';
+import { getMyPort, getMyPrivateIp, getMyPublicIp } from '../../modules/NetworkManager';
+import { GetServerName, SaveServerCredentials } from '../../modules/serverDataManager';
+import { ClaimServer } from '../Types';
+import responseFormatter from '../responseFormatter';
 
-import {
-  GetServerName,
-  SaveServerCredentials,
-} from "../../modules/serverDataManager";
+const sendResponse = responseFormatter.getCustomSendResponse<ClaimServer.ResponseData>();
 
-import { ClaimServer } from "../Types";
-
-import checkServerIsClaimed from "../../middleware/checkServerIsClaimed";
-
-const sendResponse =
-  responseFormatter.getCustomSendResponse<ClaimServer.ResponseData>();
-
-const callback = async (
-  req: Request,
-  res: Response,
-  body: ClaimServer.RequestData
-) => {
+const callback = async (req: Request, res: Response, body: ClaimServer.RequestData) => {
   try {
     const myIpPublic = await getMyPublicIp();
     const myIpPrivate = await getMyPrivateIp();
@@ -39,17 +20,17 @@ const callback = async (
     const { userToken } = body;
 
     if (req.isClaimed) {
-      console.log("server already claimed, it has valid token");
+      console.log('server already claimed, it has valid token');
       return responseFormatter.sendFailedMessage(
         res,
-        "Server already claimed",
-        "SERVER_ALREADY_CLAIMED"
+        'Server already claimed',
+        'SERVER_ALREADY_CLAIMED',
       );
     }
 
-    console.log("server not claimed");
+    console.log('server not claimed');
 
-    const keyGenerated = randomBytes(32).toString("hex");
+    const keyGenerated = randomBytes(32).toString('hex');
 
     let ret: RegisterServer.ResponseType;
     try {
@@ -63,7 +44,7 @@ const callback = async (
       });
     } catch (err) {
       if (err instanceof ErrorBackendUnreachable) {
-        console.error("Error requesting backend server");
+        console.error('Error requesting backend server');
         return responseFormatter.sendErrorBackEndServerUnreachable(res);
       } else {
         throw err;
@@ -71,36 +52,34 @@ const callback = async (
     }
 
     if (!ret.ok) {
-      if (ret.errorCode == "AUTHORIZATION_FAILED") {
-        console.log("user token authorization error");
+      if (ret.errorCode == 'AUTHORIZATION_FAILED') {
+        console.log('user token authorization error');
         return responseFormatter.sendFailedMessage(
           res,
-          "User token verification failed",
-          "AUTHORIZATION_BACKEND_FAILED"
+          'User token verification failed',
+          'AUTHORIZATION_BACKEND_FAILED',
         );
-      } else if (ret.errorCode == "AUTHORIZATION_EXPIRED") {
-        console.log("user token expired");
+      } else if (ret.errorCode == 'AUTHORIZATION_EXPIRED') {
+        console.log('user token expired');
         return responseFormatter.sendFailedMessage(
           res,
-          "User token expired",
-          "AUTHORIZATION_BACKEND_EXPIRED"
+          'User token expired',
+          'AUTHORIZATION_BACKEND_EXPIRED',
         );
       } else {
-        throw new Error(
-          "request to verify user token failed. " + JSON.stringify(ret)
-        );
+        throw new Error('request to verify user token failed. ' + JSON.stringify(ret));
       }
     }
 
     const id = ret.data.server._id;
-    console.log("server registered, got id: " + id);
+    console.log('server registered, got id: ' + id);
 
     let ret1: GetServerToken.ResponseType;
     try {
       ret1 = await GetServerToken.Post({ id: id, key: keyGenerated });
     } catch (err) {
       if (err instanceof ErrorBackendUnreachable) {
-        console.error("Error requesting backend server");
+        console.error('Error requesting backend server');
         return responseFormatter.sendErrorBackEndServerUnreachable(res);
       } else {
         throw err;
@@ -108,12 +87,10 @@ const callback = async (
     }
 
     if (!ret1.ok) {
-      throw new Error(
-        "request to verify server credentials failed. " + JSON.stringify(ret1)
-      );
+      throw new Error('request to verify server credentials failed. ' + JSON.stringify(ret1));
     }
 
-    console.log("got server token, saving to local");
+    console.log('got server token, saving to local');
 
     const serverToken = TokenManager.GetServerToken();
 
@@ -123,7 +100,7 @@ const callback = async (
       serverToken: serverToken,
     });
 
-    return sendResponse(res, "ok");
+    return sendResponse(res, 'ok');
   } catch (err) {
     console.error(err);
     return responseFormatter.sendErrorMessage(res);
@@ -133,7 +110,7 @@ const callback = async (
 export default {
   endpoint: ClaimServer.endpoint,
   callback: callback,
-  method: "post",
+  method: 'post',
   middleWare: checkServerIsClaimed,
   requestShema: ClaimServer.RequestSchema,
 };

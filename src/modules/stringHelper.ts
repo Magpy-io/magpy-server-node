@@ -1,4 +1,4 @@
-import { getPhotoPartSize } from "../config/config";
+import { getPhotoPartSize } from '../config/config';
 
 function getNumberOfParts(image64: string) {
   const len = image64.length;

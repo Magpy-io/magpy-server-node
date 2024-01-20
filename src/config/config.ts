@@ -1,34 +1,34 @@
-import * as path from "path";
-import * as os from "os";
+import * as os from 'os';
+import * as path from 'path';
 
 const hashLen = 32;
 const getPhotoPartSize = 100000; //char in base64
-const jwtUserExp = "1d";
+const jwtUserExp = '1d';
 
 const MAX_PIXELS_IN_THUMBNAIL = 40000;
 const MAX_PIXELS_IN_COMPRESSED = 200000;
 
-const backend_host = "http://opencloud-server.onrender.com";
+const backend_host = 'http://opencloud-server.onrender.com';
 const backend_port = 80;
 
-const serverName = "MyLocalServer";
-const serverNameMdnsPrefix = "OpenCloudServer";
+const serverName = 'MyLocalServer';
+const serverNameMdnsPrefix = 'OpenCloudServer';
 
 const postPhotoPartTimeoutDev = 60000; //in ms
-const rootPath = path.join(os.homedir(), "OpenCloudPhotos");
-const sqliteDbFileDev = path.join(".", "db", "database.db");
-const serverDataFile = path.join(".", "serverData", "serverInfo.json");
-const portDev = "8000";
+const rootPath = path.join(os.homedir(), 'OpenCloudPhotos');
+const sqliteDbFileDev = path.join('.', 'db', 'database.db');
+const serverDataFile = path.join('.', 'serverData', 'serverInfo.json');
+const portDev = '8000';
 
 const postPhotoPartTimeoutTest = 1000; //in ms
-const sqliteDbFileTest = ":memory:";
-const portTest = "0";
+const sqliteDbFileTest = ':memory:';
+const portTest = '0';
 
-let sqliteDbFileTmp = "";
+let sqliteDbFileTmp = '';
 let postPhotoPartTimeoutTmp = 0;
-let portTmp = "";
+let portTmp = '';
 
-if (process.env.NODE_ENV === "test") {
+if (process.env.NODE_ENV === 'test') {
   //supress console.log() when testing
   //console.log = function () {};
   sqliteDbFileTmp = sqliteDbFileTest;

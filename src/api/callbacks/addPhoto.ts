@@ -1,25 +1,19 @@
-import { Request, Response } from "express";
-import responseFormatter from "../responseFormatter";
-import { addPhotoToDB, deletePhotoByIdFromDB } from "../../db/sequelizeDb";
+import { Request, Response } from 'express';
 
-import { addPhotoToDisk } from "../../modules/diskManager";
-import { addServerImagePaths } from "../../modules/diskFilesNaming";
-import { hashFile } from "../../modules/hashing";
+import { addPhotoToDB, deletePhotoByIdFromDB } from '../../db/sequelizeDb';
+import checkUserToken from '../../middleware/checkUserToken';
+import { addServerImagePaths } from '../../modules/diskFilesNaming';
+import { addPhotoToDisk } from '../../modules/diskManager';
+import { hashFile } from '../../modules/hashing';
+import { AddPhoto } from '../Types';
+import responseFormatter from '../responseFormatter';
 
-import checkUserToken from "../../middleware/checkUserToken";
-import { AddPhoto } from "../Types";
+const sendResponse = responseFormatter.getCustomSendResponse<AddPhoto.ResponseData>();
 
-const sendResponse =
-  responseFormatter.getCustomSendResponse<AddPhoto.ResponseData>();
-
-const callback = async (
-  req: Request,
-  res: Response,
-  body: AddPhoto.RequestData
-) => {
+const callback = async (req: Request, res: Response, body: AddPhoto.RequestData) => {
   try {
     if (!req.userId) {
-      throw new Error("UserId is not defined.");
+      throw new Error('UserId is not defined.');
     }
 
     const photo = {
@@ -31,33 +25,33 @@ const callback = async (
       syncDate: new Date(Date.now()).toJSON(),
       clientPath: body.path,
       deviceUniqueId: body.deviceUniqueId,
-      serverPath: "",
-      serverCompressedPath: "",
-      serverThumbnailPath: "",
-      hash: "",
+      serverPath: '',
+      serverCompressedPath: '',
+      serverThumbnailPath: '',
+      hash: '',
     };
 
     await addServerImagePaths(photo);
     photo.hash = hashFile(body.image64);
-    console.log("Adding photo to db.");
+    console.log('Adding photo to db.');
 
     const dbPhoto = await addPhotoToDB(photo);
 
-    console.log("Photo added successfully to db.");
+    console.log('Photo added successfully to db.');
     try {
-      console.log("Adding photo to disk.");
+      console.log('Adding photo to disk.');
       await addPhotoToDisk(dbPhoto, body.image64);
     } catch (err) {
-      console.log("Could not add photo to disk, removing photo from db");
+      console.log('Could not add photo to disk, removing photo from db');
       console.log(dbPhoto);
       await deletePhotoByIdFromDB(dbPhoto.id);
       throw err;
     }
-    console.log("Photo added to disk.");
+    console.log('Photo added to disk.');
     const jsonResponse = {
-      photo: responseFormatter.createPhotoObject(dbPhoto, ""),
+      photo: responseFormatter.createPhotoObject(dbPhoto, ''),
     };
-    console.log("Sending response message.");
+    console.log('Sending response message.');
     return sendResponse(res, jsonResponse);
   } catch (err) {
     console.error(err);
@@ -68,7 +62,7 @@ const callback = async (
 export default {
   endpoint: AddPhoto.endpoint,
   callback: callback,
-  method: "post",
+  method: 'post',
   middleWare: checkUserToken,
   requestShema: AddPhoto.RequestSchema,
 };
