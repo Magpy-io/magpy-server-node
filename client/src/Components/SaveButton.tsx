@@ -1,4 +1,4 @@
-import { Button } from "@mui/material";
+import { Button, CustomFlowbiteTheme, Flowbite } from 'flowbite-react';
 
 export default function SaveButton({
   disabled,
@@ -8,21 +8,13 @@ export default function SaveButton({
   onSubmit: () => void;
 }) {
   return (
-    <Button
-      variant="contained"
-      onClick={onSubmit}
-      sx={{
-        marginTop: 4,
-        width: 200,
-        padding: 1,
-        color: "white",
-        alignSelf: "center",
-      }}
-      // color={"secondary"}
-      size="large"
-      disabled={disabled}
-    >
-      Save Changes
-    </Button>
+    <div className="flex flex-row justify-end mt-4">
+      <Button
+        disabled={disabled}
+        onClick={onSubmit}
+        className="bg-l-primary dark:bg-d-primary text-l-fg-primary dark:text-d-fg-primary">
+        Save Changes
+      </Button>
+    </div>
   );
 }

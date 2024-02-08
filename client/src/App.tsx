@@ -1,51 +1,46 @@
-import "./App.css";
-import { Box } from "@mui/material";
-import { createTheme, ThemeProvider } from "@mui/material/styles";
-import ServerConfig from "./Components/ServerConfig";
-import { SetPath } from "./ServerQueries";
-import { PATH } from "./config";
+import {
+  Button,
+  CustomFlowbiteTheme,
+  DarkThemeToggle,
+  Flowbite,
+  Navbar,
+} from 'flowbite-react';
 
-const theme = createTheme({
-  palette: {
-    primary: {
-      //ORANGE
-      main: "#edaf48",
-      light: "#fcf7ee",
-      // dark: will be calculated from palette.primary.main,
-      // contrastText: will be calculated to contrast with palette.primary.main
-    },
-    secondary: {
-      //BLUE
-      main: "#435089",
-      light: "#c6cce4",
-      dark: "#323c66",
-      contrastText: "#47008F",
-    },
-    error: {
-      main: "#d15b43",
+import ServerConfig from './Components/ServerConfig';
+import { SetPath } from './ServerQueries';
+import logoLight from './assets/LogoCompleteBlackBlue.svg';
+import logoDark from './assets/LogoCompleteWhiteBlue.svg';
+import { PATH } from './config';
+
+const customTheme: CustomFlowbiteTheme = {
+  navbar: {
+    root: {
+      base: 'bg-transparent px-2 py-2.5 dark:border-gray-700 px-4',
     },
   },
-});
-
-const BACKGROUND_COLOR = "#f1f3f9";
+};
 
 function App() {
   SetPath(PATH);
   return (
-    <ThemeProvider theme={theme}>
-      <Box
-        sx={{
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-          minHeight: "100vh",
-          width: "100vw",
-        }}
-        bgcolor={BACKGROUND_COLOR}
-      >
+    <div className="relative min-h-screen flex flex-col justify-center  bg-l-bg dark:bg-d-bg ">
+      <div className="absolute top-0 w-screen">
+        <Flowbite theme={{ theme: customTheme }}>
+          <Navbar fluid rounded>
+            <Navbar.Brand>
+              <img src={logoDark} className="mr-3 h-9 hidden dark:block" alt="Magpy Logo" />
+              <img src={logoLight} className="mr-3 h-9 dark:hidden block" alt="Magpy Logo" />
+            </Navbar.Brand>
+            <div className="flex md:order-2">
+              <DarkThemeToggle />
+            </div>
+          </Navbar>
+        </Flowbite>
+      </div>
+      <div className="relative px-8 py-8 2xl:mx-72 xl:mx-64 lg:mx-3">
         <ServerConfig />
-      </Box>
-    </ThemeProvider>
+      </div>
+    </div>
   );
 }
 
