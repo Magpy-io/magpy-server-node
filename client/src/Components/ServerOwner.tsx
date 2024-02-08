@@ -1,4 +1,4 @@
-import { Button } from 'flowbite-react';
+import { Button, CustomFlowbiteTheme } from 'flowbite-react';
 
 import { Owner } from './ServerConfig';
 
@@ -12,11 +12,10 @@ export default function ServerOwner({
   if (owner) {
     return (
       <div className="mb-8">
-        <div className="flex flex-row justify-between">
-          <h1 className="text-sm font-medium mb-2  text-l-fg dark:text-d-fg">Owner</h1>
+        <div className="flex flex-row justify-between items-center mb-2">
+          <h1 className="text-sm font-medium  text-l-fg dark:text-d-fg">Owner</h1>
           <Button
-            outline
-            color="white"
+            color="transparent"
             className="text-l-fg dark:text-d-fg"
             size="xs"
             onClick={onClearOwner}>

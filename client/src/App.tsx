@@ -26,6 +26,14 @@ const customTheme: CustomFlowbiteTheme = {
       failure: 'text-red-700 bg-red-100 border-red-500  dark:bg-d-bg-light dark:text-red-500',
     },
   },
+  button: {
+    color: {
+      transparent:
+        'bg-transparent text-l-fg dark:text-d-fg hover:bg-l-bg-light dark:hover:bg-d-bg-light',
+      primary:
+        'bg-l-primary dark:bg-d-primary text-l-fg-primary dark:text-d-fg-primary hover:bg-black dark:hover:bg-white',
+    },
+  },
 };
 
 function App() {

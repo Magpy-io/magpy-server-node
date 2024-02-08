@@ -25,6 +25,5 @@ module.exports = {
       'd-secondary': '#12666F',
       'd-bg-light': '#121A22',
     },
-    extend: {}
   }
 }

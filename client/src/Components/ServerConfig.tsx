@@ -128,7 +128,7 @@ export default function ServerConfig() {
         <Title />
         <ServerNameInput />
         <ServerPathInput onClearPhotos={onClearPhotos} />
-        <ServerOwner onClearOwner={onClearOwner} owner={owner} />
+        <ServerOwner onClearOwner={onClearOwner} owner={{ email: 'bla', name: 'blaa' }} />
         <SaveButton disabled={false} onSubmit={methods.handleSubmit(onSubmit)} />
       </FormProvider>
       {hasFailedRequests && (
