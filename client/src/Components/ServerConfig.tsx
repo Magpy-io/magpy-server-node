@@ -1,7 +1,6 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { Alert } from 'flowbite-react';
-import { cache } from 'joi';
 import { FormProvider, useForm } from 'react-hook-form';
 import { HiInformationCircle } from 'react-icons/hi';
 
@@ -11,7 +10,6 @@ import {
   UpdateServerName,
   UpdateServerPath,
 } from '../ServerQueries';
-import { ServerResponseError } from '../ServerQueries/Types/ApiGlobalTypes';
 import SaveButton from './SaveButton';
 import ServerNameInput from './ServerNameInput';
 import ServerOwner from './ServerOwner';

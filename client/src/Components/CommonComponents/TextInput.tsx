@@ -1,12 +1,4 @@
-import {
-  Button,
-  Checkbox,
-  CustomFlowbiteTheme,
-  TextInput as FBTextInput,
-  Flowbite,
-  Label,
-  TextInputProps,
-} from 'flowbite-react';
+import { TextInput as FBTextInput, TextInputProps } from 'flowbite-react';
 import { FieldError } from 'react-hook-form';
 
 type Props = {

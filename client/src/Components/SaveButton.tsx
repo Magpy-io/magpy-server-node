@@ -1,4 +1,4 @@
-import { Button, CustomFlowbiteTheme, Flowbite } from 'flowbite-react';
+import { Button } from 'flowbite-react';
 
 export default function SaveButton({
   disabled,
