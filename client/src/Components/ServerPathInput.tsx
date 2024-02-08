@@ -6,7 +6,7 @@ import TextInput from './CommonComponents/TextInput';
 
 export default function ServerPathInput({ onClearPhotos }: { onClearPhotos: () => void }) {
   return (
-    <div className="my-4">
+    <div className="mb-6">
       <h1 className="text-sm font-medium mb-2 text-l-fg dark:text-d-fg">Path</h1>
 
       <Controller

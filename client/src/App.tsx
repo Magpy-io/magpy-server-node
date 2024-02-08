@@ -18,14 +18,28 @@ const customTheme: CustomFlowbiteTheme = {
       base: 'bg-transparent px-2 py-2.5 dark:border-gray-700 px-4',
     },
   },
+  textInput: {
+    field: {
+      input: {
+        colors: {
+          gray: 'dark:bg-transparent bg-transparent border-gray-300 text-gray-900 focus:border-cyan-500 focus:ring-cyan-500 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 dark:focus:border-cyan-500 dark:focus:ring-cyan-500',
+        },
+      },
+    },
+  },
+  alert: {
+    color: {
+      failure: 'text-red-700 bg-red-100 border-red-500  dark:bg-d-bg-light dark:text-red-500',
+    },
+  },
 };
 
 function App() {
   SetPath(PATH);
   return (
-    <div className="relative min-h-screen flex flex-col justify-center  bg-l-bg dark:bg-d-bg ">
-      <div className="absolute top-0 w-screen">
-        <Flowbite theme={{ theme: customTheme }}>
+    <Flowbite theme={{ theme: customTheme }}>
+      <div className="relative min-h-screen flex flex-col justify-center  bg-l-bg dark:bg-d-bg ">
+        <div className="absolute top-0 w-screen">
           <Navbar fluid rounded>
             <Navbar.Brand>
               <img src={logoDark} className="mr-3 h-9 hidden dark:block" alt="Magpy Logo" />
@@ -35,12 +49,12 @@ function App() {
               <DarkThemeToggle />
             </div>
           </Navbar>
-        </Flowbite>
+        </div>
+        <div className="relative px-8 py-8 max-w-2xl self-center w-full">
+          <ServerConfig />
+        </div>
       </div>
-      <div className="relative px-8 py-8 2xl:mx-72 xl:mx-64 lg:mx-3">
-        <ServerConfig />
-      </div>
-    </div>
+    </Flowbite>
   );
 }
 

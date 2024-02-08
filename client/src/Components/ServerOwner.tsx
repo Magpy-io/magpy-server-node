@@ -11,7 +11,7 @@ export default function ServerOwner({
 }) {
   if (owner) {
     return (
-      <>
+      <div className="mb-8">
         <div className="flex flex-row justify-between">
           <h1 className="text-sm font-medium mb-2  text-l-fg dark:text-d-fg">Owner</h1>
           <Button
@@ -27,16 +27,16 @@ export default function ServerOwner({
           <h1 className="text-sm font-medium text-l-fg dark:text-d-fg pb-1">{`Name : ${owner.name}`}</h1>
           <h1 className="text-sm font-medium text-l-fg dark:text-d-fg">{`Email : ${owner.email}`}</h1>
         </div>
-      </>
+      </div>
     );
   } else {
     return (
-      <>
+      <div className="mb-8">
         <h1 className="text-sm font-medium mb-2  text-l-fg dark:text-d-fg">Owner</h1>
         <div className="p-4 bg-l-bg-light dark:bg-d-bg-light rounded-lg">
           <h1 className="text-sm font-medium  text-l-fg dark:text-d-fg">No owner</h1>
         </div>
-      </>
+      </div>
     );
   }
 }

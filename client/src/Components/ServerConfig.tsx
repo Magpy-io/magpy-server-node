@@ -133,15 +133,15 @@ export default function ServerConfig() {
         <ServerOwner onClearOwner={onClearOwner} owner={owner} />
         <SaveButton disabled={false} onSubmit={methods.handleSubmit(onSubmit)} />
       </FormProvider>
-      {/* {hasFailedRequests && (
-        <Alert color="failure" icon={HiInformationCircle}>
+      {hasFailedRequests && (
+        <Alert color="failure" icon={HiInformationCircle} className="mt-10">
           <span className="font-medium">Something went wrong : </span> {errorMessage}
         </Alert>
-      )} */}
+      )}
     </div>
   );
 }
 
 function Title() {
-  return <h1 className="text-3xl  text-l-fg dark:text-d-fg">Your Magpy server</h1>;
+  return <h1 className="text-3xl text-l-fg dark:text-d-fg pb-10">Your Magpy server</h1>;
 }
