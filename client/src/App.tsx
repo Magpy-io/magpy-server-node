@@ -33,6 +33,7 @@ const customTheme: CustomFlowbiteTheme = {
       primary:
         'bg-l-primary dark:bg-d-primary text-l-fg-primary dark:text-d-fg-primary hover:bg-black dark:hover:bg-white',
     },
+    base: 'group flex items-stretch items-center justify-center p-0.5 text-center font-semibold relative focus:z-10 focus:outline-none transition-[color,background-color,border-color,text-decoration-color,fill,stroke,box-shadow]',
   },
 };
 

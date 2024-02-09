@@ -14,11 +14,7 @@ export default function ServerOwner({
       <div className="mb-8">
         <div className="flex flex-row justify-between items-center mb-2">
           <h1 className="text-sm font-medium  text-l-fg dark:text-d-fg">Owner</h1>
-          <Button
-            color="transparent"
-            className="text-l-fg dark:text-d-fg"
-            size="xs"
-            onClick={onClearOwner}>
+          <Button color="transparent" className="font-medium" size="xs" onClick={onClearOwner}>
             Remove owner
           </Button>
         </div>

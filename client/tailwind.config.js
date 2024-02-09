@@ -1,3 +1,4 @@
+
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   darkMode: 'class',
@@ -24,6 +25,10 @@ module.exports = {
       'd-fg-primary': '#020D17',
       'd-secondary': '#12666F',
       'd-bg-light': '#121A22',
+    },
+    fontFamily: {
+      sans: ['Inter', 'sans-serif'],
+      serif: ['Inter', 'serif'],
     },
   }
 }

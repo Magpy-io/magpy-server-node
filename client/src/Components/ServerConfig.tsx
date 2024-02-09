@@ -128,7 +128,7 @@ export default function ServerConfig() {
         <Title />
         <ServerNameInput />
         <ServerPathInput onClearPhotos={onClearPhotos} />
-        <ServerOwner onClearOwner={onClearOwner} owner={{ email: 'bla', name: 'blaa' }} />
+        <ServerOwner onClearOwner={onClearOwner} owner={owner} />
         <SaveButton disabled={false} onSubmit={methods.handleSubmit(onSubmit)} />
       </FormProvider>
       {hasFailedRequests && (
@@ -141,5 +141,7 @@ export default function ServerConfig() {
 }
 
 function Title() {
-  return <h1 className="text-3xl text-l-fg dark:text-d-fg pb-10">Your Magpy server</h1>;
+  return (
+    <h1 className="text-3xl text-l-fg dark:text-d-fg pb-10 text-bold">Your Magpy server</h1>
+  );
 }
