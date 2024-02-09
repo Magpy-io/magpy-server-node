@@ -1,6 +1,6 @@
-import { Box, Button, Typography } from "@mui/material";
-import DeleteIcon from "@mui/icons-material/Delete";
-import { Owner } from "./ServerConfig";
+import { Button, CustomFlowbiteTheme } from 'flowbite-react';
+
+import { Owner } from './ServerConfig';
 
 export default function ServerOwner({
   onClearOwner,
@@ -11,70 +11,32 @@ export default function ServerOwner({
 }) {
   if (owner) {
     return (
-      <>
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            justifyContent: "space-between",
-            width: "100%",
-          }}
-        >
-          <Typography color="secondary.dark" variant="h5">
-            Owner
-          </Typography>
+      <div className="mb-8">
+        <div className="flex flex-row justify-between items-center mb-3">
+          <h1 className="text-md font-medium  text-l-fg dark:text-d-fg">Owner</h1>
           <Button
-            endIcon={<DeleteIcon />}
-            variant="text"
-            color="error"
-            onClick={onClearOwner}
-          >
+            color="transparent"
+            pill
+            className="font-medium"
+            size="xs"
+            onClick={onClearOwner}>
             Remove owner
           </Button>
-        </Box>
-
-        <Box
-          bgcolor={"primary.light"}
-          sx={{
-            padding: 2,
-            width: "100%",
-            marginY: 2,
-            borderRadius: 2,
-          }}
-        >
-          <Typography color="secondary.dark" variant="body1">
-            {`Name : ${owner.name}`}
-          </Typography>
-          <Typography color="secondary.dark" variant="body1">
-            {`Email : ${owner.email}`}
-          </Typography>
-        </Box>
-      </>
+        </div>
+        <div className="p-4 bg-slate-100 rounded-lg bg-l-bg-light dark:bg-d-bg-light">
+          <h1 className="text-sm font-medium text-l-fg dark:text-d-fg pb-1">{`Name : ${owner.name}`}</h1>
+          <h1 className="text-sm font-medium text-l-fg dark:text-d-fg">{`Email : ${owner.email}`}</h1>
+        </div>
+      </div>
     );
   } else {
     return (
-      <>
-        <Typography color="secondary.dark" variant="h5">
-          Owner
-        </Typography>
-        <Box
-          bgcolor={"primary.light"}
-          sx={{
-            padding: 1,
-            width: "100%",
-            marginY: 2,
-            borderRadius: 2,
-          }}
-        >
-          <Typography
-            color="secondary.dark"
-            variant="body1"
-            sx={{ padding: 2 }}
-          >
-            No owner
-          </Typography>
-        </Box>
-      </>
+      <div className="mb-8">
+        <h1 className="text-md font-medium mb-3  text-l-fg dark:text-d-fg">Owner</h1>
+        <div className="p-4 bg-l-bg-light dark:bg-d-bg-light rounded-lg">
+          <h1 className="text-sm font-medium  text-l-fg dark:text-d-fg">No owner</h1>
+        </div>
+      </div>
     );
   }
 }

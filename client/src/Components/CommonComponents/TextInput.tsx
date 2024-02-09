@@ -1,9 +1,16 @@
-import { Box, TextField, TextFieldProps } from "@mui/material";
+import { TextInput as FBTextInput, TextInputProps } from 'flowbite-react';
+import { FieldError } from 'react-hook-form';
 
-export default function TextInput(props: TextFieldProps) {
+type Props = {
+  error?: FieldError;
+} & TextInputProps;
+
+export default function TextInput({ error, ...props }: Props) {
   return (
-    <Box sx={{ width: "100%", marginY: 2 }}>
-      <TextField {...props} />
-    </Box>
+    <div>
+      <FBTextInput {...props} />
+
+      {error ? <p className="text-xs text-red-800 mt-2">{error?.message}</p> : null}
+    </div>
   );
 }

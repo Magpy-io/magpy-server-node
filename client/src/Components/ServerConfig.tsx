@@ -1,17 +1,19 @@
-import { Alert, AlertTitle, Box, Typography } from "@mui/material";
-import React, { useEffect, useMemo, useState } from "react";
-import { FormProvider, useForm } from "react-hook-form";
-import ServerNameInput from "./ServerNameInput";
-import ServerPathInput from "./ServerPathInput";
-import ServerOwner from "./ServerOwner";
-import SaveButton from "./SaveButton";
+import { useEffect, useMemo, useState } from 'react';
+
+import { Alert } from 'flowbite-react';
+import { FormProvider, useForm } from 'react-hook-form';
+import { HiInformationCircle } from 'react-icons/hi';
+
 import {
   GetServerInfo,
   UnclaimServer,
   UpdateServerName,
   UpdateServerPath,
-} from "../ServerQueries";
-import { ServerResponseError } from "../ServerQueries/Types/ApiGlobalTypes";
+} from '../ServerQueries';
+import SaveButton from './SaveButton';
+import ServerNameInput from './ServerNameInput';
+import ServerOwner from './ServerOwner';
+import ServerPathInput from './ServerPathInput';
 
 export type Owner = {
   name: string;
@@ -25,36 +27,43 @@ type ErrorTypes =
 
 export default function ServerConfig() {
   const [data, setData] = useState<GetServerInfo.ResponseType>();
-  const [failedRequests, setFailedRequests] = useState<
-    ServerResponseError<ErrorTypes>[]
-  >([]);
+  const [failedRequests, setFailedRequests] = useState<string[]>([]);
 
   const owner = data?.ok ? data.data.owner : null;
 
-  console.log("failedRequests", failedRequests);
+  console.log('failedRequests', failedRequests);
+
+  const setError = () =>
+    setFailedRequests(prev => {
+      return [...prev, 'Error'];
+    });
 
   useEffect(() => {
     async function fetchData() {
-      const ret = await GetServerInfo.Post();
-      setData(ret);
+      try {
+        const ret = await GetServerInfo.Post();
+        setData(ret);
+      } catch {
+        setError();
+      }
     }
-    fetchData().catch((error) => console.log(error));
+    fetchData();
   }, []);
 
   useEffect(() => {
-    console.log("failedRequest useEffect", failedRequests);
+    console.log('failedRequest useEffect', failedRequests);
   }, [failedRequests]);
 
   const onClearPhotos = () => {
-    console.log("clear photos");
+    console.log('clear photos');
   };
 
   const onClearOwner = async () => {
-    console.log("clear owner");
+    console.log('clear owner');
     const unclaimRes = await UnclaimServer.Post().catch(console.log);
     if (unclaimRes && !unclaimRes.ok) {
-      setFailedRequests((prev) => {
-        prev.push(unclaimRes);
+      setFailedRequests(prev => {
+        prev.push(unclaimRes.errorCode);
         return prev;
       });
     }
@@ -66,8 +75,8 @@ export default function ServerConfig() {
 
   const initialValues = useMemo(() => {
     return {
-      name: data?.ok ? data?.data?.serverName : "",
-      path: data?.ok ? data?.data?.storagePath : "",
+      name: data?.ok ? data?.data?.serverName : '',
+      path: data?.ok ? data?.data?.storagePath : '',
     };
   }, [data]);
 
@@ -85,79 +94,56 @@ export default function ServerConfig() {
   }) => {
     console.log(data);
     if (data.name && data.path) {
-      const updateNameRes = await UpdateServerName.Post({
-        name: data.name,
-      }).catch(console.log);
-      const updatePathRes = await UpdateServerPath.Post({
-        path: data.path,
-      }).catch(console.log);
-      console.log("updateNameRes", updateNameRes);
-      if (updateNameRes && !updateNameRes.ok) {
-        setFailedRequests((prev) => {
-          prev.push(updateNameRes);
-          return prev;
+      try {
+        const updateNameRes = await UpdateServerName.Post({
+          name: data.name,
         });
-      }
-      if (updatePathRes && !updatePathRes.ok) {
-        setFailedRequests((prev) => {
-          prev.push(updatePathRes);
-          return prev;
+        const updatePathRes = await UpdateServerPath.Post({
+          path: data.path,
         });
+        if (updateNameRes && !updateNameRes.ok) {
+          setFailedRequests(prev => {
+            prev.push(updateNameRes.errorCode);
+            return prev;
+          });
+        }
+        if (updatePathRes && !updatePathRes.ok) {
+          setFailedRequests(prev => {
+            prev.push(updatePathRes.errorCode);
+            return prev;
+          });
+        }
+      } catch {
+        setError();
       }
-      console.log(failedRequests);
     }
   };
 
   const hasFailedRequests = failedRequests.length > 0;
-  const errorMessage = failedRequests.reduce(
-    (prev, value) => prev + " " + value.errorCode,
-    ""
-  );
+  const errorMessage = failedRequests?.[0] + ` `;
 
   return (
-    <Box
-      bgcolor={"white"}
-      flex={1}
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "flex-start",
-        paddingY: 10,
-        paddingX: 10,
-        minHeight: "90vh",
-        maxWidth: "40%",
-        borderRadius: 10,
-      }}
-    >
+    <div>
       <FormProvider {...methods}>
         <Title />
         <ServerNameInput />
         <ServerPathInput onClearPhotos={onClearPhotos} />
         <ServerOwner onClearOwner={onClearOwner} owner={owner} />
-        <SaveButton
-          disabled={false}
-          onSubmit={methods.handleSubmit(onSubmit)}
-        />
+        <SaveButton disabled={false} onSubmit={methods.handleSubmit(onSubmit)} />
       </FormProvider>
       {hasFailedRequests && (
-        <Alert sx={{ width: "100%", marginTop: 6 }} severity="error">
-          <AlertTitle>Error</AlertTitle>
-          Something went wrong :<strong>{errorMessage}</strong>
+        <Alert color="failure" icon={HiInformationCircle} className="mt-10">
+          <span className="font-medium">Something went wrong : </span> {errorMessage}
         </Alert>
       )}
-    </Box>
+    </div>
   );
 }
 
 function Title() {
   return (
-    <Typography
-      variant="h3"
-      gutterBottom
-      sx={{ marginBottom: 6, textAlign: "center" }}
-      color="secondary.dark"
-    >
-      Your OpenCloud server
-    </Typography>
+    <h1 className="text-4xl text-l-fg dark:text-d-fg pb-10 font-medium text-center">
+      Your Magpy server
+    </h1>
   );
 }
