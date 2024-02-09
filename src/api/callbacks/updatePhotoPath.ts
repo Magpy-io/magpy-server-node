@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import { updatePhotoClientPathById } from '../../db/sequelizeDb';
+import { updatePhotoMediaIdById } from '../../db/sequelizeDb';
 import checkUserToken from '../../middleware/checkUserToken';
 import {
   AddWarningPhotosDeleted,
@@ -44,7 +44,7 @@ const callback = async (req: Request, res: Response, body: UpdatePhotoPath.Reque
 
       console.log('Photo path does not exist in db');
       console.log('Updating path in db');
-      await updatePhotoClientPathById(id, path, deviceUniqueId);
+      await updatePhotoMediaIdById(id, path, deviceUniqueId);
 
       console.log('Photo updated successfully.');
       console.log('Sending response message.');

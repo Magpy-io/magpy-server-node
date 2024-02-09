@@ -1,35 +1,31 @@
-import "@tests/helpers/loadEnvFile";
-import { mockModules } from "@tests/helpers/mockModules";
-mockModules();
-
-import { describe, expect, it } from "@jest/globals";
-
-import { Express } from "express";
-import { GetPhotosByPath } from "@src/api/export";
-
-import { initServer, stopServer } from "@src/server/server";
-
-import * as sac from "@tests/helpers/setupAndCleanup";
-
+import { describe, expect, it } from '@jest/globals';
+import { GetPhotosByPath } from '@src/api/export';
+import { PhotoTypes } from '@src/api/export/Types';
+import { initServer, stopServer } from '@src/server/server';
 import {
   addNPhotos,
   addPhoto,
-  testPhotoOriginal,
-  testPhotoCompressed,
-  testPhotoThumbnail,
-  testPhotoData,
-  getPhotoFromDb,
-  deletePhotoFromDisk,
-  testWarning,
-  defaultPhoto,
-  expectToBeOk,
-  getDataFromRet,
   addPhotoWithMultiplePaths,
-  testPhotoMetaAndIdWithAdditionalPaths,
+  defaultPhoto,
   defaultPhotoSecondPath,
+  deletePhotoFromDisk,
+  expectToBeOk,
   generateDate,
-} from "@tests/helpers/functions";
-import { PhotoTypes } from "@src/api/export/Types";
+  getDataFromRet,
+  getPhotoFromDb,
+  testPhotoCompressed,
+  testPhotoData,
+  testPhotoMetaAndIdWithAdditionalPaths,
+  testPhotoOriginal,
+  testPhotoThumbnail,
+  testWarning,
+} from '@tests/helpers/functions';
+import '@tests/helpers/loadEnvFile';
+import { mockModules } from '@tests/helpers/mockModules';
+import * as sac from '@tests/helpers/setupAndCleanup';
+import { Express } from 'express';
+
+mockModules();
 
 describe("Test 'getPhotosByPath' endpoint", () => {
   let app: Express;
@@ -51,18 +47,18 @@ describe("Test 'getPhotosByPath' endpoint", () => {
   });
 
   it.each([{ n: 0 }, { n: 1 }, { n: 2 }])(
-    "Should return $n photos all existing after adding $n photos and requesting $n photo paths",
+    'Should return $n photos all existing after adding $n photos and requesting $n photo paths',
     async (testData: { n: number }) => {
       const addedPhotosData = await addNPhotos(testData.n);
 
       const photosAdded = await Promise.all(
-        addedPhotosData.map((photoData) => {
+        addedPhotosData.map(photoData => {
           return getPhotoFromDb(photoData.id);
-        })
+        }),
       );
-      const photosData = photosAdded.map((photo) => {
+      const photosData = photosAdded.map(photo => {
         return {
-          path: photo.clientPaths[0].path,
+          path: photo.mediaIds[0].mediaId,
           size: photo.fileSize,
           date: photo.date.toJSON(),
         };
@@ -70,11 +66,11 @@ describe("Test 'getPhotosByPath' endpoint", () => {
 
       const ret = await GetPhotosByPath.Post({
         photosData: photosData,
-        photoType: "data",
+        photoType: 'data',
         deviceUniqueId: defaultPhoto.deviceUniqueId,
       });
 
-      console.log("ret:", JSON.stringify(ret));
+      console.log('ret:', JSON.stringify(ret));
 
       expectToBeOk(ret);
       expect(ret.warning).toBe(false);
@@ -87,21 +83,21 @@ describe("Test 'getPhotosByPath' endpoint", () => {
         expect(data.photos[i].path).toBe(photosData[i].path);
         expect(data.photos[i].exists).toBe(true);
       }
-    }
+    },
   );
 
   it.each([{ n: 0 }, { n: 1 }, { n: 2 }])(
-    "Should return $n photos all not existing after adding no photos and requesting $n photo paths",
+    'Should return $n photos all not existing after adding no photos and requesting $n photo paths',
     async (testData: { n: number }) => {
       const photosData = Array(testData.n)
-        .fill("")
+        .fill('')
         .map((_, i) => {
-          return { path: "path" + i.toString(), size: 0, date: generateDate() };
+          return { path: 'path' + i.toString(), size: 0, date: generateDate() };
         });
 
       const ret = await GetPhotosByPath.Post({
         photosData: photosData,
-        photoType: "data",
+        photoType: 'data',
         deviceUniqueId: defaultPhoto.deviceUniqueId,
       });
 
@@ -116,10 +112,10 @@ describe("Test 'getPhotosByPath' endpoint", () => {
         expect(data.photos[i].path).toBe(photosData[i].path);
         expect(data.photos[i].exists).toBe(false);
       }
-    }
+    },
   );
 
-  it("Should return 2 photos, the first exists and the second does not, after adding 1 photo and requesting 2", async () => {
+  it('Should return 2 photos, the first exists and the second does not, after adding 1 photo and requesting 2', async () => {
     const photoAddedData = await addPhoto();
 
     const dbPhoto = await getPhotoFromDb(photoAddedData.id);
@@ -130,12 +126,12 @@ describe("Test 'getPhotosByPath' endpoint", () => {
         size: dbPhoto.fileSize,
         date: dbPhoto.date.toJSON(),
       },
-      { path: "path2", size: 0, date: generateDate() },
+      { path: 'path2', size: 0, date: generateDate() },
     ];
 
     const ret = await GetPhotosByPath.Post({
       photosData: photosData,
-      photoType: "data",
+      photoType: 'data',
       deviceUniqueId: defaultPhoto.deviceUniqueId,
     });
 
@@ -156,15 +152,15 @@ describe("Test 'getPhotosByPath' endpoint", () => {
     photoType: PhotoTypes;
     testFunction: (...args: any[]) => any;
   }> = [
-    { photoType: "original", testFunction: testPhotoOriginal },
-    { photoType: "compressed", testFunction: testPhotoCompressed },
-    { photoType: "thumbnail", testFunction: testPhotoThumbnail },
-    { photoType: "data", testFunction: testPhotoData },
+    { photoType: 'original', testFunction: testPhotoOriginal },
+    { photoType: 'compressed', testFunction: testPhotoCompressed },
+    { photoType: 'thumbnail', testFunction: testPhotoThumbnail },
+    { photoType: 'data', testFunction: testPhotoData },
   ];
 
   it.each(testDataArrayPhotoTypeTestFunction)(
-    "Should return the image added in the quality $photoType",
-    async (testData) => {
+    'Should return the image added in the quality $photoType',
+    async testData => {
       const photoAddedData = await addPhoto();
 
       const dbPhoto = await getPhotoFromDb(photoAddedData.id);
@@ -200,17 +196,17 @@ describe("Test 'getPhotosByPath' endpoint", () => {
         path: photoAddedData.path,
         id: photoAddedData.id,
       });
-    }
+    },
   );
 
   const testDataArrayPhotoType: Array<{ photoType: PhotoTypes }> = [
-    { photoType: "thumbnail" },
-    { photoType: "compressed" },
-    { photoType: "original" },
+    { photoType: 'thumbnail' },
+    { photoType: 'compressed' },
+    { photoType: 'original' },
   ];
 
   it.each(testDataArrayPhotoType)(
-    "Should return photo does not exist if a photo exists on db but its $photoType is not on disk",
+    'Should return photo does not exist if a photo exists on db but its $photoType is not on disk',
     async (testData: { photoType: PhotoTypes }) => {
       const addedPhotoData = await addPhoto();
 
@@ -228,7 +224,7 @@ describe("Test 'getPhotosByPath' endpoint", () => {
 
       const ret = await GetPhotosByPath.Post({
         photosData: photosData,
-        photoType: "data",
+        photoType: 'data',
         deviceUniqueId: defaultPhoto.deviceUniqueId,
       });
 
@@ -243,10 +239,10 @@ describe("Test 'getPhotosByPath' endpoint", () => {
       expect(data.photos[0].exists).toBe(false);
 
       testWarning(photo);
-    }
+    },
   );
 
-  it("Should return a photo with multiple paths when requested photo has multiple paths", async () => {
+  it('Should return a photo with multiple paths when requested photo has multiple paths', async () => {
     const addedPhotoData = await addPhotoWithMultiplePaths();
 
     const photo = await getPhotoFromDb(addedPhotoData.id);
@@ -261,7 +257,7 @@ describe("Test 'getPhotosByPath' endpoint", () => {
 
     const ret = await GetPhotosByPath.Post({
       photosData: photosData,
-      photoType: "data",
+      photoType: 'data',
       deviceUniqueId: defaultPhoto.deviceUniqueId,
     });
 
@@ -276,8 +272,6 @@ describe("Test 'getPhotosByPath' endpoint", () => {
       throw new Error();
     }
 
-    testPhotoMetaAndIdWithAdditionalPaths(data.photos[0].photo, [
-      defaultPhotoSecondPath,
-    ]);
+    testPhotoMetaAndIdWithAdditionalPaths(data.photos[0].photo, [defaultPhotoSecondPath]);
   });
 });

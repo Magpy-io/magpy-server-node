@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import { getPhotosByClientPathAndSizeAndDateFromDB } from '../../db/sequelizeDb';
+import { getPhotosByMediaIdAndSizeAndDateFromDB } from '../../db/sequelizeDb';
 import checkUserToken from '../../middleware/checkUserToken';
 import { getPhotoFromDisk } from '../../modules/diskManager';
 import {
@@ -21,7 +21,12 @@ const callback = async (req: Request, res: Response, body: GetPhotosByPath.Reque
     const { photosData, photoType, deviceUniqueId } = body;
 
     console.log('Getting photos from db with paths from request.');
-    const photos = await getPhotosByClientPathAndSizeAndDateFromDB(photosData, deviceUniqueId);
+    const photos = await getPhotosByMediaIdAndSizeAndDateFromDB(
+      photosData.map(pd => {
+        return { date: pd.date, size: pd.size, mediaId: pd.path };
+      }),
+      deviceUniqueId,
+    );
     console.log('Received response from db.');
 
     const ret = await filterPhotosExistAndDeleteMissing(photos);
