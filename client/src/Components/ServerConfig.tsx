@@ -142,6 +142,6 @@ export default function ServerConfig() {
 
 function Title() {
   return (
-    <h1 className="text-3xl text-l-fg dark:text-d-fg pb-10 text-bold">Your Magpy server</h1>
+    <h1 className="text-4xl text-l-fg dark:text-d-fg pb-10 font-medium">Your Magpy server</h1>
   );
 }

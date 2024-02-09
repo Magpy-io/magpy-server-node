@@ -16,14 +16,14 @@ const customTheme: CustomFlowbiteTheme = {
     field: {
       input: {
         colors: {
-          gray: 'dark:bg-transparent bg-transparent border-gray-300 text-gray-900 focus:border-cyan-500 focus:ring-cyan-500 dark:border-gray-600 dark:text-white dark:placeholder-gray-400 dark:focus:border-cyan-500 dark:focus:ring-cyan-500',
+          gray: 'dark:bg-transparent bg-transparent border-gray-300 text-gray-900 focus:border-cyan-500 focus:ring-cyan-500 dark:border-gray-800 dark:text-white dark:placeholder-gray-400 dark:focus:border-cyan-500 dark:focus:ring-cyan-500',
         },
       },
     },
   },
   alert: {
     color: {
-      failure: 'text-red-700 bg-red-100 border-red-500  dark:bg-d-bg-light dark:text-red-500',
+      failure: 'text-red-700 bg-red-100 border-red-500  dark:bg-d-bg-light dark:text-red-400',
     },
   },
   button: {
