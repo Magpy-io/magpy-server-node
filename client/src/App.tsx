@@ -1,4 +1,12 @@
-import { CustomFlowbiteTheme, DarkThemeToggle, Flowbite, Navbar } from 'flowbite-react';
+import {
+  Button,
+  CustomFlowbiteTheme,
+  DarkThemeToggle,
+  Flowbite,
+  Label,
+  Navbar,
+  TextInput,
+} from 'flowbite-react';
 
 import ServerConfig from './Components/ServerConfig';
 import { SetPath } from './ServerQueries';
