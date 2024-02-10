@@ -175,7 +175,7 @@ async function getPhotoByMediaIdAndSizeAndDateFromDB(
     const imagesNonFiltered = await getPhotoByMediaIdFromDB(data.mediaId, deviceUniqueId);
 
     const images = imagesNonFiltered.filter(image => {
-      return image.fileSize == data.size && image.date.toJSON() == data.date;
+      return image.fileSize == data.size && image.date.toISOString() == data.date;
     });
 
     if (images.length > 1) {

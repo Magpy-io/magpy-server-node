@@ -60,7 +60,7 @@ describe("Test 'getPhotosByMediaId' endpoint", () => {
         return {
           mediaId: photo.mediaIds[0].mediaId,
           size: photo.fileSize,
-          date: photo.date.toJSON(),
+          date: photo.date.toISOString(),
         };
       });
 
@@ -124,7 +124,7 @@ describe("Test 'getPhotosByMediaId' endpoint", () => {
       {
         mediaId: photoAddedData.mediaId,
         size: dbPhoto.fileSize,
-        date: dbPhoto.date.toJSON(),
+        date: dbPhoto.date.toISOString(),
       },
       { mediaId: 'mediaId2', size: 0, date: generateDate() },
     ];
@@ -169,7 +169,7 @@ describe("Test 'getPhotosByMediaId' endpoint", () => {
         {
           mediaId: photoAddedData.mediaId,
           size: dbPhoto.fileSize,
-          date: dbPhoto.date.toJSON(),
+          date: dbPhoto.date.toISOString(),
         },
       ];
 
@@ -218,7 +218,7 @@ describe("Test 'getPhotosByMediaId' endpoint", () => {
         {
           mediaId: addedPhotoData.mediaId,
           size: photo.fileSize,
-          date: photo.date.toJSON(),
+          date: photo.date.toISOString(),
         },
       ];
 
@@ -251,7 +251,7 @@ describe("Test 'getPhotosByMediaId' endpoint", () => {
       {
         mediaId: addedPhotoData.mediaId,
         size: photo.fileSize,
-        date: photo.date.toJSON(),
+        date: photo.date.toISOString(),
       },
     ];
 

@@ -406,7 +406,7 @@ function generateId() {
 }
 
 function generateDate() {
-  return new Date().toJSON();
+  return new Date().toISOString();
 }
 
 export {

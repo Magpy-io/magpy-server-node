@@ -34,7 +34,7 @@ const callback = async (req: Request, res: Response, body: AddPhotoInit.RequestD
     console.log('Photo does not exist in server.');
     console.log('Creating syncDate and photoPath.');
     const image64Len = body.image64Len;
-    photo.syncDate = new Date(Date.now()).toJSON();
+    photo.syncDate = new Date(Date.now()).toISOString();
     await addServerImagePaths(photo);
     const id = uuid();
 
