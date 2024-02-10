@@ -38,3 +38,12 @@ packages/react-devtools-shell/dist
 packages/react-devtools-timeline/dist
 
 /src/ServerQueries
+
+# Yarn
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
