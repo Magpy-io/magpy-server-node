@@ -17,7 +17,7 @@
     "build:client": "cd client; yarn build; cd ..",
     "build:all": "yarn build:client && yarn build:server",
     "test": "yarn test:v --silent",
-    "test:v": "cross-env NODE_ENV=test jest --verbose=true --collect-coverage --testTimeout=10000 --runInBand",
+    "test:v": "cross-env NODE_ENV=test jest --verbose=true --collect-coverage --testTimeout=10000",
     "types:generate": "ts-node ./src/CreateTypes.ts",
     "types:copy": "ts-node ./src/CopyEndpointTypesToExport.ts",
     "clear:images": "ts-node ./src/clearImages.ts",

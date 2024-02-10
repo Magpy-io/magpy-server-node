@@ -43,13 +43,13 @@ const callback = async (req: Request, res: Response, body: UpdatePhotoMediaId.Re
     } else {
       console.log('Photo found');
 
-      console.log('Photo path does not exist in db');
-      console.log('Updating path in db');
+      console.log('Photo mediaId does not exist in db');
+      console.log('Updating mediaId in db');
       await updatePhotoMediaIdById(id, mediaId, deviceUniqueId);
 
       console.log('Photo updated successfully.');
       console.log('Sending response message.');
-      return sendResponse(res, `Photo with id ${id} successfully updated with new path`);
+      return sendResponse(res, `Photo with id ${id} successfully updated with new mediaId`);
     }
   } catch (err) {
     console.error(err);

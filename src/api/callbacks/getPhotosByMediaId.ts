@@ -21,7 +21,7 @@ const callback = async (req: Request, res: Response, body: GetPhotosByMediaId.Re
 
     const { photosData, photoType, deviceUniqueId } = body;
 
-    console.log('Getting photos from db with paths from request.');
+    console.log('Getting photos from db with mediaId from request.');
     const photos = await getPhotosByMediaIdAndSizeAndDateFromDB(photosData, deviceUniqueId);
     console.log('Received response from db.');
 
