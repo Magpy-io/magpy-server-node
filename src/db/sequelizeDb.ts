@@ -162,26 +162,18 @@ async function getPhotoByMediaIdFromDB(
   }
 }
 
-async function getPhotoByMediaIdAndSizeAndDateFromDB(
+async function getPhotoByMediaIdSingle(
   data: {
     mediaId: string;
-    size: number;
-    date: string;
   },
   deviceUniqueId: string,
 ): Promise<Photo | null> {
   assertDbOpen();
   try {
-    const imagesNonFiltered = await getPhotoByMediaIdFromDB(data.mediaId, deviceUniqueId);
-
-    const images = imagesNonFiltered.filter(image => {
-      return image.fileSize == data.size && image.date.toISOString() == data.date;
-    });
+    const images = await getPhotoByMediaIdFromDB(data.mediaId, deviceUniqueId);
 
     if (images.length > 1) {
-      console.error(
-        'Got more than one item from database with the same mediaId, size and date',
-      );
+      console.error('Got more than one item from database with the same mediaId');
     }
 
     if (images.length >= 1) {
@@ -372,18 +364,16 @@ async function getPhotosByMediaIdFromDB(
   }
 }
 
-async function getPhotosByMediaIdAndSizeAndDateFromDB(
+async function getPhotosByMediaId(
   photosData: Array<{
     mediaId: string;
-    size: number;
-    date: string;
   }>,
   deviceUniqueId: string,
 ): Promise<Array<Photo | null>> {
   assertDbOpen();
   try {
     const photosFoundPromise = photosData.map(photoData => {
-      return getPhotoByMediaIdAndSizeAndDateFromDB(photoData, deviceUniqueId);
+      return getPhotoByMediaIdSingle(photoData, deviceUniqueId);
     });
     return await Promise.all(photosFoundPromise);
   } catch (err) {
@@ -509,6 +499,6 @@ export {
   getPhotosByMediaIdFromDB,
   getPhotosByIdFromDB,
   updatePhotoMediaIdById,
-  getPhotosByMediaIdAndSizeAndDateFromDB,
+  getPhotosByMediaId,
   getAllMediaIdsByImageIdFromDB,
 };

@@ -14,8 +14,6 @@ export const RequestSchema = Joi.object({
   photosData: Joi.array().items(
     Joi.object({
       mediaId: Joi.string(),
-      date: Joi.string().isoDate(),
-      size: Joi.number().integer(),
     }).options({ presence: 'required' }),
   ),
   photoType: Joi.string().valid(...PhotoTypesArray),

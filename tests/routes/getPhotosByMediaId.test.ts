@@ -59,8 +59,6 @@ describe("Test 'getPhotosByMediaId' endpoint", () => {
       const photosData = photosAdded.map(photo => {
         return {
           mediaId: photo.mediaIds[0].mediaId,
-          size: photo.fileSize,
-          date: photo.date.toISOString(),
         };
       });
 
@@ -92,7 +90,7 @@ describe("Test 'getPhotosByMediaId' endpoint", () => {
       const photosData = Array(testData.n)
         .fill('')
         .map((_, i) => {
-          return { mediaId: 'mediaId' + i.toString(), size: 0, date: generateDate() };
+          return { mediaId: 'mediaId' + i.toString() };
         });
 
       const ret = await GetPhotosByMediaId.Post({
@@ -118,15 +116,11 @@ describe("Test 'getPhotosByMediaId' endpoint", () => {
   it('Should return 2 photos, the first exists and the second does not, after adding 1 photo and requesting 2', async () => {
     const photoAddedData = await addPhoto();
 
-    const dbPhoto = await getPhotoFromDb(photoAddedData.id);
-
     const photosData = [
       {
         mediaId: photoAddedData.mediaId,
-        size: dbPhoto.fileSize,
-        date: dbPhoto.date.toISOString(),
       },
-      { mediaId: 'mediaId2', size: 0, date: generateDate() },
+      { mediaId: 'mediaId2' },
     ];
 
     const ret = await GetPhotosByMediaId.Post({
@@ -163,13 +157,9 @@ describe("Test 'getPhotosByMediaId' endpoint", () => {
     async testData => {
       const photoAddedData = await addPhoto();
 
-      const dbPhoto = await getPhotoFromDb(photoAddedData.id);
-
       const photosData = [
         {
           mediaId: photoAddedData.mediaId,
-          size: dbPhoto.fileSize,
-          date: dbPhoto.date.toISOString(),
         },
       ];
 
@@ -217,8 +207,6 @@ describe("Test 'getPhotosByMediaId' endpoint", () => {
       const photosData = [
         {
           mediaId: addedPhotoData.mediaId,
-          size: photo.fileSize,
-          date: photo.date.toISOString(),
         },
       ];
 
@@ -245,13 +233,9 @@ describe("Test 'getPhotosByMediaId' endpoint", () => {
   it('Should return a photo with multiple mediaIds when requested photo has multiple mediaIds', async () => {
     const addedPhotoData = await addPhotoWithMultipleMediaIds();
 
-    const photo = await getPhotoFromDb(addedPhotoData.id);
-
     const photosData = [
       {
         mediaId: addedPhotoData.mediaId,
-        size: photo.fileSize,
-        date: photo.date.toISOString(),
       },
     ];
 

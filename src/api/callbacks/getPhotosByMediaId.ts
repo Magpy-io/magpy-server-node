@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import { getPhotosByMediaIdAndSizeAndDateFromDB } from '../../db/sequelizeDb';
+import { getPhotosByMediaId } from '../../db/sequelizeDb';
 import checkUserToken from '../../middleware/checkUserToken';
 import { getPhotoFromDisk } from '../../modules/diskManager';
 import {
@@ -22,7 +22,7 @@ const callback = async (req: Request, res: Response, body: GetPhotosByMediaId.Re
     const { photosData, photoType, deviceUniqueId } = body;
 
     console.log('Getting photos from db with mediaId from request.');
-    const photos = await getPhotosByMediaIdAndSizeAndDateFromDB(photosData, deviceUniqueId);
+    const photos = await getPhotosByMediaId(photosData, deviceUniqueId);
     console.log('Received response from db.');
 
     const ret = await filterPhotosExistAndDeleteMissing(photos);
