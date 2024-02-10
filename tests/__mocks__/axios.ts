@@ -1,5 +1,5 @@
-import request from "supertest";
-import { Express } from "express";
+import request from 'supertest';
+import { Express } from 'express';
 
 let app: Express | null = null;
 
@@ -7,17 +7,17 @@ export default {
   post: async (
     route: string,
     data: object,
-    options?: { headers: { authorization: string } }
+    options?: { headers: { authorization: string } },
   ) => {
     if (!app) {
-      throw new Error("axios mock, app for supertest is not set.");
+      throw new Error('axios mock, app for supertest is not set.');
     }
 
-    const routeSplit = route.split("/").filter((e) => !!e);
+    const routeSplit = route.split('/').filter(e => !!e);
     const endpointName = routeSplit.pop();
 
     const ret = await request(app)
-      .post("/" + endpointName)
+      .post('/' + endpointName)
       .set(options?.headers || {})
       .send(data);
 
@@ -26,7 +26,7 @@ export default {
     }
     return {
       data: ret.body,
-      headers: { "x-authorization": ret.headers["x-authorization"] },
+      headers: { 'x-authorization': ret.headers['x-authorization'] },
     };
   },
 };

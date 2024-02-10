@@ -1,17 +1,17 @@
-import "@tests/helpers/loadEnvFile";
-import { mockModules } from "@tests/helpers/mockModules";
+import '@tests/helpers/loadEnvFile';
+import { mockModules } from '@tests/helpers/mockModules';
 mockModules();
 
-import { describe, expect, it } from "@jest/globals";
+import { describe, expect, it } from '@jest/globals';
 
-import { Express } from "express";
-import { WhoAmI } from "@src/api/export";
+import { Express } from 'express';
+import { WhoAmI } from '@src/api/export';
 
-import { initServer, stopServer } from "@src/server/server";
-import * as sac from "@tests/helpers/setupAndCleanup";
+import { initServer, stopServer } from '@src/server/server';
+import * as sac from '@tests/helpers/setupAndCleanup';
 
-import * as mockValues from "@src/modules/BackendQueries/__mocks__/mockValues";
-import { expectToBeOk, getDataFromRet } from "@tests/helpers/functions";
+import * as mockValues from '@src/modules/BackendQueries/__mocks__/mockValues';
+import { expectToBeOk, getDataFromRet } from '@tests/helpers/functions';
 
 describe("Test 'whoAmI' endpoint", () => {
   let app: Express;
@@ -32,7 +32,7 @@ describe("Test 'whoAmI' endpoint", () => {
     await sac.afterEach();
   });
 
-  it("Should ok if valid user token", async () => {
+  it('Should ok if valid user token', async () => {
     const ret = await WhoAmI.Post();
 
     expectToBeOk(ret);

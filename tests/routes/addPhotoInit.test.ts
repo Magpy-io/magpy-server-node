@@ -1,24 +1,24 @@
-import "@tests/helpers/loadEnvFile";
-import { mockModules } from "@tests/helpers/mockModules";
+import '@tests/helpers/loadEnvFile';
+import { mockModules } from '@tests/helpers/mockModules';
 mockModules();
 
-import { describe, expect, it } from "@jest/globals";
+import { describe, expect, it } from '@jest/globals';
 
-import { Express } from "express";
-import { AddPhotoInit } from "@src/api/export";
-import { validate } from "uuid";
+import { Express } from 'express';
+import { AddPhotoInit } from '@src/api/export';
+import { validate } from 'uuid';
 
-import { initServer, stopServer } from "@src/server/server";
+import { initServer, stopServer } from '@src/server/server';
 
-import * as sac from "@tests/helpers/setupAndCleanup";
+import * as sac from '@tests/helpers/setupAndCleanup';
 
 import {
   defaultPhoto,
   waitForPhotoTransferToFinish,
   getDataFromRet,
   expectToBeOk,
-} from "@tests/helpers/functions";
-import FilesWaiting from "@src/modules/waitingFiles";
+} from '@tests/helpers/functions';
+import FilesWaiting from '@src/modules/waitingFiles';
 
 describe("Test 'addPhotoInit' endpoint", () => {
   let app: Express;
@@ -39,7 +39,7 @@ describe("Test 'addPhotoInit' endpoint", () => {
     await sac.afterEach();
   });
 
-  it("Should return the id of the photo being added", async () => {
+  it('Should return the id of the photo being added', async () => {
     //delete photo.image64;
     const { image64: _, ...photo } = defaultPhoto;
     const requestPhoto = { ...photo, image64Len: 132148 };

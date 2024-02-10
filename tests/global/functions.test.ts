@@ -1,14 +1,14 @@
-import "@tests/helpers/loadEnvFile";
-import { mockModules } from "@tests/helpers/mockModules";
+import '@tests/helpers/loadEnvFile';
+import { mockModules } from '@tests/helpers/mockModules';
 mockModules();
 
-import { describe, expect, it } from "@jest/globals";
+import { describe, expect, it } from '@jest/globals';
 
-import { Express } from "express";
+import { Express } from 'express';
 
-import { initServer, stopServer } from "@src/server/server";
+import { initServer, stopServer } from '@src/server/server';
 
-import * as sac from "@tests/helpers/setupAndCleanup";
+import * as sac from '@tests/helpers/setupAndCleanup';
 
 import {
   addPhoto,
@@ -18,19 +18,16 @@ import {
   getUserId,
   getPhotoById,
   generateId,
-} from "@tests/helpers/functions";
-import * as dbFunction from "@src/db/sequelizeDb";
-import { pathExists } from "@src/modules/diskManager";
+} from '@tests/helpers/functions';
+import * as dbFunction from '@src/db/sequelizeDb';
+import { pathExists } from '@src/modules/diskManager';
 
 import {
   AddWarningPhotosDeleted,
   checkPhotoExistsAndDeleteMissing,
-} from "@src/modules/functions";
-import {
-  GetLastWarningForUser,
-  HasWarningForUser,
-} from "@src/modules/warningsManager";
-import { PhotoTypes } from "@src/api/export/Types";
+} from '@src/modules/functions';
+import { GetLastWarningForUser, HasWarningForUser } from '@src/modules/warningsManager';
+import { PhotoTypes } from '@src/api/export/Types';
 
 describe("Test 'checkPhotoExistsAndDeleteMissing' function", () => {
   let app: Express;
@@ -51,7 +48,7 @@ describe("Test 'checkPhotoExistsAndDeleteMissing' function", () => {
     await sac.afterEach();
   });
 
-  it("Should return true when photo exists in db and disk", async () => {
+  it('Should return true when photo exists in db and disk', async () => {
     const addedPhotoData = await addPhoto();
 
     const ret = await checkPhotoExistsAndDeleteMissing({
@@ -64,13 +61,13 @@ describe("Test 'checkPhotoExistsAndDeleteMissing' function", () => {
     const photo = await getPhotoById(addedPhotoData.id);
 
     if (!photo) {
-      throw new Error("photo not found");
+      throw new Error('photo not found');
     }
 
     await testPhotosExistInDbAndDisk(photo);
   });
 
-  it("Should return false if photo does not exist in db nor disk", async () => {
+  it('Should return false if photo does not exist in db nor disk', async () => {
     const ret = await checkPhotoExistsAndDeleteMissing({
       id: generateId(),
     });
@@ -80,13 +77,13 @@ describe("Test 'checkPhotoExistsAndDeleteMissing' function", () => {
   });
 
   const testDataArray: Array<{ photoType: PhotoTypes }> = [
-    { photoType: "thumbnail" },
-    { photoType: "compressed" },
-    { photoType: "original" },
+    { photoType: 'thumbnail' },
+    { photoType: 'compressed' },
+    { photoType: 'original' },
   ];
   it.each(testDataArray)(
-    "Should return false if photo exists in db but $photoType is missing from disk, delete other photo variations while keeping original, and return the photo deleted.",
-    async (testData) => {
+    'Should return false if photo exists in db but $photoType is missing from disk, delete other photo variations while keeping original, and return the photo deleted.',
+    async testData => {
       const addedPhotoData = await addPhoto();
 
       const dbPhoto = await getPhotoFromDb(addedPhotoData.id);
@@ -108,10 +105,10 @@ describe("Test 'checkPhotoExistsAndDeleteMissing' function", () => {
       const compressedExists = await pathExists(dbPhoto.serverCompressedPath);
       const thumbnailExists = await pathExists(dbPhoto.serverThumbnailPath);
 
-      expect(originalExists).toBe(testData.photoType != "original");
+      expect(originalExists).toBe(testData.photoType != 'original');
       expect(compressedExists).toBe(false);
       expect(thumbnailExists).toBe(false);
-    }
+    },
   );
 });
 
@@ -134,11 +131,11 @@ describe('Test "SaveWarningPhotosDeleted" function', () => {
     await sac.afterEach();
   });
 
-  it("Should generate a warning when deleting a photo in db but not on disk", async () => {
+  it('Should generate a warning when deleting a photo in db but not on disk', async () => {
     const addedPhotoData = await addPhoto();
 
     const dbPhoto = await getPhotoFromDb(addedPhotoData.id);
-    await deletePhotoFromDisk(dbPhoto, "compressed");
+    await deletePhotoFromDisk(dbPhoto, 'compressed');
 
     const ret = await checkPhotoExistsAndDeleteMissing({
       id: addedPhotoData.id,
@@ -157,11 +154,11 @@ describe('Test "SaveWarningPhotosDeleted" function', () => {
     expect(warning).toBeTruthy();
 
     if (!warning) {
-      throw new Error("warning should be defined");
+      throw new Error('warning should be defined');
     }
 
-    expect(warning.code).toBe("PHOTOS_NOT_ON_DISK_DELETED");
-    expect(warning.data).toHaveProperty("photosDeleted");
+    expect(warning.code).toBe('PHOTOS_NOT_ON_DISK_DELETED');
+    expect(warning.data).toHaveProperty('photosDeleted');
     expect(warning.data.photosDeleted.length).toBe(1);
 
     expect(warning.data.photosDeleted[0].id).toBe(dbPhoto.id);

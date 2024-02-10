@@ -1,21 +1,17 @@
-import "@tests/helpers/loadEnvFile";
-import { mockModules } from "@tests/helpers/mockModules";
+import '@tests/helpers/loadEnvFile';
+import { mockModules } from '@tests/helpers/mockModules';
 mockModules();
 
-import { describe, expect, it } from "@jest/globals";
+import { describe, expect, it } from '@jest/globals';
 
-import { Express } from "express";
-import { GetNumberPhotos } from "@src/api/export";
+import { Express } from 'express';
+import { GetNumberPhotos } from '@src/api/export';
 
-import { initServer, stopServer } from "@src/server/server";
+import { initServer, stopServer } from '@src/server/server';
 
-import * as sac from "@tests/helpers/setupAndCleanup";
+import * as sac from '@tests/helpers/setupAndCleanup';
 
-import {
-  addNPhotos,
-  expectToBeOk,
-  getDataFromRet,
-} from "@tests/helpers/functions";
+import { addNPhotos, expectToBeOk, getDataFromRet } from '@tests/helpers/functions';
 
 describe("Test 'getNumberPhotos' endpoint", () => {
   let app: Express;
@@ -37,7 +33,7 @@ describe("Test 'getNumberPhotos' endpoint", () => {
   });
 
   it.each([{ n: 0 }, { n: 1 }, { n: 2 }])(
-    "Should return $n after adding $n photos",
+    'Should return $n after adding $n photos',
     async (p: { n: number }) => {
       await addNPhotos(p.n);
 
@@ -46,6 +42,6 @@ describe("Test 'getNumberPhotos' endpoint", () => {
       expectToBeOk(ret);
       expect(ret.warning).toBe(false);
       expect(getDataFromRet(ret).number).toBe(p.n);
-    }
+    },
   );
 });

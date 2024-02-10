@@ -1,18 +1,18 @@
-import "@tests/helpers/loadEnvFile";
-import { mockModules } from "@tests/helpers/mockModules";
+import '@tests/helpers/loadEnvFile';
+import { mockModules } from '@tests/helpers/mockModules';
 mockModules();
 
-import { describe, expect, it } from "@jest/globals";
+import { describe, expect, it } from '@jest/globals';
 
-import { Express } from "express";
-import { UnclaimServer } from "@src/api/export";
+import { Express } from 'express';
+import { UnclaimServer } from '@src/api/export';
 
-import { initServer, stopServer } from "@src/server/server";
+import { initServer, stopServer } from '@src/server/server';
 
-import * as sac from "@tests/helpers/setupAndCleanup";
+import * as sac from '@tests/helpers/setupAndCleanup';
 
-import { GetServerConfigData } from "@src/modules/serverDataManager";
-import { expectToBeOk } from "@tests/helpers/functions";
+import { GetServerConfigData } from '@src/modules/serverDataManager';
+import { expectToBeOk } from '@tests/helpers/functions';
 
 describe("Test 'unclaimServer' endpoint", () => {
   let app: Express;
@@ -33,7 +33,7 @@ describe("Test 'unclaimServer' endpoint", () => {
     await sac.afterEach();
   });
 
-  it("Should return ok if unclaimed a valid server", async () => {
+  it('Should return ok if unclaimed a valid server', async () => {
     const ret = await UnclaimServer.Post();
 
     expectToBeOk(ret);

@@ -1,23 +1,23 @@
-import "@tests/helpers/loadEnvFile";
-import { mockModules } from "@tests/helpers/mockModules";
+import '@tests/helpers/loadEnvFile';
+import { mockModules } from '@tests/helpers/mockModules';
 mockModules();
 
-import { describe, expect, it } from "@jest/globals";
+import { describe, expect, it } from '@jest/globals';
 
-import { Express } from "express";
-import { GetToken, UnclaimServer } from "@src/api/export";
+import { Express } from 'express';
+import { GetToken, UnclaimServer } from '@src/api/export';
 
-import * as mockValues from "@src/modules/BackendQueries/__mocks__/mockValues";
+import * as mockValues from '@src/modules/BackendQueries/__mocks__/mockValues';
 
-import { initServer, stopServer } from "@src/server/server";
+import { initServer, stopServer } from '@src/server/server';
 
-import * as sac from "@tests/helpers/setupAndCleanup";
+import * as sac from '@tests/helpers/setupAndCleanup';
 import {
   expectErrorCodeToBe,
   expectToBeOk,
   expectToNotBeOk,
   testReturnedToken,
-} from "@tests/helpers/functions";
+} from '@tests/helpers/functions';
 
 describe("Test 'claimServer' endpoint", () => {
   let app: Express;
@@ -38,7 +38,7 @@ describe("Test 'claimServer' endpoint", () => {
     await sac.afterEach();
   });
 
-  it("Should return a valid token when asking a claimed server", async () => {
+  it('Should return a valid token when asking a claimed server', async () => {
     const ret = await GetToken.Post({
       userToken: mockValues.validUserToken,
     });
@@ -49,25 +49,25 @@ describe("Test 'claimServer' endpoint", () => {
     testReturnedToken();
   });
 
-  it("Should return error AUTHORIZATION_BACKEND_FAILED when using invalid user token", async () => {
+  it('Should return error AUTHORIZATION_BACKEND_FAILED when using invalid user token', async () => {
     const ret = await GetToken.Post({
       userToken: mockValues.invalidUserToken,
     });
 
     expectToNotBeOk(ret);
-    expectErrorCodeToBe(ret, "AUTHORIZATION_BACKEND_FAILED");
+    expectErrorCodeToBe(ret, 'AUTHORIZATION_BACKEND_FAILED');
   });
 
-  it("Should return error AUTHORIZATION_BACKEND_EXPIRED when using an expired user token", async () => {
+  it('Should return error AUTHORIZATION_BACKEND_EXPIRED when using an expired user token', async () => {
     const ret = await GetToken.Post({
       userToken: mockValues.expiredUserToken,
     });
 
     expectToNotBeOk(ret);
-    expectErrorCodeToBe(ret, "AUTHORIZATION_BACKEND_EXPIRED");
+    expectErrorCodeToBe(ret, 'AUTHORIZATION_BACKEND_EXPIRED');
   });
 
-  it("Should return error SERVER_NOT_CLAIMED when requesting a server not claimed", async () => {
+  it('Should return error SERVER_NOT_CLAIMED when requesting a server not claimed', async () => {
     await UnclaimServer.Post();
 
     const ret = await GetToken.Post({
@@ -75,19 +75,19 @@ describe("Test 'claimServer' endpoint", () => {
     });
 
     expectToNotBeOk(ret);
-    expectErrorCodeToBe(ret, "SERVER_NOT_CLAIMED");
+    expectErrorCodeToBe(ret, 'SERVER_NOT_CLAIMED');
   });
 
-  it("Should return error USER_NOT_ALLOWED when requesting a server not owned by user", async () => {
+  it('Should return error USER_NOT_ALLOWED when requesting a server not owned by user', async () => {
     const ret = await GetToken.Post({
       userToken: mockValues.validUserToken2,
     });
 
     expectToNotBeOk(ret);
-    expectErrorCodeToBe(ret, "USER_NOT_ALLOWED");
+    expectErrorCodeToBe(ret, 'USER_NOT_ALLOWED');
   });
 
-  it("Should return error BACKEND_SERVER_UNREACHABLE when claiming a server but backend unreachable", async () => {
+  it('Should return error BACKEND_SERVER_UNREACHABLE when claiming a server but backend unreachable', async () => {
     mockValues.failNextRequestServerUnreachable();
 
     const ret = await GetToken.Post({
@@ -95,10 +95,10 @@ describe("Test 'claimServer' endpoint", () => {
     });
 
     expectToNotBeOk(ret);
-    expectErrorCodeToBe(ret, "BACKEND_SERVER_UNREACHABLE");
+    expectErrorCodeToBe(ret, 'BACKEND_SERVER_UNREACHABLE');
   });
 
-  it("Should return error SERVER_ERROR when claiming a server but receiving unexpected error from backend", async () => {
+  it('Should return error SERVER_ERROR when claiming a server but receiving unexpected error from backend', async () => {
     mockValues.failNextRequest();
 
     const ret = await GetToken.Post({
@@ -106,6 +106,6 @@ describe("Test 'claimServer' endpoint", () => {
     });
 
     expectToNotBeOk(ret);
-    expectErrorCodeToBe(ret, "SERVER_ERROR");
+    expectErrorCodeToBe(ret, 'SERVER_ERROR');
   });
 });

@@ -6,7 +6,7 @@
   "version": "1.0.0",
   "main": "dist/src/main.js",
   "scripts": {
-    "format": "prettier --write ./src",
+    "format": "prettier --write ./src ./tests",
     "start": "yarn start:server",
     "build": "yarn build:server",
     "package": "electron-forge package",

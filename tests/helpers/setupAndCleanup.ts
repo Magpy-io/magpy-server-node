@@ -1,13 +1,10 @@
-import { Express } from "express";
+import { Express } from 'express';
 
-import { volumeReset } from "@tests/helpers/mockFsVolumeManager";
-import { openAndInitDB, clearDB } from "@src/db/sequelizeDb";
-import { InitModules, ClearModules } from "@src/config/configModules";
-import {
-  setupServerUserToken,
-  setupServerClaimed,
-} from "@tests/helpers/functions";
-import { setupAxiosMock } from "@tests/__mocks__/axiosMockHelper";
+import { volumeReset } from '@tests/helpers/mockFsVolumeManager';
+import { openAndInitDB, clearDB } from '@src/db/sequelizeDb';
+import { InitModules, ClearModules } from '@src/config/configModules';
+import { setupServerUserToken, setupServerClaimed } from '@tests/helpers/functions';
+import { setupAxiosMock } from '@tests/__mocks__/axiosMockHelper';
 
 export async function beforeEachNotClaimed(app: Express) {
   await volumeReset();
