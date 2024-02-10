@@ -1,3 +1,7 @@
+import '@tests/helpers/loadEnvFile';
+import { mockModules } from '@tests/helpers/mockModules';
+mockModules();
+
 import { describe, expect, it } from '@jest/globals';
 import { DeletePhotosById } from '@src/api/export';
 import { getAllMediaIdsByImageIdFromDB } from '@src/db/sequelizeDb';
@@ -13,12 +17,8 @@ import {
   getPhotoFromDb,
   testPhotoNotInDbNorDisk,
 } from '@tests/helpers/functions';
-import '@tests/helpers/loadEnvFile';
-import { mockModules } from '@tests/helpers/mockModules';
 import * as sac from '@tests/helpers/setupAndCleanup';
 import { Express } from 'express';
-
-mockModules();
 
 describe("Test 'deletePhotosById' endpoint", () => {
   let app: Express;

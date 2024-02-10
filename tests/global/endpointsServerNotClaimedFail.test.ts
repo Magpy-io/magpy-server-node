@@ -1,13 +1,13 @@
+import '@tests/helpers/loadEnvFile';
+import { mockModules } from '@tests/helpers/mockModules';
+mockModules();
+
 import { describe, expect, it } from '@jest/globals';
 import { initServer, stopServer } from '@src/server/server';
 import { randomTokenHeader } from '@tests/helpers/functions';
-import '@tests/helpers/loadEnvFile';
-import { mockModules } from '@tests/helpers/mockModules';
 import * as sac from '@tests/helpers/setupAndCleanup';
 import { Express } from 'express';
 import request from 'supertest';
-
-mockModules();
 
 const endpointsToTestServerNotClaimed: Array<{
   endpoint: string;

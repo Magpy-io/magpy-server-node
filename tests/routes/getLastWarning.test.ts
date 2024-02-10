@@ -1,15 +1,16 @@
+import '@tests/helpers/loadEnvFile';
+import { mockModules } from '@tests/helpers/mockModules';
+mockModules();
+
 import { describe, expect, it } from '@jest/globals';
 import { GetLastWarning } from '@src/api/export';
 import { WarningPhotosNotOnDiskDeletedType } from '@src/api/export/Types/WarningTypes';
 import { SetLastWarningForUser } from '@src/modules/warningsManager';
 import { initServer, stopServer } from '@src/server/server';
 import { expectToBeOk, getDataFromRet, getUserId } from '@tests/helpers/functions';
-import '@tests/helpers/loadEnvFile';
-import { mockModules } from '@tests/helpers/mockModules';
+
 import * as sac from '@tests/helpers/setupAndCleanup';
 import { Express } from 'express';
-
-mockModules();
 
 describe("Test 'getLastWarning' endpoint", () => {
   let app: Express;
