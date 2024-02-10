@@ -23,7 +23,7 @@ const callback = async (req: Request, res: Response, body: AddPhoto.RequestData)
       height: body.height,
       date: body.date,
       syncDate: new Date(Date.now()).toJSON(),
-      clientPath: body.path,
+      mediaId: body.mediaId,
       deviceUniqueId: body.deviceUniqueId,
       serverPath: '',
       serverCompressedPath: '',

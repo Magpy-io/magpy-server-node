@@ -77,7 +77,7 @@ function createPhotoObject(dbPhoto: Photo, image64?: string): APIPhoto {
       date: dbPhoto.date.toJSON(),
       syncDate: dbPhoto.syncDate.toJSON(),
       serverPath: dbPhoto.serverPath,
-      clientPaths: dbPhoto.clientPaths,
+      mediaIds: dbPhoto.mediaIds,
     },
     image64: image64 ? image64 : '',
   };

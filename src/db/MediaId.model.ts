@@ -1,6 +1,6 @@
 import { DataTypes, Sequelize } from 'sequelize';
 
-const modelName = 'clientPath';
+const modelName = 'mediaId';
 
 const modelDefinition = {
   id: {
@@ -10,23 +10,23 @@ const modelDefinition = {
     unique: true,
     primaryKey: true,
   },
-  path: {
+  mediaId: {
     type: DataTypes.STRING,
     allowNull: false,
   },
 };
 
 const modelOptions = {
-  indexes: [{ fields: ['path'] }],
+  indexes: [{ fields: ['mediaId'] }],
 };
 
-export function createClientPathModel(sequelize: Sequelize) {
+export function createMediaIdModel(sequelize: Sequelize) {
   return sequelize.define(modelName, modelDefinition, modelOptions);
 }
 
-export interface ClientPathDB {
+export interface MediaIdDB {
   id: string;
-  path: string;
+  mediaId: string;
   deviceId: string;
   imageId: string;
 }

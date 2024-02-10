@@ -1,61 +1,49 @@
-import { expect } from "@jest/globals";
-
-import { validate } from "uuid";
-import jwt from "jsonwebtoken";
-import { v4 as uuid } from "uuid";
-import { photoImage64 } from "@tests/helpers/imageBase64";
-import { postPhotoPartTimeout } from "@src/config/config";
-import { timeout } from "@src/modules/functions";
-import { verifyUserToken } from "@src/modules/tokenManagement";
-import fs from "fs/promises";
-import { pathExists } from "@src/modules/diskManager";
-
-import * as dbFunction from "@src/db/sequelizeDb";
-
+import { expect } from '@jest/globals';
 import {
   AddPhoto,
+  GetNumberPhotos,
   GetPhotosById,
   GetToken,
-  UpdatePhotoPath,
-  GetNumberPhotos,
-} from "@src/api/export/";
+  UpdatePhotoMediaId,
+} from '@src/api/export/';
+import { GetUserToken, HasUserToken } from '@src/api/export/TokenManager';
+import { APIPhoto, PhotoTypes } from '@src/api/export/Types';
+import { ErrorCodes } from '@src/api/export/Types/ErrorTypes';
+import { postPhotoPartTimeout } from '@src/config/config';
+import * as dbFunction from '@src/db/sequelizeDb';
+import { Photo } from '@src/db/sequelizeDb';
+import * as mockValues from '@src/modules/BackendQueries/__mocks__/mockValues';
+import { pathExists } from '@src/modules/diskManager';
+import { timeout } from '@src/modules/functions';
+import { GetServerConfigData, SaveServerCredentials } from '@src/modules/serverDataManager';
+import { verifyUserToken } from '@src/modules/tokenManagement';
+import { GetLastWarningForUser, HasWarningForUser } from '@src/modules/warningsManager';
+import { photoImage64 } from '@tests/helpers/imageBase64';
+import fs from 'fs/promises';
+import jwt from 'jsonwebtoken';
+import { validate } from 'uuid';
+import { v4 as uuid } from 'uuid';
 
-import { GetUserToken, HasUserToken } from "@src/api/export/TokenManager";
-import { PhotoTypes, APIPhoto } from "@src/api/export/Types";
-import { ErrorCodes } from "@src/api/export/Types/ErrorTypes";
-
-import {
-  GetServerConfigData,
-  SaveServerCredentials,
-} from "@src/modules/serverDataManager";
-
-import * as mockValues from "@src/modules/BackendQueries/__mocks__/mockValues";
-import { Photo } from "@src/db/sequelizeDb";
-import {
-  GetLastWarningForUser,
-  HasWarningForUser,
-} from "@src/modules/warningsManager";
-
-let serverUserToken = "";
+let serverUserToken = '';
 
 const defaultPhoto = {
-  name: "image.jpg",
+  name: 'image.jpg',
   fileSize: 1000,
   width: 1500,
   height: 1000,
-  path: "/path/to/image.jpg",
-  date: "2022-12-11T17:05:21.396Z",
+  mediaId: 'mediaId',
+  date: '2022-12-11T17:05:21.396Z',
   image64: photoImage64,
-  deviceUniqueId: "fe2e61bd-31e2-4896-b121-1124fa561344",
+  deviceUniqueId: 'fe2e61bd-31e2-4896-b121-1124fa561344',
 };
 
-const defaultPhotoSecondPath = {
-  path: "/new/path/to/image.jpg",
-  deviceUniqueId: "6b065dcf-782b-4203-8b59-06d81242fac0",
+const defaultPhotoSecondMediaId = {
+  mediaId: 'secondMediaId',
+  deviceUniqueId: '6b065dcf-782b-4203-8b59-06d81242fac0',
 };
 
 async function addPhoto(data?: {
-  path?: string;
+  mediaId?: string;
   name?: string;
   fileSize?: number;
   width?: number;
@@ -69,27 +57,27 @@ async function addPhoto(data?: {
     fileSize: data?.fileSize ?? defaultPhoto.fileSize,
     width: data?.width ?? defaultPhoto.width,
     height: data?.height ?? defaultPhoto.height,
-    path: data?.path ?? defaultPhoto.path,
+    mediaId: data?.mediaId ?? defaultPhoto.mediaId,
     date: data?.date ?? defaultPhoto.date,
     image64: data?.image64 ?? defaultPhoto.image64,
     deviceUniqueId: data?.deviceUniqueId ?? defaultPhoto.deviceUniqueId,
   });
 
   if (!ret.ok) {
-    throw "Error adding photo";
+    throw 'Error adding photo';
   }
 
   return {
     id: ret.data.photo.id,
-    path: data?.path ?? defaultPhoto.path,
+    mediaId: data?.mediaId ?? defaultPhoto.mediaId,
   };
 }
 
 async function addNPhotos(n: number) {
-  const ret: { id: string; path: string }[] = [];
+  const ret: { id: string; mediaId: string }[] = [];
   for (let i = 0; i < n; i++) {
     const photoAddedData = await addPhoto({
-      path: "/path/to/image" + i.toString() + ".jpg",
+      mediaId: 'mediaId' + i.toString(),
     });
     ret.push(photoAddedData);
   }
@@ -97,15 +85,15 @@ async function addNPhotos(n: number) {
 }
 
 async function deletePhotoFromDisk(photo: Photo, photoType: PhotoTypes) {
-  if (photoType == "thumbnail") {
+  if (photoType == 'thumbnail') {
     await fs.rm(photo.serverThumbnailPath, { force: true });
   }
 
-  if (photoType == "compressed") {
+  if (photoType == 'compressed') {
     await fs.rm(photo.serverCompressedPath, { force: true });
   }
 
-  if (photoType == "original") {
+  if (photoType == 'original') {
     await fs.rm(photo.serverPath, { force: true });
   }
 }
@@ -114,7 +102,7 @@ async function getPhotoFromDb(id: string) {
   const dbPhoto = await dbFunction.getPhotoByIdFromDB(id);
 
   if (!dbPhoto) {
-    throw new Error("Photo not found in db");
+    throw new Error('Photo not found in db');
   }
 
   return dbPhoto;
@@ -139,7 +127,7 @@ async function testPhotosExistInDbAndDisk(photo: APIPhoto) {
 
   expect(dbPhoto).toBeTruthy();
   if (!dbPhoto) {
-    throw new Error("dbPhoto expected to be thruthy");
+    throw new Error('dbPhoto expected to be thruthy');
   }
 
   const originalExists = await pathExists(dbPhoto.serverPath);
@@ -153,7 +141,7 @@ async function testPhotosExistInDbAndDisk(photo: APIPhoto) {
 
 type testPhotoMetaAndIdDataType = {
   deviceUniqueId?: string;
-  path?: string;
+  mediaId?: string;
   name?: string;
   fileSize?: number;
   width?: number;
@@ -162,17 +150,14 @@ type testPhotoMetaAndIdDataType = {
   id?: string;
 };
 
-function testPhotoMetaAndId(
-  photo: APIPhoto,
-  data?: testPhotoMetaAndIdDataType
-) {
-  testPhotoMetaAndIdWithAdditionalPaths(photo, [], data);
+function testPhotoMetaAndId(photo: APIPhoto, data?: testPhotoMetaAndIdDataType) {
+  testPhotoMetaAndIdWithAdditionalMediaIds(photo, [], data);
 }
 
-function testPhotoMetaAndIdWithAdditionalPaths(
+function testPhotoMetaAndIdWithAdditionalMediaIds(
   photo: APIPhoto,
-  additionalPaths: { path: string; deviceUniqueId: string }[],
-  data?: testPhotoMetaAndIdDataType
+  additionalMediaIds: { mediaId: string; deviceUniqueId: string }[],
+  data?: testPhotoMetaAndIdDataType,
 ) {
   const validID = validate(photo.id);
   expect(validID).toBe(true);
@@ -191,33 +176,31 @@ function testPhotoMetaAndIdWithAdditionalPaths(
   const sync = new Date(photo.meta.syncDate);
   expect(Date.now() - sync.getTime()).toBeLessThan(10000);
 
-  //test paths
+  //test mediaIds
 
-  const pathsToTest = [
+  const mediaIdsToTest = [
     {
-      path: data?.path ?? defaultPhoto.path,
+      mediaId: data?.mediaId ?? defaultPhoto.mediaId,
       deviceUniqueId: data?.deviceUniqueId ?? defaultPhoto.deviceUniqueId,
     },
-    ...additionalPaths,
+    ...additionalMediaIds,
   ];
 
-  expect(photo.meta.clientPaths.length).toBe(pathsToTest.length);
+  expect(photo.meta.mediaIds.length).toBe(mediaIdsToTest.length);
 
-  for (let i = 0; i < pathsToTest.length; i++) {
-    expect(photo.meta.clientPaths[i].path).toBe(pathsToTest[i].path);
-    expect(photo.meta.clientPaths[i].deviceUniqueId).toBe(
-      pathsToTest[i].deviceUniqueId
-    );
+  for (let i = 0; i < mediaIdsToTest.length; i++) {
+    expect(photo.meta.mediaIds[i].mediaId).toBe(mediaIdsToTest[i].mediaId);
+    expect(photo.meta.mediaIds[i].deviceUniqueId).toBe(mediaIdsToTest[i].deviceUniqueId);
   }
 }
 
 function testPhotoOriginal(
   photo?: APIPhoto,
   data?: testPhotoMetaAndIdDataType,
-  image64?: string
+  image64?: string,
 ) {
   if (!photo) {
-    throw new Error("testPhotoOriginal: no photo to test");
+    throw new Error('testPhotoOriginal: no photo to test');
   }
   testPhotoMetaAndId(photo, data);
 
@@ -227,41 +210,37 @@ function testPhotoOriginal(
 function testPhotoCompressed(
   photo: APIPhoto,
   data?: testPhotoMetaAndIdDataType,
-  image64?: string
+  image64?: string,
 ) {
   testPhotoMetaAndId(photo, data);
 
-  expect(photo.image64.length).toBeLessThan(
-    image64?.length ?? photoImage64.length
-  );
+  expect(photo.image64.length).toBeLessThan(image64?.length ?? photoImage64.length);
 }
 
 function testPhotoThumbnail(
   photo: APIPhoto,
   data?: testPhotoMetaAndIdDataType,
-  image64?: string
+  image64?: string,
 ) {
   testPhotoMetaAndId(photo, data);
 
-  expect(photo.image64.length).toBeLessThan(
-    image64?.length ?? photoImage64.length
-  );
+  expect(photo.image64.length).toBeLessThan(image64?.length ?? photoImage64.length);
 }
 
 function testPhotoData(photo: APIPhoto, data?: testPhotoMetaAndIdDataType) {
   testPhotoMetaAndId(photo, data);
 
-  expect(photo.image64).toBe("");
+  expect(photo.image64).toBe('');
 }
 
 async function checkPhotoExists(id: string) {
   const ret = await GetPhotosById.Post({
     ids: [id],
-    photoType: "data",
+    photoType: 'data',
   });
 
   if (!ret.ok) {
-    throw "Error checking photo exists";
+    throw 'Error checking photo exists';
   }
 
   return ret.data.photos[0].exists;
@@ -270,11 +249,11 @@ async function checkPhotoExists(id: string) {
 async function getPhotoById(id: string, photoType?: PhotoTypes) {
   const ret = await GetPhotosById.Post({
     ids: [id],
-    photoType: photoType ?? "data",
+    photoType: photoType ?? 'data',
   });
 
   if (!ret.ok) {
-    throw "Error checking photo exists";
+    throw 'Error checking photo exists';
   }
 
   if (!ret.data.photos[0].exists) {
@@ -288,7 +267,7 @@ async function getNumberPhotos() {
   const ret = await GetNumberPhotos.Post();
 
   if (!ret.ok) {
-    throw "Error checking photo exists";
+    throw 'Error checking photo exists';
   }
 
   return ret.data.number;
@@ -302,23 +281,18 @@ function testReturnedToken() {
   const serverData = GetServerConfigData();
 
   if (!serverData.serverKey) {
-    throw new Error(
-      "testReturnedToken: serverData.serverKey needs to be defined"
-    );
+    throw new Error('testReturnedToken: serverData.serverKey needs to be defined');
   }
 
   expect(HasUserToken()).toBe(true);
 
   const userTokenRetured = GetUserToken();
 
-  const tokenVerification = verifyUserToken(
-    userTokenRetured,
-    serverData.serverKey
-  );
+  const tokenVerification = verifyUserToken(userTokenRetured, serverData.serverKey);
   expect(tokenVerification.ok).toBe(true);
 
   if (!tokenVerification.ok) {
-    throw new Error("");
+    throw new Error('');
   }
 
   expect(tokenVerification.data.id).toBeDefined();
@@ -339,7 +313,7 @@ async function setupServerUserToken() {
 
   if (!HasUserToken()) {
     throw new Error(
-      "Error setting up server to generate user token:\n " + JSON.stringify(ret)
+      'Error setting up server to generate user token:\n ' + JSON.stringify(ret),
     );
   }
   serverUserToken = GetUserToken();
@@ -347,20 +321,17 @@ async function setupServerUserToken() {
 
 function getUserId() {
   if (!serverUserToken) {
-    throw new Error("No serverUserToken to use in getUserId()");
+    throw new Error('No serverUserToken to use in getUserId()');
   }
   const serverData = GetServerConfigData();
   if (!serverData.serverKey) {
-    throw new Error("getUserId: serverData.serverKey needs to be defined");
+    throw new Error('getUserId: serverData.serverKey needs to be defined');
   }
 
-  const tokenVerification = verifyUserToken(
-    serverUserToken,
-    serverData.serverKey
-  );
+  const tokenVerification = verifyUserToken(serverUserToken, serverData.serverKey);
 
   if (!tokenVerification.ok) {
-    throw new Error("getUserId: token verification failed");
+    throw new Error('getUserId: token verification failed');
   }
   return tokenVerification.data.id;
 }
@@ -374,7 +345,7 @@ function getExpiredToken() {
 }
 
 function randomTokenHeader() {
-  return { "x-authorization": "Bearer serverUserToken" };
+  return { 'x-authorization': 'Bearer serverUserToken' };
 }
 
 function testWarning(dbPhoto: Photo) {
@@ -384,11 +355,11 @@ function testWarning(dbPhoto: Photo) {
   expect(warning).toBeTruthy();
 
   if (!warning) {
-    throw new Error("warning should be defined");
+    throw new Error('warning should be defined');
   }
 
-  expect(warning.code).toBe("PHOTOS_NOT_ON_DISK_DELETED");
-  expect(warning.data).toHaveProperty("photosDeleted");
+  expect(warning.code).toBe('PHOTOS_NOT_ON_DISK_DELETED');
+  expect(warning.data).toHaveProperty('photosDeleted');
   expect(warning.data.photosDeleted.length).toBe(1);
 
   expect(warning.data.photosDeleted[0].id).toBe(dbPhoto.id);
@@ -398,7 +369,7 @@ function getDataFromRet<T extends { ok: boolean; data?: any }>(o: T) {
   type DataType = T extends { data: infer S } ? S : never;
 
   if (!o.ok) {
-    throw new Error("getDataFromRet: ok is false, cannot get data");
+    throw new Error('getDataFromRet: ok is false, cannot get data');
   }
   return o.data as DataType;
 }
@@ -413,18 +384,18 @@ function expectToNotBeOk<T extends { ok: boolean }>(o: T) {
 
 function expectErrorCodeToBe<T extends { ok: boolean; errorCode?: ErrorCodes }>(
   o: T,
-  errorCode: ErrorCodes
+  errorCode: ErrorCodes,
 ) {
   expect(o.errorCode).toBe(errorCode);
 }
 
-async function addPhotoWithMultiplePaths() {
+async function addPhotoWithMultipleMediaIds() {
   const addedPhotoData = await addPhoto();
 
-  await UpdatePhotoPath.Post({
+  await UpdatePhotoMediaId.Post({
     id: addedPhotoData.id,
-    path: defaultPhotoSecondPath.path,
-    deviceUniqueId: defaultPhotoSecondPath.deviceUniqueId,
+    mediaId: defaultPhotoSecondMediaId.mediaId,
+    deviceUniqueId: defaultPhotoSecondMediaId.deviceUniqueId,
   });
 
   return addedPhotoData;
@@ -448,11 +419,11 @@ export {
   checkPhotoExists,
   getPhotoById,
   testPhotoMetaAndId,
-  testPhotoMetaAndIdWithAdditionalPaths,
+  testPhotoMetaAndIdWithAdditionalMediaIds,
   getNumberPhotos,
   waitForPhotoTransferToFinish,
   defaultPhoto,
-  defaultPhotoSecondPath,
+  defaultPhotoSecondMediaId,
   testReturnedToken,
   setupServerClaimed,
   setupServerUserToken,
@@ -469,7 +440,7 @@ export {
   expectToBeOk,
   expectToNotBeOk,
   expectErrorCodeToBe,
-  addPhotoWithMultiplePaths,
+  addPhotoWithMultipleMediaIds,
   generateId,
   generateDate,
 };

@@ -1,34 +1,30 @@
-import "@tests/helpers/loadEnvFile";
-import { mockModules } from "@tests/helpers/mockModules";
+import '@tests/helpers/loadEnvFile';
+import { mockModules } from '@tests/helpers/mockModules';
 mockModules();
 
-import { describe, expect, it } from "@jest/globals";
-
-import { Express } from "express";
-import { GetPhotosById } from "@src/api/export";
-
-import { initServer, stopServer } from "@src/server/server";
-
-import * as sac from "@tests/helpers/setupAndCleanup";
-
+import { describe, expect, it } from '@jest/globals';
+import { GetPhotosById } from '@src/api/export';
+import { PhotoTypes } from '@src/api/export/Types';
+import { initServer, stopServer } from '@src/server/server';
 import {
   addNPhotos,
   addPhoto,
-  testPhotoOriginal,
-  testPhotoCompressed,
-  testPhotoThumbnail,
-  testPhotoData,
-  getPhotoFromDb,
+  addPhotoWithMultipleMediaIds,
+  defaultPhotoSecondMediaId,
   deletePhotoFromDisk,
-  testWarning,
   expectToBeOk,
   generateId,
   getDataFromRet,
-  addPhotoWithMultiplePaths,
-  testPhotoMetaAndIdWithAdditionalPaths,
-  defaultPhotoSecondPath,
-} from "@tests/helpers/functions";
-import { PhotoTypes } from "@src/api/export/Types";
+  getPhotoFromDb,
+  testPhotoCompressed,
+  testPhotoData,
+  testPhotoMetaAndIdWithAdditionalMediaIds,
+  testPhotoOriginal,
+  testPhotoThumbnail,
+  testWarning,
+} from '@tests/helpers/functions';
+import * as sac from '@tests/helpers/setupAndCleanup';
+import { Express } from 'express';
 
 describe("Test 'getPhotosById' endpoint", () => {
   let app: Express;
@@ -50,15 +46,15 @@ describe("Test 'getPhotosById' endpoint", () => {
   });
 
   it.each([{ n: 0 }, { n: 1 }, { n: 2 }])(
-    "Should return $n photos all existing after adding $n photos and requesting $n photo ids",
-    async (testData) => {
+    'Should return $n photos all existing after adding $n photos and requesting $n photo ids',
+    async testData => {
       const addedPhotosData = await addNPhotos(testData.n);
 
-      const ids = addedPhotosData.map((e) => e.id);
+      const ids = addedPhotosData.map(e => e.id);
 
       const ret = await GetPhotosById.Post({
         ids: ids,
-        photoType: "data",
+        photoType: 'data',
       });
 
       expectToBeOk(ret);
@@ -72,19 +68,19 @@ describe("Test 'getPhotosById' endpoint", () => {
         expect(data.photos[i].id).toBe(ids[i]);
         expect(data.photos[i].exists).toBe(true);
       }
-    }
+    },
   );
 
   it.each([{ n: 0 }, { n: 1 }, { n: 2 }])(
-    "Should return $n photos all not existing after adding no photos and requesting $n photo ids",
-    async (testData) => {
+    'Should return $n photos all not existing after adding no photos and requesting $n photo ids',
+    async testData => {
       const ids = Array(testData.n)
-        .fill("")
+        .fill('')
         .map(() => generateId());
 
       const ret = await GetPhotosById.Post({
         ids: ids,
-        photoType: "data",
+        photoType: 'data',
       });
 
       expectToBeOk(ret);
@@ -97,17 +93,17 @@ describe("Test 'getPhotosById' endpoint", () => {
         expect(data.photos[i].id).toBe(ids[i]);
         expect(data.photos[i].exists).toBe(false);
       }
-    }
+    },
   );
 
-  it("Should return 2 photos, the first exists and the second does not, after adding 1 photo and requesting 2", async () => {
+  it('Should return 2 photos, the first exists and the second does not, after adding 1 photo and requesting 2', async () => {
     const photoAddedData = await addPhoto();
 
     const ids = [photoAddedData.id, generateId()];
 
     const ret = await GetPhotosById.Post({
       ids: ids,
-      photoType: "data",
+      photoType: 'data',
     });
 
     expectToBeOk(ret);
@@ -127,15 +123,15 @@ describe("Test 'getPhotosById' endpoint", () => {
     photoType: PhotoTypes;
     testFunction: (...args: any[]) => any;
   }> = [
-    { photoType: "original", testFunction: testPhotoOriginal },
-    { photoType: "compressed", testFunction: testPhotoCompressed },
-    { photoType: "thumbnail", testFunction: testPhotoThumbnail },
-    { photoType: "data", testFunction: testPhotoData },
+    { photoType: 'original', testFunction: testPhotoOriginal },
+    { photoType: 'compressed', testFunction: testPhotoCompressed },
+    { photoType: 'thumbnail', testFunction: testPhotoThumbnail },
+    { photoType: 'data', testFunction: testPhotoData },
   ];
 
   it.each(testDataArrayPhotoTypeTestFunction)(
-    "Should return the image added in the quality $photoType",
-    async (testData) => {
+    'Should return the image added in the quality $photoType',
+    async testData => {
       const photoAddedData = await addPhoto();
 
       const ret = await GetPhotosById.Post({
@@ -157,21 +153,21 @@ describe("Test 'getPhotosById' endpoint", () => {
       }
 
       testData.testFunction(data.photos[0].photo, {
-        path: photoAddedData.path,
+        mediaId: photoAddedData.mediaId,
         id: photoAddedData.id,
       });
-    }
+    },
   );
 
   const testDataArrayPhotoType: Array<{ photoType: PhotoTypes }> = [
-    { photoType: "thumbnail" },
-    { photoType: "compressed" },
-    { photoType: "original" },
+    { photoType: 'thumbnail' },
+    { photoType: 'compressed' },
+    { photoType: 'original' },
   ];
 
   it.each(testDataArrayPhotoType)(
-    "Should return photo does not exist with a warning if a photo exists on db but its $photoType is not on disk",
-    async (testData) => {
+    'Should return photo does not exist with a warning if a photo exists on db but its $photoType is not on disk',
+    async testData => {
       const addedPhotoData = await addPhoto();
 
       const photo = await getPhotoFromDb(addedPhotoData.id);
@@ -179,7 +175,7 @@ describe("Test 'getPhotosById' endpoint", () => {
 
       const ret = await GetPhotosById.Post({
         ids: [addedPhotoData.id],
-        photoType: "data",
+        photoType: 'data',
       });
 
       expectToBeOk(ret);
@@ -193,15 +189,15 @@ describe("Test 'getPhotosById' endpoint", () => {
       expect(data.photos[0].exists).toBe(false);
 
       testWarning(photo);
-    }
+    },
   );
 
-  it("Should return a photo with multiple paths when requested photo has multiple paths", async () => {
-    const addedPhotoData = await addPhotoWithMultiplePaths();
+  it('Should return a photo with multiple mediaIds when requested photo has multiple mediaIds', async () => {
+    const addedPhotoData = await addPhotoWithMultipleMediaIds();
 
     const ret = await GetPhotosById.Post({
       ids: [addedPhotoData.id],
-      photoType: "data",
+      photoType: 'data',
     });
 
     expectToBeOk(ret);
@@ -215,8 +211,8 @@ describe("Test 'getPhotosById' endpoint", () => {
       throw new Error();
     }
 
-    testPhotoMetaAndIdWithAdditionalPaths(data.photos[0].photo, [
-      defaultPhotoSecondPath,
+    testPhotoMetaAndIdWithAdditionalMediaIds(data.photos[0].photo, [
+      defaultPhotoSecondMediaId,
     ]);
   });
 });

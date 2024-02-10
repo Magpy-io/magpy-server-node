@@ -5,9 +5,9 @@ import { v4 as uuid } from 'uuid';
 import { sqliteDbFile } from '../config/config';
 import { createFolder } from '../modules/diskManager';
 import { filterNull } from '../modules/functions';
-import { ClientPathDB, createClientPathModel } from './ClientPath.model';
 import { DeviceDB, createDevicesModel } from './Devices.model';
 import { PhotoDB, createImageModel } from './Image.model';
+import { MediaIdDB, createMediaIdModel } from './MediaId.model';
 
 let sequelize: Sequelize | null = null;
 
@@ -35,27 +35,25 @@ type modelFunctions<T> = {
 };
 
 let ImageModel: modelFunctions<PhotoDB>;
-let ClientPathModel: modelFunctions<ClientPathDB>;
+let MediaIdModel: modelFunctions<MediaIdDB>;
 let DeviceModel: modelFunctions<DeviceDB>;
 
 async function openAndInitDB() {
   await openDb();
   ImageModel = createImageModel(sequelize!) as unknown as modelFunctions<PhotoDB>;
-  ClientPathModel = createClientPathModel(
-    sequelize!,
-  ) as unknown as modelFunctions<ClientPathDB>;
+  MediaIdModel = createMediaIdModel(sequelize!) as unknown as modelFunctions<MediaIdDB>;
   DeviceModel = createDevicesModel(sequelize!) as unknown as modelFunctions<DeviceDB>;
 
-  ImageModel.hasMany(ClientPathModel, {
+  ImageModel.hasMany(MediaIdModel, {
     onDelete: 'CASCADE',
   });
-  ClientPathModel.belongsTo(ImageModel);
+  MediaIdModel.belongsTo(ImageModel);
 
-  DeviceModel.hasMany(ClientPathModel);
-  ClientPathModel.belongsTo(DeviceModel);
+  DeviceModel.hasMany(MediaIdModel);
+  MediaIdModel.belongsTo(DeviceModel);
 
   await ImageModel.sync();
-  await ClientPathModel.sync();
+  await MediaIdModel.sync();
   await DeviceModel.sync();
 }
 
@@ -112,8 +110,8 @@ async function countDevicesInDB() {
   return count;
 }
 
-async function getPhotoByClientPathFromDB(
-  photoPath: string,
+async function getPhotoByMediaIdFromDB(
+  photoMediaId: string,
   deviceUniqueId: string,
 ): Promise<Array<Photo>> {
   assertDbOpen();
@@ -126,35 +124,35 @@ async function getPhotoByClientPathFromDB(
       return [];
     }
 
-    // Possibly same path present for multiple photos on the same device
-    const clientPaths = await ClientPathModel.findAll({
-      where: { path: photoPath, deviceId: device.dataValues.id },
+    // Possibly same mediaId present for multiple photos on the same device
+    const mediaIds = await MediaIdModel.findAll({
+      where: { mediaId: photoMediaId, deviceId: device.dataValues.id },
     });
 
-    if (clientPaths.length == 0) {
+    if (mediaIds.length == 0) {
       return [];
     }
 
-    const imagesPromises = clientPaths.map(clientPath => {
-      return getPhotoByIdFromDB(clientPath.dataValues.imageId);
+    const imagesPromises = mediaIds.map(mediaId => {
+      return getPhotoByIdFromDB(mediaId.dataValues.imageId);
     });
 
     const images = await Promise.all(imagesPromises);
 
     if (images.some(e => e == null)) {
       console.error(
-        'Found some paths where the imageId does not exist in db\nClearning the paths.',
+        'Found some mediaIds where the imageId does not exist in db\nClearning the mediaIds.',
       );
 
-      const deletePathsWithNoPhoto = images.map((e, index) => {
+      const deleteMediaIdsWithNoPhoto = images.map((e, index) => {
         if (e == null) {
-          return ClientPathModel.destroy({
-            where: { id: clientPaths[index].dataValues.id },
+          return MediaIdModel.destroy({
+            where: { id: mediaIds[index].dataValues.id },
           });
         }
       });
 
-      await Promise.all(deletePathsWithNoPhoto);
+      await Promise.all(deleteMediaIdsWithNoPhoto);
     }
 
     return filterNull(images);
@@ -164,9 +162,9 @@ async function getPhotoByClientPathFromDB(
   }
 }
 
-async function getPhotoByClientPathAndSizeAndDateFromDB(
+async function getPhotoByMediaIdAndSizeAndDateFromDB(
   data: {
-    path: string;
+    mediaId: string;
     size: number;
     date: string;
   },
@@ -174,7 +172,7 @@ async function getPhotoByClientPathAndSizeAndDateFromDB(
 ): Promise<Photo | null> {
   assertDbOpen();
   try {
-    const imagesNonFiltered = await getPhotoByClientPathFromDB(data.path, deviceUniqueId);
+    const imagesNonFiltered = await getPhotoByMediaIdFromDB(data.mediaId, deviceUniqueId);
 
     const images = imagesNonFiltered.filter(image => {
       return image.fileSize == data.size && image.date.toJSON() == data.date;
@@ -182,7 +180,7 @@ async function getPhotoByClientPathAndSizeAndDateFromDB(
 
     if (images.length > 1) {
       console.error(
-        'Got more than one item from database with the same clientPath, size and date',
+        'Got more than one item from database with the same mediaId, size and date',
       );
     }
 
@@ -227,20 +225,20 @@ async function addPhotoToDB(photo: AddPhotoType): Promise<Photo> {
       throw new Error('Error adding device to db');
     }
 
-    const clientPath = await ClientPathModel.create({
+    const mediaId = await MediaIdModel.create({
       id: uuid(),
-      path: photo.clientPath,
+      mediaId: photo.mediaId,
       imageId: dbPhoto.id,
       deviceId: device.dataValues.id,
     });
 
-    if (!clientPath) {
-      throw new Error('Error adding clientPath to db');
+    if (!mediaId) {
+      throw new Error('Error adding mediaId to db');
     }
 
     return {
       ...image.dataValues,
-      clientPaths: [{ path: photo.clientPath, deviceUniqueId: photo.deviceUniqueId }],
+      mediaIds: [{ mediaId: photo.mediaId, deviceUniqueId: photo.deviceUniqueId }],
     };
   } catch (err) {
     console.error(err);
@@ -306,37 +304,37 @@ async function getPhotoByIdFromDB(id: string): Promise<Photo | null> {
       return null;
     }
 
-    const clientPaths = await ClientPathModel.findAll({
+    const mediaIds = await MediaIdModel.findAll({
       where: { imageId: id },
     });
 
-    const devicesPromises = clientPaths.map(async clientPath => {
+    const devicesPromises = mediaIds.map(async mediaId => {
       const device = await DeviceModel.findOne({
-        where: { id: clientPath.dataValues.deviceId },
+        where: { id: mediaId.dataValues.deviceId },
       });
 
       if (!device) {
         console.error(
-          'Found some paths where the deviceId does not exist in db\nClearning the paths.',
+          'Found some mediaIds where the deviceId does not exist in db\nClearning the mediaIds.',
         );
 
-        await ClientPathModel.destroy({
-          where: { id: clientPath.dataValues.id },
+        await MediaIdModel.destroy({
+          where: { id: mediaId.dataValues.id },
         });
         return null;
       }
 
       return {
         deviceUniqueId: device.dataValues.deviceUniqueId,
-        path: clientPath.dataValues.path,
+        mediaId: mediaId.dataValues.mediaId,
       };
     });
 
-    const clientPathsWithDevices = await Promise.all(devicesPromises);
+    const mediaIdsWithDevices = await Promise.all(devicesPromises);
 
     return {
       ...image.dataValues,
-      clientPaths: filterNull(clientPathsWithDevices),
+      mediaIds: filterNull(mediaIdsWithDevices),
     };
   } catch (err) {
     console.error(err);
@@ -358,14 +356,14 @@ async function deletePhotoByIdFromDB(id: string) {
   }
 }
 
-async function getPhotosByClientPathFromDB(
-  photosPaths: string[],
+async function getPhotosByMediaIdFromDB(
+  photosMediaIds: string[],
   deviceUniqueId: string,
 ): Promise<Array<Photo[] | null>> {
   assertDbOpen();
   try {
-    const photosFoundPromise = photosPaths.map(photoPath => {
-      return getPhotoByClientPathFromDB(photoPath, deviceUniqueId);
+    const photosFoundPromise = photosMediaIds.map(photoMediaId => {
+      return getPhotoByMediaIdFromDB(photoMediaId, deviceUniqueId);
     });
     return await Promise.all(photosFoundPromise);
   } catch (err) {
@@ -374,9 +372,9 @@ async function getPhotosByClientPathFromDB(
   }
 }
 
-async function getPhotosByClientPathAndSizeAndDateFromDB(
+async function getPhotosByMediaIdAndSizeAndDateFromDB(
   photosData: Array<{
-    path: string;
+    mediaId: string;
     size: number;
     date: string;
   }>,
@@ -385,7 +383,7 @@ async function getPhotosByClientPathAndSizeAndDateFromDB(
   assertDbOpen();
   try {
     const photosFoundPromise = photosData.map(photoData => {
-      return getPhotoByClientPathAndSizeAndDateFromDB(photoData, deviceUniqueId);
+      return getPhotoByMediaIdAndSizeAndDateFromDB(photoData, deviceUniqueId);
     });
     return await Promise.all(photosFoundPromise);
   } catch (err) {
@@ -407,7 +405,7 @@ async function getPhotosByIdFromDB(ids: string[]): Promise<Array<Photo | null>> 
   }
 }
 
-async function updatePhotoClientPathById(id: string, path: string, deviceUniqueId: string) {
+async function updatePhotoMediaIdById(id: string, mediaId: string, deviceUniqueId: string) {
   assertDbOpen();
   try {
     let device = await getDeviceFromDB(deviceUniqueId);
@@ -423,25 +421,25 @@ async function updatePhotoClientPathById(id: string, path: string, deviceUniqueI
       throw new Error('Error adding photo to db');
     }
 
-    const clientPath = await ClientPathModel.findOne({
+    const dbMediaId = await MediaIdModel.findOne({
       where: { imageId: id, deviceId: device.dataValues.id },
     });
 
-    if (!clientPath) {
-      const clientPathCreated = await ClientPathModel.create({
+    if (!dbMediaId) {
+      const mediaIdCreated = await MediaIdModel.create({
         id: uuid(),
-        path: path,
+        mediaId: mediaId,
         imageId: id,
         deviceId: device.dataValues.id,
       });
 
-      if (!clientPathCreated) {
-        throw new Error('updatePhotoClientPathById: Error adding new clientPath to photo');
+      if (!mediaIdCreated) {
+        throw new Error('updatePhotoMediaIdById: Error adding new mediaId to photo');
       }
     } else {
-      await ClientPathModel.update(
-        { path: path },
-        { where: { id: clientPath.dataValues.id } },
+      await MediaIdModel.update(
+        { mediaId: mediaId },
+        { where: { id: dbMediaId.dataValues.id } },
       );
     }
   } catch (err) {
@@ -450,14 +448,14 @@ async function updatePhotoClientPathById(id: string, path: string, deviceUniqueI
   }
 }
 
-async function getAllClientPathsByImageIdFromDB(imageId: string) {
-  const clientPaths = (
-    await ClientPathModel.findAll({
+async function getAllMediaIdsByImageIdFromDB(imageId: string) {
+  const mediaIds = (
+    await MediaIdModel.findAll({
       where: { imageId: imageId },
     })
   ).map(e => e.dataValues);
 
-  return clientPaths;
+  return mediaIds;
 }
 
 async function clearDB() {
@@ -477,7 +475,7 @@ function assertDbOpen() {
 }
 
 export type Photo = PhotoDB & {
-  clientPaths: Array<{ deviceUniqueId: string; path: string }>;
+  mediaIds: Array<{ deviceUniqueId: string; mediaId: string }>;
 };
 
 export type AddPhotoType = {
@@ -487,7 +485,7 @@ export type AddPhotoType = {
   height: number;
   date: string;
   syncDate: string;
-  clientPath: string;
+  mediaId: string;
   deviceUniqueId: string;
   serverPath: string;
   serverCompressedPath: string;
@@ -502,15 +500,15 @@ export {
   clearDB,
   getDeviceFromDB,
   countDevicesInDB,
-  getPhotoByClientPathFromDB,
+  getPhotoByMediaIdFromDB,
   addPhotoToDB,
   numberPhotosFromDB,
   getPhotosFromDB,
   getPhotoByIdFromDB,
   deletePhotoByIdFromDB,
-  getPhotosByClientPathFromDB,
+  getPhotosByMediaIdFromDB,
   getPhotosByIdFromDB,
-  updatePhotoClientPathById,
-  getPhotosByClientPathAndSizeAndDateFromDB,
-  getAllClientPathsByImageIdFromDB,
+  updatePhotoMediaIdById,
+  getPhotosByMediaIdAndSizeAndDateFromDB,
+  getAllMediaIdsByImageIdFromDB,
 };
