@@ -37,7 +37,7 @@ const callback = async (req: Request, res: Response, body: GetPhotos.RequestData
       } photos were missing.`,
     );
 
-    let images64Promises;
+    let images64Promises: Promise<string>[] = [];
 
     if (photoType == 'data') {
       images64Promises = new Array(ret.photosThatExist.length).fill('');
