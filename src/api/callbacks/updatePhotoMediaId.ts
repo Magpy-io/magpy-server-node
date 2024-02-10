@@ -6,17 +6,18 @@ import {
   AddWarningPhotosDeleted,
   checkPhotoExistsAndDeleteMissing,
 } from '../../modules/functions';
-import { UpdatePhotoPath } from '../Types';
+import { UpdatePhotoMediaId } from '../Types';
 import responseFormatter from '../responseFormatter';
 
-const sendResponse = responseFormatter.getCustomSendResponse<UpdatePhotoPath.ResponseData>();
+const sendResponse =
+  responseFormatter.getCustomSendResponse<UpdatePhotoMediaId.ResponseData>();
 
-const callback = async (req: Request, res: Response, body: UpdatePhotoPath.RequestData) => {
+const callback = async (req: Request, res: Response, body: UpdatePhotoMediaId.RequestData) => {
   if (!req.userId) {
     throw new Error('UserId is not defined.');
   }
 
-  const { id, path, deviceUniqueId } = body;
+  const { id, mediaId, deviceUniqueId } = body;
 
   try {
     console.log(`Searching in db for photo with id: ${id}`);
@@ -44,7 +45,7 @@ const callback = async (req: Request, res: Response, body: UpdatePhotoPath.Reque
 
       console.log('Photo path does not exist in db');
       console.log('Updating path in db');
-      await updatePhotoMediaIdById(id, path, deviceUniqueId);
+      await updatePhotoMediaIdById(id, mediaId, deviceUniqueId);
 
       console.log('Photo updated successfully.');
       console.log('Sending response message.');
@@ -57,9 +58,9 @@ const callback = async (req: Request, res: Response, body: UpdatePhotoPath.Reque
 };
 
 export default {
-  endpoint: UpdatePhotoPath.endpoint,
+  endpoint: UpdatePhotoMediaId.endpoint,
   callback: callback,
   method: 'post',
   middleWare: checkUserToken,
-  requestShema: UpdatePhotoPath.RequestSchema,
+  requestShema: UpdatePhotoMediaId.RequestSchema,
 };

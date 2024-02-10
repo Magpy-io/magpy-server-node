@@ -4,7 +4,7 @@ import checkConnexionLocal from '../../middleware/checkConnexionLocal';
 import { folderHasRights, pathExists } from '../../modules/diskManager';
 import { isAbsolutePath } from '../../modules/functions';
 import { SaveStorageFolderPath } from '../../modules/serverDataManager';
-import { UpdatePhotoPath, UpdateServerPath } from '../Types';
+import { UpdateServerPath } from '../Types';
 import responseFormatter from '../responseFormatter';
 
 const sendResponse = responseFormatter.getCustomSendResponse<UpdateServerPath.ResponseData>();

@@ -147,14 +147,14 @@ describe("Test 'deletePhotosById' endpoint", () => {
     await testPhotoNotInDbNorDisk(photo);
   });
 
-  it('Should delete all clientPaths associated with photo when deleted', async () => {
+  it('Should delete all mediaIds associated with photo when deleted', async () => {
     const addedPhotoData = await addPhoto();
 
     await DeletePhotosById.Post({
       ids: [addedPhotoData.id],
     });
 
-    const clientPaths = await getAllMediaIdsByImageIdFromDB(addedPhotoData.id);
-    expect(clientPaths.length).toBe(0);
+    const mediaIds = await getAllMediaIdsByImageIdFromDB(addedPhotoData.id);
+    expect(mediaIds.length).toBe(0);
   });
 });

@@ -7,12 +7,13 @@ import {
   AddWarningPhotosDeleted,
   filterPhotosExistAndDeleteMissing,
 } from '../../modules/functions';
-import { APIPhoto, GetPhotosByPath } from '../Types';
+import { APIPhoto, GetPhotosByMediaId } from '../Types';
 import responseFormatter from '../responseFormatter';
 
-const sendResponse = responseFormatter.getCustomSendResponse<GetPhotosByPath.ResponseData>();
+const sendResponse =
+  responseFormatter.getCustomSendResponse<GetPhotosByMediaId.ResponseData>();
 
-const callback = async (req: Request, res: Response, body: GetPhotosByPath.RequestData) => {
+const callback = async (req: Request, res: Response, body: GetPhotosByMediaId.RequestData) => {
   try {
     if (!req.userId) {
       throw new Error('UserId is not defined.');
@@ -21,12 +22,7 @@ const callback = async (req: Request, res: Response, body: GetPhotosByPath.Reque
     const { photosData, photoType, deviceUniqueId } = body;
 
     console.log('Getting photos from db with paths from request.');
-    const photos = await getPhotosByMediaIdAndSizeAndDateFromDB(
-      photosData.map(pd => {
-        return { date: pd.date, size: pd.size, mediaId: pd.path };
-      }),
-      deviceUniqueId,
-    );
+    const photos = await getPhotosByMediaIdAndSizeAndDateFromDB(photosData, deviceUniqueId);
     console.log('Received response from db.');
 
     const ret = await filterPhotosExistAndDeleteMissing(photos);
@@ -51,17 +47,17 @@ const callback = async (req: Request, res: Response, body: GetPhotosByPath.Reque
 
     const photosResponse = ret.photosThatExist.map((photo, index) => {
       if (!photo)
-        return { path: photosData[index].path, exists: false } as {
-          path: string;
+        return { mediaId: photosData[index].mediaId, exists: false } as {
+          mediaId: string;
           exists: false;
         };
 
       const photoWithImage64 = responseFormatter.createPhotoObject(photo, images64[index]);
       return {
-        path: photosData[index].path,
+        mediaId: photosData[index].mediaId,
         exists: true,
         photo: photoWithImage64,
-      } as { path: string; exists: true; photo: APIPhoto };
+      } as { mediaId: string; exists: true; photo: APIPhoto };
     });
 
     const jsonResponse = {
@@ -78,9 +74,9 @@ const callback = async (req: Request, res: Response, body: GetPhotosByPath.Reque
 };
 
 export default {
-  endpoint: GetPhotosByPath.endpoint,
+  endpoint: GetPhotosByMediaId.endpoint,
   callback: callback,
   method: 'post',
   middleWare: checkUserToken,
-  requestShema: GetPhotosByPath.RequestSchema,
+  requestShema: GetPhotosByMediaId.RequestSchema,
 };

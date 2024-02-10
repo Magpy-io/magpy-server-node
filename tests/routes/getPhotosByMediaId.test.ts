@@ -1,13 +1,13 @@
 import { describe, expect, it } from '@jest/globals';
-import { GetPhotosByPath } from '@src/api/export';
+import { GetPhotosByMediaId } from '@src/api/export';
 import { PhotoTypes } from '@src/api/export/Types';
 import { initServer, stopServer } from '@src/server/server';
 import {
   addNPhotos,
   addPhoto,
-  addPhotoWithMultiplePaths,
+  addPhotoWithMultipleMediaIds,
   defaultPhoto,
-  defaultPhotoSecondPath,
+  defaultPhotoSecondMediaId,
   deletePhotoFromDisk,
   expectToBeOk,
   generateDate,
@@ -15,7 +15,7 @@ import {
   getPhotoFromDb,
   testPhotoCompressed,
   testPhotoData,
-  testPhotoMetaAndIdWithAdditionalPaths,
+  testPhotoMetaAndIdWithAdditionalMediaIds,
   testPhotoOriginal,
   testPhotoThumbnail,
   testWarning,
@@ -27,7 +27,7 @@ import { Express } from 'express';
 
 mockModules();
 
-describe("Test 'getPhotosByPath' endpoint", () => {
+describe("Test 'getPhotosByMediaId' endpoint", () => {
   let app: Express;
 
   beforeAll(async () => {
@@ -47,7 +47,7 @@ describe("Test 'getPhotosByPath' endpoint", () => {
   });
 
   it.each([{ n: 0 }, { n: 1 }, { n: 2 }])(
-    'Should return $n photos all existing after adding $n photos and requesting $n photo paths',
+    'Should return $n photos all existing after adding $n photos and requesting $n photo mediaIds',
     async (testData: { n: number }) => {
       const addedPhotosData = await addNPhotos(testData.n);
 
@@ -58,13 +58,13 @@ describe("Test 'getPhotosByPath' endpoint", () => {
       );
       const photosData = photosAdded.map(photo => {
         return {
-          path: photo.mediaIds[0].mediaId,
+          mediaId: photo.mediaIds[0].mediaId,
           size: photo.fileSize,
           date: photo.date.toJSON(),
         };
       });
 
-      const ret = await GetPhotosByPath.Post({
+      const ret = await GetPhotosByMediaId.Post({
         photosData: photosData,
         photoType: 'data',
         deviceUniqueId: defaultPhoto.deviceUniqueId,
@@ -80,22 +80,22 @@ describe("Test 'getPhotosByPath' endpoint", () => {
       expect(data.photos.length).toBe(testData.n);
 
       for (let i = 0; i < testData.n; i++) {
-        expect(data.photos[i].path).toBe(photosData[i].path);
+        expect(data.photos[i].mediaId).toBe(photosData[i].mediaId);
         expect(data.photos[i].exists).toBe(true);
       }
     },
   );
 
   it.each([{ n: 0 }, { n: 1 }, { n: 2 }])(
-    'Should return $n photos all not existing after adding no photos and requesting $n photo paths',
+    'Should return $n photos all not existing after adding no photos and requesting $n photo mediaIds',
     async (testData: { n: number }) => {
       const photosData = Array(testData.n)
         .fill('')
         .map((_, i) => {
-          return { path: 'path' + i.toString(), size: 0, date: generateDate() };
+          return { mediaId: 'mediaId' + i.toString(), size: 0, date: generateDate() };
         });
 
-      const ret = await GetPhotosByPath.Post({
+      const ret = await GetPhotosByMediaId.Post({
         photosData: photosData,
         photoType: 'data',
         deviceUniqueId: defaultPhoto.deviceUniqueId,
@@ -109,7 +109,7 @@ describe("Test 'getPhotosByPath' endpoint", () => {
       expect(data.photos.length).toBe(testData.n);
 
       for (let i = 0; i < testData.n; i++) {
-        expect(data.photos[i].path).toBe(photosData[i].path);
+        expect(data.photos[i].mediaId).toBe(photosData[i].mediaId);
         expect(data.photos[i].exists).toBe(false);
       }
     },
@@ -122,14 +122,14 @@ describe("Test 'getPhotosByPath' endpoint", () => {
 
     const photosData = [
       {
-        path: photoAddedData.path,
+        mediaId: photoAddedData.mediaId,
         size: dbPhoto.fileSize,
         date: dbPhoto.date.toJSON(),
       },
-      { path: 'path2', size: 0, date: generateDate() },
+      { mediaId: 'mediaId2', size: 0, date: generateDate() },
     ];
 
-    const ret = await GetPhotosByPath.Post({
+    const ret = await GetPhotosByMediaId.Post({
       photosData: photosData,
       photoType: 'data',
       deviceUniqueId: defaultPhoto.deviceUniqueId,
@@ -141,10 +141,10 @@ describe("Test 'getPhotosByPath' endpoint", () => {
     expect(data.number).toBe(2);
     expect(data.photos.length).toBe(2);
 
-    expect(data.photos[0].path).toBe(photosData[0].path);
+    expect(data.photos[0].mediaId).toBe(photosData[0].mediaId);
     expect(data.photos[0].exists).toBe(true);
 
-    expect(data.photos[1].path).toBe(photosData[1].path);
+    expect(data.photos[1].mediaId).toBe(photosData[1].mediaId);
     expect(data.photos[1].exists).toBe(false);
   });
 
@@ -167,13 +167,13 @@ describe("Test 'getPhotosByPath' endpoint", () => {
 
       const photosData = [
         {
-          path: photoAddedData.path,
+          mediaId: photoAddedData.mediaId,
           size: dbPhoto.fileSize,
           date: dbPhoto.date.toJSON(),
         },
       ];
 
-      const ret = await GetPhotosByPath.Post({
+      const ret = await GetPhotosByMediaId.Post({
         photosData: photosData,
         photoType: testData.photoType,
         deviceUniqueId: defaultPhoto.deviceUniqueId,
@@ -185,7 +185,7 @@ describe("Test 'getPhotosByPath' endpoint", () => {
       expect(data.number).toBe(1);
       expect(data.photos.length).toBe(1);
 
-      expect(data.photos[0].path).toBe(photoAddedData.path);
+      expect(data.photos[0].mediaId).toBe(photoAddedData.mediaId);
       expect(data.photos[0].exists).toBe(true);
 
       if (!data.photos[0].exists) {
@@ -193,7 +193,7 @@ describe("Test 'getPhotosByPath' endpoint", () => {
       }
 
       testData.testFunction(data.photos[0].photo, {
-        path: photoAddedData.path,
+        mediaId: photoAddedData.mediaId,
         id: photoAddedData.id,
       });
     },
@@ -216,13 +216,13 @@ describe("Test 'getPhotosByPath' endpoint", () => {
 
       const photosData = [
         {
-          path: addedPhotoData.path,
+          mediaId: addedPhotoData.mediaId,
           size: photo.fileSize,
           date: photo.date.toJSON(),
         },
       ];
 
-      const ret = await GetPhotosByPath.Post({
+      const ret = await GetPhotosByMediaId.Post({
         photosData: photosData,
         photoType: 'data',
         deviceUniqueId: defaultPhoto.deviceUniqueId,
@@ -235,27 +235,27 @@ describe("Test 'getPhotosByPath' endpoint", () => {
       expect(data.number).toBe(1);
       expect(data.photos.length).toBe(1);
 
-      expect(data.photos[0].path).toBe(addedPhotoData.path);
+      expect(data.photos[0].mediaId).toBe(addedPhotoData.mediaId);
       expect(data.photos[0].exists).toBe(false);
 
       testWarning(photo);
     },
   );
 
-  it('Should return a photo with multiple paths when requested photo has multiple paths', async () => {
-    const addedPhotoData = await addPhotoWithMultiplePaths();
+  it('Should return a photo with multiple mediaIds when requested photo has multiple mediaIds', async () => {
+    const addedPhotoData = await addPhotoWithMultipleMediaIds();
 
     const photo = await getPhotoFromDb(addedPhotoData.id);
 
     const photosData = [
       {
-        path: addedPhotoData.path,
+        mediaId: addedPhotoData.mediaId,
         size: photo.fileSize,
         date: photo.date.toJSON(),
       },
     ];
 
-    const ret = await GetPhotosByPath.Post({
+    const ret = await GetPhotosByMediaId.Post({
       photosData: photosData,
       photoType: 'data',
       deviceUniqueId: defaultPhoto.deviceUniqueId,
@@ -266,12 +266,14 @@ describe("Test 'getPhotosByPath' endpoint", () => {
     const data = getDataFromRet(ret);
 
     expect(data.photos[0].exists).toBe(true);
-    expect(data.photos[0].path).toBe(photosData[0].path);
+    expect(data.photos[0].mediaId).toBe(photosData[0].mediaId);
 
     if (!data.photos[0].exists) {
       throw new Error();
     }
 
-    testPhotoMetaAndIdWithAdditionalPaths(data.photos[0].photo, [defaultPhotoSecondPath]);
+    testPhotoMetaAndIdWithAdditionalMediaIds(data.photos[0].photo, [
+      defaultPhotoSecondMediaId,
+    ]);
   });
 });

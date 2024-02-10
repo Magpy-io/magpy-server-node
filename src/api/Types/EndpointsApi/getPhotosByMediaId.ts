@@ -6,14 +6,14 @@ import { APIPhoto, PhotoTypesArray, TokenAuthentification } from '../Types';
 export type ResponseData = {
   number: number;
   photos: Array<
-    { path: string; exists: false } | { path: string; exists: true; photo: APIPhoto }
+    { mediaId: string; exists: false } | { mediaId: string; exists: true; photo: APIPhoto }
   >;
 };
 
 export const RequestSchema = Joi.object({
   photosData: Joi.array().items(
     Joi.object({
-      path: Joi.string(),
+      mediaId: Joi.string(),
       date: Joi.string().isoDate(),
       size: Joi.number().integer(),
     }).options({ presence: 'required' }),
@@ -26,9 +26,9 @@ export const RequestSchema = Joi.object({
 
 export type ResponseErrorTypes = ErrorServerNotClaimed | ErrorsAuthorization;
 
-export const endpoint = 'getPhotosByPath';
+export const endpoint = 'getPhotosByMediaId';
 
 export const tokenAuth: TokenAuthentification = 'yes';
 
 //auto-generated file using "yarn types"
-export * from '../RequestTypes/getPhotosByPath';
+export * from '../RequestTypes/getPhotosByMediaId';
