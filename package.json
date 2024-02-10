@@ -13,6 +13,7 @@
     "make": "electron-forge make",
     "start:server": "yarn build:server && electron-forge start",
     "start:all": "yarn build:all && electron-forge start",
+    "types:check": "tsc --noEmit && echo No typescript errors found",
     "build:server": "rimraf ./dist && tsc",
     "build:client": "cd client; yarn build; cd ..",
     "build:all": "yarn build:client && yarn build:server",

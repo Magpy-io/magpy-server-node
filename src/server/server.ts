@@ -8,7 +8,7 @@ import jsonParsingErrorHandler from '../middleware/jsonParsingErrorHandler';
 import FilesWaiting from '../modules/waitingFiles';
 
 let app: Express;
-let server: any;
+let server: ReturnType<typeof app.listen>;
 
 async function initServer() {
   app = express();

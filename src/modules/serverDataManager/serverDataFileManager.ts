@@ -37,7 +37,7 @@ export function AssertConfigLoaded() {
   }
 }
 
-async function getServerDataFromFile(): Promise<any> {
+async function getServerDataFromFile(): Promise<unknown> {
   try {
     const buffer = await fs.readFile(config.serverDataFile);
 
@@ -48,7 +48,7 @@ async function getServerDataFromFile(): Promise<any> {
   }
 }
 
-function AddServerDataIfMissing(data: any): ServerDataType {
+function AddServerDataIfMissing(data: unknown): ServerDataType {
   const { error, value } = ServerDataSchema.validate(data);
 
   if (!error) {
