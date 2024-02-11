@@ -20,6 +20,7 @@ async function types(): Promise<void> {
   const tsfiles = await glob(join(inputPathAbsolute, '/**/*.ts'), {
     absolute: true,
     nodir: true,
+    windowsPathsNoEscape: true,
   });
 
   await fs.rm(outputPath, { force: true, recursive: true });
