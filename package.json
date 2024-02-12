@@ -10,7 +10,7 @@
     "start": "yarn start:server",
     "build": "yarn build:server",
     "package": "rimraf ./out && pkg . && yarn copy:binary:forked-systray",
-    "convert:exec": "node ./scripts/convert.js out/app.exe out/appConverted.exe",
+    "convert:exec": "node ./scripts/convert.js out/opencloud-server.exe out/opencloud-server.exe",
     "start:server": "yarn build:server && node ./dist/src/index.js",
     "start:all": "yarn build:all && node ./dist/src/index.js",
     "types:check": "tsc --noEmit && echo No typescript errors found",
@@ -83,6 +83,7 @@
     "typescript-parser": "^2.6.1"
   },
   "packageManager": "yarn@4.0.2",
+  "bin": "dist/src/index.js",
   "pkg": {
     "scripts": [
       "node_modules/axios/dist/node/axios.cjs"
@@ -93,6 +94,6 @@
     "targets": [
       "node18-win-x64"
     ],
-    "outputPath": "out/app"
+    "outputPath": "out"
   }
 }
