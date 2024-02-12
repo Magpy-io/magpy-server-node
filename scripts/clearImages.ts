@@ -1,8 +1,8 @@
 // IMPORTS
 import dotenv from 'dotenv';
 
-import { ClearModulesKeepServerConfig, InitModules } from './config/configModules';
-import { clearDbFile, clearImagesDisk } from './modules/diskManager';
+import { ClearModulesKeepServerConfig, InitModules } from '../src/config/configModules';
+import { clearDbFile, clearImagesDisk } from '../src/modules/diskManager';
 
 dotenv.config();
 
