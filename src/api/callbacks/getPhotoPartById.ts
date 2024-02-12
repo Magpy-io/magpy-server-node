@@ -10,6 +10,7 @@ import {
 import { getNumberOfParts, getPartN } from '../../modules/stringHelper';
 import { GetPhotoPartById } from '../Types';
 import responseFormatter from '../responseFormatter';
+import { EndpointType } from '../endpointsLoader';
 
 const sendResponse = responseFormatter.getCustomSendResponse<GetPhotoPartById.ResponseData>();
 
@@ -88,4 +89,4 @@ export default {
   method: 'post',
   middleWare: checkUserToken,
   requestShema: GetPhotoPartById.RequestSchema,
-};
+} as EndpointType;

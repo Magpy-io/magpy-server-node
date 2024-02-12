@@ -7,6 +7,7 @@ import { GetServerConfigData } from '../../modules/serverDataManager';
 import { generateUserToken } from '../../modules/tokenManagement';
 import { GetToken } from '../Types';
 import responseFormatter from '../responseFormatter';
+import { EndpointType } from '../endpointsLoader';
 
 const sendResponse = responseFormatter.getCustomSendResponse<GetToken.ResponseData>();
 
@@ -109,4 +110,4 @@ export default {
   method: 'post',
   middleWare: checkServerIsClaimed,
   requestShema: GetToken.RequestSchema,
-};
+} as EndpointType;

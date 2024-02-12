@@ -8,6 +8,7 @@ import { getMyPort, getMyPrivateIp, getMyPublicIp } from '../../modules/NetworkM
 import { GetServerName, SaveServerCredentials } from '../../modules/serverDataManager';
 import { ClaimServer } from '../Types';
 import responseFormatter from '../responseFormatter';
+import { EndpointType } from '../endpointsLoader';
 
 const sendResponse = responseFormatter.getCustomSendResponse<ClaimServer.ResponseData>();
 
@@ -113,4 +114,4 @@ export default {
   method: 'post',
   middleWare: checkServerIsClaimed,
   requestShema: ClaimServer.RequestSchema,
-};
+} as EndpointType;

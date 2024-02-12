@@ -6,6 +6,7 @@ import { UpdateServerData } from '../../modules/BackendQueries';
 import { SaveServerName } from '../../modules/serverDataManager';
 import { UpdateServerName } from '../Types';
 import responseFormatter from '../responseFormatter';
+import { EndpointType } from '../endpointsLoader';
 
 const sendResponse = responseFormatter.getCustomSendResponse<UpdateServerName.ResponseData>();
 
@@ -58,4 +59,4 @@ export default {
   method: 'post',
   middleWare: [checkConnexionLocal, checkServerHasValidCredentials],
   requestShema: UpdateServerName.RequestSchema,
-};
+} as EndpointType;

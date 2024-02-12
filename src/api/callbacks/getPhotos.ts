@@ -9,6 +9,7 @@ import {
 } from '../../modules/functions';
 import { GetPhotos } from '../Types';
 import responseFormatter from '../responseFormatter';
+import { EndpointType } from '../endpointsLoader';
 
 const sendResponse = responseFormatter.getCustomSendResponse<GetPhotos.ResponseData>();
 
@@ -75,4 +76,4 @@ export default {
   method: 'post',
   middleWare: checkUserToken,
   requestShema: GetPhotos.RequestSchema,
-};
+} as EndpointType;

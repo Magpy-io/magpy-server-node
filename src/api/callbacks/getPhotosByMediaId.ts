@@ -9,6 +9,7 @@ import {
 } from '../../modules/functions';
 import { APIPhoto, GetPhotosByMediaId } from '../Types';
 import responseFormatter from '../responseFormatter';
+import { EndpointType } from '../endpointsLoader';
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetPhotosByMediaId.ResponseData>();
@@ -79,4 +80,4 @@ export default {
   method: 'post',
   middleWare: checkUserToken,
   requestShema: GetPhotosByMediaId.RequestSchema,
-};
+} as EndpointType;

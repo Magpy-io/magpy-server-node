@@ -7,6 +7,7 @@ import { addPhotoToDisk } from '../../modules/diskManager';
 import { hashFile } from '../../modules/hashing';
 import { AddPhoto } from '../Types';
 import responseFormatter from '../responseFormatter';
+import { EndpointType } from '../endpointsLoader';
 
 const sendResponse = responseFormatter.getCustomSendResponse<AddPhoto.ResponseData>();
 
@@ -65,4 +66,4 @@ export default {
   method: 'post',
   middleWare: checkUserToken,
   requestShema: AddPhoto.RequestSchema,
-};
+} as EndpointType;

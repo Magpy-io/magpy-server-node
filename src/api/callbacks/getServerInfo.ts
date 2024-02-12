@@ -6,6 +6,7 @@ import { GetServerInfo as BackendGetServerInfo } from '../../modules/BackendQuer
 import { GetServerConfigData } from '../../modules/serverDataManager';
 import { GetServerInfo } from '../Types';
 import responseFormatter from '../responseFormatter';
+import { EndpointType } from '../endpointsLoader';
 
 const sendResponse = responseFormatter.getCustomSendResponse<GetServerInfo.ResponseData>();
 
@@ -52,4 +53,4 @@ export default {
   method: 'post',
   middleWare: [checkConnexionLocal, checkServerHasValidCredentials],
   requestShema: GetServerInfo.RequestSchema,
-};
+} as EndpointType;

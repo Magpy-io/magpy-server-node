@@ -6,6 +6,7 @@ import { DeleteServer } from '../../modules/BackendQueries';
 import { ClearServerCredentials } from '../../modules/serverDataManager';
 import { UnclaimServer } from '../Types';
 import responseFormatter from '../responseFormatter';
+import { EndpointType } from '../endpointsLoader';
 
 const sendResponse = responseFormatter.getCustomSendResponse<UnclaimServer.ResponseData>();
 
@@ -43,4 +44,4 @@ export default {
   method: 'post',
   middleWare: [checkConnexionLocal, checkServerHasValidCredentials],
   requestShema: UnclaimServer.RequestSchema,
-};
+} as EndpointType;

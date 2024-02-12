@@ -5,6 +5,7 @@ import checkUserToken from '../../middleware/checkUserToken';
 import { removePhotoFromDisk } from '../../modules/diskManager';
 import { DeletePhotosById } from '../Types';
 import responseFormatter from '../responseFormatter';
+import { EndpointType } from '../endpointsLoader';
 
 const sendResponse = responseFormatter.getCustomSendResponse<DeletePhotosById.ResponseData>();
 
@@ -37,4 +38,4 @@ export default {
   method: 'post',
   middleWare: checkUserToken,
   requestShema: DeletePhotosById.RequestSchema,
-};
+} as EndpointType;

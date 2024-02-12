@@ -6,6 +6,7 @@ import { isAbsolutePath } from '../../modules/functions';
 import { SaveStorageFolderPath } from '../../modules/serverDataManager';
 import { UpdateServerPath } from '../Types';
 import responseFormatter from '../responseFormatter';
+import { EndpointType } from '../endpointsLoader';
 
 const sendResponse = responseFormatter.getCustomSendResponse<UpdateServerPath.ResponseData>();
 
@@ -56,4 +57,4 @@ export default {
   method: 'post',
   middleWare: [checkConnexionLocal],
   requestShema: UpdateServerPath.RequestSchema,
-};
+} as EndpointType;

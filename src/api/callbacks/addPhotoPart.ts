@@ -8,6 +8,7 @@ import { hashFile } from '../../modules/hashing';
 import FilesWaiting, { FilesWaitingType } from '../../modules/waitingFiles';
 import { AddPhotoPart } from '../Types';
 import responseFormatter from '../responseFormatter';
+import { EndpointType } from '../endpointsLoader';
 
 const sendResponse = responseFormatter.getCustomSendResponse<AddPhotoPart.ResponseData>();
 
@@ -160,4 +161,4 @@ export default {
   method: 'post',
   middleWare: checkUserToken,
   requestShema: AddPhotoPart.RequestSchema,
-};
+} as EndpointType;

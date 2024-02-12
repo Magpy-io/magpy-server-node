@@ -8,6 +8,7 @@ import {
 } from '../../modules/functions';
 import { UpdatePhotoMediaId } from '../Types';
 import responseFormatter from '../responseFormatter';
+import { EndpointType } from '../endpointsLoader';
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<UpdatePhotoMediaId.ResponseData>();
@@ -63,4 +64,4 @@ export default {
   method: 'post',
   middleWare: checkUserToken,
   requestShema: UpdatePhotoMediaId.RequestSchema,
-};
+} as EndpointType;

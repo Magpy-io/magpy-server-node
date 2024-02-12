@@ -4,6 +4,7 @@ import { numberPhotosFromDB } from '../../db/sequelizeDb';
 import checkUserToken from '../../middleware/checkUserToken';
 import { GetNumberPhotos } from '../Types';
 import responseFormatter from '../responseFormatter';
+import { EndpointType } from '../endpointsLoader';
 
 const sendResponse = responseFormatter.getCustomSendResponse<GetNumberPhotos.ResponseData>();
 
@@ -29,4 +30,4 @@ export default {
   method: 'post',
   middleWare: checkUserToken,
   requestShema: GetNumberPhotos.RequestSchema,
-};
+} as EndpointType;

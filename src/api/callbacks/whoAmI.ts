@@ -3,6 +3,7 @@ import { Request, Response } from 'express';
 import checkUserToken from '../../middleware/checkUserToken';
 import { WhoAmI } from '../Types';
 import responseFormatter from '../responseFormatter';
+import { EndpointType } from '../endpointsLoader';
 
 const sendResponse = responseFormatter.getCustomSendResponse<WhoAmI.ResponseData>();
 
@@ -30,4 +31,4 @@ export default {
   method: 'post',
   middleWare: checkUserToken,
   requestShema: WhoAmI.RequestSchema,
-};
+} as EndpointType;

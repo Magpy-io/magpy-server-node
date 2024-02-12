@@ -7,6 +7,7 @@ import { addServerImagePaths } from '../../modules/diskFilesNaming';
 import FilesWaiting from '../../modules/waitingFiles';
 import { AddPhotoInit } from '../Types';
 import responseFormatter from '../responseFormatter';
+import { EndpointType } from '../endpointsLoader';
 
 const sendResponse = responseFormatter.getCustomSendResponse<AddPhotoInit.ResponseData>();
 
@@ -63,4 +64,4 @@ export default {
   method: 'post',
   middleWare: checkUserToken,
   requestShema: AddPhotoInit.RequestSchema,
-};
+} as EndpointType;

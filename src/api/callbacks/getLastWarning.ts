@@ -4,6 +4,7 @@ import checkUserToken from '../../middleware/checkUserToken';
 import { GetLastWarningForUser } from '../../modules/warningsManager';
 import { GetLastWarning } from '../Types';
 import responseFormatter from '../responseFormatter';
+import { EndpointType } from '../endpointsLoader';
 
 const sendResponse = responseFormatter.getCustomSendResponse<GetLastWarning.ResponseData>();
 
@@ -34,4 +35,4 @@ export default {
   method: 'post',
   middleWare: checkUserToken,
   requestShema: GetLastWarning.RequestSchema,
-};
+} as EndpointType;
