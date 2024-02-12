@@ -9,7 +9,7 @@
     "format": "prettier --write ./src ./tests",
     "start": "yarn start:server",
     "build": "yarn build:server",
-    "package": "pkg -c ./package.json -t node18-win-x64 -o out/app ./dist/src/index.js",
+    "package": "pkg -C GZip -c ./package.json -t node18-win-x64 -o out/app ./dist/src/index.js",
     "convert:exec": "node ./scripts/convert.js out/app.exe out/appConverted.exe",
     "start:server": "yarn build:server && node ./dist/src/index.js",
     "start:all": "yarn build:all && node ./dist/src/index.js",
