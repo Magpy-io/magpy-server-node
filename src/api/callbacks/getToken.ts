@@ -7,11 +7,11 @@ import { GetServerConfigData } from '../../modules/serverDataManager';
 import { generateUserToken } from '../../modules/tokenManagement';
 import { GetToken } from '../Types';
 import responseFormatter from '../responseFormatter';
-import { EndpointType } from '../endpointsLoader';
+import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
 const sendResponse = responseFormatter.getCustomSendResponse<GetToken.ResponseData>();
 
-const callback = async (req: Request, res: Response, body: GetToken.RequestData) => {
+const callback = async (req: ExtendedRequest, res: Response, body: GetToken.RequestData) => {
   try {
     const backendUserToken = body.userToken;
 

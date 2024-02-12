@@ -6,11 +6,15 @@ import { DeleteServer } from '../../modules/BackendQueries';
 import { ClearServerCredentials } from '../../modules/serverDataManager';
 import { UnclaimServer } from '../Types';
 import responseFormatter from '../responseFormatter';
-import { EndpointType } from '../endpointsLoader';
+import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
 const sendResponse = responseFormatter.getCustomSendResponse<UnclaimServer.ResponseData>();
 
-const callback = async (req: Request, res: Response, body: UnclaimServer.RequestData) => {
+const callback = async (
+  req: ExtendedRequest,
+  res: Response,
+  body: UnclaimServer.RequestData,
+) => {
   try {
     if (req.hasValidCredentials) {
       let ret: DeleteServer.ResponseType | undefined;

@@ -9,12 +9,16 @@ import {
 } from '../../modules/functions';
 import { APIPhoto, GetPhotosByMediaId } from '../Types';
 import responseFormatter from '../responseFormatter';
-import { EndpointType } from '../endpointsLoader';
+import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<GetPhotosByMediaId.ResponseData>();
 
-const callback = async (req: Request, res: Response, body: GetPhotosByMediaId.RequestData) => {
+const callback = async (
+  req: ExtendedRequest,
+  res: Response,
+  body: GetPhotosByMediaId.RequestData,
+) => {
   try {
     if (!req.userId) {
       throw new Error('UserId is not defined.');

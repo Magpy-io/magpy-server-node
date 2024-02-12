@@ -1,8 +1,13 @@
 import { NextFunction, Request, Response } from 'express';
 
 import responseFormatter from '../api/responseFormatter';
+import { ExtendedRequest } from '../api/endpointsLoader';
 
-const verifyAuthorizationHeader = async (req: Request, res: Response, next: NextFunction) => {
+const verifyAuthorizationHeader = async (
+  req: ExtendedRequest,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     console.log('#VerifyAuthorizationHeader middleware');
     const bearerHeader = req.headers['x-authorization'];

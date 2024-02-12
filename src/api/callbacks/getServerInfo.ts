@@ -6,11 +6,15 @@ import { GetServerInfo as BackendGetServerInfo } from '../../modules/BackendQuer
 import { GetServerConfigData } from '../../modules/serverDataManager';
 import { GetServerInfo } from '../Types';
 import responseFormatter from '../responseFormatter';
-import { EndpointType } from '../endpointsLoader';
+import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
 const sendResponse = responseFormatter.getCustomSendResponse<GetServerInfo.ResponseData>();
 
-const callback = async (req: Request, res: Response, body: GetServerInfo.RequestData) => {
+const callback = async (
+  req: ExtendedRequest,
+  res: Response,
+  body: GetServerInfo.RequestData,
+) => {
   try {
     const serverDataConfig = GetServerConfigData();
 

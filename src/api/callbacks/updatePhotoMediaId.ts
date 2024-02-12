@@ -8,12 +8,16 @@ import {
 } from '../../modules/functions';
 import { UpdatePhotoMediaId } from '../Types';
 import responseFormatter from '../responseFormatter';
-import { EndpointType } from '../endpointsLoader';
+import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
 const sendResponse =
   responseFormatter.getCustomSendResponse<UpdatePhotoMediaId.ResponseData>();
 
-const callback = async (req: Request, res: Response, body: UpdatePhotoMediaId.RequestData) => {
+const callback = async (
+  req: ExtendedRequest,
+  res: Response,
+  body: UpdatePhotoMediaId.RequestData,
+) => {
   if (!req.userId) {
     throw new Error('UserId is not defined.');
   }

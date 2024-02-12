@@ -6,11 +6,15 @@ import { isAbsolutePath } from '../../modules/functions';
 import { SaveStorageFolderPath } from '../../modules/serverDataManager';
 import { UpdateServerPath } from '../Types';
 import responseFormatter from '../responseFormatter';
-import { EndpointType } from '../endpointsLoader';
+import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
 const sendResponse = responseFormatter.getCustomSendResponse<UpdateServerPath.ResponseData>();
 
-const callback = async (req: Request, res: Response, body: UpdateServerPath.RequestData) => {
+const callback = async (
+  req: ExtendedRequest,
+  res: Response,
+  body: UpdateServerPath.RequestData,
+) => {
   try {
     const { path } = body;
 

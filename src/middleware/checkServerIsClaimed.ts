@@ -4,8 +4,9 @@ import responseFormatter from '../api/responseFormatter';
 import { GetServerInfo } from '../modules/BackendQueries';
 import { combineMiddleware } from '../modules/functions';
 import checkServerHasValidCredentials from './checkServerHasValidCredentials';
+import { ExtendedRequest } from '../api/endpointsLoader';
 
-async function checkServerIsClaimed(req: Request, res: Response, next: NextFunction) {
+async function checkServerIsClaimed(req: ExtendedRequest, res: Response, next: NextFunction) {
   try {
     console.log('#CheckServerIsClaimed middleware');
     if (!req.hasValidCredentials) {

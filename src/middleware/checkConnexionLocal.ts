@@ -2,8 +2,9 @@ import { NextFunction, Request, Response } from 'express';
 import { isLoopback } from 'ip';
 
 import responseFormatter from '../api/responseFormatter';
+import { ExtendedRequest } from '../api/endpointsLoader';
 
-async function checkConnexionLocal(req: Request, res: Response, next: NextFunction) {
+async function checkConnexionLocal(req: ExtendedRequest, res: Response, next: NextFunction) {
   try {
     console.log('#CheckConnexionLocal middleware');
 

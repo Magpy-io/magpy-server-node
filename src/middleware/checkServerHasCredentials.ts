@@ -2,8 +2,13 @@ import { NextFunction, Request, Response } from 'express';
 
 import responseFormatter from '../api/responseFormatter';
 import { GetServerConfigData } from '../modules/serverDataManager';
+import { ExtendedRequest } from '../api/endpointsLoader';
 
-async function checkServerHasCredentials(req: Request, res: Response, next: NextFunction) {
+async function checkServerHasCredentials(
+  req: ExtendedRequest,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     console.log('#CheckServerHasCredentials middleware');
     req.serverData = GetServerConfigData();

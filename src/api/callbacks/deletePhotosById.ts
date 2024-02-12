@@ -5,11 +5,15 @@ import checkUserToken from '../../middleware/checkUserToken';
 import { removePhotoFromDisk } from '../../modules/diskManager';
 import { DeletePhotosById } from '../Types';
 import responseFormatter from '../responseFormatter';
-import { EndpointType } from '../endpointsLoader';
+import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
 const sendResponse = responseFormatter.getCustomSendResponse<DeletePhotosById.ResponseData>();
 
-const callback = async (req: Request, res: Response, body: DeletePhotosById.RequestData) => {
+const callback = async (
+  req: ExtendedRequest,
+  res: Response,
+  body: DeletePhotosById.RequestData,
+) => {
   try {
     const ids: string[] = body.ids;
 

@@ -5,8 +5,9 @@ import { combineMiddleware } from '../modules/functions';
 import { verifyUserToken } from '../modules/tokenManagement';
 import checkServerHasCredentials from './checkServerHasCredentials';
 import verifyAuthorizationHeader from './verifyAuthorizationHeader';
+import { ExtendedRequest } from '../api/endpointsLoader';
 
-async function checkUserToken(req: Request, res: Response, next: NextFunction) {
+async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFunction) {
   try {
     console.log('#VerifyServerToken middleware');
 

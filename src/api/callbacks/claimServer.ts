@@ -8,11 +8,15 @@ import { getMyPort, getMyPrivateIp, getMyPublicIp } from '../../modules/NetworkM
 import { GetServerName, SaveServerCredentials } from '../../modules/serverDataManager';
 import { ClaimServer } from '../Types';
 import responseFormatter from '../responseFormatter';
-import { EndpointType } from '../endpointsLoader';
+import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
 const sendResponse = responseFormatter.getCustomSendResponse<ClaimServer.ResponseData>();
 
-const callback = async (req: Request, res: Response, body: ClaimServer.RequestData) => {
+const callback = async (
+  req: ExtendedRequest,
+  res: Response,
+  body: ClaimServer.RequestData,
+) => {
   try {
     const myIpPublic = await getMyPublicIp();
     const myIpPrivate = await getMyPrivateIp();

@@ -6,11 +6,15 @@ import { UpdateServerData } from '../../modules/BackendQueries';
 import { SaveServerName } from '../../modules/serverDataManager';
 import { UpdateServerName } from '../Types';
 import responseFormatter from '../responseFormatter';
-import { EndpointType } from '../endpointsLoader';
+import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
 const sendResponse = responseFormatter.getCustomSendResponse<UpdateServerName.ResponseData>();
 
-const callback = async (req: Request, res: Response, body: UpdateServerName.RequestData) => {
+const callback = async (
+  req: ExtendedRequest,
+  res: Response,
+  body: UpdateServerName.RequestData,
+) => {
   try {
     const { name } = body;
 

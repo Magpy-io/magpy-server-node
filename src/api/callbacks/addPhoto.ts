@@ -7,11 +7,11 @@ import { addPhotoToDisk } from '../../modules/diskManager';
 import { hashFile } from '../../modules/hashing';
 import { AddPhoto } from '../Types';
 import responseFormatter from '../responseFormatter';
-import { EndpointType } from '../endpointsLoader';
+import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
 const sendResponse = responseFormatter.getCustomSendResponse<AddPhoto.ResponseData>();
 
-const callback = async (req: Request, res: Response, body: AddPhoto.RequestData) => {
+const callback = async (req: ExtendedRequest, res: Response, body: AddPhoto.RequestData) => {
   try {
     if (!req.userId) {
       throw new Error('UserId is not defined.');

@@ -7,11 +7,15 @@ import { addServerImagePaths } from '../../modules/diskFilesNaming';
 import FilesWaiting from '../../modules/waitingFiles';
 import { AddPhotoInit } from '../Types';
 import responseFormatter from '../responseFormatter';
-import { EndpointType } from '../endpointsLoader';
+import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
 const sendResponse = responseFormatter.getCustomSendResponse<AddPhotoInit.ResponseData>();
 
-const callback = async (req: Request, res: Response, body: AddPhotoInit.RequestData) => {
+const callback = async (
+  req: ExtendedRequest,
+  res: Response,
+  body: AddPhotoInit.RequestData,
+) => {
   try {
     if (!req.userId) {
       throw new Error('UserId is not defined.');

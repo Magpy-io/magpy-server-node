@@ -2,10 +2,11 @@ import { NextFunction, Request, Response } from 'express';
 import Joi from 'joi';
 
 import responseFormatter from '../api/responseFormatter';
+import { ExtendedRequest } from '../api/endpointsLoader';
 
 function generateMiddlewareFromShema(shema: Joi.ObjectSchema) {
   return async function checkValidRequestParameters(
-    req: Request,
+    req: ExtendedRequest,
     res: Response,
     next: NextFunction,
   ) {

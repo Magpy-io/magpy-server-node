@@ -4,11 +4,15 @@ import checkUserToken from '../../middleware/checkUserToken';
 import { GetLastWarningForUser } from '../../modules/warningsManager';
 import { GetLastWarning } from '../Types';
 import responseFormatter from '../responseFormatter';
-import { EndpointType } from '../endpointsLoader';
+import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
 const sendResponse = responseFormatter.getCustomSendResponse<GetLastWarning.ResponseData>();
 
-const callback = async (req: Request, res: Response, body: GetLastWarning.RequestData) => {
+const callback = async (
+  req: ExtendedRequest,
+  res: Response,
+  body: GetLastWarning.RequestData,
+) => {
   try {
     if (!req.userId) {
       throw new Error('UserId is not defined.');

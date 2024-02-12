@@ -9,11 +9,11 @@ import {
 } from '../../modules/functions';
 import { GetPhotos } from '../Types';
 import responseFormatter from '../responseFormatter';
-import { EndpointType } from '../endpointsLoader';
+import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
 const sendResponse = responseFormatter.getCustomSendResponse<GetPhotos.ResponseData>();
 
-const callback = async (req: Request, res: Response, body: GetPhotos.RequestData) => {
+const callback = async (req: ExtendedRequest, res: Response, body: GetPhotos.RequestData) => {
   try {
     if (!req.userId) {
       throw new Error('UserId is not defined.');

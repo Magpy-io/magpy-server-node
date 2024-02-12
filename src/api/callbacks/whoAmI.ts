@@ -3,11 +3,11 @@ import { Request, Response } from 'express';
 import checkUserToken from '../../middleware/checkUserToken';
 import { WhoAmI } from '../Types';
 import responseFormatter from '../responseFormatter';
-import { EndpointType } from '../endpointsLoader';
+import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
 const sendResponse = responseFormatter.getCustomSendResponse<WhoAmI.ResponseData>();
 
-const callback = async (req: Request, res: Response, body: WhoAmI.RequestData) => {
+const callback = async (req: ExtendedRequest, res: Response, body: WhoAmI.RequestData) => {
   try {
     if (!req.userId) {
       throw new Error('UserId is not defined.');

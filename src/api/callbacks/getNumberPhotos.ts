@@ -4,11 +4,15 @@ import { numberPhotosFromDB } from '../../db/sequelizeDb';
 import checkUserToken from '../../middleware/checkUserToken';
 import { GetNumberPhotos } from '../Types';
 import responseFormatter from '../responseFormatter';
-import { EndpointType } from '../endpointsLoader';
+import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
 const sendResponse = responseFormatter.getCustomSendResponse<GetNumberPhotos.ResponseData>();
 
-const callback = async (req: Request, res: Response, body: GetNumberPhotos.RequestData) => {
+const callback = async (
+  req: ExtendedRequest,
+  res: Response,
+  body: GetNumberPhotos.RequestData,
+) => {
   try {
     console.log('Getting number of photos in db.');
     const nb = await numberPhotosFromDB();

@@ -6,9 +6,10 @@ import { ErrorBackendUnreachable } from '../modules/BackendQueries/ExceptionsMan
 import { combineMiddleware } from '../modules/functions';
 import { SaveServerCredentials } from '../modules/serverDataManager';
 import checkServerHasCredentials from './checkServerHasCredentials';
+import { ExtendedRequest } from '../api/endpointsLoader';
 
 async function checkServerHasValidCredentials(
-  req: Request,
+  req: ExtendedRequest,
   res: Response,
   next: NextFunction,
 ) {
