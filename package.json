@@ -43,7 +43,7 @@
     "cross-env": "^7.0.3",
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
-    "forked-systray": "^3.0.11",
+    "forked-systray": "patch:forked-systray@npm%3A3.0.11#~/.yarn/patches/forked-systray-npm-3.0.11-b6b9b5a093.patch",
     "glob": "^10.3.10",
     "ip": "^1.1.8",
     "joi": "^17.11.0",
@@ -85,14 +85,13 @@
   "packageManager": "yarn@4.0.2",
   "bin": "dist/src/index.js",
   "pkg": {
-    "scripts": [
-      "node_modules/axios/dist/node/axios.cjs"
-    ],
     "assets": [
+      "node_modules/axios/dist/node/axios.cjs",
       "client/build/**/*"
     ],
     "targets": [
-      "node18-win-x64"
+      "node18-win-x64",
+      "node18-linux-x64"
     ],
     "outputPath": "out"
   }
