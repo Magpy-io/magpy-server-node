@@ -9,7 +9,7 @@
     "format": "prettier --write ./src ./tests",
     "start": "yarn start:server",
     "build": "yarn build:server",
-    "package": "pkg -c ./package.json -t node18-win-x64 -o out/app ./dist/src/index.js",
+    "package": "rimraf ./out && pkg -c ./package.json -t node18-win-x64 -o out/app ./dist/src/index.js && yarn copy:binary:forked-systray",
     "convert:exec": "node ./scripts/convert.js out/app.exe out/appConverted.exe",
     "start:server": "yarn build:server && node ./dist/src/index.js",
     "start:all": "yarn build:all && node ./dist/src/index.js",
@@ -22,6 +22,7 @@
     "types:generate": "ts-node ./scripts/CreateTypes.ts",
     "types:copy": "ts-node ./scripts/CopyEndpointTypesToExport.ts",
     "clear:images": "ts-node ./scripts/clearImages.ts",
+    "copy:binary:forked-systray": "ts-node ./scripts/copySystrayBinary.ts",
     "clean:types": "rimraf ./src/api/export/Types && rimraf ./src/api/Types/RequestTypes",
     "clean:backendQueries": "rimraf ./src/modules/BackendQueries",
     "types": "yarn clean:types && yarn types:generate && yarn types:copy"
