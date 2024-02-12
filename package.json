@@ -9,7 +9,7 @@
     "format": "prettier --write ./src ./tests",
     "start": "yarn start:server",
     "build": "yarn build:server",
-    "package": "rimraf ./out && pkg -c ./package.json -t node18-win-x64 -o out/app ./dist/src/index.js && yarn copy:binary:forked-systray",
+    "package": "rimraf ./out && pkg . && yarn copy:binary:forked-systray",
     "convert:exec": "node ./scripts/convert.js out/app.exe out/appConverted.exe",
     "start:server": "yarn build:server && node ./dist/src/index.js",
     "start:all": "yarn build:all && node ./dist/src/index.js",
@@ -86,6 +86,13 @@
   "pkg": {
     "scripts": [
       "node_modules/axios/dist/node/axios.cjs"
-    ]
+    ],
+    "assets": [
+      "client/build/**/*"
+    ],
+    "targets": [
+      "node18-win-x64"
+    ],
+    "outputPath": "out/app"
   }
 }

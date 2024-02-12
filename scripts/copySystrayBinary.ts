@@ -26,7 +26,19 @@ async function copyFiles(): Promise<void> {
     const outputPathAbsolute = join(process.cwd(), outputPath);
 
     await fs.rm(outputPathAbsolute, { force: true, recursive: true });
-    await fs.cp(inputPathAbsolute, join(outputPath, binName), { recursive: true });
+
+    try {
+      await fs.access(inputPathAbsolute, fs.constants.F_OK);
+    } catch (e) {
+      console.log(
+        'Error: Binary file ' +
+          inputPathAbsolute +
+          " does not exist, make sure packages are installed 'yarn install'",
+      );
+      process.exit(1);
+    }
+
+    await fs.cp(inputPathAbsolute, join(outputPath, binName));
 
     console.log("Binaries for 'forked-systray' package successfully copied to out/lib.");
   } catch (err) {
