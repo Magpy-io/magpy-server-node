@@ -1,0 +1,19 @@
+diff --git a/dictionary/forked-systray.js b/dictionary/forked-systray.js
+new file mode 100644
+index 0000000000000000000000000000000000000000..d28b8519def3bb257822a9eed03c7d8dc0a83277
+--- /dev/null
++++ b/dictionary/forked-systray.js
+@@ -0,0 +1,12 @@
++'use strict';
++
++module.exports = {
++  pkg: {
++    patches: {
++      'util.js': [
++        "const helperLocation = join(__dirname, helperName)",
++        "const helperLocation = join(require('path').dirname(process.execPath), 'lib', helperName)",
++      ],
++    },
++  },
++};
+\ No newline at end of file
