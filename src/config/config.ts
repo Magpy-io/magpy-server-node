@@ -1,6 +1,8 @@
 import * as os from 'os';
 import * as path from 'path';
 
+import { getAppDataPath } from 'appdata-path';
+
 const hashLen = 32;
 const getPhotoPartSize = 100000; //char in base64
 const jwtUserExp = '1d';
@@ -14,32 +16,37 @@ const backend_port = 80;
 const serverName = 'MyLocalServer';
 const serverNameMdnsPrefix = 'OpenCloudServer';
 
-const postPhotoPartTimeoutDev = 60000; //in ms
 const rootPath = path.join(os.homedir(), 'OpenCloudPhotos');
-const sqliteDbFileDev = path.join('.', 'db', 'database.db');
-const serverDataFile = path.join('.', 'serverData', 'serverInfo.json');
-const portDev = '8000';
 
-const postPhotoPartTimeoutTest = 1000; //in ms
-const sqliteDbFileTest = ':memory:';
-const portTest = '0';
-
+let serverDataFileTmp = '';
 let sqliteDbFileTmp = '';
 let postPhotoPartTimeoutTmp = 0;
 let portTmp = '';
 
-if (process.env.NODE_ENV === 'test') {
-  //supress console.log() when testing
-  //console.log = function () {};
-  sqliteDbFileTmp = sqliteDbFileTest;
-  postPhotoPartTimeoutTmp = postPhotoPartTimeoutTest;
-  portTmp = portTest;
+const pkg = (process as any).pkg;
+
+if (pkg) {
+  // Packaged application
+  const appDir = getAppDataPath('magpy');
+  sqliteDbFileTmp = path.join(appDir, 'db', 'database.db');
+  serverDataFileTmp = path.join(appDir, 'serverData', 'serverInfo.json');
+  postPhotoPartTimeoutTmp = 60000;
+  portTmp = '8000';
+} else if (process.env.NODE_ENV === 'test') {
+  sqliteDbFileTmp = ':memory:';
+  serverDataFileTmp = path.join('.', 'serverData', 'serverInfo.json');
+  postPhotoPartTimeoutTmp = 1000;
+  portTmp = '0';
+} else if (process.env.NODE_ENV === 'dev') {
+  sqliteDbFileTmp = path.join('.', 'db', 'database.db');
+  serverDataFileTmp = path.join('.', 'serverData', 'serverInfo.json');
+  postPhotoPartTimeoutTmp = 60000;
+  portTmp = '8000';
 } else {
-  sqliteDbFileTmp = sqliteDbFileDev;
-  postPhotoPartTimeoutTmp = postPhotoPartTimeoutDev;
-  portTmp = portDev;
+  throw new Error('config.ts: App is not packaged and NODE_ENV is not set to a valid value');
 }
 
+const serverDataFile = serverDataFileTmp;
 const sqliteDbFile = sqliteDbFileTmp;
 const postPhotoPartTimeout = postPhotoPartTimeoutTmp;
 const port = portTmp;
