@@ -103,15 +103,10 @@
     // "noPropertyAccessFromIndexSignature": true,       /* Enforces using indexed accessors for keys declared using an indexed type. */
     // "allowUnusedLabels": true,                        /* Disable error reporting for unused labels. */
     "allowUnreachableCode": true /* Disable error reporting for unreachable code. */,
-
     /* Completeness */
     // "skipDefaultLibCheck": true,                      /* Skip type checking .d.ts files that are included with TypeScript. */
-    "skipLibCheck": true /* Skip type checking all .d.ts files. */,
-    "paths": {
-      "@src/*": ["./src/*"],
-      "@tests/*": ["./tests/*"]
-    }
+    "skipLibCheck": true /* Skip type checking all .d.ts files. */
   },
-  "include": ["src/**/*.ts", "src/**/*.js", "tests/**/*.ts"],
+  "include": ["src/**/*.ts"],
   "exclude": ["node_modules", "<node_internals>/**"]
 }
