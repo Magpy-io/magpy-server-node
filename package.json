@@ -9,7 +9,7 @@
     "format": "prettier --write ./src ./tests",
     "start": "yarn start:server",
     "build": "yarn build:server",
-    "package": "rimraf ./out && pkg . && yarn copy:binary:forked-systray",
+    "package": "yarn build:server && rimraf ./out && pkg . && yarn copy:binary:forked-systray",
     "start:server": "yarn build:server && cross-env NODE_ENV=dev node ./dist/src/index.js",
     "start:all": "yarn build:all && yarn start:server",
     "types:check": "tsc --noEmit && echo No typescript errors found",
@@ -22,7 +22,7 @@
     "types:copy": "ts-node ./scripts/CopyEndpointTypesToExport.ts",
     "clear:images": "ts-node ./scripts/clearImages.ts",
     "copy:binary:forked-systray": "ts-node ./scripts/copySystrayBinary.ts",
-    "convert:exec": "node ./scripts/convert.js out/opencloud-server.exe out/opencloud-server.exe",
+    "convert:exec": "node ./scripts/convert.js out/opencloud-server-win.exe out/opencloud-server-win.exe",
     "clean:types": "rimraf ./src/api/export/Types && rimraf ./src/api/Types/RequestTypes",
     "clean:backendQueries": "rimraf ./src/modules/BackendQueries",
     "types": "yarn clean:types && yarn types:generate && yarn types:copy"
