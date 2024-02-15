@@ -22,7 +22,7 @@
     "test:v": "cross-env NODE_ENV=test jest --verbose=true --collect-coverage --testTimeout=10000",
     "types:generate": "ts-node ./scripts/CreateTypes.ts",
     "types:copy": "ts-node ./scripts/CopyEndpointTypesToExport.ts",
-    "clear:images": "ts-node ./scripts/clearImages.ts",
+    "clear:images": "cross-env NODE_ENV=dev ts-node ./scripts/clearImages.ts",
     "copy:binary:forked-systray": "ts-node ./scripts/copySystrayBinary.ts",
     "convert:exec": "node ./scripts/convert.js out/opencloud-server-win.exe out/opencloud-server-win.exe",
     "clean:types": "rimraf ./src/api/export/Types && rimraf ./src/api/Types/RequestTypes",
