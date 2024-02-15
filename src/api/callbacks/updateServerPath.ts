@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import checkConnexionLocal from '../../middleware/checkConnexionLocal';
 import { folderHasRights, pathExists } from '../../modules/diskManager';
 import { isAbsolutePath } from '../../modules/functions';
-import { SaveStorageFolderPath } from '../../modules/serverDataManager';
+import { SaveStorageFolderPath, GetStorageFolderPath } from '../../modules/serverDataManager';
 import { UpdateServerPath } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
@@ -21,6 +21,13 @@ const callback = async (
     if (!path) {
       console.log('Nothing to update, sending response');
       return sendResponse(res, 'Nothing to update');
+    }
+
+    const currentPath = await GetStorageFolderPath();
+
+    if (path == currentPath) {
+      console.log('Path is already set, sending response');
+      return sendResponse(res, 'Path is already set');
     }
 
     if (!isAbsolutePath(path)) {

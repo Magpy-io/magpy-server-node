@@ -64,4 +64,14 @@ describe("Test 'updateServerPath' endpoint", () => {
 
     expect(serverPath).toBe(serverPathBefore);
   });
+
+  it('Should return ok when sending the path that is already set, even if the folder does not exist', async () => {
+    const serverPath = GetStorageFolderPath();
+
+    const ret = await UpdateServerPath.Post({
+      path: serverPath,
+    });
+
+    expectToBeOk(ret);
+  });
 });
