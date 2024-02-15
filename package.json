@@ -9,14 +9,14 @@
     "format": "prettier --write ./src ./tests",
     "start": "yarn start:server",
     "build": "yarn build:server",
-    "package": "yarn build:server && rimraf ./out && pkg . && yarn copy:binary:forked-systray",
+    "package": "yarn build:all && rimraf ./out && pkg . && yarn copy:binary:forked-systray",
     "start:server": "yarn build:server && cross-env NODE_ENV=dev node ./dist/index.js",
     "start:all": "yarn build:all && yarn start:server",
     "types:check": "yarn types:check:src && yarn types:check:tests",
     "types:check:src": "tsc --noEmit && echo No typescript errors found in src",
     "types:check:tests": "tsc --project ./tests/tsconfig.json --noEmit && echo No typescript errors found in tests",
     "build:server": "rimraf ./dist && tsc && echo Build server successfull",
-    "build:client": "cd client; yarn build; cd .. && Build client successfull",
+    "build:client": "cd client; yarn build; cd .. && echo Build client successfull",
     "build:all": "yarn build:client && yarn build:server",
     "test": "yarn test:v --silent",
     "test:v": "cross-env NODE_ENV=test jest --verbose=true --collect-coverage --testTimeout=10000",
@@ -90,7 +90,8 @@
   "pkg": {
     "assets": [
       "node_modules/axios/dist/node/axios.cjs",
-      "client/build/**/*"
+      "client/build/**/*",
+      "assets/**/*"
     ],
     "targets": [
       "node18-win-x64",

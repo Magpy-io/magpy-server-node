@@ -25,11 +25,11 @@ async function initServer() {
   console.log('Endpoints loaded');
 
   // Serve static files from the React app
-  app.use(express.static(path.join(__dirname, '../../..', 'client/build')));
+  app.use(express.static(path.join(__dirname, '../..', 'client/build')));
 
   // Catch-all route to serve React app
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../../..', 'client/build', 'index.html'));
+    res.sendFile(path.join(__dirname, '../..', 'client/build', 'index.html'));
   });
 
   return new Promise<Express>(resolve => {
