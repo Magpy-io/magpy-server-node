@@ -49,7 +49,13 @@ const callback = async (
     photoWaiting.dataParts.set(body.partNumber, body.photoPart);
 
     if (photoWaiting.received < photoWaiting.image64Len) {
-      console.log('Photo part added.');
+      console.log(
+        'Photo part added. (' +
+          photoWaiting.received.toString() +
+          '/' +
+          photoWaiting.image64Len.toString() +
+          ')',
+      );
       console.log('Reseting timeout.');
 
       clearTimeout(photoWaiting.timeout);
@@ -83,7 +89,14 @@ const callback = async (
         'PHOTO_SIZE_EXCEEDED',
       );
     }
-    console.log('Full image received.');
+
+    console.log(
+      'Full image received. (' +
+        photoWaiting.image64Len.toString() +
+        '/' +
+        photoWaiting.image64Len.toString() +
+        ')',
+    );
 
     console.log('Removing timeout');
     clearTimeout(photoWaiting.timeout);
