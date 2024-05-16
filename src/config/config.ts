@@ -5,7 +5,7 @@ import { getAppDataPath } from 'appdata-path';
 
 const hashLen = 32;
 const getPhotoPartSize = 100000; //char in base64
-const jwtUserExp = '1d';
+const jwtUserExp = '30d';
 
 const MAX_PIXELS_IN_THUMBNAIL = 40000;
 const MAX_PIXELS_IN_COMPRESSED = 200000;
