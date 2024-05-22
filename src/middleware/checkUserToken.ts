@@ -3,9 +3,9 @@ import { NextFunction, Request, Response } from 'express';
 import responseFormatter from '../api/responseFormatter';
 import { combineMiddleware } from '../modules/functions';
 import { verifyUserToken } from '../modules/tokenManagement';
-import checkServerHasCredentials from './checkServerHasCredentials';
 import verifyAuthorizationHeader from './verifyAuthorizationHeader';
 import { ExtendedRequest } from '../api/endpointsLoader';
+import { GetServerCredentials } from '../modules/serverDataManager';
 
 async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFunction) {
   try {
@@ -17,9 +17,11 @@ async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFun
       throw new Error('Token undefined in checkUserToken');
     }
 
+    const serverCredentials = GetServerCredentials();
+
     if (
-      !req?.serverData?.serverRegisteredInfo.serverCredentials?.serverId ||
-      !req?.serverData.serverRegisteredInfo.serverCredentials.serverKey
+      !serverCredentials?.serverId ||
+      !serverCredentials.serverKey
     ) {
       console.log('server is not claimed');
       responseFormatter.sendFailedMessage(res, 'Server not claimed', 'SERVER_NOT_CLAIMED');
@@ -28,7 +30,7 @@ async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFun
 
     const ret = verifyUserToken(
       token,
-      req.serverData.serverRegisteredInfo.serverCredentials.serverKey,
+      serverCredentials.serverKey,
     );
 
     if (!ret.ok) {
@@ -62,7 +64,6 @@ async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFun
 }
 
 export default combineMiddleware([
-  checkServerHasCredentials,
   verifyAuthorizationHeader,
   checkUserToken,
 ]);

@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import checkConnexionLocal from '../../middleware/checkConnexionLocal';
 import checkServerHasValidCredentials from '../../middleware/checkServerHasValidCredentials';
 import { GetServerInfo as BackendGetServerInfo } from '../../modules/BackendQueries';
-import { GetServerConfigData } from '../../modules/serverDataManager';
+import { GetStorageFolderPath, GetServerName } from '../../modules/serverDataManager';
 import { GetServerInfo } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
@@ -16,15 +16,16 @@ const callback = async (
   body: GetServerInfo.RequestData,
 ) => {
   try {
-    const serverDataConfig = GetServerConfigData();
+    const storageFolderPath = GetStorageFolderPath()
+    const serverName = GetServerName();
 
     const responseJson: {
       storagePath: string;
       serverName: string;
       owner: { name: string; email: string } | null;
     } = {
-      storagePath: serverDataConfig.storageFolderPath,
-      serverName: serverDataConfig.serverName,
+      storagePath: storageFolderPath,
+      serverName: serverName,
       owner: null,
     };
 

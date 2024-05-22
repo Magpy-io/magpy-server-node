@@ -15,7 +15,7 @@ import { Photo } from '@src/db/sequelizeDb';
 import * as mockValues from '@src/modules/BackendQueries/__mocks__/mockValues';
 import { pathExists } from '@src/modules/diskManager';
 import { timeout } from '@src/modules/functions';
-import { GetServerConfigData, SaveServerCredentials } from '@src/modules/serverDataManager';
+import { GetServerCredentials, SaveServerCredentials } from '@src/modules/serverDataManager';
 import { verifyUserToken } from '@src/modules/tokenManagement';
 import { GetLastWarningForUser, HasWarningForUser } from '@src/modules/warningsManager';
 import { photoImage64 } from '@tests/helpers/imageBase64';
@@ -278,9 +278,9 @@ async function waitForPhotoTransferToFinish() {
 }
 
 function testReturnedToken() {
-  const serverData = GetServerConfigData();
+  const serverCredentials = GetServerCredentials()
 
-  if (!serverData.serverRegisteredInfo.serverCredentials?.serverKey) {
+  if (!serverCredentials?.serverKey) {
     throw new Error('testReturnedToken: serverData.serverKey needs to be defined');
   }
 
@@ -290,7 +290,7 @@ function testReturnedToken() {
 
   const tokenVerification = verifyUserToken(
     userTokenRetured,
-    serverData.serverRegisteredInfo.serverCredentials.serverKey,
+    serverCredentials.serverKey,
   );
   expect(tokenVerification.ok).toBe(true);
 
@@ -326,14 +326,14 @@ function getUserId() {
   if (!serverUserToken) {
     throw new Error('No serverUserToken to use in getUserId()');
   }
-  const serverData = GetServerConfigData();
-  if (!serverData.serverRegisteredInfo.serverCredentials?.serverKey) {
+  const serverCredentials = GetServerCredentials()
+  if (!serverCredentials?.serverKey) {
     throw new Error('getUserId: serverData.serverKey needs to be defined');
   }
 
   const tokenVerification = verifyUserToken(
     serverUserToken,
-    serverData.serverRegisteredInfo.serverCredentials.serverKey,
+    serverCredentials.serverKey,
   );
 
   if (!tokenVerification.ok) {

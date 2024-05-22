@@ -1,20 +1,20 @@
 import jwt from 'jsonwebtoken';
 
 import { jwtUserExp } from '../config/config';
-import { GetServerConfigData } from './serverDataManager';
+import { GetServerCredentials } from './serverDataManager';
 
 export type TokenUserData = { id: string };
 
 export function generateUserToken(userId: string) {
-  const serverData = GetServerConfigData();
-  if (!serverData.serverRegisteredInfo.serverCredentials?.serverKey) {
+  const serverCredentials = GetServerCredentials();
+  if (!serverCredentials?.serverKey) {
     throw new Error('Server key not defined');
   }
 
   const tokenData: TokenUserData = { id: userId };
   const token = jwt.sign(
     tokenData,
-    serverData.serverRegisteredInfo.serverCredentials.serverKey,
+    serverCredentials.serverKey,
     {
       expiresIn: jwtUserExp,
     },

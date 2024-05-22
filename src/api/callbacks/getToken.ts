@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import checkServerIsClaimed from '../../middleware/checkServerIsClaimed';
 import { GetServerInfo, TokenManager, WhoAmI } from '../../modules/BackendQueries';
 import { ErrorBackendUnreachable } from '../../modules/BackendQueries/ExceptionsManager';
-import { GetServerConfigData } from '../../modules/serverDataManager';
+import { GetServerToken } from '../../modules/serverDataManager';
 import { generateUserToken } from '../../modules/tokenManagement';
 import { GetToken } from '../Types';
 import responseFormatter from '../responseFormatter';
@@ -15,7 +15,7 @@ const callback = async (req: ExtendedRequest, res: Response, body: GetToken.Requ
   try {
     const backendUserToken = body.userToken;
 
-    const serverData = GetServerConfigData();
+    const serverToken = GetServerToken();
 
     if (!req.isClaimed) {
       console.log('server is not claimed');
@@ -61,13 +61,13 @@ const callback = async (req: ExtendedRequest, res: Response, body: GetToken.Requ
       }
     }
 
-    if (!serverData.serverRegisteredInfo?.serverToken) {
+    if (!serverToken) {
       throw new Error('Should have server token');
     }
 
     let retServer: GetServerInfo.ResponseType;
     try {
-      TokenManager.SetServerToken(serverData.serverRegisteredInfo?.serverToken);
+      TokenManager.SetServerToken(serverToken);
       retServer = await GetServerInfo.Post();
     } catch (err) {
       if (err instanceof ErrorBackendUnreachable) {

@@ -10,12 +10,12 @@ import {
   SaveServerDataFile,
 } from './serverDataFileManager';
 
-export function GetServerConfigData() {
+function GetServerConfigData() {
   AssertConfigLoaded();
   return GetServerDataFromCache();
 }
 
-export async function SetServerConfigData(data: ServerDataType) {
+async function SetServerConfigData(data: ServerDataType) {
   SaveServerDataToCache(data);
   await SaveServerDataFile(data);
 }

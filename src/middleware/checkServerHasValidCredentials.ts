@@ -1,11 +1,10 @@
 import { NextFunction, Request, Response } from 'express';
 
 import responseFormatter from '../api/responseFormatter';
-import { GetServerInfo, GetServerToken, TokenManager } from '../modules/BackendQueries';
+import * as BackendQueries from '../modules/BackendQueries';
 import { ErrorBackendUnreachable } from '../modules/BackendQueries/ExceptionsManager';
 import { combineMiddleware } from '../modules/functions';
-import { SaveServerCredentials, SaveServerToken } from '../modules/serverDataManager';
-import checkServerHasCredentials from './checkServerHasCredentials';
+import { SaveServerCredentials, SaveServerToken, GetServerToken, GetServerCredentials } from '../modules/serverDataManager';
 import { ExtendedRequest } from '../api/endpointsLoader';
 
 async function checkServerHasValidCredentials(
@@ -15,15 +14,14 @@ async function checkServerHasValidCredentials(
 ) {
   try {
     console.log('#CheckServerHasValidCredentials middleware');
-    const serverData = req.serverData;
-
-    if (serverData?.serverRegisteredInfo?.serverToken) {
+    const serverToken = GetServerToken();
+    if (serverToken) {
       console.log('server token found');
 
-      let ret: GetServerInfo.ResponseType;
+      let ret: BackendQueries.GetServerInfo.ResponseType;
       try {
-        TokenManager.SetServerToken(serverData.serverRegisteredInfo?.serverToken);
-        ret = await GetServerInfo.Post();
+        BackendQueries.TokenManager.SetServerToken(serverToken);
+        ret = await BackendQueries.GetServerInfo.Post();
       } catch (err) {
         if (err instanceof ErrorBackendUnreachable) {
           console.log('Error requesting backend server');
@@ -51,17 +49,19 @@ async function checkServerHasValidCredentials(
       }
     }
 
+    const serverCredentials = GetServerCredentials()
+
     if (
-      serverData?.serverRegisteredInfo.serverCredentials?.serverId &&
-      serverData?.serverRegisteredInfo.serverCredentials?.serverKey
+      serverCredentials?.serverId &&
+      serverCredentials?.serverKey
     ) {
       console.log('server credentials found');
 
-      let ret: GetServerToken.ResponseType;
+      let ret: BackendQueries.GetServerToken.ResponseType;
       try {
-        ret = await GetServerToken.Post({
-          id: serverData.serverRegisteredInfo.serverCredentials.serverId,
-          key: serverData.serverRegisteredInfo.serverCredentials.serverKey,
+        ret = await BackendQueries.GetServerToken.Post({
+          id: serverCredentials.serverId,
+          key: serverCredentials.serverKey,
         });
       } catch (err) {
         if (err instanceof ErrorBackendUnreachable) {
@@ -83,7 +83,7 @@ async function checkServerHasValidCredentials(
         }
       } else {
         console.log('server claimed, it has valid credentials');
-        const serverToken = TokenManager.GetServerToken();
+        const serverToken = BackendQueries.TokenManager.GetServerToken();
 
         console.log('saving server token');
         await SaveServerToken(serverToken);
@@ -103,4 +103,4 @@ async function checkServerHasValidCredentials(
   }
 }
 
-export default combineMiddleware([checkServerHasCredentials, checkServerHasValidCredentials]);
+export default checkServerHasValidCredentials;
