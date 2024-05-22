@@ -2,6 +2,7 @@ export * as addPhoto from './addPhoto';
 export * as addPhotoInit from './addPhotoInit';
 export * as addPhotoPart from './addPhotoPart';
 export * as claimServer from './claimServer';
+export * as claimServerLocal from './claimServerLocal';
 export * as deletePhotosById from './deletePhotosById';
 export * as getLastWarning from './getLastWarning';
 export * as getNumberPhotos from './getNumberPhotos';

@@ -71,6 +71,7 @@ export function GetServerToken(): string | null {
 export async function ClearServerCredentials() {
   const dataSaved = GetServerConfigData();  
   dataSaved.serverRegisteredInfo = null;
+  dataSaved.localClaimInfo = null;
   await SetServerConfigData(dataSaved);
 }
 

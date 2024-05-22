@@ -2,6 +2,7 @@ export * as AddPhoto from './EndpointsApi/addPhoto';
 export * as AddPhotoInit from './EndpointsApi/addPhotoInit';
 export * as AddPhotoPart from './EndpointsApi/addPhotoPart';
 export * as ClaimServer from './EndpointsApi/claimServer';
+export * as ClaimServerLocal from './EndpointsApi/claimServerLocal';
 export * as DeletePhotosById from './EndpointsApi/deletePhotosById';
 export * as GetLastWarning from './EndpointsApi/getLastWarning';
 export * as GetNumberPhotos from './EndpointsApi/getNumberPhotos';
