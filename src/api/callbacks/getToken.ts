@@ -61,13 +61,13 @@ const callback = async (req: ExtendedRequest, res: Response, body: GetToken.Requ
       }
     }
 
-    if (!serverData.serverToken) {
+    if (!serverData.serverRegisteredInfo?.serverToken) {
       throw new Error('Should have server token');
     }
 
     let retServer: GetServerInfo.ResponseType;
     try {
-      TokenManager.SetServerToken(serverData.serverToken);
+      TokenManager.SetServerToken(serverData.serverRegisteredInfo?.serverToken);
       retServer = await GetServerInfo.Post();
     } catch (err) {
       if (err instanceof ErrorBackendUnreachable) {

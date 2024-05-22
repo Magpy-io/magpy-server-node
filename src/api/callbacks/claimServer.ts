@@ -5,7 +5,11 @@ import checkServerIsClaimed from '../../middleware/checkServerIsClaimed';
 import { GetServerToken, RegisterServer, TokenManager } from '../../modules/BackendQueries';
 import { ErrorBackendUnreachable } from '../../modules/BackendQueries/ExceptionsManager';
 import { getMyPort, getMyPrivateIp, getMyPublicIp } from '../../modules/NetworkManager';
-import { GetServerName, SaveServerCredentials } from '../../modules/serverDataManager';
+import {
+  GetServerName,
+  SaveServerCredentials,
+  SaveServerToken,
+} from '../../modules/serverDataManager';
 import { ClaimServer } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
@@ -102,8 +106,9 @@ const callback = async (
     await SaveServerCredentials({
       serverId: id,
       serverKey: keyGenerated,
-      serverToken: serverToken,
     });
+
+    await SaveServerToken(serverToken);
 
     return sendResponse(res, 'ok');
   } catch (err) {

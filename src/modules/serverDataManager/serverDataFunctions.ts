@@ -25,32 +25,41 @@ export async function ClearServerConfigData() {
   await ClearServerDataFile();
 }
 
-export type ServerCredentials = {
-  serverId?: string;
-  serverKey?: string;
-  serverToken?: string;
-};
-
-export async function SaveServerCredentials(data: ServerCredentials) {
+export async function SaveServerCredentials(
+  serverCredentials: {
+    serverId: string;
+    serverKey: string;
+  } | null,
+) {
   const dataSaved = GetServerConfigData();
-
-  const dataUpdated = { ...dataSaved, ...data };
-
-  await SetServerConfigData(dataUpdated);
+  dataSaved.serverRegisteredInfo.serverCredentials = serverCredentials;
+  await SetServerConfigData(dataSaved);
 }
 
-export function GetServerCredentials(): ServerCredentials {
+export async function SaveServerToken(serverToken: string) {
+  const dataSaved = GetServerConfigData();
+  dataSaved.serverRegisteredInfo.serverToken = serverToken;
+  await SetServerConfigData(dataSaved);
+}
+
+export function GetServerCredentials(): {
+  serverId: string;
+  serverKey: string;
+} | null {
   const serverData = GetServerConfigData();
 
-  return {
-    serverId: serverData.serverId,
-    serverKey: serverData.serverKey,
-    serverToken: serverData.serverToken,
-  };
+  return serverData.serverRegisteredInfo.serverCredentials;
+}
+
+export function GetServerToken(): string | null {
+  const serverData = GetServerConfigData();
+
+  return serverData.serverRegisteredInfo.serverToken;
 }
 
 export async function ClearServerCredentials() {
-  await SaveServerCredentials({ serverId: '', serverKey: '', serverToken: '' });
+  await SaveServerCredentials({ serverId: '', serverKey: '' });
+  await SaveServerToken('');
 }
 
 export async function SaveStorageFolderPath(pathStorageFolder: string) {

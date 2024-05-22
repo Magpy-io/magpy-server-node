@@ -4,7 +4,7 @@ import responseFormatter from '../api/responseFormatter';
 import { GetServerInfo, GetServerToken, TokenManager } from '../modules/BackendQueries';
 import { ErrorBackendUnreachable } from '../modules/BackendQueries/ExceptionsManager';
 import { combineMiddleware } from '../modules/functions';
-import { SaveServerCredentials } from '../modules/serverDataManager';
+import { SaveServerCredentials, SaveServerToken } from '../modules/serverDataManager';
 import checkServerHasCredentials from './checkServerHasCredentials';
 import { ExtendedRequest } from '../api/endpointsLoader';
 
@@ -17,12 +17,12 @@ async function checkServerHasValidCredentials(
     console.log('#CheckServerHasValidCredentials middleware');
     const serverData = req.serverData;
 
-    if (serverData?.serverToken) {
+    if (serverData?.serverRegisteredInfo?.serverToken) {
       console.log('server token found');
 
       let ret: GetServerInfo.ResponseType;
       try {
-        TokenManager.SetServerToken(serverData.serverToken);
+        TokenManager.SetServerToken(serverData.serverRegisteredInfo?.serverToken);
         ret = await GetServerInfo.Post();
       } catch (err) {
         if (err instanceof ErrorBackendUnreachable) {
@@ -51,14 +51,17 @@ async function checkServerHasValidCredentials(
       }
     }
 
-    if (serverData?.serverId && serverData?.serverKey) {
+    if (
+      serverData?.serverRegisteredInfo.serverCredentials?.serverId &&
+      serverData?.serverRegisteredInfo.serverCredentials?.serverKey
+    ) {
       console.log('server credentials found');
 
       let ret: GetServerToken.ResponseType;
       try {
         ret = await GetServerToken.Post({
-          id: serverData.serverId,
-          key: serverData.serverKey,
+          id: serverData.serverRegisteredInfo.serverCredentials.serverId,
+          key: serverData.serverRegisteredInfo.serverCredentials.serverKey,
         });
       } catch (err) {
         if (err instanceof ErrorBackendUnreachable) {
@@ -83,9 +86,7 @@ async function checkServerHasValidCredentials(
         const serverToken = TokenManager.GetServerToken();
 
         console.log('saving server token');
-        await SaveServerCredentials({
-          serverToken: serverToken,
-        });
+        await SaveServerToken(serverToken);
 
         console.log('server has valid credentials');
         req.hasValidCredentials = true;

@@ -17,13 +17,19 @@ async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFun
       throw new Error('Token undefined in checkUserToken');
     }
 
-    if (!req?.serverData?.serverId || !req?.serverData.serverKey) {
+    if (
+      !req?.serverData?.serverRegisteredInfo.serverCredentials?.serverId ||
+      !req?.serverData.serverRegisteredInfo.serverCredentials.serverKey
+    ) {
       console.log('server is not claimed');
       responseFormatter.sendFailedMessage(res, 'Server not claimed', 'SERVER_NOT_CLAIMED');
       return;
     }
 
-    const ret = verifyUserToken(token, req.serverData.serverKey);
+    const ret = verifyUserToken(
+      token,
+      req.serverData.serverRegisteredInfo.serverCredentials.serverKey,
+    );
 
     if (!ret.ok) {
       if (ret.error == 'TOKEN_EXPIRED_ERROR') {

@@ -54,8 +54,7 @@ function AddServerDataIfMissing(data: unknown): ServerDataType {
   if (!error) {
     return value;
   }
-
-  return ServerDataDefault;
+  return JSON.parse(JSON.stringify(ServerDataDefault));
 }
 
 async function CreateFileIfDoesNotExist() {

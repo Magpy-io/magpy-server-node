@@ -7,14 +7,18 @@ export type TokenUserData = { id: string };
 
 export function generateUserToken(userId: string) {
   const serverData = GetServerConfigData();
-  if (!serverData.serverKey) {
+  if (!serverData.serverRegisteredInfo.serverCredentials?.serverKey) {
     throw new Error('Server key not defined');
   }
 
   const tokenData: TokenUserData = { id: userId };
-  const token = jwt.sign(tokenData, serverData.serverKey, {
-    expiresIn: jwtUserExp,
-  });
+  const token = jwt.sign(
+    tokenData,
+    serverData.serverRegisteredInfo.serverCredentials.serverKey,
+    {
+      expiresIn: jwtUserExp,
+    },
+  );
   return token;
 }
 

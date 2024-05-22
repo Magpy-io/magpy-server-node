@@ -41,8 +41,8 @@ describe("Test 'unclaimServer' endpoint", () => {
 
     const serverData = GetServerConfigData();
 
-    expect(serverData.serverId).toBeFalsy();
-    expect(serverData.serverKey).toBeFalsy();
-    expect(serverData.serverToken).toBeFalsy();
+    expect(serverData.serverRegisteredInfo.serverCredentials?.serverId).toBeFalsy();
+    expect(serverData.serverRegisteredInfo.serverCredentials?.serverKey).toBeFalsy();
+    expect(serverData.serverRegisteredInfo.serverToken).toBeFalsy();
   });
 });

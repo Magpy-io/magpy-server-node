@@ -12,7 +12,7 @@ import * as mockValues from '@src/modules/BackendQueries/__mocks__/mockValues';
 import * as mockValuesGetIp from '@src/modules/__mocks__/NetworkManagerMockValues';
 
 import { initServer, stopServer } from '@src/server/server';
-import { SaveServerCredentials } from '@src/modules/serverDataManager';
+import { SaveServerCredentials, SaveServerToken } from '@src/modules/serverDataManager';
 import * as sac from '@tests/helpers/setupAndCleanup';
 import { expectToBeOk, expectToNotBeOk, expectErrorCodeToBe } from '@tests/helpers/functions';
 
@@ -62,9 +62,7 @@ describe("Test 'claimServer' endpoint", () => {
   });
 
   it('Should return error SERVER_ALREADY_CLAIMED when claiming a server with a valid server token', async () => {
-    SaveServerCredentials({
-      serverToken: mockValues.validServerToken,
-    });
+    SaveServerToken(mockValues.validServerToken);
 
     const ret = await ClaimServer.Post({
       userToken: mockValues.validUserToken,

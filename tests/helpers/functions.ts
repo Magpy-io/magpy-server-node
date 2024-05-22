@@ -280,7 +280,7 @@ async function waitForPhotoTransferToFinish() {
 function testReturnedToken() {
   const serverData = GetServerConfigData();
 
-  if (!serverData.serverKey) {
+  if (!serverData.serverRegisteredInfo.serverCredentials?.serverKey) {
     throw new Error('testReturnedToken: serverData.serverKey needs to be defined');
   }
 
@@ -288,7 +288,10 @@ function testReturnedToken() {
 
   const userTokenRetured = GetUserToken();
 
-  const tokenVerification = verifyUserToken(userTokenRetured, serverData.serverKey);
+  const tokenVerification = verifyUserToken(
+    userTokenRetured,
+    serverData.serverRegisteredInfo.serverCredentials.serverKey,
+  );
   expect(tokenVerification.ok).toBe(true);
 
   if (!tokenVerification.ok) {
@@ -324,11 +327,14 @@ function getUserId() {
     throw new Error('No serverUserToken to use in getUserId()');
   }
   const serverData = GetServerConfigData();
-  if (!serverData.serverKey) {
+  if (!serverData.serverRegisteredInfo.serverCredentials?.serverKey) {
     throw new Error('getUserId: serverData.serverKey needs to be defined');
   }
 
-  const tokenVerification = verifyUserToken(serverUserToken, serverData.serverKey);
+  const tokenVerification = verifyUserToken(
+    serverUserToken,
+    serverData.serverRegisteredInfo.serverCredentials.serverKey,
+  );
 
   if (!tokenVerification.ok) {
     throw new Error('getUserId: token verification failed');
