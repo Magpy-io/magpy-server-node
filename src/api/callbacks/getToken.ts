@@ -3,19 +3,23 @@ import { Request, Response } from 'express';
 import checkServerIsClaimedRemote from '../../middleware/checkServerIsClaimedRemote';
 import { GetServerInfo, TokenManager, WhoAmI } from '../../modules/BackendQueries';
 import { ErrorBackendUnreachable } from '../../modules/BackendQueries/ExceptionsManager';
-import { GetServerToken } from '../../modules/serverDataManager';
+import {
+  GetServerCredentials,
+  GetServerSigningKey,
+  GetServerToken,
+  SaveServerSigningKey,
+} from '../../modules/serverDataManager';
 import { generateUserToken } from '../../modules/tokenManagement';
 import { GetToken } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
+import { randomBytes } from 'crypto';
 
 const sendResponse = responseFormatter.getCustomSendResponse<GetToken.ResponseData>();
 
 const callback = async (req: ExtendedRequest, res: Response, body: GetToken.RequestData) => {
   try {
     const backendUserToken = body.userToken;
-
-    const serverToken = GetServerToken();
 
     if (!req.isClaimedRemote) {
       console.log('server is not claimed');
@@ -61,6 +65,8 @@ const callback = async (req: ExtendedRequest, res: Response, body: GetToken.Requ
       }
     }
 
+    const serverToken = GetServerToken();
+
     if (!serverToken) {
       throw new Error('Should have server token');
     }
@@ -93,7 +99,18 @@ const callback = async (req: ExtendedRequest, res: Response, body: GetToken.Requ
 
     console.log('user has access to server, generating token');
 
-    const userToken = generateUserToken(retUser.data.user._id);
+    let serverSigningKey = GetServerSigningKey();
+
+    if (!serverSigningKey) {
+      console.log(
+        'First time generating token, generating signing key and saving it to server config.',
+      );
+      const keyGenerated = randomBytes(32).toString('hex');
+      serverSigningKey = keyGenerated;
+      await SaveServerSigningKey(keyGenerated);
+    }
+
+    const userToken = generateUserToken(retUser.data.user._id, serverSigningKey);
     res.set('x-authorization', 'Bearer ' + userToken);
 
     console.log('sending response');

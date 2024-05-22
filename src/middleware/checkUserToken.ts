@@ -5,7 +5,11 @@ import { combineMiddleware } from '../modules/functions';
 import { verifyUserToken } from '../modules/tokenManagement';
 import verifyAuthorizationHeader from './verifyAuthorizationHeader';
 import { ExtendedRequest } from '../api/endpointsLoader';
-import { GetServerCredentials, IsServerClaimedRemote } from '../modules/serverDataManager';
+import {
+  GetServerCredentials,
+  GetServerSigningKey,
+  IsServerClaimedRemote,
+} from '../modules/serverDataManager';
 
 async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFunction) {
   try {
@@ -19,17 +23,25 @@ async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFun
 
     if (!IsServerClaimedRemote()) {
       console.log('server is not claimed');
-      responseFormatter.sendFailedMessage(res, 'Server not claimed', 'SERVER_NOT_CLAIMED');
-      return;
+      return responseFormatter.sendFailedMessage(
+        res,
+        'Server not claimed',
+        'SERVER_NOT_CLAIMED',
+      );
     }
 
-    const serverCredentials = GetServerCredentials();
+    const serverSigningKey = GetServerSigningKey();
 
-    if (!serverCredentials?.serverKey) {
-      throw new Error('Server Claimed but serverKey is missing.');
+    if (!serverSigningKey) {
+      console.log('User token verification failed because to server signing key was found.');
+      return responseFormatter.sendFailedMessage(
+        res,
+        'User token verification failed',
+        'AUTHORIZATION_FAILED',
+      );
     }
 
-    const ret = verifyUserToken(token, serverCredentials.serverKey);
+    const ret = verifyUserToken(token, serverSigningKey);
 
     if (!ret.ok) {
       if (ret.error == 'TOKEN_EXPIRED_ERROR') {

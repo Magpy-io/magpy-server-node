@@ -15,7 +15,11 @@ import { Photo } from '@src/db/sequelizeDb';
 import * as mockValues from '@src/modules/BackendQueries/__mocks__/mockValues';
 import { pathExists } from '@src/modules/diskManager';
 import { timeout } from '@src/modules/functions';
-import { GetServerCredentials, SaveServerCredentials } from '@src/modules/serverDataManager';
+import {
+  GetServerCredentials,
+  GetServerSigningKey,
+  SaveServerCredentials,
+} from '@src/modules/serverDataManager';
 import { verifyUserToken } from '@src/modules/tokenManagement';
 import { GetLastWarningForUser, HasWarningForUser } from '@src/modules/warningsManager';
 import { photoImage64 } from '@tests/helpers/imageBase64';
@@ -278,17 +282,17 @@ async function waitForPhotoTransferToFinish() {
 }
 
 function testReturnedToken() {
-  const serverCredentials = GetServerCredentials();
+  const serverSigningKey = GetServerSigningKey();
 
-  if (!serverCredentials?.serverKey) {
-    throw new Error('testReturnedToken: serverKey needs to be defined');
+  if (!serverSigningKey) {
+    throw new Error('testReturnedToken: serverSigningKey needs to be defined');
   }
 
   expect(HasUserToken()).toBe(true);
 
   const userTokenRetured = GetUserToken();
 
-  const tokenVerification = verifyUserToken(userTokenRetured, serverCredentials.serverKey);
+  const tokenVerification = verifyUserToken(userTokenRetured, serverSigningKey);
   expect(tokenVerification.ok).toBe(true);
 
   if (!tokenVerification.ok) {
@@ -323,12 +327,12 @@ function getUserId() {
   if (!serverUserToken) {
     throw new Error('No serverUserToken to use in getUserId()');
   }
-  const serverCredentials = GetServerCredentials();
-  if (!serverCredentials?.serverKey) {
-    throw new Error('getUserId: serverKey needs to be defined');
+  const serverSigningKey = GetServerSigningKey();
+  if (!serverSigningKey) {
+    throw new Error('getUserId: serverSigningKey needs to be defined');
   }
 
-  const tokenVerification = verifyUserToken(serverUserToken, serverCredentials.serverKey);
+  const tokenVerification = verifyUserToken(serverUserToken, serverSigningKey);
 
   if (!tokenVerification.ok) {
     throw new Error('getUserId: token verification failed');
@@ -337,7 +341,11 @@ function getUserId() {
 }
 
 function getExpiredToken() {
-  const expiredToken = jwt.sign({}, mockValues.validKey, {
+  const serverSigningKey = GetServerSigningKey();
+  if (!serverSigningKey) {
+    throw new Error('getExpiredToken: serverSigningKey needs to be defined');
+  }
+  const expiredToken = jwt.sign({}, serverSigningKey, {
     expiresIn: 0,
   });
 
