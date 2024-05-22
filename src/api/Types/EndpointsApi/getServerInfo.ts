@@ -7,6 +7,7 @@ export type ResponseData = {
   storagePath: string;
   serverName: string;
   owner: { name: string; email: string } | null;
+  ownerLocal: { name: string } | null;
 };
 
 export const RequestSchema = Joi.object()
