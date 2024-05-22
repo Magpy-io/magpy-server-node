@@ -11,7 +11,7 @@ async function checkServerIsClaimedRemote(req: ExtendedRequest, res: Response, n
     console.log('#CheckServerIsClaimed middleware');
     if (!req.hasValidCredentials) {
       console.log('server is not claimed');
-      req.isClaimed = false;
+      req.isClaimedRemote = false;
       next();
       return;
     }
@@ -24,13 +24,13 @@ async function checkServerIsClaimedRemote(req: ExtendedRequest, res: Response, n
 
     if (ret.data.server.owner == null) {
       console.log('server is not claimed');
-      req.isClaimed = false;
+      req.isClaimedRemote = false;
       next();
       return;
     }
 
     console.log('server is claimed');
-    req.isClaimed = true;
+    req.isClaimedRemote = true;
 
     next();
   } catch (err) {
