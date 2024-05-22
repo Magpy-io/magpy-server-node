@@ -99,3 +99,17 @@ export function GetServerName(): string {
 
   return serverData.serverName;
 }
+
+export function IsServerClaimedRemote():boolean{
+  const serverData = GetServerConfigData();
+  return !!serverData.serverRegisteredInfo;
+}
+
+export function IsServerClaimedLocal():boolean{
+  const serverData = GetServerConfigData();
+  return !!serverData.localClaimInfo;
+}
+
+export function IsServerClaimedAny():boolean{
+  return IsServerClaimedRemote() || IsServerClaimedLocal();
+}

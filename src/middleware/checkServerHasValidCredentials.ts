@@ -4,7 +4,7 @@ import responseFormatter from '../api/responseFormatter';
 import * as BackendQueries from '../modules/BackendQueries';
 import { ErrorBackendUnreachable } from '../modules/BackendQueries/ExceptionsManager';
 import { combineMiddleware } from '../modules/functions';
-import { SaveServerCredentials, SaveServerToken, GetServerToken, GetServerCredentials } from '../modules/serverDataManager';
+import { SaveServerCredentials, SaveServerToken, GetServerToken, GetServerCredentials, IsServerClaimedRemote } from '../modules/serverDataManager';
 import { ExtendedRequest } from '../api/endpointsLoader';
 
 async function checkServerHasValidCredentials(
@@ -14,6 +14,13 @@ async function checkServerHasValidCredentials(
 ) {
   try {
     console.log('#CheckServerHasValidCredentials middleware');
+
+    if(!IsServerClaimedRemote()){
+      req.hasValidCredentials = false;
+      next();
+      return;
+    }
+
     const serverToken = GetServerToken();
     if (serverToken) {
       console.log('server token found');
@@ -49,13 +56,17 @@ async function checkServerHasValidCredentials(
       }
     }
 
+
     const serverCredentials = GetServerCredentials()
 
     if (
-      serverCredentials?.serverId &&
-      serverCredentials?.serverKey
+      !serverCredentials?.serverId ||
+      !serverCredentials?.serverKey
     ) {
-      console.log('server credentials found');
+      throw new Error("Server is claimed but serverId or serverKey is missing.");
+    }
+
+      console.log('Server credentials found');
 
       let ret: BackendQueries.GetServerToken.ResponseType;
       try {
@@ -93,10 +104,6 @@ async function checkServerHasValidCredentials(
         next();
         return;
       }
-    }
-
-    req.hasValidCredentials = false;
-    next();
   } catch (err) {
     console.error(err);
     responseFormatter.sendErrorMessage(res);

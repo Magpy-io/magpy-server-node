@@ -11,7 +11,7 @@ import { initServer, stopServer } from '@src/server/server';
 
 import * as sac from '@tests/helpers/setupAndCleanup';
 
-import { GetServerCredentials, GetServerToken } from '@src/modules/serverDataManager';
+import { GetServerCredentials, GetServerToken, IsServerClaimedRemote } from '@src/modules/serverDataManager';
 import { expectToBeOk } from '@tests/helpers/functions';
 
 describe("Test 'unclaimServer' endpoint", () => {
@@ -42,6 +42,7 @@ describe("Test 'unclaimServer' endpoint", () => {
     const serverCredentials = GetServerCredentials()
     const serverToken = GetServerToken();
 
+    expect(IsServerClaimedRemote()).toBe(false);
     expect(serverCredentials?.serverId).toBeFalsy();
     expect(serverCredentials?.serverKey).toBeFalsy();
     expect(serverToken).toBeFalsy();

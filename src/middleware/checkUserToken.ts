@@ -5,7 +5,7 @@ import { combineMiddleware } from '../modules/functions';
 import { verifyUserToken } from '../modules/tokenManagement';
 import verifyAuthorizationHeader from './verifyAuthorizationHeader';
 import { ExtendedRequest } from '../api/endpointsLoader';
-import { GetServerCredentials } from '../modules/serverDataManager';
+import { GetServerCredentials, IsServerClaimedRemote } from '../modules/serverDataManager';
 
 async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFunction) {
   try {
@@ -17,15 +17,18 @@ async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFun
       throw new Error('Token undefined in checkUserToken');
     }
 
-    const serverCredentials = GetServerCredentials();
-
     if (
-      !serverCredentials?.serverId ||
-      !serverCredentials.serverKey
+      !IsServerClaimedRemote()
     ) {
       console.log('server is not claimed');
       responseFormatter.sendFailedMessage(res, 'Server not claimed', 'SERVER_NOT_CLAIMED');
       return;
+    }
+
+    const serverCredentials = GetServerCredentials();
+
+    if(!serverCredentials?.serverKey){
+      throw new Error("Server Claimed but serverKey is missing.");
     }
 
     const ret = verifyUserToken(
