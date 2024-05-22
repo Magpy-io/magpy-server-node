@@ -113,3 +113,21 @@ export function IsServerClaimedLocal():boolean{
 export function IsServerClaimedAny():boolean{
   return IsServerClaimedRemote() || IsServerClaimedLocal();
 }
+
+export async function SaveServerLocalClaimInfo(claimInfo: {
+  username: string;
+  passwordHash: string;
+}){
+  const dataSaved = GetServerConfigData();
+  dataSaved.localClaimInfo = claimInfo;
+  await SetServerConfigData(dataSaved);
+}
+
+export function GetServerLocalClaimInfo():{
+  username: string;
+  passwordHash: string;
+} | null
+{
+  const serverData = GetServerConfigData();
+  return serverData.localClaimInfo;
+}
