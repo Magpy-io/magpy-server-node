@@ -131,3 +131,14 @@ export function GetServerLocalClaimInfo(): {
   const serverData = GetServerConfigData();
   return serverData.localClaimInfo;
 }
+
+export function GetServerSigningKey(): string | null {
+  const serverData = GetServerConfigData();
+  return serverData.serverSigningKey;
+}
+
+export async function SaveServerSigningKey(key: string) {
+  const dataSaved = GetServerConfigData();
+  dataSaved.serverSigningKey = key;
+  await SetServerConfigData(dataSaved);
+}
