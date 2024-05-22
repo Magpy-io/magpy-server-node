@@ -6,7 +6,11 @@ import { combineMiddleware } from '../modules/functions';
 import checkServerHasValidCredentials from './checkServerHasValidCredentials';
 import { ExtendedRequest } from '../api/endpointsLoader';
 
-async function checkServerIsClaimedRemote(req: ExtendedRequest, res: Response, next: NextFunction) {
+async function checkServerIsClaimedRemote(
+  req: ExtendedRequest,
+  res: Response,
+  next: NextFunction,
+) {
   try {
     console.log('#checkServerIsClaimedRemote middleware');
     if (!req.hasValidCredentials) {

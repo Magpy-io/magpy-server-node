@@ -40,7 +40,7 @@ const callback = async (
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    await SaveServerLocalClaimInfo({username: userName, passwordHash:hashedPassword})
+    await SaveServerLocalClaimInfo({ username: userName, passwordHash: hashedPassword });
 
     return sendResponse(res, 'ok');
   } catch (err) {

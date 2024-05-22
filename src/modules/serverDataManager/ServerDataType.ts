@@ -20,10 +20,11 @@ export const ServerDataSchema = Joi.object({
     serverCredentials: Joi.object({
       serverId: Joi.string().required(),
       serverKey: Joi.string().required(),
-    })
-      .required(),
+    }).required(),
     serverToken: Joi.string().allow(null),
-  }).required().allow(null),
+  })
+    .required()
+    .allow(null),
   localClaimInfo: Joi.object({
     username: Joi.string().required(),
     passwordHash: Joi.string().required(),

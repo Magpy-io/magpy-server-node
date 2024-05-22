@@ -12,13 +12,9 @@ export function generateUserToken(userId: string) {
   }
 
   const tokenData: TokenUserData = { id: userId };
-  const token = jwt.sign(
-    tokenData,
-    serverCredentials.serverKey,
-    {
-      expiresIn: jwtUserExp,
-    },
-  );
+  const token = jwt.sign(tokenData, serverCredentials.serverKey, {
+    expiresIn: jwtUserExp,
+  });
   return token;
 }
 

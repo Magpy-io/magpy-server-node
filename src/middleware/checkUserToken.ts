@@ -17,9 +17,7 @@ async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFun
       throw new Error('Token undefined in checkUserToken');
     }
 
-    if (
-      !IsServerClaimedRemote()
-    ) {
+    if (!IsServerClaimedRemote()) {
       console.log('server is not claimed');
       responseFormatter.sendFailedMessage(res, 'Server not claimed', 'SERVER_NOT_CLAIMED');
       return;
@@ -27,14 +25,11 @@ async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFun
 
     const serverCredentials = GetServerCredentials();
 
-    if(!serverCredentials?.serverKey){
-      throw new Error("Server Claimed but serverKey is missing.");
+    if (!serverCredentials?.serverKey) {
+      throw new Error('Server Claimed but serverKey is missing.');
     }
 
-    const ret = verifyUserToken(
-      token,
-      serverCredentials.serverKey,
-    );
+    const ret = verifyUserToken(token, serverCredentials.serverKey);
 
     if (!ret.ok) {
       if (ret.error == 'TOKEN_EXPIRED_ERROR') {
@@ -66,7 +61,4 @@ async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFun
   }
 }
 
-export default combineMiddleware([
-  verifyAuthorizationHeader,
-  checkUserToken,
-]);
+export default combineMiddleware([verifyAuthorizationHeader, checkUserToken]);

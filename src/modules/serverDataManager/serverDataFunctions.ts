@@ -25,17 +25,15 @@ export async function ClearServerConfigData() {
   await ClearServerDataFile();
 }
 
-export async function SaveServerCredentials(
-  serverCredentials: {
-    serverId: string;
-    serverKey: string;
-  },
-) {
+export async function SaveServerCredentials(serverCredentials: {
+  serverId: string;
+  serverKey: string;
+}) {
   const dataSaved = GetServerConfigData();
-  
-  if(dataSaved.serverRegisteredInfo == null){
-    dataSaved.serverRegisteredInfo = {serverCredentials:serverCredentials}
-  }else{
+
+  if (dataSaved.serverRegisteredInfo == null) {
+    dataSaved.serverRegisteredInfo = { serverCredentials: serverCredentials };
+  } else {
     dataSaved.serverRegisteredInfo.serverCredentials = serverCredentials;
   }
   await SetServerConfigData(dataSaved);
@@ -44,10 +42,12 @@ export async function SaveServerCredentials(
 export async function SaveServerToken(serverToken: string) {
   const dataSaved = GetServerConfigData();
 
-  if(dataSaved.serverRegisteredInfo == null){
-    throw new Error("SaveServerToken: Saving server token but there is not saved credentials.")  
+  if (dataSaved.serverRegisteredInfo == null) {
+    throw new Error(
+      'SaveServerToken: Saving server token but there is not saved credentials.',
+    );
   }
-  
+
   dataSaved.serverRegisteredInfo.serverToken = serverToken;
 
   await SetServerConfigData(dataSaved);
@@ -69,7 +69,7 @@ export function GetServerToken(): string | null {
 }
 
 export async function ClearServerCredentials() {
-  const dataSaved = GetServerConfigData();  
+  const dataSaved = GetServerConfigData();
   dataSaved.serverRegisteredInfo = null;
   dataSaved.localClaimInfo = null;
   await SetServerConfigData(dataSaved);
@@ -101,34 +101,33 @@ export function GetServerName(): string {
   return serverData.serverName;
 }
 
-export function IsServerClaimedRemote():boolean{
+export function IsServerClaimedRemote(): boolean {
   const serverData = GetServerConfigData();
   return !!serverData.serverRegisteredInfo;
 }
 
-export function IsServerClaimedLocal():boolean{
+export function IsServerClaimedLocal(): boolean {
   const serverData = GetServerConfigData();
   return !!serverData.localClaimInfo;
 }
 
-export function IsServerClaimedAny():boolean{
+export function IsServerClaimedAny(): boolean {
   return IsServerClaimedRemote() || IsServerClaimedLocal();
 }
 
 export async function SaveServerLocalClaimInfo(claimInfo: {
   username: string;
   passwordHash: string;
-}){
+}) {
   const dataSaved = GetServerConfigData();
   dataSaved.localClaimInfo = claimInfo;
   await SetServerConfigData(dataSaved);
 }
 
-export function GetServerLocalClaimInfo():{
+export function GetServerLocalClaimInfo(): {
   username: string;
   passwordHash: string;
-} | null
-{
+} | null {
   const serverData = GetServerConfigData();
   return serverData.localClaimInfo;
 }

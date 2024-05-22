@@ -1,8 +1,6 @@
 import Joi from 'joi';
 
-import {
-  ErrorServerAlreadyClaimed,
-} from '../ErrorTypes';
+import { ErrorServerAlreadyClaimed } from '../ErrorTypes';
 import { TokenAuthentification } from '../Types';
 
 export type ResponseData = string;
@@ -14,8 +12,7 @@ export const RequestSchema = Joi.object({
   .options({ presence: 'required' })
   .meta({ className: 'RequestData' });
 
-export type ResponseErrorTypes =
-  | ErrorServerAlreadyClaimed;
+export type ResponseErrorTypes = ErrorServerAlreadyClaimed;
 
 export const endpoint = 'claimServerLocal';
 
