@@ -11,6 +11,7 @@ export type ServerDataType = {
     username: string;
     passwordHash: string;
   } | null;
+  serverSigningKey: string | null;
   storageFolderPath: string;
   serverName: string;
 };

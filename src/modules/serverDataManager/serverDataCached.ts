@@ -6,6 +6,7 @@ export const ServerDataDefault: ServerDataType = {
   serverName: config.serverName,
   serverRegisteredInfo: null,
   localClaimInfo: null,
+  serverSigningKey: null,
 };
 
 let serverData: ServerDataType = ServerDataDefault;
