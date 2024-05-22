@@ -6,7 +6,7 @@ import { combineMiddleware } from '../modules/functions';
 import checkServerHasValidCredentials from './checkServerHasValidCredentials';
 import { ExtendedRequest } from '../api/endpointsLoader';
 
-async function checkServerIsClaimed(req: ExtendedRequest, res: Response, next: NextFunction) {
+async function checkServerIsClaimedRemote(req: ExtendedRequest, res: Response, next: NextFunction) {
   try {
     console.log('#CheckServerIsClaimed middleware');
     if (!req.hasValidCredentials) {
@@ -39,4 +39,4 @@ async function checkServerIsClaimed(req: ExtendedRequest, res: Response, next: N
   }
 }
 
-export default combineMiddleware([checkServerHasValidCredentials, checkServerIsClaimed]);
+export default combineMiddleware([checkServerHasValidCredentials, checkServerIsClaimedRemote]);

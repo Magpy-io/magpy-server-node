@@ -1,7 +1,7 @@
 import { randomBytes } from 'crypto';
 import { Request, Response } from 'express';
 
-import checkServerIsClaimed from '../../middleware/checkServerIsClaimed';
+import checkServerIsClaimedRemote from '../../middleware/checkServerIsClaimedRemote';
 import { GetServerToken, RegisterServer, TokenManager } from '../../modules/BackendQueries';
 import { ErrorBackendUnreachable } from '../../modules/BackendQueries/ExceptionsManager';
 import { getMyPort, getMyPrivateIp, getMyPublicIp } from '../../modules/NetworkManager';
@@ -28,7 +28,7 @@ const callback = async (
 
     const { userToken } = body;
 
-    if (req.isClaimed) {
+    if (req.isClaimedRemote) {
       console.log('server already claimed, it has valid token');
       return responseFormatter.sendFailedMessage(
         res,
@@ -121,6 +121,6 @@ export default {
   endpoint: ClaimServer.endpoint,
   callback: callback,
   method: 'post',
-  middleWare: checkServerIsClaimed,
+  middleWare: checkServerIsClaimedRemote,
   requestShema: ClaimServer.RequestSchema,
 } as EndpointType;

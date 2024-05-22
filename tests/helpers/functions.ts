@@ -281,7 +281,7 @@ function testReturnedToken() {
   const serverCredentials = GetServerCredentials()
 
   if (!serverCredentials?.serverKey) {
-    throw new Error('testReturnedToken: serverData.serverKey needs to be defined');
+    throw new Error('testReturnedToken: serverKey needs to be defined');
   }
 
   expect(HasUserToken()).toBe(true);
@@ -328,7 +328,7 @@ function getUserId() {
   }
   const serverCredentials = GetServerCredentials()
   if (!serverCredentials?.serverKey) {
-    throw new Error('getUserId: serverData.serverKey needs to be defined');
+    throw new Error('getUserId: serverKey needs to be defined');
   }
 
   const tokenVerification = verifyUserToken(

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import checkServerIsClaimed from '../../middleware/checkServerIsClaimed';
+import checkServerIsClaimedRemote from '../../middleware/checkServerIsClaimedRemote';
 import { GetServerInfo, TokenManager, WhoAmI } from '../../modules/BackendQueries';
 import { ErrorBackendUnreachable } from '../../modules/BackendQueries/ExceptionsManager';
 import { GetServerToken } from '../../modules/serverDataManager';
@@ -17,7 +17,7 @@ const callback = async (req: ExtendedRequest, res: Response, body: GetToken.Requ
 
     const serverToken = GetServerToken();
 
-    if (!req.isClaimed) {
+    if (!req.isClaimedRemote) {
       console.log('server is not claimed');
       return responseFormatter.sendFailedMessage(
         res,
@@ -108,6 +108,6 @@ export default {
   endpoint: GetToken.endpoint,
   callback: callback,
   method: 'post',
-  middleWare: checkServerIsClaimed,
+  middleWare: checkServerIsClaimedRemote,
   requestShema: GetToken.RequestSchema,
 } as EndpointType;
