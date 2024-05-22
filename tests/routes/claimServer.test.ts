@@ -61,16 +61,6 @@ describe("Test 'claimServer' endpoint", () => {
     expectErrorCodeToBe(ret, 'AUTHORIZATION_BACKEND_EXPIRED');
   });
 
-  it('Should return error SERVER_ALREADY_CLAIMED when claiming a server with a valid server token', async () => {
-    SaveServerToken(mockValues.validServerToken);
-
-    const ret = await ClaimServer.Post({
-      userToken: mockValues.validUserToken,
-    });
-    expectToNotBeOk(ret);
-    expectErrorCodeToBe(ret, 'SERVER_ALREADY_CLAIMED');
-  });
-
   it('Should return error SERVER_ALREADY_CLAIMED when claiming a server with a valid id and key', async () => {
     SaveServerCredentials({
       serverId: mockValues.serverId,

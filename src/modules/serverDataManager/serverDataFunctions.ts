@@ -29,16 +29,27 @@ export async function SaveServerCredentials(
   serverCredentials: {
     serverId: string;
     serverKey: string;
-  } | null,
+  },
 ) {
   const dataSaved = GetServerConfigData();
-  dataSaved.serverRegisteredInfo.serverCredentials = serverCredentials;
+  
+  if(dataSaved.serverRegisteredInfo == null){
+    dataSaved.serverRegisteredInfo = {serverCredentials:serverCredentials}
+  }else{
+    dataSaved.serverRegisteredInfo.serverCredentials = serverCredentials;
+  }
   await SetServerConfigData(dataSaved);
 }
 
 export async function SaveServerToken(serverToken: string) {
   const dataSaved = GetServerConfigData();
+
+  if(dataSaved.serverRegisteredInfo == null){
+    throw new Error("SaveServerToken: Saving server token but there is not saved credentials.")  
+  }
+  
   dataSaved.serverRegisteredInfo.serverToken = serverToken;
+
   await SetServerConfigData(dataSaved);
 }
 
@@ -48,18 +59,19 @@ export function GetServerCredentials(): {
 } | null {
   const serverData = GetServerConfigData();
 
-  return serverData.serverRegisteredInfo.serverCredentials;
+  return serverData.serverRegisteredInfo?.serverCredentials ?? null;
 }
 
 export function GetServerToken(): string | null {
   const serverData = GetServerConfigData();
 
-  return serverData.serverRegisteredInfo.serverToken;
+  return serverData.serverRegisteredInfo?.serverToken ?? null;
 }
 
 export async function ClearServerCredentials() {
-  await SaveServerCredentials({ serverId: '', serverKey: '' });
-  await SaveServerToken('');
+  const dataSaved = GetServerConfigData();  
+  dataSaved.serverRegisteredInfo = null;
+  await SetServerConfigData(dataSaved);
 }
 
 export async function SaveStorageFolderPath(pathStorageFolder: string) {
