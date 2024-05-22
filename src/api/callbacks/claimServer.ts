@@ -7,6 +7,7 @@ import { ErrorBackendUnreachable } from '../../modules/BackendQueries/Exceptions
 import { getMyPort, getMyPrivateIp, getMyPublicIp } from '../../modules/NetworkManager';
 import {
   GetServerName,
+  IsServerClaimedLocal,
   SaveServerCredentials,
   SaveServerToken,
 } from '../../modules/serverDataManager';
@@ -28,8 +29,8 @@ const callback = async (
 
     const { userToken } = body;
 
-    if (req.isClaimedRemote) {
-      console.log('server already claimed, it has valid token');
+    if (req.isClaimedRemote || IsServerClaimedLocal()) {
+      console.log('server already claimed');
       return responseFormatter.sendFailedMessage(
         res,
         'Server already claimed',

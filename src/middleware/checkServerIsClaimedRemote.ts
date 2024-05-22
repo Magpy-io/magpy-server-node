@@ -8,7 +8,7 @@ import { ExtendedRequest } from '../api/endpointsLoader';
 
 async function checkServerIsClaimedRemote(req: ExtendedRequest, res: Response, next: NextFunction) {
   try {
-    console.log('#CheckServerIsClaimed middleware');
+    console.log('#checkServerIsClaimedRemote middleware');
     if (!req.hasValidCredentials) {
       console.log('server is not claimed');
       req.isClaimedRemote = false;
