@@ -16,6 +16,7 @@ import {
   expectErrorCodeToBe,
   expectToBeOk,
   expectToNotBeOk,
+  setupServerClaimedLocally,
   testReturnedToken,
 } from '@tests/helpers/functions';
 
@@ -38,7 +39,7 @@ describe("Test 'claimServer' endpoint", () => {
     await sac.afterEach();
   });
 
-  it('Should return a valid token when asking a claimed server', async () => {
+  it('Should return a valid token when asking a remotly claimed server', async () => {
     const ret = await GetToken.Post({
       userToken: mockValues.validUserToken,
     });
@@ -47,6 +48,20 @@ describe("Test 'claimServer' endpoint", () => {
     expect(ret.warning).toBe(false);
 
     testReturnedToken();
+  });
+
+  it('Should return SERVER_NOT_CLAIMED when asking a locally claimed server', async () => {
+
+    await UnclaimServer.Post();
+
+    await setupServerClaimedLocally();
+
+    const ret = await GetToken.Post({
+      userToken: mockValues.validUserToken,
+    });
+
+    expectToNotBeOk(ret);
+    expectErrorCodeToBe(ret,'SERVER_NOT_CLAIMED');
   });
 
   it('Should return error AUTHORIZATION_BACKEND_FAILED when using invalid user token', async () => {
