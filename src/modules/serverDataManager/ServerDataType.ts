@@ -36,4 +36,5 @@ export const ServerDataSchema = Joi.object({
     .allow(null),
   storageFolderPath: Joi.string().default(ServerDataDefault.storageFolderPath),
   serverName: Joi.string().default(ServerDataDefault.serverName),
+  serverSigningKey: Joi.string().allow(null),
 });
