@@ -5,11 +5,7 @@ import { combineMiddleware } from '../modules/functions';
 import { verifyUserToken } from '../modules/tokenManagement';
 import verifyAuthorizationHeader from './verifyAuthorizationHeader';
 import { ExtendedRequest } from '../api/endpointsLoader';
-import {
-  GetServerCredentials,
-  GetServerSigningKey,
-  IsServerClaimedRemote,
-} from '../modules/serverDataManager';
+import { GetServerSigningKey, IsServerClaimedAny } from '../modules/serverDataManager';
 
 async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFunction) {
   try {
@@ -21,7 +17,7 @@ async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFun
       throw new Error('Token undefined in checkUserToken');
     }
 
-    if (!IsServerClaimedRemote()) {
+    if (!IsServerClaimedAny()) {
       console.log('server is not claimed');
       return responseFormatter.sendFailedMessage(
         res,
