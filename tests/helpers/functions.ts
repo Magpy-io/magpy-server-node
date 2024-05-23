@@ -467,6 +467,8 @@ export {
   waitForPhotoTransferToFinish,
   defaultPhoto,
   defaultPhotoSecondMediaId,
+  defaultPassword,
+  defaultUsername,
   testReturnedToken,
   setupServerClaimed,
   setupServerUserToken,
