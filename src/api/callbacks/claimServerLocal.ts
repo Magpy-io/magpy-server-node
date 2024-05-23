@@ -25,7 +25,7 @@ const callback = async (
   body: ClaimServerLocal.RequestData,
 ) => {
   try {
-    const { userName, password } = body;
+    const { username, password } = body;
 
     if (IsServerClaimedAny()) {
       console.log('server already claimed');
@@ -42,7 +42,7 @@ const callback = async (
     const hashedPassword = await bcrypt.hash(password, salt);
 
     await SaveServerLocalClaimInfo({
-      username: userName,
+      username: username,
       passwordHash: hashedPassword,
       userId: uuid(),
     });

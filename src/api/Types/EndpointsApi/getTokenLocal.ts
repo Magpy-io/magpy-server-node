@@ -1,6 +1,6 @@
 import Joi from 'joi';
 
-import { ErrorServerAlreadyClaimed } from '../ErrorTypes';
+import { ErrorInvalidCredentials, ErrorServerNotClaimed } from '../ErrorTypes';
 import { TokenAuthentification } from '../Types';
 
 export type ResponseData = string;
@@ -12,11 +12,11 @@ export const RequestSchema = Joi.object({
   .options({ presence: 'required' })
   .meta({ className: 'RequestData' });
 
-export type ResponseErrorTypes = ErrorServerAlreadyClaimed;
+export type ResponseErrorTypes = ErrorServerNotClaimed | ErrorInvalidCredentials;
 
-export const endpoint = 'claimServerLocal';
+export const endpoint = 'getTokenLocal';
 
-export const tokenAuth: TokenAuthentification = 'no';
+export const tokenAuth: TokenAuthentification = 'set-token';
 
 //auto-generated file using "yarn types"
-export * from '../RequestTypes/claimServerLocal';
+export * from '../RequestTypes/getTokenLocal';

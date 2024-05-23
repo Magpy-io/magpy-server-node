@@ -12,6 +12,7 @@ export * as getPhotosById from './getPhotosById';
 export * as getPhotosByMediaId from './getPhotosByMediaId';
 export * as getServerInfo from './getServerInfo';
 export * as getToken from './getToken';
+export * as getTokenLocal from './getTokenLocal';
 export * as unclaimServer from './unclaimServer';
 export * as updatePhotoMediaId from './updatePhotoMediaId';
 export * as updateServerName from './updateServerName';

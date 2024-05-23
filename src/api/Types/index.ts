@@ -12,6 +12,7 @@ export * as GetPhotosById from './EndpointsApi/getPhotosById';
 export * as GetPhotosByMediaId from './EndpointsApi/getPhotosByMediaId';
 export * as GetServerInfo from './EndpointsApi/getServerInfo';
 export * as GetToken from './EndpointsApi/getToken';
+export * as GetTokenLocal from './EndpointsApi/getTokenLocal';
 export * as UnclaimServer from './EndpointsApi/unclaimServer';
 export * as UpdatePhotoMediaId from './EndpointsApi/updatePhotoMediaId';
 export * as UpdateServerName from './EndpointsApi/updateServerName';
