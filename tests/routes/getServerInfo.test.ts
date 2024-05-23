@@ -17,7 +17,7 @@ import {
   SaveStorageFolderPath,
   SaveServerName,
 } from '@src/modules/serverDataManager';
-import { expectToBeOk, getDataFromRet } from '@tests/helpers/functions';
+import { defaultUsername, expectToBeOk, getDataFromRet, setupServerClaimed, setupServerClaimedLocally } from '@tests/helpers/functions';
 
 describe("Test 'getServerInfo' endpoint", () => {
   let app: Express;
@@ -31,14 +31,17 @@ describe("Test 'getServerInfo' endpoint", () => {
   });
 
   beforeEach(async () => {
-    await sac.beforeEach(app);
+    await sac.beforeEachNotClaimed(app);
   });
 
   afterEach(async () => {
     await sac.afterEach();
   });
 
-  it('Should return the default server info', async () => {
+  it('Should return the default server info when claimed remotly', async () => {
+
+    await setupServerClaimed();
+
     const ret = await GetServerInfo.Post();
 
     expectToBeOk(ret);
@@ -52,12 +55,43 @@ describe("Test 'getServerInfo' endpoint", () => {
     expect(data.storagePath).toBe(serverPath);
     expect(data.serverName).toBe(serverName);
 
+    expect(data.owner).toBeTruthy();
     if (!data.owner) {
       throw new Error('owner not found');
     }
 
     expect(data.owner.name).toBe(mockValues.validUserName);
     expect(data.owner.email).toBe(mockValues.validUserEmail);
+
+    expect(data.ownerLocal).toBeNull();
+
+  });
+
+  it('Should return the default server info when claimed locally', async () => {
+
+    await setupServerClaimedLocally();
+
+    const ret = await GetServerInfo.Post();
+
+    expectToBeOk(ret);
+    expect(ret.warning).toBe(false);
+
+    const data = getDataFromRet(ret);
+
+    const serverName = GetServerName();
+    const serverPath = GetStorageFolderPath();
+
+    expect(data.storagePath).toBe(serverPath);
+    expect(data.serverName).toBe(serverName);
+
+    expect(data.ownerLocal).toBeTruthy();
+    if (!data.ownerLocal) {
+      throw new Error('ownerLocal not found');
+    }
+
+    expect(data.ownerLocal.name).toBe(defaultUsername);
+
+    expect(data.owner).toBeNull();
   });
 
   it('Should return the updated server info when changed', async () => {
@@ -73,13 +107,13 @@ describe("Test 'getServerInfo' endpoint", () => {
     expect(data.serverName).toBe('newName');
   });
 
-  it('Should return owner null for an unclaimed server', async () => {
-    await UnclaimServer.Post();
-
+  it('Should return owner null and ownerLocal null for an unclaimed server', async () => {
     const ret = await GetServerInfo.Post();
 
     expectToBeOk(ret);
     const data = getDataFromRet(ret);
     expect(data.owner).toBeNull();
+    expect(data.ownerLocal).toBeNull();
   });
+
 });
