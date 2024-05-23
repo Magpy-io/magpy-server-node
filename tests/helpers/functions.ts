@@ -316,7 +316,6 @@ async function setupServerClaimed() {
 }
 
 async function setupServerUserToken() {
-  await setupServerClaimed();
   const ret = await GetToken.Post({
     userToken: mockValues.validUserToken,
   });
@@ -344,7 +343,6 @@ async function setupServerClaimedLocally() {
 }
 
 async function setupServerLocalUserToken() {
-  await setupServerClaimedLocally();
   const ret = await GetTokenLocal.Post({
     username: defaultUsername,
     password: defaultPassword

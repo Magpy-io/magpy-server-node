@@ -34,6 +34,7 @@ export async function beforeEach(app: Express) {
   await InitModules();
   setupAxiosMock(app);
   await openAndInitDB();
+  await setupServerClaimed();
   await setupServerUserToken();
 }
 
@@ -42,6 +43,7 @@ export async function beforeEachLocalClaim(app: Express) {
   await InitModules();
   setupAxiosMock(app);
   await openAndInitDB();
+  await setupServerClaimedLocally();
   await setupServerLocalUserToken();
 }
 
