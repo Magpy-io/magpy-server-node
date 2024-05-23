@@ -118,6 +118,7 @@ export function IsServerClaimedAny(): boolean {
 export async function SaveServerLocalClaimInfo(claimInfo: {
   username: string;
   passwordHash: string;
+  userId: string;
 }) {
   const dataSaved = GetServerConfigData();
   dataSaved.localClaimInfo = claimInfo;
@@ -127,6 +128,7 @@ export async function SaveServerLocalClaimInfo(claimInfo: {
 export function GetServerLocalClaimInfo(): {
   username: string;
   passwordHash: string;
+  userId: string;
 } | null {
   const serverData = GetServerConfigData();
   return serverData.localClaimInfo;

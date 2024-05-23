@@ -1,6 +1,7 @@
 import { randomBytes } from 'crypto';
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
+import { v4 as uuid } from 'uuid';
 import checkServerIsClaimed from '../../middleware/checkServerIsClaimedRemote';
 import { GetServerToken, RegisterServer, TokenManager } from '../../modules/BackendQueries';
 import { ErrorBackendUnreachable } from '../../modules/BackendQueries/ExceptionsManager';
@@ -40,7 +41,11 @@ const callback = async (
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
-    await SaveServerLocalClaimInfo({ username: userName, passwordHash: hashedPassword });
+    await SaveServerLocalClaimInfo({
+      username: userName,
+      passwordHash: hashedPassword,
+      userId: uuid(),
+    });
 
     return sendResponse(res, 'ok');
   } catch (err) {

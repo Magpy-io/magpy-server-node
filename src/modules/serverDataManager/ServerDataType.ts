@@ -10,6 +10,7 @@ export type ServerDataType = {
   localClaimInfo: {
     username: string;
     passwordHash: string;
+    userId: string;
   } | null;
   serverSigningKey: string | null;
   storageFolderPath: string;
@@ -29,6 +30,7 @@ export const ServerDataSchema = Joi.object({
   localClaimInfo: Joi.object({
     username: Joi.string().required(),
     passwordHash: Joi.string().required(),
+    userId: Joi.string().required(),
   })
     .required()
     .allow(null),
