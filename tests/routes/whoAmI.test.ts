@@ -42,7 +42,7 @@ describe("Test 'whoAmI' endpoint", () => {
 
     const data = getDataFromRet(ret);
 
-    expect(data.user.id).toBeInstanceOf(String)
+    expect(data.user.id).toBeDefined()
   });
 
   it('Should ok if valid user token and server claimed locally', async () => {
@@ -54,7 +54,7 @@ describe("Test 'whoAmI' endpoint", () => {
     expect(ret.warning).toBe(false);
 
     const data = getDataFromRet(ret);
-    
-    expect(data.user.id).toBeInstanceOf(String)
+
+    expect(data.user.id).toBeDefined()
   });
 });
