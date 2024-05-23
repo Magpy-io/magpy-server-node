@@ -3,7 +3,7 @@ import { Express } from 'express';
 import { volumeReset } from '@tests/helpers/mockFsVolumeManager';
 import { openAndInitDB, clearDB } from '@src/db/sequelizeDb';
 import { InitModules, ClearModules } from '@src/config/configModules';
-import { setupServerUserToken, setupServerClaimed } from '@tests/helpers/functions';
+import { setupServerUserToken, setupServerClaimed, setupServerLocalUserToken } from '@tests/helpers/functions';
 import { setupAxiosMock } from '@tests/__mocks__/axiosMockHelper';
 
 export async function beforeEachNotClaimed(app: Express) {
@@ -27,6 +27,14 @@ export async function beforeEach(app: Express) {
   setupAxiosMock(app);
   await openAndInitDB();
   await setupServerUserToken();
+}
+
+export async function beforeEachLocalClaim(app: Express) {
+  await volumeReset();
+  await InitModules();
+  setupAxiosMock(app);
+  await openAndInitDB();
+  await setupServerLocalUserToken();
 }
 
 export async function afterEach() {

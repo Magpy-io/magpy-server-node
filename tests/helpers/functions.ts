@@ -4,6 +4,8 @@ import {
   GetNumberPhotos,
   GetPhotosById,
   GetToken,
+  GetTokenLocal,
+  ClaimServerLocal,
   UpdatePhotoMediaId,
 } from '@src/api/export/';
 import { GetUserToken, HasUserToken } from '@src/api/export/TokenManager';
@@ -19,6 +21,7 @@ import {
   GetServerCredentials,
   GetServerSigningKey,
   SaveServerCredentials,
+  SaveServerLocalClaimInfo,
 } from '@src/modules/serverDataManager';
 import { verifyUserToken } from '@src/modules/tokenManagement';
 import { GetLastWarningForUser, HasWarningForUser } from '@src/modules/warningsManager';
@@ -29,6 +32,9 @@ import { validate } from 'uuid';
 import { v4 as uuid } from 'uuid';
 
 let serverUserToken = '';
+
+const defaultUsername = "username";
+const defaultPassword = "password";
 
 const defaultPhoto = {
   name: 'image.jpg',
@@ -303,16 +309,45 @@ function testReturnedToken() {
 }
 
 async function setupServerClaimed() {
-  SaveServerCredentials({
+  await SaveServerCredentials({
     serverId: mockValues.serverId,
     serverKey: mockValues.validKey,
   });
 }
 
 async function setupServerUserToken() {
-  setupServerClaimed();
+  await setupServerClaimed();
   const ret = await GetToken.Post({
     userToken: mockValues.validUserToken,
+  });
+
+  if (!HasUserToken()) {
+    throw new Error(
+      'Error setting up server to generate user token:\n ' + JSON.stringify(ret),
+    );
+  }
+  serverUserToken = GetUserToken();
+}
+
+async function setupServerClaimedLocally() {
+  const ret = await ClaimServerLocal.Post({
+    username: defaultUsername,
+    password: defaultPassword
+  })
+
+  if(!ret.ok){
+    throw new Error(
+      'Error claiming server locally:\n ' + JSON.stringify(ret),
+    );
+  }
+
+}
+
+async function setupServerLocalUserToken() {
+  await setupServerClaimedLocally();
+  const ret = await GetTokenLocal.Post({
+    username: defaultUsername,
+    password: defaultPassword
   });
 
   if (!HasUserToken()) {
@@ -435,6 +470,8 @@ export {
   testReturnedToken,
   setupServerClaimed,
   setupServerUserToken,
+  setupServerClaimedLocally,
+  setupServerLocalUserToken,
   serverUserToken,
   getExpiredToken,
   randomTokenHeader,
