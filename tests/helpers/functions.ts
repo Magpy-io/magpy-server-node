@@ -6,6 +6,7 @@ import {
   GetToken,
   GetTokenLocal,
   ClaimServerLocal,
+  ClaimServer,
   UpdatePhotoMediaId,
 } from '@src/api/export/';
 import { GetUserToken, HasUserToken } from '@src/api/export/TokenManager';
@@ -33,8 +34,8 @@ import { v4 as uuid } from 'uuid';
 
 let serverUserToken = '';
 
-const defaultUsername = "username";
-const defaultPassword = "password";
+const defaultUsername = 'username';
+const defaultPassword = 'password';
 
 const defaultPhoto = {
   name: 'image.jpg',
@@ -309,10 +310,13 @@ function testReturnedToken() {
 }
 
 async function setupServerClaimed() {
-  await SaveServerCredentials({
-    serverId: mockValues.serverId,
-    serverKey: mockValues.validKey,
+  const ret = await ClaimServer.Post({
+    userToken: mockValues.validUserToken,
   });
+
+  if (!ret.ok) {
+    throw new Error('Error claiming server remotely:\n ' + JSON.stringify(ret));
+  }
 }
 
 async function setupServerUserToken() {
@@ -331,21 +335,18 @@ async function setupServerUserToken() {
 async function setupServerClaimedLocally() {
   const ret = await ClaimServerLocal.Post({
     username: defaultUsername,
-    password: defaultPassword
-  })
+    password: defaultPassword,
+  });
 
-  if(!ret.ok){
-    throw new Error(
-      'Error claiming server locally:\n ' + JSON.stringify(ret),
-    );
+  if (!ret.ok) {
+    throw new Error('Error claiming server locally:\n ' + JSON.stringify(ret));
   }
-
 }
 
 async function setupServerLocalUserToken() {
   const ret = await GetTokenLocal.Post({
     username: defaultUsername,
-    password: defaultPassword
+    password: defaultPassword,
   });
 
   if (!HasUserToken()) {
