@@ -54,6 +54,11 @@ function AddServerDataIfMissing(data: unknown): ServerDataType {
   if (!error) {
     return value;
   }
+
+  console.log('Error while loading config file.');
+  console.log(error);
+  console.log('Loading default');
+
   return JSON.parse(JSON.stringify(ServerDataDefault));
 }
 

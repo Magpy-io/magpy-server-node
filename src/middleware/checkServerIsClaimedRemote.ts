@@ -6,12 +6,16 @@ import { combineMiddleware } from '../modules/functions';
 import checkServerHasValidCredentials from './checkServerHasValidCredentials';
 import { ExtendedRequest } from '../api/endpointsLoader';
 
-async function checkServerIsClaimed(req: ExtendedRequest, res: Response, next: NextFunction) {
+async function checkServerIsClaimedRemote(
+  req: ExtendedRequest,
+  res: Response,
+  next: NextFunction,
+) {
   try {
-    console.log('#CheckServerIsClaimed middleware');
+    console.log('#checkServerIsClaimedRemote middleware');
     if (!req.hasValidCredentials) {
       console.log('server is not claimed');
-      req.isClaimed = false;
+      req.isClaimedRemote = false;
       next();
       return;
     }
@@ -24,13 +28,13 @@ async function checkServerIsClaimed(req: ExtendedRequest, res: Response, next: N
 
     if (ret.data.server.owner == null) {
       console.log('server is not claimed');
-      req.isClaimed = false;
+      req.isClaimedRemote = false;
       next();
       return;
     }
 
     console.log('server is claimed');
-    req.isClaimed = true;
+    req.isClaimedRemote = true;
 
     next();
   } catch (err) {
@@ -39,4 +43,4 @@ async function checkServerIsClaimed(req: ExtendedRequest, res: Response, next: N
   }
 }
 
-export default combineMiddleware([checkServerHasValidCredentials, checkServerIsClaimed]);
+export default combineMiddleware([checkServerHasValidCredentials, checkServerIsClaimedRemote]);

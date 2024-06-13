@@ -25,20 +25,31 @@ export async function ClearServerConfigData() {
   await ClearServerDataFile();
 }
 
-export async function SaveServerCredentials(
-  serverCredentials: {
-    serverId: string;
-    serverKey: string;
-  } | null,
-) {
+export async function SaveServerCredentials(serverCredentials: {
+  serverId: string;
+  serverKey: string;
+}) {
   const dataSaved = GetServerConfigData();
-  dataSaved.serverRegisteredInfo.serverCredentials = serverCredentials;
+
+  if (dataSaved.serverRegisteredInfo == null) {
+    dataSaved.serverRegisteredInfo = { serverCredentials: serverCredentials };
+  } else {
+    dataSaved.serverRegisteredInfo.serverCredentials = serverCredentials;
+  }
   await SetServerConfigData(dataSaved);
 }
 
 export async function SaveServerToken(serverToken: string) {
   const dataSaved = GetServerConfigData();
+
+  if (dataSaved.serverRegisteredInfo == null) {
+    throw new Error(
+      'SaveServerToken: Saving server token but there is not saved credentials.',
+    );
+  }
+
   dataSaved.serverRegisteredInfo.serverToken = serverToken;
+
   await SetServerConfigData(dataSaved);
 }
 
@@ -48,18 +59,20 @@ export function GetServerCredentials(): {
 } | null {
   const serverData = GetServerConfigData();
 
-  return serverData.serverRegisteredInfo.serverCredentials;
+  return serverData.serverRegisteredInfo?.serverCredentials ?? null;
 }
 
 export function GetServerToken(): string | null {
   const serverData = GetServerConfigData();
 
-  return serverData.serverRegisteredInfo.serverToken;
+  return serverData.serverRegisteredInfo?.serverToken ?? null;
 }
 
 export async function ClearServerCredentials() {
-  await SaveServerCredentials({ serverId: '', serverKey: '' });
-  await SaveServerToken('');
+  const dataSaved = GetServerConfigData();
+  dataSaved.serverRegisteredInfo = null;
+  dataSaved.localClaimInfo = null;
+  await SetServerConfigData(dataSaved);
 }
 
 export async function SaveStorageFolderPath(pathStorageFolder: string) {
@@ -86,4 +99,48 @@ export function GetServerName(): string {
   const serverData = GetServerConfigData();
 
   return serverData.serverName;
+}
+
+export function IsServerClaimedRemote(): boolean {
+  const serverData = GetServerConfigData();
+  return !!serverData.serverRegisteredInfo;
+}
+
+export function IsServerClaimedLocal(): boolean {
+  const serverData = GetServerConfigData();
+  return !!serverData.localClaimInfo;
+}
+
+export function IsServerClaimedAny(): boolean {
+  return IsServerClaimedRemote() || IsServerClaimedLocal();
+}
+
+export async function SaveServerLocalClaimInfo(claimInfo: {
+  username: string;
+  passwordHash: string;
+  userId: string;
+}) {
+  const dataSaved = GetServerConfigData();
+  dataSaved.localClaimInfo = claimInfo;
+  await SetServerConfigData(dataSaved);
+}
+
+export function GetServerLocalClaimInfo(): {
+  username: string;
+  passwordHash: string;
+  userId: string;
+} | null {
+  const serverData = GetServerConfigData();
+  return serverData.localClaimInfo;
+}
+
+export function GetServerSigningKey(): string | null {
+  const serverData = GetServerConfigData();
+  return serverData.serverSigningKey;
+}
+
+export async function SaveServerSigningKey(key: string) {
+  const dataSaved = GetServerConfigData();
+  dataSaved.serverSigningKey = key;
+  await SetServerConfigData(dataSaved);
 }

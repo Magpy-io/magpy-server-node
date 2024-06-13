@@ -12,9 +12,8 @@ import * as mockValues from '@src/modules/BackendQueries/__mocks__/mockValues';
 import * as mockValuesGetIp from '@src/modules/__mocks__/NetworkManagerMockValues';
 
 import { initServer, stopServer } from '@src/server/server';
-import { SaveServerCredentials, SaveServerToken } from '@src/modules/serverDataManager';
 import * as sac from '@tests/helpers/setupAndCleanup';
-import { expectToBeOk, expectToNotBeOk, expectErrorCodeToBe } from '@tests/helpers/functions';
+import { expectToBeOk, expectToNotBeOk, expectErrorCodeToBe, setupServerClaimed, setupServerClaimedLocally } from '@tests/helpers/functions';
 
 describe("Test 'claimServer' endpoint", () => {
   let app: Express;
@@ -61,8 +60,8 @@ describe("Test 'claimServer' endpoint", () => {
     expectErrorCodeToBe(ret, 'AUTHORIZATION_BACKEND_EXPIRED');
   });
 
-  it('Should return error SERVER_ALREADY_CLAIMED when claiming a server with a valid server token', async () => {
-    SaveServerToken(mockValues.validServerToken);
+  it('Should return error SERVER_ALREADY_CLAIMED when claiming a server already claimed remotly', async () => {
+    await setupServerClaimed()
 
     const ret = await ClaimServer.Post({
       userToken: mockValues.validUserToken,
@@ -71,11 +70,8 @@ describe("Test 'claimServer' endpoint", () => {
     expectErrorCodeToBe(ret, 'SERVER_ALREADY_CLAIMED');
   });
 
-  it('Should return error SERVER_ALREADY_CLAIMED when claiming a server with a valid id and key', async () => {
-    SaveServerCredentials({
-      serverId: mockValues.serverId,
-      serverKey: mockValues.validKey,
-    });
+  it('Should return error SERVER_ALREADY_CLAIMED when claiming a server already claimed locally', async () => {
+    await setupServerClaimedLocally();
 
     const ret = await ClaimServer.Post({
       userToken: mockValues.validUserToken,

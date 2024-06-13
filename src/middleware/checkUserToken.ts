@@ -5,7 +5,7 @@ import { combineMiddleware } from '../modules/functions';
 import { verifyUserToken } from '../modules/tokenManagement';
 import verifyAuthorizationHeader from './verifyAuthorizationHeader';
 import { ExtendedRequest } from '../api/endpointsLoader';
-import { GetServerCredentials } from '../modules/serverDataManager';
+import { GetServerSigningKey, IsServerClaimedAny } from '../modules/serverDataManager';
 
 async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFunction) {
   try {
@@ -17,21 +17,27 @@ async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFun
       throw new Error('Token undefined in checkUserToken');
     }
 
-    const serverCredentials = GetServerCredentials();
-
-    if (
-      !serverCredentials?.serverId ||
-      !serverCredentials.serverKey
-    ) {
+    if (!IsServerClaimedAny()) {
       console.log('server is not claimed');
-      responseFormatter.sendFailedMessage(res, 'Server not claimed', 'SERVER_NOT_CLAIMED');
-      return;
+      return responseFormatter.sendFailedMessage(
+        res,
+        'Server not claimed',
+        'SERVER_NOT_CLAIMED',
+      );
     }
 
-    const ret = verifyUserToken(
-      token,
-      serverCredentials.serverKey,
-    );
+    const serverSigningKey = GetServerSigningKey();
+
+    if (!serverSigningKey) {
+      console.log('User token verification failed because to server signing key was found.');
+      return responseFormatter.sendFailedMessage(
+        res,
+        'User token verification failed',
+        'AUTHORIZATION_FAILED',
+      );
+    }
+
+    const ret = verifyUserToken(token, serverSigningKey);
 
     if (!ret.ok) {
       if (ret.error == 'TOKEN_EXPIRED_ERROR') {
@@ -63,7 +69,4 @@ async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFun
   }
 }
 
-export default combineMiddleware([
-  verifyAuthorizationHeader,
-  checkUserToken,
-]);
+export default combineMiddleware([verifyAuthorizationHeader, checkUserToken]);

@@ -4,10 +4,9 @@ import { ServerDataType } from './ServerDataType';
 export const ServerDataDefault: ServerDataType = {
   storageFolderPath: config.rootPath,
   serverName: config.serverName,
-  serverRegisteredInfo: {
-    serverCredentials: null,
-    serverToken: null,
-  },
+  serverRegisteredInfo: null,
+  localClaimInfo: null,
+  serverSigningKey: null,
 };
 
 let serverData: ServerDataType = ServerDataDefault;

@@ -4,6 +4,8 @@ import {
   GetNumberPhotos,
   GetPhotosById,
   GetToken,
+  GetTokenLocal,
+  ClaimServerLocal,
   UpdatePhotoMediaId,
 } from '@src/api/export/';
 import { GetUserToken, HasUserToken } from '@src/api/export/TokenManager';
@@ -15,7 +17,12 @@ import { Photo } from '@src/db/sequelizeDb';
 import * as mockValues from '@src/modules/BackendQueries/__mocks__/mockValues';
 import { pathExists } from '@src/modules/diskManager';
 import { timeout } from '@src/modules/functions';
-import { GetServerCredentials, SaveServerCredentials } from '@src/modules/serverDataManager';
+import {
+  GetServerCredentials,
+  GetServerSigningKey,
+  SaveServerCredentials,
+  SaveServerLocalClaimInfo,
+} from '@src/modules/serverDataManager';
 import { verifyUserToken } from '@src/modules/tokenManagement';
 import { GetLastWarningForUser, HasWarningForUser } from '@src/modules/warningsManager';
 import { photoImage64 } from '@tests/helpers/imageBase64';
@@ -25,6 +32,9 @@ import { validate } from 'uuid';
 import { v4 as uuid } from 'uuid';
 
 let serverUserToken = '';
+
+const defaultUsername = "username";
+const defaultPassword = "password";
 
 const defaultPhoto = {
   name: 'image.jpg',
@@ -278,20 +288,17 @@ async function waitForPhotoTransferToFinish() {
 }
 
 function testReturnedToken() {
-  const serverCredentials = GetServerCredentials()
+  const serverSigningKey = GetServerSigningKey();
 
-  if (!serverCredentials?.serverKey) {
-    throw new Error('testReturnedToken: serverData.serverKey needs to be defined');
+  if (!serverSigningKey) {
+    throw new Error('testReturnedToken: serverSigningKey needs to be defined');
   }
 
   expect(HasUserToken()).toBe(true);
 
   const userTokenRetured = GetUserToken();
 
-  const tokenVerification = verifyUserToken(
-    userTokenRetured,
-    serverCredentials.serverKey,
-  );
+  const tokenVerification = verifyUserToken(userTokenRetured, serverSigningKey);
   expect(tokenVerification.ok).toBe(true);
 
   if (!tokenVerification.ok) {
@@ -302,16 +309,43 @@ function testReturnedToken() {
 }
 
 async function setupServerClaimed() {
-  SaveServerCredentials({
+  await SaveServerCredentials({
     serverId: mockValues.serverId,
     serverKey: mockValues.validKey,
   });
 }
 
 async function setupServerUserToken() {
-  setupServerClaimed();
   const ret = await GetToken.Post({
     userToken: mockValues.validUserToken,
+  });
+
+  if (!HasUserToken()) {
+    throw new Error(
+      'Error setting up server to generate user token:\n ' + JSON.stringify(ret),
+    );
+  }
+  serverUserToken = GetUserToken();
+}
+
+async function setupServerClaimedLocally() {
+  const ret = await ClaimServerLocal.Post({
+    username: defaultUsername,
+    password: defaultPassword
+  })
+
+  if(!ret.ok){
+    throw new Error(
+      'Error claiming server locally:\n ' + JSON.stringify(ret),
+    );
+  }
+
+}
+
+async function setupServerLocalUserToken() {
+  const ret = await GetTokenLocal.Post({
+    username: defaultUsername,
+    password: defaultPassword
   });
 
   if (!HasUserToken()) {
@@ -326,15 +360,12 @@ function getUserId() {
   if (!serverUserToken) {
     throw new Error('No serverUserToken to use in getUserId()');
   }
-  const serverCredentials = GetServerCredentials()
-  if (!serverCredentials?.serverKey) {
-    throw new Error('getUserId: serverData.serverKey needs to be defined');
+  const serverSigningKey = GetServerSigningKey();
+  if (!serverSigningKey) {
+    throw new Error('getUserId: serverSigningKey needs to be defined');
   }
 
-  const tokenVerification = verifyUserToken(
-    serverUserToken,
-    serverCredentials.serverKey,
-  );
+  const tokenVerification = verifyUserToken(serverUserToken, serverSigningKey);
 
   if (!tokenVerification.ok) {
     throw new Error('getUserId: token verification failed');
@@ -343,7 +374,11 @@ function getUserId() {
 }
 
 function getExpiredToken() {
-  const expiredToken = jwt.sign({}, mockValues.validKey, {
+  const serverSigningKey = GetServerSigningKey();
+  if (!serverSigningKey) {
+    throw new Error('getExpiredToken: serverSigningKey needs to be defined');
+  }
+  const expiredToken = jwt.sign({}, serverSigningKey, {
     expiresIn: 0,
   });
 
@@ -430,9 +465,13 @@ export {
   waitForPhotoTransferToFinish,
   defaultPhoto,
   defaultPhotoSecondMediaId,
+  defaultPassword,
+  defaultUsername,
   testReturnedToken,
   setupServerClaimed,
   setupServerUserToken,
+  setupServerClaimedLocally,
+  setupServerLocalUserToken,
   serverUserToken,
   getExpiredToken,
   randomTokenHeader,
