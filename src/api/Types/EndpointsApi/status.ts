@@ -3,7 +3,7 @@ import Joi from 'joi';
 import { ErrorServerNotClaimed, ErrorsAuthorization } from '../ErrorTypes';
 import { APIPhoto, TokenAuthentification } from '../Types';
 
-export type ResponseData = string;
+export type ResponseData = { claimed: 'None' | 'Locally' | 'Remotely' };
 
 export const RequestSchema = Joi.object({})
   .options({ presence: 'required' })
