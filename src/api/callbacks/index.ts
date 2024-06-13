@@ -18,3 +18,4 @@ export * as updatePhotoMediaId from './updatePhotoMediaId';
 export * as updateServerName from './updateServerName';
 export * as updateServerPath from './updateServerPath';
 export * as whoAmI from './whoAmI';
+export * as status from './status';
