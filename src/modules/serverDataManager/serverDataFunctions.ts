@@ -72,6 +72,7 @@ export async function ClearServerCredentials() {
   const dataSaved = GetServerConfigData();
   dataSaved.serverRegisteredInfo = null;
   dataSaved.localClaimInfo = null;
+  dataSaved.serverSigningKey = null;
   await SetServerConfigData(dataSaved);
 }
 
