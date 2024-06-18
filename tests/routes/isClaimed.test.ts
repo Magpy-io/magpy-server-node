@@ -5,7 +5,7 @@ mockModules();
 import { describe, expect, it } from '@jest/globals';
 
 import { Express } from 'express';
-import { Status } from '@src/api/export';
+import { IsClaimed } from '@src/api/export';
 
 import { initServer, stopServer } from '@src/server/server';
 import * as sac from '@tests/helpers/setupAndCleanup';
@@ -19,7 +19,7 @@ import {
   setupServerUserToken,
 } from '@tests/helpers/functions';
 
-describe("Test 'status' endpoint", () => {
+describe("Test 'isClaimed' endpoint", () => {
   let app: Express;
 
   beforeAll(async () => {
@@ -39,7 +39,7 @@ describe("Test 'status' endpoint", () => {
   });
 
   it('Should return claimed None when server is not claimed', async () => {
-    const ret = await Status.Post();
+    const ret = await IsClaimed.Post();
 
     expectToBeOk(ret);
     expect(ret.warning).toBe(false);
@@ -51,7 +51,7 @@ describe("Test 'status' endpoint", () => {
 
   it('Should return claimed Remotly when server is claimed remotly', async () => {
     await setupServerClaimed();
-    const ret = await Status.Post();
+    const ret = await IsClaimed.Post();
 
     expectToBeOk(ret);
     expect(ret.warning).toBe(false);
@@ -63,7 +63,7 @@ describe("Test 'status' endpoint", () => {
 
   it('Should return claimed Locally when server is claimed locally', async () => {
     await setupServerClaimedLocally();
-    const ret = await Status.Post();
+    const ret = await IsClaimed.Post();
 
     expectToBeOk(ret);
     expect(ret.warning).toBe(false);

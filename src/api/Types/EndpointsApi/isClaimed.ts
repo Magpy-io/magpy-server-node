@@ -1,18 +1,19 @@
 import Joi from 'joi';
 
+import { ErrorBackendServerUnreachable } from '../ErrorTypes';
 import { TokenAuthentification } from '../Types';
 
-export type ResponseData = string;
+export type ResponseData = { claimed: 'None' | 'Locally' | 'Remotely' };
 
 export const RequestSchema = Joi.object({})
   .options({ presence: 'required' })
   .meta({ className: 'RequestData' });
 
-export type ResponseErrorTypes = void;
+export type ResponseErrorTypes = ErrorBackendServerUnreachable;
 
-export const endpoint = 'status';
+export const endpoint = 'isClaimed';
 
 export const tokenAuth: TokenAuthentification = 'no';
 
 //auto-generated file using "yarn types"
-export * from '../RequestTypes/status';
+export * from '../RequestTypes/isClaimed';

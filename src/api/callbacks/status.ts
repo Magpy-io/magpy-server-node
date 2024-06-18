@@ -21,6 +21,5 @@ export default {
   endpoint: Status.endpoint,
   callback: callback,
   method: 'post',
-  middleWare: checkServerHasValidCredentials,
   requestShema: Status.RequestSchema,
 } as EndpointType;
