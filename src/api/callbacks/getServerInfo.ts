@@ -32,21 +32,19 @@ const callback = async (
       ownerLocal: null,
     };
 
-    if (IsServerClaimedRemote()) {
-      if (req.hasValidCredentials) {
-        const ret = await BackendGetServerInfo.Post();
+    if (req.hasValidCredentials) {
+      const ret = await BackendGetServerInfo.Post();
 
-        if (!ret.ok) {
-          throw new Error('Error retrieving server info. ' + JSON.stringify(ret));
-        }
+      if (!ret.ok) {
+        throw new Error('Error retrieving server info. ' + JSON.stringify(ret));
+      }
 
-        if (ret.data.server.owner != null) {
-          const owner = ret.data.server.owner;
-          responseJson.owner = {
-            name: owner.name,
-            email: owner.email,
-          };
-        }
+      if (ret.data.server.owner != null) {
+        const owner = ret.data.server.owner;
+        responseJson.owner = {
+          name: owner.name,
+          email: owner.email,
+        };
       }
     }
 
