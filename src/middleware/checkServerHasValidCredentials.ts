@@ -10,6 +10,7 @@ import {
   GetServerToken,
   GetServerCredentials,
   IsServerClaimedRemote,
+  ClearServerCredentials,
 } from '../modules/serverDataManager';
 import { ExtendedRequest } from '../api/endpointsLoader';
 
@@ -89,6 +90,10 @@ async function checkServerHasValidCredentials(
     if (!ret.ok) {
       if (ret.errorCode == 'INVALID_CREDENTIALS') {
         console.log('invalid server credentials');
+        console.log('Deleting credentials');
+        await ClearServerCredentials();
+        req.hasValidCredentials = false;
+        next();
       } else {
         throw new Error('request to verify server credentials failed. ' + JSON.stringify(ret));
       }
