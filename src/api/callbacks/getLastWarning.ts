@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import checkUserToken from '../../middleware/checkUserToken';
+import assertUserToken from '../../middleware/userToken/assertUserToken';
 import { GetLastWarningForUser } from '../../modules/warningsManager';
 import { GetLastWarning } from '../Types';
 import responseFormatter from '../responseFormatter';
@@ -37,6 +37,6 @@ export default {
   endpoint: GetLastWarning.endpoint,
   callback: callback,
   method: 'post',
-  middleWare: checkUserToken,
+  middleWare: assertUserToken,
   requestShema: GetLastWarning.RequestSchema,
 } as EndpointType;

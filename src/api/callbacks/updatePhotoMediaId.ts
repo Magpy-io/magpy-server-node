@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 import { updatePhotoMediaIdById } from '../../db/sequelizeDb';
-import checkUserToken from '../../middleware/checkUserToken';
+import assertUserToken from '../../middleware/userToken/assertUserToken';
 import {
   AddWarningPhotosDeleted,
   checkPhotoExistsAndDeleteMissing,
@@ -66,6 +66,6 @@ export default {
   endpoint: UpdatePhotoMediaId.endpoint,
   callback: callback,
   method: 'post',
-  middleWare: checkUserToken,
+  middleWare: assertUserToken,
   requestShema: UpdatePhotoMediaId.RequestSchema,
 } as EndpointType;

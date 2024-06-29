@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import checkUserToken from '../../middleware/checkUserToken';
+import assertUserToken from '../../middleware/userToken/assertUserToken';
 import { WhoAmI } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
@@ -29,6 +29,6 @@ export default {
   endpoint: WhoAmI.endpoint,
   callback: callback,
   method: 'post',
-  middleWare: checkUserToken,
+  middleWare: assertUserToken,
   requestShema: WhoAmI.RequestSchema,
 } as EndpointType;

@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 import { getPhotosFromDB } from '../../db/sequelizeDb';
-import checkUserToken from '../../middleware/checkUserToken';
+import assertUserToken from '../../middleware/userToken/assertUserToken';
 import { getPhotoFromDisk } from '../../modules/diskManager';
 import {
   AddWarningPhotosDeleted,
@@ -74,6 +74,6 @@ export default {
   endpoint: GetPhotos.endpoint,
   callback: callback,
   method: 'post',
-  middleWare: checkUserToken,
+  middleWare: assertUserToken,
   requestShema: GetPhotos.RequestSchema,
 } as EndpointType;

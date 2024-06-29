@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 import { numberPhotosFromDB } from '../../db/sequelizeDb';
-import checkUserToken from '../../middleware/checkUserToken';
+import assertUserToken from '../../middleware/userToken/assertUserToken';
 import { GetNumberPhotos } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
@@ -32,6 +32,6 @@ export default {
   endpoint: GetNumberPhotos.endpoint,
   callback: callback,
   method: 'post',
-  middleWare: checkUserToken,
+  middleWare: assertUserToken,
   requestShema: GetNumberPhotos.RequestSchema,
 } as EndpointType;

@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { v4 as uuid } from 'uuid';
 
 import { postPhotoPartTimeout } from '../../config/config';
-import checkUserToken from '../../middleware/checkUserToken';
+import assertUserToken from '../../middleware/userToken/assertUserToken';
 import { addServerImagePaths } from '../../modules/diskFilesNaming';
 import FilesWaiting from '../../modules/waitingFiles';
 import { AddPhotoInit } from '../Types';
@@ -66,6 +66,6 @@ export default {
   endpoint: AddPhotoInit.endpoint,
   callback: callback,
   method: 'post',
-  middleWare: checkUserToken,
+  middleWare: assertUserToken,
   requestShema: AddPhotoInit.RequestSchema,
 } as EndpointType;

@@ -1,15 +1,15 @@
 import { NextFunction, Request, Response } from 'express';
 
-import responseFormatter from '../api/responseFormatter';
-import { combineMiddleware } from '../modules/functions';
-import { verifyUserToken } from '../modules/tokenManagement';
-import verifyAuthorizationHeader from './verifyAuthorizationHeader';
-import { ExtendedRequest } from '../api/endpointsLoader';
-import { GetServerSigningKey, IsServerClaimedAny } from '../modules/serverDataManager';
+import responseFormatter from '../../api/responseFormatter';
+import { combineMiddleware } from '../../modules/functions';
+import { verifyUserToken } from '../../modules/tokenManagement';
+import verifyAuthorizationHeader from '../verifyAuthorizationHeader';
+import { ExtendedRequest } from '../../api/endpointsLoader';
+import { GetServerSigningKey, IsServerClaimedAny } from '../../modules/serverDataManager';
 
 async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFunction) {
   try {
-    console.log('#VerifyServerToken middleware');
+    console.log('#checkUserToken middleware');
 
     const token = req.token;
 
@@ -19,22 +19,21 @@ async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFun
 
     if (!IsServerClaimedAny()) {
       console.log('server is not claimed');
-      return responseFormatter.sendFailedMessage(
-        res,
-        'Server not claimed',
-        'SERVER_NOT_CLAIMED',
-      );
+      req.userIdError = { message: 'Server not claimed', code: 'SERVER_NOT_CLAIMED' };
+      next();
+      return;
     }
 
     const serverSigningKey = GetServerSigningKey();
 
     if (!serverSigningKey) {
       console.log('User token verification failed because to server signing key was found.');
-      return responseFormatter.sendFailedMessage(
-        res,
-        'User token verification failed',
-        'AUTHORIZATION_FAILED',
-      );
+      req.userIdError = {
+        message: 'User token verification failed',
+        code: 'AUTHORIZATION_FAILED',
+      };
+      next();
+      return;
     }
 
     const ret = verifyUserToken(token, serverSigningKey);
@@ -43,20 +42,20 @@ async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFun
       if (ret.error == 'TOKEN_EXPIRED_ERROR') {
         console.log('User Token expired');
         console.log(ret);
-        responseFormatter.sendFailedMessage(
-          res,
-          'User token expired',
-          'AUTHORIZATION_EXPIRED',
-        );
+        req.userIdError = {
+          message: 'User token expired',
+          code: 'AUTHORIZATION_EXPIRED',
+        };
+        next();
         return;
       } else {
         console.log('Invalid user Token');
         console.log(ret);
-        responseFormatter.sendFailedMessage(
-          res,
-          'User token verification failed',
-          'AUTHORIZATION_FAILED',
-        );
+        req.userIdError = {
+          message: 'User token verification failed',
+          code: 'AUTHORIZATION_FAILED',
+        };
+        next();
         return;
       }
     }

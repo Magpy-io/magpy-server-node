@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 import { addPhotoToDB, deletePhotoByIdFromDB } from '../../db/sequelizeDb';
-import checkUserToken from '../../middleware/checkUserToken';
+import assertUserToken from '../../middleware/userToken/assertUserToken';
 import { addServerImagePaths } from '../../modules/diskFilesNaming';
 import { addPhotoToDisk } from '../../modules/diskManager';
 import { hashFile } from '../../modules/hashing';
@@ -64,6 +64,6 @@ export default {
   endpoint: AddPhoto.endpoint,
   callback: callback,
   method: 'post',
-  middleWare: checkUserToken,
+  middleWare: assertUserToken,
   requestShema: AddPhoto.RequestSchema,
 } as EndpointType;

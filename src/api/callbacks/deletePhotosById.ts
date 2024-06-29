@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 import { deletePhotoByIdFromDB, getPhotoByIdFromDB } from '../../db/sequelizeDb';
-import checkUserToken from '../../middleware/checkUserToken';
+import assertUserToken from '../../middleware/userToken/assertUserToken';
 import { removePhotoFromDisk } from '../../modules/diskManager';
 import { DeletePhotosById } from '../Types';
 import responseFormatter from '../responseFormatter';
@@ -40,6 +40,6 @@ export default {
   endpoint: DeletePhotosById.endpoint,
   callback: callback,
   method: 'post',
-  middleWare: checkUserToken,
+  middleWare: assertUserToken,
   requestShema: DeletePhotosById.RequestSchema,
 } as EndpointType;

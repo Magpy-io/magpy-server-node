@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 
 import { postPhotoPartTimeout } from '../../config/config';
 import { addPhotoToDB, deletePhotoByIdFromDB } from '../../db/sequelizeDb';
-import checkUserToken from '../../middleware/checkUserToken';
+import assertUserToken from '../../middleware/userToken/assertUserToken';
 import { addPhotoToDisk } from '../../modules/diskManager';
 import { hashFile } from '../../modules/hashing';
 import FilesWaiting, { FilesWaitingType } from '../../modules/waitingFiles';
@@ -176,6 +176,6 @@ export default {
   endpoint: AddPhotoPart.endpoint,
   callback: callback,
   method: 'post',
-  middleWare: checkUserToken,
+  middleWare: assertUserToken,
   requestShema: AddPhotoPart.RequestSchema,
 } as EndpointType;
