@@ -3,13 +3,19 @@ import { NextFunction, Request, Response } from 'express';
 import responseFormatter from '../../api/responseFormatter';
 import { combineMiddleware } from '../../modules/functions';
 import { verifyUserToken } from '../../modules/tokenManagement';
-import verifyAuthorizationHeader from '../verifyAuthorizationHeader';
+import checkAuthorizationHeader from '../authorizationHeader/checkAuthorizationHeader';
 import { ExtendedRequest } from '../../api/endpointsLoader';
 import { GetServerSigningKey, IsServerClaimedAny } from '../../modules/serverDataManager';
 
 async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFunction) {
   try {
     console.log('#checkUserToken middleware');
+
+    if (req.tokenError) {
+      req.userIdError = req.tokenError;
+      next();
+      return;
+    }
 
     const token = req.token;
 
@@ -68,4 +74,4 @@ async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFun
   }
 }
 
-export default combineMiddleware([verifyAuthorizationHeader, checkUserToken]);
+export default combineMiddleware([checkAuthorizationHeader, checkUserToken]);
