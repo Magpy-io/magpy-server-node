@@ -1,6 +1,10 @@
 import Joi from 'joi';
 
-import { ErrorBackendServerUnreachable, ErrorsNotFromLocal } from '../ErrorTypes';
+import {
+  ErrorAuthorizationFailed,
+  ErrorBackendServerUnreachable,
+  ErrorCouldNotGetRequestAddress,
+} from '../ErrorTypes';
 import { TokenAuthentification } from '../Types';
 
 export type ResponseData = string;
@@ -11,7 +15,10 @@ export const RequestSchema = Joi.object()
   })
   .meta({ className: 'RequestData' });
 
-export type ResponseErrorTypes = ErrorsNotFromLocal | ErrorBackendServerUnreachable;
+export type ResponseErrorTypes =
+  | ErrorAuthorizationFailed
+  | ErrorCouldNotGetRequestAddress
+  | ErrorBackendServerUnreachable;
 
 export const endpoint = 'unclaimServer';
 

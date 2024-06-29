@@ -3,7 +3,8 @@ import Joi from 'joi';
 import {
   ErrorPathAccessDenied,
   ErrorPathFolderDoesNotExist,
-  ErrorsNotFromLocal,
+  ErrorCouldNotGetRequestAddress,
+  ErrorAuthorizationFailed,
 } from '../ErrorTypes';
 import { TokenAuthentification } from '../Types';
 
@@ -16,9 +17,10 @@ export const RequestSchema = Joi.object({
   .meta({ className: 'RequestData' });
 
 export type ResponseErrorTypes =
+  | ErrorAuthorizationFailed
   | ErrorPathFolderDoesNotExist
   | ErrorPathAccessDenied
-  | ErrorsNotFromLocal;
+  | ErrorCouldNotGetRequestAddress;
 
 export const endpoint = 'updateServerPath';
 

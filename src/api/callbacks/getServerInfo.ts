@@ -1,6 +1,5 @@
 import { Request, Response } from 'express';
 
-import assertConnexionLocal from '../../middleware/connexionLocal/assertConnexionLocal';
 import checkServerHasValidCredentials from '../../middleware/checkServerHasValidCredentials';
 import { GetServerInfo as BackendGetServerInfo } from '../../modules/BackendQueries';
 import {
@@ -13,6 +12,7 @@ import {
 import { GetServerInfo } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
+import assertLocalOrValidUserToken from '../../middleware/assertLocalOrValidUserToken';
 
 const sendResponse = responseFormatter.getCustomSendResponse<GetServerInfo.ResponseData>();
 
@@ -69,6 +69,6 @@ export default {
   endpoint: GetServerInfo.endpoint,
   callback: callback,
   method: 'post',
-  middleWare: [assertConnexionLocal, checkServerHasValidCredentials],
+  middleWare: [assertLocalOrValidUserToken, checkServerHasValidCredentials],
   requestShema: GetServerInfo.RequestSchema,
 } as EndpointType;

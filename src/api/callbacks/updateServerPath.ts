@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import assertConnexionLocal from '../../middleware/connexionLocal/assertConnexionLocal';
+import assertLocalOrValidUserToken from '../../middleware/assertLocalOrValidUserToken';
 import { folderHasRights, pathExists } from '../../modules/diskManager';
 import { isAbsolutePath } from '../../modules/functions';
 import { SaveStorageFolderPath, GetStorageFolderPath } from '../../modules/serverDataManager';
@@ -66,6 +66,6 @@ export default {
   endpoint: UpdateServerPath.endpoint,
   callback: callback,
   method: 'post',
-  middleWare: [assertConnexionLocal],
+  middleWare: [assertLocalOrValidUserToken],
   requestShema: UpdateServerPath.RequestSchema,
 } as EndpointType;

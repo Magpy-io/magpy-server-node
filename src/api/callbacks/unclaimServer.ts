@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import assertConnexionLocal from '../../middleware/connexionLocal/assertConnexionLocal';
+import assertLocalOrValidUserToken from '../../middleware/assertLocalOrValidUserToken';
 import checkServerHasValidCredentials from '../../middleware/checkServerHasValidCredentials';
 import { DeleteServer } from '../../modules/BackendQueries';
 import { ClearServerCredentials } from '../../modules/serverDataManager';
@@ -46,6 +46,6 @@ export default {
   endpoint: UnclaimServer.endpoint,
   callback: callback,
   method: 'post',
-  middleWare: [assertConnexionLocal, checkServerHasValidCredentials],
+  middleWare: [assertLocalOrValidUserToken, checkServerHasValidCredentials],
   requestShema: UnclaimServer.RequestSchema,
 } as EndpointType;

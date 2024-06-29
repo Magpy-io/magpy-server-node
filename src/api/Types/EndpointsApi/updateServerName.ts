@@ -3,7 +3,8 @@ import Joi from 'joi';
 import {
   ErrorBackendServerUnreachable,
   ErrorInvalidName,
-  ErrorsNotFromLocal,
+  ErrorCouldNotGetRequestAddress,
+  ErrorAuthorizationFailed,
 } from '../ErrorTypes';
 import { TokenAuthentification } from '../Types';
 
@@ -16,8 +17,9 @@ export const RequestSchema = Joi.object({
   .meta({ className: 'RequestData' });
 
 export type ResponseErrorTypes =
+  | ErrorAuthorizationFailed
   | ErrorInvalidName
-  | ErrorsNotFromLocal
+  | ErrorCouldNotGetRequestAddress
   | ErrorBackendServerUnreachable;
 
 export const endpoint = 'updateServerName';
