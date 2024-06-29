@@ -1,40 +1,36 @@
 import { NextFunction, Request, Response } from 'express';
 
-import responseFormatter from '../api/responseFormatter';
-import { ExtendedRequest } from '../api/endpointsLoader';
+import responseFormatter from '../../api/responseFormatter';
+import { ExtendedRequest } from '../../api/endpointsLoader';
 
-const verifyAuthorizationHeader = async (
+const checkAuthorizationHeader = async (
   req: ExtendedRequest,
   res: Response,
   next: NextFunction,
 ) => {
   try {
-    console.log('#VerifyAuthorizationHeader middleware');
+    console.log('#checkAuthorizationHeader middleware');
     const bearerHeader = req.headers['x-authorization'];
 
     if (!bearerHeader || typeof bearerHeader != 'string') {
       console.log('Error : No authorization header');
-      responseFormatter.sendFailedMessage(
-        res,
-        'Invalid authorization',
-        'AUTHORIZATION_MISSING',
-      );
+      req.tokenError = { message: 'Invalid authorization', code: 'AUTHORIZATION_MISSING' };
+      next();
       return;
     }
     const [prefix, token] = bearerHeader.split(' ');
 
     if (!prefix || prefix != 'Bearer' || !token) {
       console.log('Error : authorization header wrong format');
-      responseFormatter.sendFailedMessage(
-        res,
-        'Invalid authorization',
-        'AUTHORIZATION_WRONG_FORMAT',
-      );
+      req.tokenError = {
+        message: 'Invalid authorization',
+        code: 'AUTHORIZATION_WRONG_FORMAT',
+      };
+      next();
       return;
     }
 
     req.token = token;
-
     next();
   } catch (err) {
     console.error(err);
@@ -42,4 +38,4 @@ const verifyAuthorizationHeader = async (
   }
 };
 
-export default verifyAuthorizationHeader;
+export default checkAuthorizationHeader;
