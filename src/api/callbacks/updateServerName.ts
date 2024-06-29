@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import checkConnexionLocal from '../../middleware/checkConnexionLocal';
+import assertConnexionLocal from '../../middleware/connexionLocal/assertConnexionLocal';
 import checkServerHasValidCredentials from '../../middleware/checkServerHasValidCredentials';
 import { UpdateServerData } from '../../modules/BackendQueries';
 import { SaveServerName } from '../../modules/serverDataManager';
@@ -61,6 +61,6 @@ export default {
   endpoint: UpdateServerName.endpoint,
   callback: callback,
   method: 'post',
-  middleWare: [checkConnexionLocal, checkServerHasValidCredentials],
+  middleWare: [assertConnexionLocal, checkServerHasValidCredentials],
   requestShema: UpdateServerName.RequestSchema,
 } as EndpointType;

@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import checkConnexionLocal from '../../middleware/checkConnexionLocal';
+import assertConnexionLocal from '../../middleware/connexionLocal/assertConnexionLocal';
 import checkServerHasValidCredentials from '../../middleware/checkServerHasValidCredentials';
 import { GetServerInfo as BackendGetServerInfo } from '../../modules/BackendQueries';
 import {
@@ -69,6 +69,6 @@ export default {
   endpoint: GetServerInfo.endpoint,
   callback: callback,
   method: 'post',
-  middleWare: [checkConnexionLocal, checkServerHasValidCredentials],
+  middleWare: [assertConnexionLocal, checkServerHasValidCredentials],
   requestShema: GetServerInfo.RequestSchema,
 } as EndpointType;

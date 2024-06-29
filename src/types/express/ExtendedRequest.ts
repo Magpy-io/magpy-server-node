@@ -7,4 +7,5 @@ export interface ExtendedRequest extends Request {
   userId?: string;
   userIdError?: { message: string; code: ErrorCodes };
   token?: string;
+  isConnexionLocal?: boolean;
 }
