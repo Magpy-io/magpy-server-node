@@ -7,6 +7,7 @@ import {
   extractToken,
   userAuthorizationObject,
   verifyHasUserToken,
+  HasUserToken,
 } from './TokenManager';
 import { ResponseTypeFrom } from './Types/ApiGlobalTypes';
 import { TokenAuthentification } from './Types/Types';
@@ -26,6 +27,37 @@ function GeneratePostWithAuth<RequestData, ResponseData, ResponseErrorTypes>(
         userAuthorizationObject(),
       );
       return response.data;
+    } catch (err: any) {
+      return handleAxiosError(err);
+    }
+  };
+  return PostFunction;
+}
+
+function GeneratePostWithAuthOptional<RequestData, ResponseData, ResponseErrorTypes>(
+  endpointPath: string,
+) {
+  const PostFunction = async <RequestData, ResponseData, ResponseErrorTypes>(
+    data: RequestData,
+    options?: { path?: string },
+  ): Promise<ResponseTypeFrom<ResponseData, ResponseErrorTypes>> => {
+    const hasToken = HasUserToken();
+
+    try {
+      if (hasToken) {
+        const response = await axios.post(
+          getPathWithEndpoint(endpointPath, options?.path),
+          data,
+          userAuthorizationObject(),
+        );
+        return response.data;
+      } else {
+        const response = await axios.post(
+          getPathWithEndpoint(endpointPath, options?.path),
+          data,
+        );
+        return response.data;
+      }
     } catch (err: any) {
       return handleAxiosError(err);
     }
@@ -99,5 +131,9 @@ export function GeneratePostRequest<RequestData, ResponseData, ResponseErrorType
       );
     case 'set-token':
       return GeneratePostSetAuth<RequestData, ResponseData, ResponseErrorTypes>(endpointPath);
+    case 'optional':
+      return GeneratePostWithAuthOptional<RequestData, ResponseData, ResponseErrorTypes>(
+        endpointPath,
+      );
   }
 }
