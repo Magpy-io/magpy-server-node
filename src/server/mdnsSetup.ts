@@ -6,7 +6,7 @@ import { GetServerName } from '../modules/serverDataManager';
 let advert: ReturnType<typeof mdns.createAdvertisement>;
 
 function startMdns() {
-  advert = mdns.createAdvertisement(mdns.tcp('http'), parseInt(port || '8000'), {
+  advert = mdns.createAdvertisement(mdns.tcp('http'), parseInt(port), {
     name: serverNameMdnsPrefix + GetServerName(),
   });
   advert.start();
