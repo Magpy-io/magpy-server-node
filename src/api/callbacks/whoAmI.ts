@@ -5,7 +5,10 @@ import { WhoAmI } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
-const sendResponse = responseFormatter.getCustomSendResponse<WhoAmI.ResponseData>();
+const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendResponse<
+  WhoAmI.ResponseData,
+  WhoAmI.ResponseErrorTypes
+>();
 
 const callback = async (req: ExtendedRequest, res: Response, body: WhoAmI.RequestData) => {
   try {

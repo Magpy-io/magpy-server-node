@@ -12,7 +12,7 @@ async function assertConnexionLocal(req: ExtendedRequest, res: Response, next: N
 
     if (!req.isConnexionLocal) {
       console.log('Request not from loopback');
-      responseFormatter.sendFailedMessage(
+      responseFormatter.sendFailedMessageMiddleware(
         res,
         'Request must be made using loopback address',
         'REQUEST_NOT_FROM_LOOPBACK',

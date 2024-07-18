@@ -10,7 +10,7 @@ async function assertUserToken(req: ExtendedRequest, res: Response, next: NextFu
     console.log('#assertUserToken middleware');
 
     if (req.userIdError) {
-      return responseFormatter.sendFailedMessage(
+      return responseFormatter.sendFailedMessageMiddleware(
         res,
         req.userIdError.message,
         req.userIdError.code,

@@ -17,7 +17,10 @@ import { ClaimServerLocal } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
-const sendResponse = responseFormatter.getCustomSendResponse<ClaimServerLocal.ResponseData>();
+const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendResponse<
+  ClaimServerLocal.ResponseData,
+  ClaimServerLocal.ResponseErrorTypes
+>();
 
 const callback = async (
   req: ExtendedRequest,
@@ -29,11 +32,7 @@ const callback = async (
 
     if (IsServerClaimedAny()) {
       console.log('server already claimed');
-      return responseFormatter.sendFailedMessage(
-        res,
-        'Server already claimed',
-        'SERVER_ALREADY_CLAIMED',
-      );
+      return sendFailedMessage(res, 'Server already claimed', 'SERVER_ALREADY_CLAIMED');
     }
 
     console.log('server not claimed, saving claiming user.');

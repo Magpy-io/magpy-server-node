@@ -11,7 +11,10 @@ import { APIPhoto, GetPhotosById } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
-const sendResponse = responseFormatter.getCustomSendResponse<GetPhotosById.ResponseData>();
+const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendResponse<
+  GetPhotosById.ResponseData,
+  GetPhotosById.ResponseErrorTypes
+>();
 
 const callback = async (
   req: ExtendedRequest,

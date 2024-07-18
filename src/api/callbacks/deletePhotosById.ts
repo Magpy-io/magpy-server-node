@@ -7,7 +7,10 @@ import { DeletePhotosById } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
-const sendResponse = responseFormatter.getCustomSendResponse<DeletePhotosById.ResponseData>();
+const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendResponse<
+  DeletePhotosById.ResponseData,
+  DeletePhotosById.ResponseErrorTypes
+>();
 
 const callback = async (
   req: ExtendedRequest,

@@ -8,7 +8,10 @@ import { UnclaimServer } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
-const sendResponse = responseFormatter.getCustomSendResponse<UnclaimServer.ResponseData>();
+const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendResponse<
+  UnclaimServer.ResponseData,
+  UnclaimServer.ResponseErrorTypes
+>();
 
 const callback = async (
   req: ExtendedRequest,

@@ -14,7 +14,7 @@ const assertAuthorizationHeader = async (
     console.log('#assertAuthorizationHeader middleware');
 
     if (req.tokenError) {
-      return responseFormatter.sendFailedMessage(
+      return responseFormatter.sendFailedMessageMiddleware(
         res,
         req.tokenError.message,
         req.tokenError.code,

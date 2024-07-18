@@ -6,10 +6,25 @@ import { APIPhoto } from './Types';
 import { ResponseTypeFrom } from './Types/ApiGlobalTypes';
 import { ErrorCodes } from './Types/ErrorTypes';
 
-function getCustomSendResponse<T>() {
-  return async function (res: Response, data: T, warning: boolean = false) {
+function getCustomSendResponse<T, E extends ErrorCodes | null>() {
+  const sendResponseCustom = async function (
+    res: Response,
+    data: T,
+    warning: boolean = false,
+  ) {
     return await sendResponse(res, data, warning);
   };
+
+  const sendFailedMessageCustom = async function (
+    res: Response,
+    msg: string,
+    code: E,
+    warning: boolean = false,
+  ) {
+    return await sendFailedMessage(res, msg, code, warning);
+  };
+
+  return { sendResponse: sendResponseCustom, sendFailedMessage: sendFailedMessageCustom };
 }
 
 async function sendResponse<T>(res: Response, data: T, warning: boolean = false) {
@@ -38,10 +53,10 @@ function formatError(
 async function sendFailedMessage(
   res: Response,
   msg: string,
-  code: ErrorCodes,
+  code: ErrorCodes | null,
   warning: boolean = false,
 ) {
-  let jsonResponse = formatError(msg, code, warning);
+  let jsonResponse = formatError(msg, code ?? 'SERVER_ERROR', warning);
 
   return await res.status(400).json(jsonResponse);
 }
@@ -85,9 +100,9 @@ function createPhotoObject(dbPhoto: Photo, image64?: string): APIPhoto {
 
 export default {
   getCustomSendResponse,
-  sendFailedMessage,
   sendFailedBadRequest,
   sendErrorBackEndServerUnreachable,
   sendErrorMessage,
   createPhotoObject,
+  sendFailedMessageMiddleware: sendFailedMessage,
 };

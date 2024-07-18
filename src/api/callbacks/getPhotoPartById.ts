@@ -12,7 +12,10 @@ import { GetPhotoPartById } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
-const sendResponse = responseFormatter.getCustomSendResponse<GetPhotoPartById.ResponseData>();
+const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendResponse<
+  GetPhotoPartById.ResponseData,
+  GetPhotoPartById.ResponseErrorTypes
+>();
 
 const callback = async (
   req: ExtendedRequest,
@@ -39,12 +42,7 @@ const callback = async (
     if (!ret.exists) {
       console.log('Photo not found in db.');
       console.log('Sending response message.');
-      return responseFormatter.sendFailedMessage(
-        res,
-        `Photo with id: ${id} not found`,
-        'ID_NOT_FOUND',
-        warning,
-      );
+      return sendFailedMessage(res, `Photo with id: ${id} not found`, 'ID_NOT_FOUND', warning);
     } else {
       console.log('Photo found in db.');
       console.log(`Getting photo with id = ${id} from db.`);
@@ -74,7 +72,7 @@ const callback = async (
           `Part number ${part} must be between 0 and ${totalNbOfParts - 1} included`,
         );
         console.log('Sending response message.');
-        return responseFormatter.sendFailedMessage(
+        return sendFailedMessage(
           res,
           `Part number ${part} must be between 0 and ${totalNbOfParts - 1} included`,
           'INVALID_PART_NUMBER',

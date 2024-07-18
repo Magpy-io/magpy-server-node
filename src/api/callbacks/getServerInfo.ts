@@ -14,7 +14,10 @@ import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 import assertLocalOrValidUserToken from '../../middleware/assertLocalOrValidUserToken';
 
-const sendResponse = responseFormatter.getCustomSendResponse<GetServerInfo.ResponseData>();
+const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendResponse<
+  GetServerInfo.ResponseData,
+  GetServerInfo.ResponseErrorTypes
+>();
 
 const callback = async (
   req: ExtendedRequest,

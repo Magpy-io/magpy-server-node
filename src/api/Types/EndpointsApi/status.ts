@@ -8,7 +8,7 @@ export const RequestSchema = Joi.object({})
   .options({ presence: 'required' })
   .meta({ className: 'RequestData' });
 
-export type ResponseErrorTypes = void;
+export type ResponseErrorTypes = null;
 
 export const endpoint = 'status';
 

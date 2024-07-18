@@ -10,7 +10,7 @@ async function checkConnexionLocal(req: ExtendedRequest, res: Response, next: Ne
 
     if (!req.ip) {
       console.log('Could not get ip from request');
-      return responseFormatter.sendFailedMessage(
+      return responseFormatter.sendFailedMessageMiddleware(
         res,
         'Request must be made using loopback address',
         'COULD_NOT_GET_REQUEST_ADDRESS',

@@ -6,7 +6,10 @@ import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 import { IsServerClaimedLocal, IsServerClaimedRemote } from '../../modules/serverDataManager';
 import checkServerHasValidCredentials from '../../middleware/checkServerHasValidCredentials';
 
-const sendResponse = responseFormatter.getCustomSendResponse<Status.ResponseData>();
+const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendResponse<
+  Status.ResponseData,
+  Status.ResponseErrorTypes
+>();
 
 const callback = async (req: ExtendedRequest, res: Response, body: Status.RequestData) => {
   try {

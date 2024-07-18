@@ -15,7 +15,10 @@ import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 import { randomBytes } from 'crypto';
 
-const sendResponse = responseFormatter.getCustomSendResponse<GetToken.ResponseData>();
+const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendResponse<
+  GetToken.ResponseData,
+  GetToken.ResponseErrorTypes
+>();
 
 const callback = async (req: ExtendedRequest, res: Response, body: GetToken.RequestData) => {
   try {
@@ -23,11 +26,7 @@ const callback = async (req: ExtendedRequest, res: Response, body: GetToken.Requ
 
     if (!req.isClaimedRemote) {
       console.log('server is not claimed');
-      return responseFormatter.sendFailedMessage(
-        res,
-        'Server not claimed',
-        'SERVER_NOT_CLAIMED',
-      );
+      return sendFailedMessage(res, 'Server not claimed', 'SERVER_NOT_CLAIMED');
     }
 
     let retUser: WhoAmI.ResponseType;
@@ -46,18 +45,14 @@ const callback = async (req: ExtendedRequest, res: Response, body: GetToken.Requ
     if (!retUser.ok) {
       if (retUser.errorCode == 'AUTHORIZATION_FAILED') {
         console.log('user token authorization error');
-        return responseFormatter.sendFailedMessage(
+        return sendFailedMessage(
           res,
           'User token verification failed',
           'AUTHORIZATION_BACKEND_FAILED',
         );
       } else if (retUser.errorCode == 'AUTHORIZATION_EXPIRED') {
         console.log('user token expired');
-        return responseFormatter.sendFailedMessage(
-          res,
-          'User token expired',
-          'AUTHORIZATION_BACKEND_EXPIRED',
-        );
+        return sendFailedMessage(res, 'User token expired', 'AUTHORIZATION_BACKEND_EXPIRED');
       } else {
         console.error('Error requesting backend server');
         console.error(retUser);
@@ -90,7 +85,7 @@ const callback = async (req: ExtendedRequest, res: Response, body: GetToken.Requ
 
     if (retServer.data.server.owner?._id != retUser.data.user._id) {
       console.log('user not allowed to access this server');
-      return responseFormatter.sendFailedMessage(
+      return sendFailedMessage(
         res,
         'User not allowed to access this server',
         'USER_NOT_ALLOWED',

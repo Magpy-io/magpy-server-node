@@ -8,7 +8,10 @@ import { UpdateServerPath } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
-const sendResponse = responseFormatter.getCustomSendResponse<UpdateServerPath.ResponseData>();
+const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendResponse<
+  UpdateServerPath.ResponseData,
+  UpdateServerPath.ResponseErrorTypes
+>();
 
 const callback = async (
   req: ExtendedRequest,
@@ -32,12 +35,12 @@ const callback = async (
 
     if (!isAbsolutePath(path)) {
       console.log('Invalid path, not an absolute path');
-      return responseFormatter.sendFailedMessage(res, 'Invalid path', 'BAD_REQUEST');
+      return responseFormatter.sendFailedBadRequest(res, 'Invalid path');
     }
 
     if (!(await pathExists(path))) {
       console.log('Invalid path, could not access the folder');
-      return responseFormatter.sendFailedMessage(
+      return sendFailedMessage(
         res,
         'Cannot reach the given path',
         'PATH_FOLDER_DOES_NOT_EXIST',
@@ -46,11 +49,7 @@ const callback = async (
 
     if (!(await folderHasRights(path))) {
       console.log('Invalid path, could not access the folder');
-      return responseFormatter.sendFailedMessage(
-        res,
-        'Cannot access the given path',
-        'PATH_ACCESS_DENIED',
-      );
+      return sendFailedMessage(res, 'Cannot access the given path', 'PATH_ACCESS_DENIED');
     }
 
     await SaveStorageFolderPath(path);

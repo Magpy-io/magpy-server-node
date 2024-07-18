@@ -17,7 +17,10 @@ import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 import { randomBytes } from 'crypto';
 
-const sendResponse = responseFormatter.getCustomSendResponse<GetTokenLocal.ResponseData>();
+const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendResponse<
+  GetTokenLocal.ResponseData,
+  GetTokenLocal.ResponseErrorTypes
+>();
 
 const callback = async (
   req: ExtendedRequest,
@@ -29,11 +32,7 @@ const callback = async (
 
     if (!IsServerClaimedLocal()) {
       console.log('server is not claimed');
-      return responseFormatter.sendFailedMessage(
-        res,
-        'Server not claimed',
-        'SERVER_NOT_CLAIMED',
-      );
+      return sendFailedMessage(res, 'Server not claimed', 'SERVER_NOT_CLAIMED');
     }
 
     const localCredentials = GetServerLocalClaimInfo();
@@ -46,11 +45,7 @@ const callback = async (
 
     if (localCredentials.username != username || !passwordValid) {
       console.log('Wrong username or password.');
-      return responseFormatter.sendFailedMessage(
-        res,
-        'Wrong username or password.',
-        'INVALID_CREDENTIALS',
-      );
+      return sendFailedMessage(res, 'Wrong username or password.', 'INVALID_CREDENTIALS');
     }
 
     console.log('user has access to server, generating token');

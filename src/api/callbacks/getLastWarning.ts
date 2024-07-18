@@ -6,7 +6,10 @@ import { GetLastWarning } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
-const sendResponse = responseFormatter.getCustomSendResponse<GetLastWarning.ResponseData>();
+const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendResponse<
+  GetLastWarning.ResponseData,
+  GetLastWarning.ResponseErrorTypes
+>();
 
 const callback = async (
   req: ExtendedRequest,

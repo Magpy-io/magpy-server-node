@@ -15,7 +15,10 @@ import { ClaimServer } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
-const sendResponse = responseFormatter.getCustomSendResponse<ClaimServer.ResponseData>();
+const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendResponse<
+  ClaimServer.ResponseData,
+  ClaimServer.ResponseErrorTypes
+>();
 
 const callback = async (
   req: ExtendedRequest,
@@ -31,11 +34,7 @@ const callback = async (
 
     if (req.isClaimedRemote || IsServerClaimedLocal()) {
       console.log('server already claimed');
-      return responseFormatter.sendFailedMessage(
-        res,
-        'Server already claimed',
-        'SERVER_ALREADY_CLAIMED',
-      );
+      return sendFailedMessage(res, 'Server already claimed', 'SERVER_ALREADY_CLAIMED');
     }
 
     console.log('server not claimed');
@@ -64,18 +63,14 @@ const callback = async (
     if (!ret.ok) {
       if (ret.errorCode == 'AUTHORIZATION_FAILED') {
         console.log('user token authorization error');
-        return responseFormatter.sendFailedMessage(
+        return sendFailedMessage(
           res,
           'User token verification failed',
           'AUTHORIZATION_BACKEND_FAILED',
         );
       } else if (ret.errorCode == 'AUTHORIZATION_EXPIRED') {
         console.log('user token expired');
-        return responseFormatter.sendFailedMessage(
-          res,
-          'User token expired',
-          'AUTHORIZATION_BACKEND_EXPIRED',
-        );
+        return sendFailedMessage(res, 'User token expired', 'AUTHORIZATION_BACKEND_EXPIRED');
       } else {
         throw new Error('request to verify user token failed. ' + JSON.stringify(ret));
       }

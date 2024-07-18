@@ -13,7 +13,10 @@ import { AddPhoto } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
-const sendResponse = responseFormatter.getCustomSendResponse<AddPhoto.ResponseData>();
+const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendResponse<
+  AddPhoto.ResponseData,
+  AddPhoto.ResponseErrorTypes
+>();
 
 const callback = async (req: ExtendedRequest, res: Response, body: AddPhoto.RequestData) => {
   try {

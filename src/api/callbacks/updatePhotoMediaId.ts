@@ -10,8 +10,10 @@ import { UpdatePhotoMediaId } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
-const sendResponse =
-  responseFormatter.getCustomSendResponse<UpdatePhotoMediaId.ResponseData>();
+const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendResponse<
+  UpdatePhotoMediaId.ResponseData,
+  UpdatePhotoMediaId.ResponseErrorTypes
+>();
 
 const callback = async (
   req: ExtendedRequest,
@@ -39,7 +41,7 @@ const callback = async (
     if (!ret.exists) {
       console.log('Photo does not exist in server.');
       console.log('Sending response message.');
-      return responseFormatter.sendFailedMessage(
+      return sendFailedMessage(
         res,
         `Photo with id ${id} not found in server`,
         'ID_NOT_FOUND',

@@ -10,7 +10,10 @@ import { AddPhotoPart } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
-const sendResponse = responseFormatter.getCustomSendResponse<AddPhotoPart.ResponseData>();
+const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendResponse<
+  AddPhotoPart.ResponseData,
+  AddPhotoPart.ResponseErrorTypes
+>();
 
 const callback = async (
   req: ExtendedRequest,
@@ -25,17 +28,16 @@ const callback = async (
     if (body.partSize != body.photoPart.length) {
       console.log('Bad request parameters');
       console.log('Sending response message');
-      return responseFormatter.sendFailedMessage(
+      return responseFormatter.sendFailedBadRequest(
         res,
         'photoPart length and partSize do not match',
-        'BAD_REQUEST',
       );
     }
 
     if (!FilesWaiting.has(body.id)) {
       console.log(`No photo transfer for id ${body.id} was found.`);
       console.log('Sending response message.');
-      return responseFormatter.sendFailedMessage(
+      return sendFailedMessage(
         res,
         `No photo transfer for id ${body.id} was found.`,
         'PHOTO_TRANSFER_NOT_FOUND',
@@ -83,7 +85,7 @@ const callback = async (
       FilesWaiting.delete(body.id);
 
       console.log('Sending response message.');
-      return responseFormatter.sendFailedMessage(
+      return sendFailedMessage(
         res,
         `Transfered data (${photoWaiting.received}) exceeds initial image size (${photoWaiting.image64Len}).`,
         'PHOTO_SIZE_EXCEEDED',
@@ -107,11 +109,7 @@ const callback = async (
       FilesWaiting.delete(body.id);
 
       console.log('Sending response message.');
-      return responseFormatter.sendFailedMessage(
-        res,
-        `Not all parts were found`,
-        'MISSING_PARTS',
-      );
+      return sendFailedMessage(res, `Not all parts were found`, 'MISSING_PARTS');
     }
 
     const image64 = joinParts(photoWaiting.dataParts);

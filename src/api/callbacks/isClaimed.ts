@@ -14,7 +14,10 @@ import {
 import checkServerIsClaimedRemote from '../../middleware/checkServerIsClaimedRemote';
 import { ErrorBackendUnreachable } from '../../modules/BackendQueries/ExceptionsManager';
 
-const sendResponse = responseFormatter.getCustomSendResponse<IsClaimed.ResponseData>();
+const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendResponse<
+  IsClaimed.ResponseData,
+  IsClaimed.ResponseErrorTypes
+>();
 
 const callback = async (req: ExtendedRequest, res: Response, body: IsClaimed.RequestData) => {
   try {
@@ -38,7 +41,7 @@ const callback = async (req: ExtendedRequest, res: Response, body: IsClaimed.Req
       } catch (err) {
         if (err instanceof ErrorBackendUnreachable) {
           console.log('Error requesting backend server');
-          return responseFormatter.sendFailedMessage(
+          return sendFailedMessage(
             res,
             'Backend server unreachable, could not confirm server claim status.',
             'BACKEND_SERVER_UNREACHABLE',

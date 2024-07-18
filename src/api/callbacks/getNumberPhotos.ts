@@ -6,7 +6,10 @@ import { GetNumberPhotos } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
-const sendResponse = responseFormatter.getCustomSendResponse<GetNumberPhotos.ResponseData>();
+const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendResponse<
+  GetNumberPhotos.ResponseData,
+  GetNumberPhotos.ResponseErrorTypes
+>();
 
 const callback = async (
   req: ExtendedRequest,

@@ -8,7 +8,10 @@ import { UpdateServerName } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
-const sendResponse = responseFormatter.getCustomSendResponse<UpdateServerName.ResponseData>();
+const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendResponse<
+  UpdateServerName.ResponseData,
+  UpdateServerName.ResponseErrorTypes
+>();
 
 const callback = async (
   req: ExtendedRequest,
@@ -25,16 +28,12 @@ const callback = async (
 
     if (name.length < 3 || name.length > 70) {
       console.log('Invalid name');
-      return responseFormatter.sendFailedMessage(
-        res,
-        'Name too short or too long',
-        'INVALID_NAME',
-      );
+      return sendFailedMessage(res, 'Name too short or too long', 'INVALID_NAME');
     }
 
     if (!/^[a-zA-Z0-9 \-_]+$/.test(name)) {
       console.log('Invalid name');
-      return responseFormatter.sendFailedMessage(
+      return sendFailedMessage(
         res,
         'Name can only contain alphanumeric characters, whitespaces, -, and _',
         'INVALID_NAME',
