@@ -1,6 +1,10 @@
 import { Request, Response } from 'express';
 
-import { addPhotoToDB, deletePhotoByIdFromDB } from '../../db/sequelizeDb';
+import {
+  addPhotoToDB,
+  deletePhotoByIdFromDB,
+  checkPhotoExistsByMediaIdInDB,
+} from '../../db/sequelizeDb';
 import assertUserToken from '../../middleware/userToken/assertUserToken';
 import { addServerImagePaths } from '../../modules/diskFilesNaming';
 import { addPhotoToDisk } from '../../modules/diskManager';
@@ -15,6 +19,14 @@ const callback = async (req: ExtendedRequest, res: Response, body: AddPhoto.Requ
   try {
     if (!req.userId) {
       throw new Error('UserId is not defined.');
+    }
+
+    const photoExists = await checkPhotoExistsByMediaIdInDB(body.mediaId, body.deviceUniqueId);
+
+    if (photoExists) {
+      console.log('Photo exists in db');
+      console.log('Sending response message.');
+      return sendFailedMessage(res, `Photo already exists`, 'PHOTO_EXISTS');
     }
 
     const photo = {
