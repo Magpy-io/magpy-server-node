@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import { numberPhotosFromDB } from '../../db/sequelizeDb';
+import { countPhotosInDB } from '../../db/sequelizeDb';
 import assertUserToken from '../../middleware/userToken/assertUserToken';
 import { GetNumberPhotos } from '../Types';
 import responseFormatter from '../responseFormatter';
@@ -15,7 +15,7 @@ const callback = async (
 ) => {
   try {
     console.log('Getting number of photos in db.');
-    const nb = await numberPhotosFromDB();
+    const nb = await countPhotosInDB();
     console.log(`Number of photos found in db: ${nb}.`);
     const jsonResponse = {
       number: nb,

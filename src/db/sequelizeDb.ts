@@ -238,7 +238,7 @@ async function addPhotoToDB(photo: AddPhotoType): Promise<Photo> {
   }
 }
 
-async function numberPhotosFromDB(): Promise<number> {
+async function countPhotosInDB(): Promise<number> {
   assertDbOpen();
   try {
     return await ImageModel.count();
@@ -253,7 +253,7 @@ async function getPhotosFromDB(
   offset: number,
 ): Promise<{ photos: Photo[]; endReached: boolean }> {
   assertDbOpen();
-  const nbPhotos = await numberPhotosFromDB();
+  const nbPhotos = await countPhotosInDB();
 
   try {
     const imagesIds = await ImageModel.findAll({
@@ -490,15 +490,15 @@ export {
   clearDB,
   getDeviceFromDB,
   countDevicesInDB,
-  getPhotoByMediaIdFromDB,
+  countPhotosInDB,
   addPhotoToDB,
-  numberPhotosFromDB,
+  getPhotoByMediaIdFromDB,
   getPhotosFromDB,
   getPhotoByIdFromDB,
-  deletePhotoByIdFromDB,
-  getPhotosByMediaIdFromDB,
   getPhotosByIdFromDB,
-  updatePhotoMediaIdById,
+  getPhotosByMediaIdFromDB,
   getPhotosByMediaId,
   getAllMediaIdsByImageIdFromDB,
+  deletePhotoByIdFromDB,
+  updatePhotoMediaIdById,
 };
