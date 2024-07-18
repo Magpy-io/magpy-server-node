@@ -349,22 +349,6 @@ async function deletePhotoByIdFromDB(id: string) {
 }
 
 async function getPhotosByMediaIdFromDB(
-  photosMediaIds: string[],
-  deviceUniqueId: string,
-): Promise<Array<Photo[] | null>> {
-  assertDbOpen();
-  try {
-    const photosFoundPromise = photosMediaIds.map(photoMediaId => {
-      return getPhotoByMediaIdFromDB(photoMediaId, deviceUniqueId);
-    });
-    return await Promise.all(photosFoundPromise);
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
-}
-
-async function getPhotosByMediaId(
   photosData: Array<{
     mediaId: string;
   }>,
@@ -492,12 +476,11 @@ export {
   countDevicesInDB,
   countPhotosInDB,
   addPhotoToDB,
-  getPhotoByMediaIdFromDB,
   getPhotosFromDB,
   getPhotoByIdFromDB,
+  getPhotoByMediaIdFromDB,
   getPhotosByIdFromDB,
   getPhotosByMediaIdFromDB,
-  getPhotosByMediaId,
   getAllMediaIdsByImageIdFromDB,
   deletePhotoByIdFromDB,
   updatePhotoMediaIdById,
