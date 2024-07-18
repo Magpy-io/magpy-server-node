@@ -2,6 +2,7 @@ import Joi from 'joi';
 
 import {
   ErrorMissingParts,
+  ErrorPhotoExists,
   ErrorPhotoSizeExceeded,
   ErrorPhotoTransferNotFound,
   ErrorServerNotClaimed,
@@ -38,7 +39,8 @@ export type ResponseErrorTypes =
   | ErrorMissingParts
   | ErrorPhotoTransferNotFound
   | ErrorServerNotClaimed
-  | ErrorsAuthorization;
+  | ErrorsAuthorization
+  | ErrorPhotoExists;
 
 export const endpoint = 'addPhotoPart';
 

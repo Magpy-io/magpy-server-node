@@ -8,6 +8,7 @@ import FilesWaiting from '../../modules/waitingFiles';
 import { AddPhotoInit } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
+import { checkPhotoExistsAndDeleteMissing } from '../../modules/functions';
 
 const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendResponse<
   AddPhotoInit.ResponseData,
@@ -22,6 +23,17 @@ const callback = async (
   try {
     if (!req.userId) {
       throw new Error('UserId is not defined.');
+    }
+
+    const photoExists = await checkPhotoExistsAndDeleteMissing({
+      mediaId: body.mediaId,
+      deviceUniqueId: body.deviceUniqueId,
+    });
+
+    if (photoExists.exists) {
+      console.log('Photo exists in db');
+      console.log('Sending response message.');
+      return sendFailedMessage(res, `Photo already exists`, 'PHOTO_EXISTS');
     }
 
     const photo = {

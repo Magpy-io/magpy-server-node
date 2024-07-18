@@ -9,6 +9,7 @@ import FilesWaiting, { FilesWaitingType } from '../../modules/waitingFiles';
 import { AddPhotoPart } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
+import { checkPhotoExistsAndDeleteMissing } from '../../modules/functions';
 
 const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendResponse<
   AddPhotoPart.ResponseData,
@@ -119,6 +120,17 @@ const callback = async (
 
     console.log(`Deleting pending transfer for id ${body.id}`);
     FilesWaiting.delete(body.id);
+
+    const photoExists = await checkPhotoExistsAndDeleteMissing({
+      mediaId: photoWaiting.photo.mediaId,
+      deviceUniqueId: photoWaiting.photo.deviceUniqueId,
+    });
+
+    if (photoExists.exists) {
+      console.log('Photo exists in db');
+      console.log('Sending response message.');
+      return sendFailedMessage(res, `Photo already exists`, 'PHOTO_EXISTS');
+    }
 
     const dbPhoto = await addPhotoToDB(photoWaiting.photo);
 

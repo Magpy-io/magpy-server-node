@@ -3,7 +3,11 @@ import { platform } from 'os';
 import { isAbsolute } from 'path';
 
 import responseFormatter from '../api/responseFormatter';
-import { deletePhotoByIdFromDB, getPhotoByIdFromDB } from '../db/sequelizeDb';
+import {
+  deletePhotoByIdFromDB,
+  getPhotoByIdFromDB,
+  getPhotoByMediaIdFromDB,
+} from '../db/sequelizeDb';
 import { Photo } from '../db/sequelizeDb';
 import { isPhotoOnDisk, removePhotoVariationsFromDisk } from './diskManager';
 import { SetLastWarningForUser } from './warningsManager';
@@ -61,16 +65,25 @@ export function isAbsolutePath(path: string) {
  *
  * If any variation of the photo is missing from disk returns false and deletes the photo entry from db.
  */
-export async function checkPhotoExistsAndDeleteMissing(data: {
-  id: string;
-}): Promise<
+export async function checkPhotoExistsAndDeleteMissing(
+  data:
+    | {
+        id: string;
+      }
+    | { mediaId: string; deviceUniqueId: string },
+): Promise<
   | { exists: false; deleted: Photo; warning: true }
   | { exists: false; deleted: null; warning: false }
   | { exists: true; deleted: null; warning: false }
 > {
   let photo: Photo | null;
 
-  photo = await getPhotoByIdFromDB(data.id);
+  if ('id' in data) {
+    photo = await getPhotoByIdFromDB(data.id);
+  } else {
+    photo = await getPhotoByMediaIdFromDB({ mediaId: data.mediaId }, data.deviceUniqueId);
+  }
+
   if (!photo) {
     return { exists: false, deleted: null, warning: false };
   }

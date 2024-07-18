@@ -110,7 +110,7 @@ async function countDevicesInDB() {
   return count;
 }
 
-async function getPhotoByMediaIdFromDB(
+async function getPhotoByMediaIdAll(
   photoMediaId: string,
   deviceUniqueId: string,
 ): Promise<Array<Photo>> {
@@ -162,7 +162,7 @@ async function getPhotoByMediaIdFromDB(
   }
 }
 
-async function getPhotoByMediaIdSingle(
+async function getPhotoByMediaIdFromDB(
   data: {
     mediaId: string;
   },
@@ -170,7 +170,7 @@ async function getPhotoByMediaIdSingle(
 ): Promise<Photo | null> {
   assertDbOpen();
   try {
-    const images = await getPhotoByMediaIdFromDB(data.mediaId, deviceUniqueId);
+    const images = await getPhotoByMediaIdAll(data.mediaId, deviceUniqueId);
 
     if (images.length > 1) {
       console.error('Got more than one item from database with the same mediaId');
@@ -357,7 +357,7 @@ async function getPhotosByMediaIdFromDB(
   assertDbOpen();
   try {
     const photosFoundPromise = photosData.map(photoData => {
-      return getPhotoByMediaIdSingle(photoData, deviceUniqueId);
+      return getPhotoByMediaIdFromDB(photoData, deviceUniqueId);
     });
     return await Promise.all(photosFoundPromise);
   } catch (err) {
@@ -372,7 +372,7 @@ async function checkPhotoExistsByMediaIdInDB(
 ): Promise<boolean> {
   assertDbOpen();
   try {
-    const photo = await getPhotoByMediaIdSingle({ mediaId }, deviceUniqueId);
+    const photo = await getPhotoByMediaIdFromDB({ mediaId }, deviceUniqueId);
     return !!photo;
   } catch (err) {
     console.error(err);
@@ -494,6 +494,7 @@ export {
   getPhotoByIdFromDB,
   checkPhotoExistsByMediaIdInDB,
   getPhotosByIdFromDB,
+  getPhotoByMediaIdFromDB,
   getPhotosByMediaIdFromDB,
   getAllMediaIdsByImageIdFromDB,
   deletePhotoByIdFromDB,

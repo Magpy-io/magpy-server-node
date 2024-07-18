@@ -12,6 +12,7 @@ import { hashFile } from '../../modules/hashing';
 import { AddPhoto } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
+import { checkPhotoExistsAndDeleteMissing } from '../../modules/functions';
 
 const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendResponse<
   AddPhoto.ResponseData,
@@ -24,9 +25,12 @@ const callback = async (req: ExtendedRequest, res: Response, body: AddPhoto.Requ
       throw new Error('UserId is not defined.');
     }
 
-    const photoExists = await checkPhotoExistsByMediaIdInDB(body.mediaId, body.deviceUniqueId);
+    const photoExists = await checkPhotoExistsAndDeleteMissing({
+      mediaId: body.mediaId,
+      deviceUniqueId: body.deviceUniqueId,
+    });
 
-    if (photoExists) {
+    if (photoExists.exists) {
       console.log('Photo exists in db');
       console.log('Sending response message.');
       return sendFailedMessage(res, `Photo already exists`, 'PHOTO_EXISTS');
