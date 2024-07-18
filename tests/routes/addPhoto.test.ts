@@ -5,7 +5,7 @@ mockModules();
 import { describe, expect, it } from '@jest/globals';
 
 import { Express } from 'express';
-import { AddPhoto } from '@src/api/export';
+import { AddPhoto, GetNumberPhotos } from '@src/api/export';
 
 import * as sac from '@tests/helpers/setupAndCleanup';
 
@@ -19,7 +19,14 @@ import {
   testPhotoOriginal,
   getDataFromRet,
   expectToBeOk,
+  expectToNotBeOk,
+  expectErrorCodeToBe,
+  addPhoto,
+  deletePhotoFromDisk,
+  getPhotoFromDb,
+  testWarning,
 } from '@tests/helpers/functions';
+import { PhotoTypes } from '@src/api/Types';
 
 describe("Test 'addPhoto' endpoint", () => {
   let app: Express;
@@ -41,22 +48,36 @@ describe("Test 'addPhoto' endpoint", () => {
   });
 
   it.each([{ times: 1 }, { times: 2 }, { times: 3 }])(
-    'Should add $times photos when called $times times with same photo',
+    'Should add $times photos when called $times times with $times photos with different mediaIds',
     async testData => {
       for (let i = 0; i < testData.times; i++) {
-        const ret = await AddPhoto.Post(defaultPhoto);
+        const ret = await AddPhoto.Post({
+          ...defaultPhoto,
+          mediaId: 'mediaId' + i,
+        });
 
         expectToBeOk(ret);
         expect(ret.warning).toBe(false);
 
         const data = getDataFromRet(ret);
-        testPhotoMetaAndId(data.photo);
+        testPhotoMetaAndId(data.photo, { mediaId: 'mediaId' + i });
         await testPhotosExistInDbAndDisk(data.photo);
 
         const getPhoto = await getPhotoById(data.photo.id, 'original');
         expect(getPhoto).toBeTruthy();
-        testPhotoOriginal(getPhoto, { id: data.photo.id });
+        testPhotoOriginal(getPhoto, {
+          id: data.photo.id,
+          mediaId: 'mediaId' + i,
+        });
       }
+
+      const retNumberPhotos = await GetNumberPhotos.Post();
+
+      if (!retNumberPhotos.ok) {
+        throw new Error('could not get number photos');
+      }
+
+      expect(retNumberPhotos.data.number).toBe(testData.times);
     },
   );
 
@@ -82,4 +103,59 @@ describe("Test 'addPhoto' endpoint", () => {
       deviceUniqueId: 'newDeviceUniqueId',
     });
   });
+
+  it('Should return error PHOTO_EXISTS and not add photo if tried to add same mediaId and deviceUniqueId twice', async () => {
+    const ret1 = await AddPhoto.Post(defaultPhoto);
+
+    const ret2 = await AddPhoto.Post(defaultPhoto);
+
+    expectToBeOk(ret1);
+
+    expectToNotBeOk(ret2);
+    expectErrorCodeToBe(ret2, 'PHOTO_EXISTS');
+
+    const retNumberPhotos = await GetNumberPhotos.Post();
+
+    if (!retNumberPhotos.ok) {
+      throw new Error('could not get number photos');
+    }
+
+    expect(retNumberPhotos.data.number).toBe(1);
+  });
+
+  const testDataArray: Array<{ photoType: PhotoTypes }> = [
+    { photoType: 'thumbnail' },
+    { photoType: 'compressed' },
+    { photoType: 'original' },
+  ];
+
+  it.each(testDataArray)(
+    'Should add 1 photo when called with an existing photo in db but $photoType missing on disk, and generate a warning',
+    async testData => {
+      const addedPhotoData = await addPhoto();
+
+      const photo = await getPhotoFromDb(addedPhotoData.id);
+      await deletePhotoFromDisk(photo, testData.photoType);
+
+      const ret = await AddPhoto.Post({ ...defaultPhoto, name: 'imageNewName.jpg' });
+
+      expectToBeOk(ret);
+
+      const data = getDataFromRet(ret);
+      testPhotoMetaAndId(data.photo, { name: 'imageNewName.jpg' });
+      await testPhotosExistInDbAndDisk(data.photo);
+
+      const getPhoto = await getPhotoById(data.photo.id, 'data');
+      expect(getPhoto).toBeTruthy();
+
+      if (!getPhoto) {
+        throw new Error('getPhoto should not be null');
+      }
+
+      testPhotoMetaAndId(getPhoto, {
+        id: data.photo.id,
+        name: 'imageNewName.jpg',
+      });
+    },
+  );
 });

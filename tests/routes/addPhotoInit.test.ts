@@ -5,7 +5,7 @@ mockModules();
 import { describe, expect, it } from '@jest/globals';
 
 import { Express } from 'express';
-import { AddPhotoInit } from '@src/api/export';
+import { AddPhotoInit, GetNumberPhotos } from '@src/api/export';
 import { validate } from 'uuid';
 
 import { initServer, stopServer } from '@src/server/server';
@@ -17,7 +17,11 @@ import {
   waitForPhotoTransferToFinish,
   getDataFromRet,
   expectToBeOk,
+  addPhoto,
+  expectToNotBeOk,
+  expectErrorCodeToBe,
 } from '@tests/helpers/functions';
+import * as imageBase64Parts from '@tests/helpers/imageBase64Parts';
 import FilesWaiting from '@src/modules/waitingFiles';
 
 describe("Test 'addPhotoInit' endpoint", () => {
@@ -40,9 +44,8 @@ describe("Test 'addPhotoInit' endpoint", () => {
   });
 
   it('Should return the id of the photo being added', async () => {
-    //delete photo.image64;
     const { image64: _, ...photo } = defaultPhoto;
-    const requestPhoto = { ...photo, image64Len: 132148 };
+    const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };
 
     const ret = await AddPhotoInit.Post(requestPhoto);
 
@@ -59,5 +62,17 @@ describe("Test 'addPhotoInit' endpoint", () => {
     await waitForPhotoTransferToFinish();
 
     expect(FilesWaiting.size).toBe(0);
+  });
+
+  it('Should return error PHOTO_EXISTS if tried to add same mediaId and deviceUniqueId twice', async () => {
+    await addPhoto();
+
+    const { image64: _, ...photo } = defaultPhoto;
+    const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };
+
+    const ret = await AddPhotoInit.Post(requestPhoto);
+
+    expectToNotBeOk(ret);
+    expectErrorCodeToBe(ret, 'PHOTO_EXISTS');
   });
 });
