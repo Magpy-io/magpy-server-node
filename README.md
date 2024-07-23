@@ -55,3 +55,11 @@ yarn clean
 ```
 yarn test
 ```
+
+## mDNS Debugging
+
+To check if mdns discovery is running correctly, use the following command :
+
+```
+avahi-browse -r -t _http._tcp
+```
