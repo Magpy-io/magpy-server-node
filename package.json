@@ -90,6 +90,9 @@
   "pkg": {
     "assets": [
       "node_modules/axios/dist/node/axios.cjs",
+      "node_modules/sharp/build/Release/*",
+      "node_modules/mdns/build/Release/*",
+      "node_modules/sqlite3/build/Release/*",
       "client/build/**/*",
       "assets/**/*"
     ],
