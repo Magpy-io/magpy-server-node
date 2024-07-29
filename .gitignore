@@ -2,25 +2,19 @@
 /db
 /dist
 /yarn-error.log
-/yarn.lock
 /coverage
 /.env
 /serverData
-.yarn/*
-!.yarn/cache
-!.yarn/patches
-!.yarn/plugins
-!.yarn/releases
-!.yarn/sdks
-!.yarn/versions
 out/
 /src/api/export/Types/
 /src/api/Types/RequestTypes
 /src/modules/BackendQueries
 
-# Yarn
 .pnp.*
+
+# Yarn
 .yarn/*
+!.yarn/cache
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
