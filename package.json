@@ -27,7 +27,8 @@
     "convert:exec": "node ./scripts/convert.js out/opencloud-server-win.exe out/opencloud-server-win.exe",
     "clean:types": "rimraf ./src/api/export/Types && rimraf ./src/api/Types/RequestTypes",
     "clean:backendQueries": "rimraf ./src/modules/BackendQueries",
-    "types": "yarn clean:types && yarn types:generate && yarn types:copy"
+    "types": "yarn clean:types && yarn types:generate && yarn types:copy",
+    "updateExecutable": "ts-node ./scripts/updateExecutable.ts out/opencloud-server-win.exe"
   },
   "dependencies": {
     "@sequelize/core": "^7.0.0-alpha.29",
@@ -80,6 +81,7 @@
     "joi-to-typescript": "^4.12.0",
     "memfs": "^4.6.0",
     "prettier": "^3.2.4",
+    "rcedit": "^4.0.1",
     "supertest": "^6.3.3",
     "ts-jest": "^29.1.2",
     "tslib": "^2.6.2",
