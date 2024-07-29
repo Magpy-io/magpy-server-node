@@ -1,9 +1,9 @@
 {
   "name": "opencloud-server",
-  "author": "ic",
-  "description": "Description",
+  "author": "Magpy",
+  "description": "Magpy's Server Project",
   "license": "MIT",
-  "version": "1.0.0",
+  "version": "0.1.0",
   "main": "dist/index.js",
   "scripts": {
     "format": "prettier --write ./src ./tests",
