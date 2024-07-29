@@ -5,6 +5,7 @@ import { createWriteStream } from 'fs';
 import { format } from 'util';
 
 import { getAppDataPath } from 'appdata-path';
+import { createFolder } from '../modules/diskManager';
 
 const hashLen = 32;
 const getPhotoPartSize = 100000; //char in base64
@@ -36,18 +37,22 @@ if (pkg) {
   postPhotoPartTimeoutTmp = 60000;
   portTmp = '8000';
 
-  var log_file = createWriteStream(path.join(appDir, 'logs', 'debug.log'), {
-    flags: 'w',
+  const logsFilePath = path.join(appDir, 'logs', 'debug.log');
+  const logsFilePathParsed = path.parse(logsFilePath);
+  createFolder(logsFilePathParsed.dir).then(() => {
+    var log_file = createWriteStream(logsFilePath, {
+      flags: 'w',
+    });
+    var log_stdout = process.stdout;
+    console.log = function (d) {
+      log_file.write(format(d) + '\n');
+      log_stdout.write(format(d) + '\n');
+    };
+    console.error = function (d) {
+      log_file.write(format(d) + '\n');
+      log_stdout.write(format(d) + '\n');
+    };
   });
-  var log_stdout = process.stdout;
-  console.log = function (d) {
-    log_file.write(format(d) + '\n');
-    log_stdout.write(format(d) + '\n');
-  };
-  console.error = function (d) {
-    log_file.write(format(d) + '\n');
-    log_stdout.write(format(d) + '\n');
-  };
 } else if (process.env.NODE_ENV === 'test') {
   sqliteDbFileTmp = ':memory:';
   serverDataFileTmp = path.join('.', 'serverData', 'serverInfo.json');
