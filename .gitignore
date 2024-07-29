@@ -10,11 +10,9 @@ out/
 /src/api/Types/RequestTypes
 /src/modules/BackendQueries
 
-.pnp.*
-
 # Yarn
+.pnp.*
 .yarn/*
-!.yarn/cache
 !.yarn/patches
 !.yarn/plugins
 !.yarn/releases
