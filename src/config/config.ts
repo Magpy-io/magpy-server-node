@@ -36,7 +36,7 @@ if (pkg) {
   postPhotoPartTimeoutTmp = 60000;
   portTmp = '8000';
 
-  var log_file = createWriteStream(path.join(appDir, 'serverData', 'debug.log'), {
+  var log_file = createWriteStream(path.join(appDir, 'logs', 'debug.log'), {
     flags: 'w',
   });
   var log_stdout = process.stdout;
