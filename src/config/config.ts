@@ -1,6 +1,9 @@
 import * as os from 'os';
 import * as path from 'path';
 
+import { createWriteStream } from 'fs';
+import { format } from 'util';
+
 import { getAppDataPath } from 'appdata-path';
 
 const hashLen = 32;
@@ -32,6 +35,19 @@ if (pkg) {
   serverDataFileTmp = path.join(appDir, 'serverData', 'serverInfo.json');
   postPhotoPartTimeoutTmp = 60000;
   portTmp = '8000';
+
+  var log_file = createWriteStream(path.join(appDir, 'serverData', 'debug.log'), {
+    flags: 'w',
+  });
+  var log_stdout = process.stdout;
+  console.log = function (d) {
+    log_file.write(format(d) + '\n');
+    log_stdout.write(format(d) + '\n');
+  };
+  console.error = function (d) {
+    log_file.write(format(d) + '\n');
+    log_stdout.write(format(d) + '\n');
+  };
 } else if (process.env.NODE_ENV === 'test') {
   sqliteDbFileTmp = ':memory:';
   serverDataFileTmp = path.join('.', 'serverData', 'serverInfo.json');
