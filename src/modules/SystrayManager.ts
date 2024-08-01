@@ -10,6 +10,15 @@ export async function createSystray() {
   }
   systrayCreated = true;
 
+  // if packaged app, Windows app will manage the systray
+  const pkg = (process as any).pkg;
+  if (pkg) {
+    process.stdin.on('data', () => {
+      process.exit(0);
+    });
+    return;
+  }
+
   const result = await fs.readFile(path.join(__dirname, '../../assets/iconSystray.ico'), {
     encoding: 'base64',
   });
