@@ -27,11 +27,11 @@ export async function createSystray() {
     menu: {
       icon: result,
       title: '',
-      tooltip: 'Tips',
+      tooltip: 'Magpy',
       items: [
         {
           title: 'Exit',
-          tooltip: 'bb',
+          tooltip: 'Exit',
           checked: false,
           enabled: true,
         },
