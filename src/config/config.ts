@@ -17,10 +17,11 @@ const MAX_PIXELS_IN_COMPRESSED = 200000;
 const backend_host = 'http://opencloud-server.onrender.com';
 const backend_port = 80;
 
-const serverName = 'MyLocalServer';
-const serverNameMdnsPrefix = 'OpenCloudServer';
+export const serverDefaultName = 'MyLocalServer';
 
 const rootPath = path.join(os.homedir(), 'OpenCloudPhotos');
+
+export const serverDiscoveryPort = 38951;
 
 let serverDataFileTmp = '';
 let sqliteDbFileTmp = '';
@@ -82,8 +83,6 @@ export {
   MAX_PIXELS_IN_COMPRESSED,
   serverDataFile,
   jwtUserExp,
-  serverName,
-  serverNameMdnsPrefix,
   port,
   backend_host,
   backend_port,

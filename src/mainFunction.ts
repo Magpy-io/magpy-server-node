@@ -1,7 +1,7 @@
 import { InitModules } from './config/configModules';
 import { openAndInitDB } from './db/sequelizeDb';
 import { createSystray } from './modules/SystrayManager';
-import { startMdns } from './server/mdnsSetup';
+import { startServerDiscovery } from './server/serverDiscovery';
 import { initServer } from './server/server';
 
 export async function main() {
@@ -9,5 +9,5 @@ export async function main() {
   await openAndInitDB();
   await initServer();
   await createSystray();
-  startMdns();
+  await startServerDiscovery();
 }
