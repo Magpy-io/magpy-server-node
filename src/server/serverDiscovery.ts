@@ -24,7 +24,7 @@ export async function startServerDiscovery(): Promise<void> {
 
     socket.on('listening', function () {
       const address = socket!.address();
-      console.log('UDP socket listening on ' + address.address + ':' + address.port);
+      console.log('Discovery service listening on ' + address.address + ':' + address.port);
       res();
     });
 
