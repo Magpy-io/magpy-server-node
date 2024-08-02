@@ -3,7 +3,7 @@ import { ServerDataType } from './ServerDataType';
 
 export const ServerDataDefault: ServerDataType = {
   storageFolderPath: config.rootPath,
-  serverName: config.serverName,
+  serverName: config.serverDefaultName,
   serverRegisteredInfo: null,
   localClaimInfo: null,
   serverSigningKey: null,
