@@ -46,6 +46,7 @@ export async function startServerDiscovery(): Promise<void> {
       const expectedRequest: DiscoveryRequest = { domain: 'magpy-discovery', type: 'request' };
 
       if (JSON.stringify(request) != JSON.stringify(expectedRequest)) {
+        console.log('invalid discovery message.');
         return;
       }
 
