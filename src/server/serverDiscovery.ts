@@ -34,7 +34,14 @@ export async function startServerDiscovery(): Promise<void> {
         remote.address + ':' + remote.port + ' - ' + message,
       );
 
-      const request = JSON.parse(message.toString());
+      let request: any;
+
+      try {
+        request = JSON.parse(message.toString());
+      } catch (e) {
+        console.log('invalid discovery message.');
+        return;
+      }
 
       const expectedRequest: DiscoveryRequest = { domain: 'magpy-discovery', type: 'request' };
 
