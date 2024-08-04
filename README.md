@@ -22,14 +22,6 @@ sudo npm install
 yarn install
 ```
 
-### Install dependecy for the `mdns` package.
-
-```
-sudo apt-get install libavahi-compat-libdnssd-dev
-```
-
-More information on the package main page.
-
 ## Configuration
 
 Configure the path of your photos. Edit these lines in the file Config/config.js
@@ -54,16 +46,4 @@ yarn clean
 
 ```
 yarn test
-```
-
-## mDNS Debugging
-
-To check if mdns discovery is running correctly, use the following command :
-
-```
-avahi-browse -r -t _http._tcp
-```
-or
-```
-avahi-browse -r --all
 ```
