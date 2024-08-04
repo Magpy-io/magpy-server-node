@@ -27,7 +27,7 @@
     "clean:types": "rimraf ./src/api/export/Types && rimraf ./src/api/Types/RequestTypes",
     "clean:backendQueries": "rimraf ./src/modules/BackendQueries",
     "types": "yarn clean:types && yarn types:generate && yarn types:copy",
-    "package-webpack": "webpack --config webpack.config.js"
+    "bundle": "webpack --config webpack.config.js"
   },
   "dependencies": {
     "@sequelize/core": "^7.0.0-alpha.29",
