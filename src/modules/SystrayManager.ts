@@ -10,9 +10,8 @@ export async function createSystray() {
   }
   systrayCreated = true;
 
-  // if packaged app, Windows app will manage the systray
-  const pkg = (process as any).pkg;
-  if (pkg) {
+  // if bundled app, Windows app will manage the systray
+  if (process.env.NODE_ENV !== 'dev') {
     process.stdin.on('data', () => {
       process.exit(0);
     });

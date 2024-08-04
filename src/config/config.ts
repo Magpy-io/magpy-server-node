@@ -28,10 +28,18 @@ let sqliteDbFileTmp = '';
 let postPhotoPartTimeoutTmp = 0;
 let portTmp = '';
 
-const pkg = (process as any).pkg;
-
-if (pkg) {
-  // Packaged application
+if (process.env.NODE_ENV === 'test') {
+  sqliteDbFileTmp = ':memory:';
+  serverDataFileTmp = path.join('.', 'serverData', 'serverInfo.json');
+  postPhotoPartTimeoutTmp = 1000;
+  portTmp = '0';
+} else if (process.env.NODE_ENV === 'dev') {
+  sqliteDbFileTmp = path.join('.', 'db', 'database.db');
+  serverDataFileTmp = path.join('.', 'serverData', 'serverInfo.json');
+  postPhotoPartTimeoutTmp = 60000;
+  portTmp = '8000';
+} else {
+  // Bundled application
   const appDir = getAppDataPath('magpy');
   sqliteDbFileTmp = path.join(appDir, 'db', 'database.db');
   serverDataFileTmp = path.join(appDir, 'serverData', 'serverInfo.json');
@@ -54,18 +62,6 @@ if (pkg) {
       log_stdout.write(format(d) + '\n');
     };
   });
-} else if (process.env.NODE_ENV === 'test') {
-  sqliteDbFileTmp = ':memory:';
-  serverDataFileTmp = path.join('.', 'serverData', 'serverInfo.json');
-  postPhotoPartTimeoutTmp = 1000;
-  portTmp = '0';
-} else if (process.env.NODE_ENV === 'dev') {
-  sqliteDbFileTmp = path.join('.', 'db', 'database.db');
-  serverDataFileTmp = path.join('.', 'serverData', 'serverInfo.json');
-  postPhotoPartTimeoutTmp = 60000;
-  portTmp = '8000';
-} else {
-  throw new Error('config.ts: App is not packaged and NODE_ENV is not set to a valid value');
 }
 
 const serverDataFile = serverDataFileTmp;
