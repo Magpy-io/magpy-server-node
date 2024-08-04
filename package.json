@@ -93,8 +93,7 @@
       "node_modules/sharp/build/Release/*",
       "node_modules/sharp/vendor/**/*",
       "node_modules/sqlite3/build/Release/*",
-      "client/build/**/*",
-      "assets/**/*"
+      "client/build/**/*"
     ],
     "targets": [
       "node18-win-x64",
