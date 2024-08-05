@@ -6737,7 +6737,7 @@ __metadata:
     typesync: "npm:^0.11.1"
     uuid: "npm:^9.0.0"
   bin:
-    opencloud-server: dist/index.js
+    opencloud-server: dist/src/index.js
   languageName: unknown
   linkType: soft
 

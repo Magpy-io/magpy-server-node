@@ -3,7 +3,7 @@ import { Sequelize } from 'sequelize';
 import { v4 as uuid } from 'uuid';
 
 import { sqliteDbFile } from '../config/config';
-import { createFolder } from '../modules/diskManager';
+import { createFolder } from '../modules/diskBasicFunctions';
 import { filterNull } from '../modules/functions';
 import { DeviceDB, createDevicesModel } from './Devices.model';
 import { PhotoDB, createImageModel } from './Image.model';

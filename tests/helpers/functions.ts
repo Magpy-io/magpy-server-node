@@ -16,7 +16,7 @@ import { postPhotoPartTimeout } from '@src/config/config';
 import * as dbFunction from '@src/db/sequelizeDb';
 import { Photo } from '@src/db/sequelizeDb';
 import * as mockValues from '@src/modules/BackendQueries/__mocks__/mockValues';
-import { pathExists } from '@src/modules/diskManager';
+import { pathExists } from '@src/modules/diskBasicFunctions';
 import { timeout } from '@src/modules/functions';
 import {
   GetServerCredentials,

@@ -3,7 +3,7 @@ import fs from 'fs/promises';
 import * as path from 'path';
 
 import * as config from '../../config/config';
-import { createFolder, pathExists } from '../diskManager';
+import { createFolder, pathExists } from '../diskBasicFunctions';
 import { ServerDataSchema, ServerDataType } from './ServerDataType';
 import { SaveServerDataToCache, ServerDataDefault } from './serverDataCached';
 

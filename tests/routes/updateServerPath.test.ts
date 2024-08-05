@@ -7,7 +7,7 @@ import { describe, expect, it } from '@jest/globals';
 import { Express } from 'express';
 import { UpdateServerPath } from '@src/api/export';
 
-import { createFolder } from '@src/modules/diskManager';
+import { createFolder } from '@src/modules/diskBasicFunctions';
 
 import { GetPathFromRoot } from '@tests/helpers/mockFsVolumeManager';
 import { initServer, stopServer } from '@src/server/server';

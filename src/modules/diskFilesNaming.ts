@@ -1,6 +1,6 @@
 import * as path from 'path';
 
-import { createFolder, pathExists } from './diskManager';
+import { createFolder, pathExists } from './diskBasicFunctions';
 import { GetStorageFolderPath } from './serverDataManager';
 
 type createServerImageNameInputType = { name: string; syncDate: string };

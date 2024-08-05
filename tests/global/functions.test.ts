@@ -20,7 +20,7 @@ import {
   generateId,
 } from '@tests/helpers/functions';
 import * as dbFunction from '@src/db/sequelizeDb';
-import { pathExists } from '@src/modules/diskManager';
+import { pathExists } from '@src/modules/diskBasicFunctions';
 
 import {
   AddWarningPhotosDeleted,

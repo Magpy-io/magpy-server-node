@@ -5,7 +5,7 @@ import { createWriteStream } from 'fs';
 import { format } from 'util';
 
 import { getAppDataPath } from 'appdata-path';
-import { createFolder } from '../modules/diskManager';
+import { createFolder } from '../modules/diskBasicFunctions';
 
 const hashLen = 32;
 const getPhotoPartSize = 100000; //char in base64

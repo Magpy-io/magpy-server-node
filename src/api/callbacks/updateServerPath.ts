@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 
 import assertLocalOrValidUserToken from '../../middleware/assertLocalOrValidUserToken';
-import { folderHasRights, pathExists } from '../../modules/diskManager';
+import { folderHasRights, pathExists } from '../../modules/diskBasicFunctions';
 import { isAbsolutePath } from '../../modules/functions';
 import { SaveStorageFolderPath, GetStorageFolderPath } from '../../modules/serverDataManager';
 import { UpdateServerPath } from '../Types';
