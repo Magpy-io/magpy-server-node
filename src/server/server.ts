@@ -25,19 +25,21 @@ async function initServer() {
   loadEndpoints(app);
   console.log('Endpoints loaded');
 
-  const clientBuildPath = await findClientBuildPath();
+  if (process.env.NODE_ENV !== 'test') {
+    const clientBuildPath = await findClientBuildPath();
 
-  if (!clientBuildPath) {
-    throw new Error('Client build not found.');
+    if (!clientBuildPath) {
+      throw new Error('Client build not found.');
+    }
+
+    // Serve static files from the React app
+    app.use(express.static(clientBuildPath));
+
+    // Catch-all route to serve React app
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(clientBuildPath, 'index.html'));
+    });
   }
-
-  // Serve static files from the React app
-  app.use(express.static(clientBuildPath));
-
-  // Catch-all route to serve React app
-  app.get('*', (req, res) => {
-    res.sendFile(path.join(clientBuildPath, 'index.html'));
-  });
 
   return new Promise<Express>(resolve => {
     server = app.listen(config.port, () => {
