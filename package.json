@@ -9,7 +9,7 @@
     "format": "prettier --write ./src ./tests",
     "start": "yarn start:server",
     "build": "yarn build:server",
-    "package": "yarn build:all && rimraf ./out && pkg .",
+    "package": "yarn build:all && rimraf ./packageOut && pkg .",
     "start:server": "yarn build:server && cross-env NODE_ENV=dev node ./dist/index.js",
     "start:all": "yarn build:all && yarn start:server",
     "types:check": "yarn types:check:src && yarn types:check:tests",
@@ -23,7 +23,7 @@
     "types:generate": "ts-node ./scripts/CreateTypes.ts",
     "types:copy": "ts-node ./scripts/CopyEndpointTypesToExport.ts",
     "clear:images": "cross-env NODE_ENV=dev ts-node ./scripts/clearImages.ts",
-    "convert:exec": "node ./scripts/convert.js out/opencloud-server-win.exe out/opencloud-server-win.exe",
+    "convert:exec": "node ./scripts/convert.js packageOut/opencloud-server-win.exe packageOut/opencloud-server-win.exe",
     "clean:types": "rimraf ./src/api/export/Types && rimraf ./src/api/Types/RequestTypes",
     "clean:backendQueries": "rimraf ./src/modules/BackendQueries",
     "types": "yarn clean:types && yarn types:generate && yarn types:copy",
@@ -99,6 +99,6 @@
       "node18-win-x64",
       "node18-linux-x64"
     ],
-    "outputPath": "out"
+    "outputPath": "packageOut"
   }
 }
