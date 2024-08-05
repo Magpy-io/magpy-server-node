@@ -28,7 +28,7 @@
     "clean:backendQueries": "rimraf ./src/modules/BackendQueries",
     "types": "yarn clean:types && yarn types:generate && yarn types:copy",
     "bundle": "yarn build:all && rimraf ./bundle && yarn bundle:nobuild",
-    "bundle:nobuild": "esbuild ./dist/index.js --platform=node '--external:*.node' --bundle --outfile=bundle/bundle.js"
+    "bundle:nobuild": "esbuild ./dist/index.js --platform=node '--external:*.node' --minify --bundle --outfile=bundle/js/bundle.js"
   },
   "dependencies": {
     "@sequelize/core": "^7.0.0-alpha.29",
