@@ -9,7 +9,6 @@
     "format": "prettier --write ./src ./tests",
     "start": "yarn start:server",
     "build": "yarn build:server",
-    "package": "yarn build:all && rimraf ./packageOut && pkg .",
     "start:server": "yarn build:server && cross-env NODE_ENV=dev node ./dist/src/index.js",
     "start:all": "yarn build:all && yarn start:server",
     "types:check": "yarn types:check:src && yarn types:check:tests",
@@ -23,7 +22,6 @@
     "types:generate": "ts-node ./scripts/CreateTypes.ts",
     "types:copy": "ts-node ./scripts/CopyEndpointTypesToExport.ts",
     "clear:images": "cross-env NODE_ENV=dev ts-node ./scripts/clearImages.ts",
-    "convert:exec": "node ./scripts/convert.js packageOut/opencloud-server-win.exe packageOut/opencloud-server-win.exe",
     "clean:types": "rimraf ./src/api/export/Types && rimraf ./src/api/Types/RequestTypes",
     "clean:backendQueries": "rimraf ./src/modules/BackendQueries",
     "types": "yarn clean:types && yarn types:generate && yarn types:copy",
@@ -52,7 +50,6 @@
     "jsonwebtoken": "^9.0.2",
     "mz": "^2.7.0",
     "network": "^0.6.1",
-    "pkg": "^5.8.1",
     "rimraf": "^5.0.5",
     "sequelize": "patch:sequelize@npm%3A6.37.3#~/.yarn/patches/sequelize-npm-6.37.3-e2e584f609.patch",
     "sharp": "^0.32.6",
@@ -73,7 +70,6 @@
     "@types/ip": "^1",
     "@types/jest": "^29.5.11",
     "babel-jest": "^29.7.0",
-    "create-nodew-exe": "^1.0.10",
     "esbuild": "^0.23.0",
     "esbuild-plugin-copy": "^2.1.1",
     "jest": "^29.7.0",
@@ -85,20 +81,5 @@
     "tslib": "^2.6.2",
     "typescript-parser": "^2.6.1"
   },
-  "packageManager": "yarn@4.0.2",
-  "bin": "dist/src/index.js",
-  "pkg": {
-    "assets": [
-      "node_modules/axios/dist/node/axios.cjs",
-      "node_modules/sharp/build/Release/*",
-      "node_modules/sharp/vendor/**/*",
-      "node_modules/sqlite3/build/Release/*",
-      "client/build/**/*"
-    ],
-    "targets": [
-      "node18-win-x64",
-      "node18-linux-x64"
-    ],
-    "outputPath": "packageOut"
-  }
+  "packageManager": "yarn@4.0.2"
 }
