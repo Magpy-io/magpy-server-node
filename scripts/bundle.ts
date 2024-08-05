@@ -17,12 +17,12 @@ import { copy } from 'esbuild-plugin-copy';
             to: ['../client/build'],
           },
           {
-            from: ['./node_modules/sharp/build/Release/*.node'],
+            from: ['./node_modules/sharp/build/Release/*'],
             to: ['../build/Release'],
           },
           {
-            from: ['./node_modules/sharp/vendor/8.14.5/linux-x64/lib/*'],
-            to: ['../vendor/8.14.5/linux-x64/lib'],
+            from: ['./node_modules/sharp/vendor/**/*'],
+            to: ['../vendor'],
           },
           {
             from: ['./node_modules/sqlite3/build/Release/*.node'],
