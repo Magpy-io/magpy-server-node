@@ -29,7 +29,6 @@ import { copy } from 'esbuild-plugin-copy';
             to: ['../build/Release'],
           },
         ],
-        watch: true,
       }),
     ],
   });
