@@ -6,6 +6,7 @@ import loadEndpoints from '../api/endpointsLoader';
 import * as config from '../config/config';
 import jsonParsingErrorHandler from '../middleware/jsonParsingErrorHandler';
 import FilesWaiting from '../modules/waitingFiles';
+import { findClientBuildPath } from './findClientBuildPath';
 
 let app: Express;
 let server: ReturnType<typeof app.listen>;
@@ -24,12 +25,18 @@ async function initServer() {
   loadEndpoints(app);
   console.log('Endpoints loaded');
 
+  const clientBuildPath = await findClientBuildPath();
+
+  if (!clientBuildPath) {
+    throw new Error('Client build not found.');
+  }
+
   // Serve static files from the React app
-  app.use(express.static(path.join(__dirname, '../..', 'client/build')));
+  app.use(express.static(clientBuildPath));
 
   // Catch-all route to serve React app
   app.get('*', (req, res) => {
-    res.sendFile(path.join(__dirname, '../..', 'client/build', 'index.html'));
+    res.sendFile(path.join(clientBuildPath, 'index.html'));
   });
 
   return new Promise<Express>(resolve => {
