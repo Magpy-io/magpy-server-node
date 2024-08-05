@@ -1,0 +1,7 @@
+diff --git a/lib/sqlite3-binding.js b/lib/sqlite3-binding.js
+index 98d1b91b7baac055dd858d50570074d3d4f6c3d4..3fb655a80e3f3f68151e7767cf314e2125c0fb74 100644
+--- a/lib/sqlite3-binding.js
++++ b/lib/sqlite3-binding.js
+@@ -1 +1 @@
+-module.exports = require('bindings')('node_sqlite3.node');
++module.exports = require("../build/Release/node_sqlite3.node");
