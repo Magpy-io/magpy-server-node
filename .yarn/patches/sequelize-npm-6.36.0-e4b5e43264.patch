@@ -1,0 +1,13 @@
+diff --git a/lib/dialects/sqlite/connection-manager.js b/lib/dialects/sqlite/connection-manager.js
+index 7fe2c7349d6efe59bfb61cb75dd99bab34c0f614..562b23c02cff14accac446528c11b07e92cb9818 100644
+--- a/lib/dialects/sqlite/connection-manager.js
++++ b/lib/dialects/sqlite/connection-manager.js
+@@ -15,7 +15,7 @@ class ConnectionManager extends AbstractConnectionManager {
+       delete this.sequelize.options.host;
+     }
+     this.connections = {};
+-    this.lib = this._loadDialectModule("sqlite3");
++    this.lib = require("sqlite3");
+     this.refreshTypeParser(dataTypes);
+   }
+   async _onProcessExit() {
