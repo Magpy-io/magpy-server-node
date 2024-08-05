@@ -6645,7 +6645,7 @@ __metadata:
     pkg: "npm:^5.8.1"
     prettier: "npm:^3.2.4"
     rimraf: "npm:^5.0.5"
-    sequelize: "npm:^6.36.0"
+    sequelize: "patch:sequelize@npm%3A6.37.3#~/.yarn/patches/sequelize-npm-6.37.3-e2e584f609.patch"
     sharp: "npm:^0.32.6"
     sqlite3: "patch:sqlite3@npm%3A5.1.7#~/.yarn/patches/sqlite3-npm-5.1.7-0efaca1baf.patch"
     supertest: "npm:^6.3.3"
@@ -7470,7 +7470,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"sequelize@npm:^6.36.0":
+"sequelize@npm:6.37.3":
   version: 6.37.3
   resolution: "sequelize@npm:6.37.3"
   dependencies:
@@ -7510,6 +7510,49 @@ __metadata:
     tedious:
       optional: true
   checksum: f6006bbe85d0e9660df410e7d33ff754a60912c5f4b5b0511be9fc3abd83fe83d6a1954814a741916ab8385211aba0a7a6561f3568061154105bb863f1900fa8
+  languageName: node
+  linkType: hard
+
+"sequelize@patch:sequelize@npm%3A6.37.3#~/.yarn/patches/sequelize-npm-6.37.3-e2e584f609.patch":
+  version: 6.37.3
+  resolution: "sequelize@patch:sequelize@npm%3A6.37.3#~/.yarn/patches/sequelize-npm-6.37.3-e2e584f609.patch::version=6.37.3&hash=448d6b"
+  dependencies:
+    "@types/debug": "npm:^4.1.8"
+    "@types/validator": "npm:^13.7.17"
+    debug: "npm:^4.3.4"
+    dottie: "npm:^2.0.6"
+    inflection: "npm:^1.13.4"
+    lodash: "npm:^4.17.21"
+    moment: "npm:^2.29.4"
+    moment-timezone: "npm:^0.5.43"
+    pg-connection-string: "npm:^2.6.1"
+    retry-as-promised: "npm:^7.0.4"
+    semver: "npm:^7.5.4"
+    sequelize-pool: "npm:^7.1.0"
+    toposort-class: "npm:^1.0.1"
+    uuid: "npm:^8.3.2"
+    validator: "npm:^13.9.0"
+    wkx: "npm:^0.5.0"
+  peerDependenciesMeta:
+    ibm_db:
+      optional: true
+    mariadb:
+      optional: true
+    mysql2:
+      optional: true
+    oracledb:
+      optional: true
+    pg:
+      optional: true
+    pg-hstore:
+      optional: true
+    snowflake-sdk:
+      optional: true
+    sqlite3:
+      optional: true
+    tedious:
+      optional: true
+  checksum: e9c6212117799ab8573c81c825962bec103a963bf8a3ad3e8973b530b4eca7899d5b4253be17f1252d57e72e66393d6b8e50d865e7b3869d3cc7cea61fa5092d
   languageName: node
   linkType: hard
 

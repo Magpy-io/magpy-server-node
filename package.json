@@ -54,7 +54,7 @@
     "network": "^0.6.1",
     "pkg": "^5.8.1",
     "rimraf": "^5.0.5",
-    "sequelize": "^6.36.0",
+    "sequelize": "patch:sequelize@npm%3A6.37.3#~/.yarn/patches/sequelize-npm-6.37.3-e2e584f609.patch",
     "sharp": "^0.32.6",
     "sqlite3": "patch:sqlite3@npm%3A5.1.7#~/.yarn/patches/sqlite3-npm-5.1.7-0efaca1baf.patch",
     "ts-node": "^10.9.1",
