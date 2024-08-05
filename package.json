@@ -27,8 +27,8 @@
     "clean:types": "rimraf ./src/api/export/Types && rimraf ./src/api/Types/RequestTypes",
     "clean:backendQueries": "rimraf ./src/modules/BackendQueries",
     "types": "yarn clean:types && yarn types:generate && yarn types:copy",
-    "bundle": "yarn build:all && rimraf ./bundle && yarn bundle:nobuild",
-    "bundle:nobuild": "ts-node ./scripts/bundle.ts"
+    "bundle": "yarn build:all && yarn bundle:nobuild",
+    "bundle:nobuild": "rimraf ./bundle && ts-node ./scripts/bundle.ts"
   },
   "dependencies": {
     "@sequelize/core": "^7.0.0-alpha.29",

@@ -1,5 +1,6 @@
 import { build } from 'esbuild';
 import { copy } from 'esbuild-plugin-copy';
+import fs from 'fs/promises';
 
 (async () => {
   const res = await build({
@@ -32,4 +33,7 @@ import { copy } from 'esbuild-plugin-copy';
       }),
     ],
   });
+
+  const p = require('../package.json');
+  await fs.writeFile('./bundle/.version_' + p.version, '', 'utf-8');
 })();
