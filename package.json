@@ -4,13 +4,13 @@
   "description": "Magpy's Server Project",
   "license": "MIT",
   "version": "0.1.0",
-  "main": "dist/index.js",
+  "main": "dist/src/index.js",
   "scripts": {
     "format": "prettier --write ./src ./tests",
     "start": "yarn start:server",
     "build": "yarn build:server",
     "package": "yarn build:all && rimraf ./packageOut && pkg .",
-    "start:server": "yarn build:server && cross-env NODE_ENV=dev node ./dist/index.js",
+    "start:server": "yarn build:server && cross-env NODE_ENV=dev node ./dist/src/index.js",
     "start:all": "yarn build:all && yarn start:server",
     "types:check": "yarn types:check:src && yarn types:check:tests",
     "types:check:src": "tsc --noEmit && echo No typescript errors found in src",
@@ -86,7 +86,7 @@
     "typescript-parser": "^2.6.1"
   },
   "packageManager": "yarn@4.0.2",
-  "bin": "dist/index.js",
+  "bin": "dist/src/index.js",
   "pkg": {
     "assets": [
       "node_modules/axios/dist/node/axios.cjs",

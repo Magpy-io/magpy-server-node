@@ -4,7 +4,7 @@ import fs from 'fs/promises';
 
 (async () => {
   const res = await build({
-    entryPoints: ['./dist/index.js'],
+    entryPoints: ['./dist/src/index.js'],
     bundle: true,
     minify: true,
     external: ['*.node'],
