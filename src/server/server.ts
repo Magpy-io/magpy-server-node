@@ -18,6 +18,11 @@ let server: Server | null;
 export async function initServer() {
   app = express();
 
+  app.on('error', e => {
+    console.log(e);
+    throw e;
+  });
+
   app.use(
     express.json({
       limit: '50mb',
@@ -46,15 +51,10 @@ export async function initServer() {
   }
 
   return new Promise<Express>(resolve => {
-    server = app
-      .listen(config.port, () => {
-        console.log(`Server is listening on port ${config.port}`);
-        resolve(app);
-      })
-      .on('error', e => {
-        console.log(e);
-        throw e;
-      });
+    server = app.listen(config.port, () => {
+      console.log(`Server is listening on port ${config.port}`);
+      resolve(app);
+    });
   });
 }
 
