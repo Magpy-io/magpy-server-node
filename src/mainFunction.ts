@@ -2,6 +2,7 @@ import { InitModules } from './config/configModules';
 import { openAndInitDB } from './db/sequelizeDb';
 import { startServerDiscovery } from './server/serverDiscovery';
 import { initServer, setupShutdownManager } from './server/server';
+import { setupOpenInterfaceEvent } from './modules/LaunchWebBrowserInterface';
 
 import packageJson from '../package.json';
 
@@ -12,4 +13,5 @@ export async function main() {
   await initServer();
   setupShutdownManager();
   await startServerDiscovery();
+  setupOpenInterfaceEvent();
 }

@@ -51,6 +51,7 @@
     "jsonwebtoken": "^9.0.2",
     "mz": "^2.7.0",
     "network": "^0.6.1",
+    "open": "8.4.2",
     "rimraf": "^5.0.5",
     "sequelize": "patch:sequelize@npm%3A6.37.3#~/.yarn/patches/sequelize-npm-6.37.3-e2e584f609.patch",
     "sharp": "^0.32.6",
