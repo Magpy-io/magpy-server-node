@@ -37,7 +37,7 @@ describe("Test 'checkPhotoExistsAndDeleteMissing' function", () => {
   });
 
   afterAll(async () => {
-    stopServer();
+    await stopServer();
   });
 
   beforeEach(async () => {
@@ -120,7 +120,7 @@ describe('Test "SaveWarningPhotosDeleted" function', () => {
   });
 
   afterAll(async () => {
-    stopServer();
+    await stopServer();
   });
 
   beforeEach(async () => {

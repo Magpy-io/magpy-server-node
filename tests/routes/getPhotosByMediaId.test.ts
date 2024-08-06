@@ -35,7 +35,7 @@ describe("Test 'getPhotosByMediaId' endpoint", () => {
   });
 
   afterAll(async () => {
-    stopServer();
+    await stopServer();
   });
 
   beforeEach(async () => {

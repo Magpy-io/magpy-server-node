@@ -39,7 +39,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
   });
 
   afterAll(async () => {
-    stopServer();
+    await stopServer();
   });
 
   beforeEach(async () => {

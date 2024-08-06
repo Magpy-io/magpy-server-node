@@ -36,7 +36,7 @@ describe("Test 'addPhoto' endpoint", () => {
   });
 
   afterAll(async () => {
-    stopServer();
+    await stopServer();
   });
 
   beforeEach(async () => {

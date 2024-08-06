@@ -35,7 +35,7 @@ describe("Test 'unclaimServer' endpoint", () => {
   });
 
   afterAll(async () => {
-    stopServer();
+    await stopServer();
   });
 
   beforeEach(async () => {

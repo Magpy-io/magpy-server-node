@@ -31,7 +31,7 @@ describe("Test 'claimServerLocal' endpoint", () => {
   });
 
   afterAll(async () => {
-    stopServer();
+    await stopServer();
   });
 
   beforeEach(async () => {
@@ -44,8 +44,8 @@ describe("Test 'claimServerLocal' endpoint", () => {
 
   it('Should return a valid token when asking a locally claimed server', async () => {
     const ret = await GetTokenLocal.Post({
-      username:defaultUsername,
-      password:defaultPassword
+      username: defaultUsername,
+      password: defaultPassword,
     });
 
     expectToBeOk(ret);
@@ -55,26 +55,25 @@ describe("Test 'claimServerLocal' endpoint", () => {
   });
 
   it('Should return SERVER_NOT_CLAIMED when asking a remotly claimed server', async () => {
-
     await UnclaimServer.Post();
 
     await setupServerClaimed();
 
-    const ret = await GetTokenLocal.Post({      
-      username:defaultUsername,
-      password:defaultPassword
+    const ret = await GetTokenLocal.Post({
+      username: defaultUsername,
+      password: defaultPassword,
     });
 
     expectToNotBeOk(ret);
-    expectErrorCodeToBe(ret,'SERVER_NOT_CLAIMED');
+    expectErrorCodeToBe(ret, 'SERVER_NOT_CLAIMED');
   });
 
   it('Should return error SERVER_NOT_CLAIMED when requesting a server not claimed', async () => {
     await UnclaimServer.Post();
 
     const ret = await GetTokenLocal.Post({
-      username:defaultUsername,
-      password:defaultPassword
+      username: defaultUsername,
+      password: defaultPassword,
     });
 
     expectToNotBeOk(ret);
@@ -84,7 +83,7 @@ describe("Test 'claimServerLocal' endpoint", () => {
   it('Should return error INVALID_CREDENTIALS when requesting a server with a wrong username', async () => {
     const ret = await GetTokenLocal.Post({
       username: 'wrong_username',
-      password:defaultPassword
+      password: defaultPassword,
     });
 
     expectToNotBeOk(ret);
@@ -94,7 +93,7 @@ describe("Test 'claimServerLocal' endpoint", () => {
   it('Should return error INVALID_CREDENTIALS when requesting a server with a wrong password', async () => {
     const ret = await GetTokenLocal.Post({
       username: defaultUsername,
-      password:'wrong_password'
+      password: 'wrong_password',
     });
 
     expectToNotBeOk(ret);

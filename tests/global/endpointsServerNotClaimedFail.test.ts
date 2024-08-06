@@ -33,7 +33,7 @@ describe('Test endpoints return error when invalid token', () => {
   });
 
   afterAll(async () => {
-    stopServer();
+    await stopServer();
   });
 
   beforeEach(async () => {

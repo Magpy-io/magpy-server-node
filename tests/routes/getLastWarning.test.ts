@@ -20,7 +20,7 @@ describe("Test 'getLastWarning' endpoint", () => {
   });
 
   afterAll(async () => {
-    stopServer();
+    await stopServer();
   });
 
   beforeEach(async () => {

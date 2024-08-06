@@ -40,7 +40,7 @@ describe('Test endpoints return error when invalid request for endpoint $endpoin
   });
 
   afterAll(async () => {
-    stopServer();
+    await stopServer();
   });
 
   beforeEach(async () => {

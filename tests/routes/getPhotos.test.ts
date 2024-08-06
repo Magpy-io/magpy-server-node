@@ -33,7 +33,7 @@ describe("Test 'getPhotos' endpoint", () => {
   });
 
   afterAll(async () => {
-    stopServer();
+    await stopServer();
   });
 
   beforeEach(async () => {

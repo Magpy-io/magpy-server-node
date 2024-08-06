@@ -32,7 +32,7 @@ describe("Test 'addPhotoInit' endpoint", () => {
   });
 
   afterAll(async () => {
-    stopServer();
+    await stopServer();
   });
 
   beforeEach(async () => {

@@ -25,7 +25,7 @@ describe("Test 'updateServerPath' endpoint", () => {
   });
 
   afterAll(async () => {
-    stopServer();
+    await stopServer();
   });
 
   beforeEach(async () => {

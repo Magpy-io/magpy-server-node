@@ -13,7 +13,13 @@ import * as mockValuesGetIp from '@src/modules/__mocks__/NetworkManagerMockValue
 
 import { initServer, stopServer } from '@src/server/server';
 import * as sac from '@tests/helpers/setupAndCleanup';
-import { expectToBeOk, expectToNotBeOk, expectErrorCodeToBe, setupServerClaimed, setupServerClaimedLocally } from '@tests/helpers/functions';
+import {
+  expectToBeOk,
+  expectToNotBeOk,
+  expectErrorCodeToBe,
+  setupServerClaimed,
+  setupServerClaimedLocally,
+} from '@tests/helpers/functions';
 
 describe("Test 'claimServer' endpoint", () => {
   let app: Express;
@@ -23,7 +29,7 @@ describe("Test 'claimServer' endpoint", () => {
   });
 
   afterAll(async () => {
-    stopServer();
+    await stopServer();
   });
 
   beforeEach(async () => {
@@ -61,7 +67,7 @@ describe("Test 'claimServer' endpoint", () => {
   });
 
   it('Should return error SERVER_ALREADY_CLAIMED when claiming a server already claimed remotly', async () => {
-    await setupServerClaimed()
+    await setupServerClaimed();
 
     const ret = await ClaimServer.Post({
       userToken: mockValues.validUserToken,

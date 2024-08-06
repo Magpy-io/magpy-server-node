@@ -21,7 +21,7 @@ describe("Test 'getNumberPhotos' endpoint", () => {
   });
 
   afterAll(async () => {
-    stopServer();
+    await stopServer();
   });
 
   beforeEach(async () => {

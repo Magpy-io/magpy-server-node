@@ -33,7 +33,7 @@ describe("Test 'getPhotoPartById' endpoint", () => {
   });
 
   afterAll(async () => {
-    stopServer();
+    await stopServer();
   });
 
   beforeEach(async () => {

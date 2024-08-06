@@ -17,7 +17,13 @@ import {
   SaveStorageFolderPath,
   SaveServerName,
 } from '@src/modules/serverDataManager';
-import { defaultUsername, expectToBeOk, getDataFromRet, setupServerClaimed, setupServerClaimedLocally } from '@tests/helpers/functions';
+import {
+  defaultUsername,
+  expectToBeOk,
+  getDataFromRet,
+  setupServerClaimed,
+  setupServerClaimedLocally,
+} from '@tests/helpers/functions';
 
 describe("Test 'getServerInfo' endpoint", () => {
   let app: Express;
@@ -27,7 +33,7 @@ describe("Test 'getServerInfo' endpoint", () => {
   });
 
   afterAll(async () => {
-    stopServer();
+    await stopServer();
   });
 
   beforeEach(async () => {
@@ -39,7 +45,6 @@ describe("Test 'getServerInfo' endpoint", () => {
   });
 
   it('Should return the default server info when claimed remotly', async () => {
-
     await setupServerClaimed();
 
     const ret = await GetServerInfo.Post();
@@ -64,11 +69,9 @@ describe("Test 'getServerInfo' endpoint", () => {
     expect(data.owner.email).toBe(mockValues.validUserEmail);
 
     expect(data.ownerLocal).toBeNull();
-
   });
 
   it('Should return the default server info when claimed locally', async () => {
-
     await setupServerClaimedLocally();
 
     const ret = await GetServerInfo.Post();
@@ -115,5 +118,4 @@ describe("Test 'getServerInfo' endpoint", () => {
     expect(data.owner).toBeNull();
     expect(data.ownerLocal).toBeNull();
   });
-
 });

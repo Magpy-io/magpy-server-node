@@ -57,11 +57,19 @@ function clearFilesWaiting() {
   FilesWaiting.clear();
 }
 
-function stopServer() {
-  clearFilesWaiting();
-  if (server) {
-    server.close();
-  }
+async function stopServer(): Promise<null> {
+  return new Promise((res, rej) => {
+    clearFilesWaiting();
+    if (server) {
+      server.close(err => {
+        if (err) {
+          rej(err);
+        } else {
+          res(null);
+        }
+      });
+    }
+  });
 }
 
 export { initServer, stopServer, clearFilesWaiting };

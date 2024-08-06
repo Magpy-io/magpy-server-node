@@ -34,7 +34,7 @@ describe("Test 'getPhotosById' endpoint", () => {
   });
 
   afterAll(async () => {
-    stopServer();
+    await stopServer();
   });
 
   beforeEach(async () => {

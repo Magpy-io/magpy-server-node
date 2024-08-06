@@ -14,7 +14,15 @@ import * as mockValuesGetIp from '@src/modules/__mocks__/NetworkManagerMockValue
 import { initServer, stopServer } from '@src/server/server';
 import { SaveServerCredentials, SaveServerToken } from '@src/modules/serverDataManager';
 import * as sac from '@tests/helpers/setupAndCleanup';
-import { expectToBeOk, expectToNotBeOk, expectErrorCodeToBe, defaultUsername, defaultPassword, setupServerClaimed, setupServerClaimedLocally } from '@tests/helpers/functions';
+import {
+  expectToBeOk,
+  expectToNotBeOk,
+  expectErrorCodeToBe,
+  defaultUsername,
+  defaultPassword,
+  setupServerClaimed,
+  setupServerClaimedLocally,
+} from '@tests/helpers/functions';
 
 describe("Test 'claimServerLocal' endpoint", () => {
   let app: Express;
@@ -24,7 +32,7 @@ describe("Test 'claimServerLocal' endpoint", () => {
   });
 
   afterAll(async () => {
-    stopServer();
+    await stopServer();
   });
 
   beforeEach(async () => {
@@ -37,8 +45,8 @@ describe("Test 'claimServerLocal' endpoint", () => {
 
   it('Should return ok when claiming a non claimed server', async () => {
     const ret = await ClaimServerLocal.Post({
-      username:defaultUsername,
-      password:defaultPassword,
+      username: defaultUsername,
+      password: defaultPassword,
     });
 
     expectToBeOk(ret);
@@ -46,11 +54,11 @@ describe("Test 'claimServerLocal' endpoint", () => {
   });
 
   it('Should return error SERVER_ALREADY_CLAIMED when claiming a server already claimed remotly', async () => {
-    await setupServerClaimed()
+    await setupServerClaimed();
 
     const ret = await ClaimServerLocal.Post({
-      username:defaultUsername,
-      password:defaultPassword,
+      username: defaultUsername,
+      password: defaultPassword,
     });
     expectToNotBeOk(ret);
     expectErrorCodeToBe(ret, 'SERVER_ALREADY_CLAIMED');
@@ -60,11 +68,10 @@ describe("Test 'claimServerLocal' endpoint", () => {
     await setupServerClaimedLocally();
 
     const ret = await ClaimServerLocal.Post({
-      username:defaultUsername,
-      password:defaultPassword,
+      username: defaultUsername,
+      password: defaultPassword,
     });
     expectToNotBeOk(ret);
     expectErrorCodeToBe(ret, 'SERVER_ALREADY_CLAIMED');
   });
-
 });

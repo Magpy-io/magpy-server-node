@@ -28,7 +28,7 @@ describe("Test 'claimServer' endpoint", () => {
   });
 
   afterAll(async () => {
-    stopServer();
+    await stopServer();
   });
 
   beforeEach(async () => {
@@ -51,7 +51,6 @@ describe("Test 'claimServer' endpoint", () => {
   });
 
   it('Should return SERVER_NOT_CLAIMED when asking a locally claimed server', async () => {
-
     await UnclaimServer.Post();
 
     await setupServerClaimedLocally();
@@ -61,7 +60,7 @@ describe("Test 'claimServer' endpoint", () => {
     });
 
     expectToNotBeOk(ret);
-    expectErrorCodeToBe(ret,'SERVER_NOT_CLAIMED');
+    expectErrorCodeToBe(ret, 'SERVER_NOT_CLAIMED');
   });
 
   it('Should return error AUTHORIZATION_BACKEND_FAILED when using invalid user token', async () => {
