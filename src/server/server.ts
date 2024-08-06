@@ -46,10 +46,15 @@ export async function initServer() {
   }
 
   return new Promise<Express>(resolve => {
-    server = app.listen(config.port, () => {
-      console.log(`Server is listening on port ${config.port}`);
-      resolve(app);
-    });
+    server = app
+      .listen(config.port, () => {
+        console.log(`Server is listening on port ${config.port}`);
+        resolve(app);
+      })
+      .on('error', e => {
+        console.log(e);
+        throw e;
+      });
   });
 }
 
