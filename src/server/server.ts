@@ -8,10 +8,14 @@ import jsonParsingErrorHandler from '../middleware/jsonParsingErrorHandler';
 import FilesWaiting from '../modules/waitingFiles';
 import { findClientBuildPath } from './findClientBuildPath';
 
-let app: Express;
-let server: ReturnType<typeof app.listen>;
+import { GracefulShutdownManager } from '@moebius/http-graceful-shutdown';
+import { Server } from 'http';
+import { stdinEventEmitter } from '../modules/StdinEvents';
 
-async function initServer() {
+let app: Express;
+let server: Server | null;
+
+export async function initServer() {
   app = express();
 
   app.use(
@@ -49,7 +53,38 @@ async function initServer() {
   });
 }
 
-function clearFilesWaiting() {
+export function setupShutdownManager() {
+  console.log('Setting up gracefull termination of server');
+  if (!server) {
+    throw new Error('setupShutdownManager: server not yet initialized');
+  }
+  const shutdownManager = new GracefulShutdownManager(server);
+
+  stdinEventEmitter.on('notification-icon-clicked', e => {
+    if (e == 'exit') {
+      shutdownManager.terminate(() => {
+        console.log('Server was gracefully terminated');
+        process.exit(0);
+      });
+    }
+  });
+
+  process.on('SIGINT', () => {
+    shutdownManager.terminate(() => {
+      console.log('Server is gracefully terminated');
+      process.exit(0);
+    });
+  });
+
+  process.on('SIGTERM', () => {
+    shutdownManager.terminate(() => {
+      console.log('Server is gracefully terminated');
+      process.exit(0);
+    });
+  });
+}
+
+export function clearFilesWaiting() {
   const files = Array.from(FilesWaiting.values());
   files.forEach(file => {
     clearTimeout(file.timeout);
@@ -57,11 +92,12 @@ function clearFilesWaiting() {
   FilesWaiting.clear();
 }
 
-async function stopServer(): Promise<null> {
+export async function stopServer(): Promise<null> {
   return new Promise((res, rej) => {
     clearFilesWaiting();
     if (server) {
       server.close(err => {
+        server = null;
         if (err) {
           rej(err);
         } else {
@@ -71,5 +107,3 @@ async function stopServer(): Promise<null> {
     }
   });
 }
-
-export { initServer, stopServer, clearFilesWaiting };

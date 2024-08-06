@@ -1943,6 +1943,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@moebius/http-graceful-shutdown@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "@moebius/http-graceful-shutdown@npm:1.1.0"
+  checksum: f025383d5eaa255b9dfbb11a88893a7bb2c6eb8ef01b5810b0309017e2ad17ae26fa106b68bd25970e7db8610931b267b9d4e1dfd660f85c5e1f26ed49dc1fef
+  languageName: node
+  linkType: hard
+
 "@nodelib/fs.scandir@npm:2.1.5":
   version: 2.1.5
   resolution: "@nodelib/fs.scandir@npm:2.1.5"
@@ -6389,6 +6396,7 @@ __metadata:
     "@babel/preset-env": "npm:^7.23.5"
     "@babel/preset-typescript": "npm:^7.23.3"
     "@jest/globals": "npm:^29.7.0"
+    "@moebius/http-graceful-shutdown": "npm:^1.1.0"
     "@sequelize/core": "npm:^7.0.0-alpha.29"
     "@trivago/prettier-plugin-sort-imports": "npm:^4.3.0"
     "@types/bcryptjs": "npm:^2"

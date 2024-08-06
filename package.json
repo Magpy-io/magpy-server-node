@@ -29,6 +29,7 @@
     "bundle:nobuild": "rimraf ./bundle && ts-node ./scripts/bundle.ts"
   },
   "dependencies": {
+    "@moebius/http-graceful-shutdown": "^1.1.0",
     "@sequelize/core": "^7.0.0-alpha.29",
     "@types/express": "^4.17.21",
     "@types/jsonwebtoken": "^9.0.5",

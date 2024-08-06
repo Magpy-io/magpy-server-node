@@ -1,3 +1,4 @@
+import { SetupStdinEvents } from '../modules/StdinEvents/';
 import { SetPath } from '../modules/BackendQueries';
 import { LoadConfigFile } from '../modules/serverDataManager';
 import { ClearServerDataFile } from '../modules/serverDataManager/serverDataFileManager';
@@ -10,6 +11,7 @@ export async function InitModules() {
   await LoadConfigFile();
   await clearFilesWaiting();
   ClearAllWarnings();
+  SetupStdinEvents();
 }
 
 export async function ClearModules() {
