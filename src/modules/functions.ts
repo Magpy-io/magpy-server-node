@@ -161,3 +161,11 @@ export function AddWarningPhotosDeleted(photosDeleted: Photo[], userid: string) 
     },
   });
 }
+
+export async function sleep(timeout: number): Promise<null> {
+  return new Promise(res => {
+    setTimeout(() => {
+      res(null);
+    }, timeout);
+  });
+}
