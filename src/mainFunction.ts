@@ -7,7 +7,7 @@ import { setupOpenInterfaceEvent } from './modules/LaunchWebBrowserInterface';
 import packageJson from '../package.json';
 
 export async function main() {
-  console.log('Running Magpy V' + packageJson.version);
+  console.log('Running Magpy v' + packageJson.version);
   await InitModules();
   await openAndInitDB();
   await initServer();
