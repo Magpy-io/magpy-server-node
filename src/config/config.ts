@@ -36,7 +36,7 @@ if (process.env.NODE_ENV === 'test') {
   portTmp = '31803';
 } else {
   // Bundled application
-  const appDir = getAppDataPath('magpy');
+  const appDir = getAppDataPath('Magpy');
   sqliteDbFileTmp = path.join(appDir, 'db', 'database.db');
   serverDataFileTmp = path.join(appDir, 'serverData', 'serverInfo.json');
   postPhotoPartTimeoutTmp = 60000;
