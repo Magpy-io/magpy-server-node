@@ -2,7 +2,7 @@ import { build } from 'esbuild';
 import { copy } from 'esbuild-plugin-copy';
 import fs from 'fs/promises';
 
-(async () => {
+async function bundle() {
   const res = await build({
     entryPoints: ['./dist/src/index.js'],
     bundle: true,
@@ -36,4 +36,13 @@ import fs from 'fs/promises';
 
   const p = require('../package.json');
   await fs.writeFile('./bundle/.version_' + p.version, '', 'utf-8');
-})();
+}
+
+bundle()
+  .then(() => {
+    console.log('Finished bundling project.');
+  })
+  .catch(err => {
+    console.log('Error while bundling project.');
+    console.log(err);
+  });

@@ -11,9 +11,13 @@ async function ResetServer() {
   await clearDbFile();
   console.log('database cleared');
   await clearImagesDisk();
-  console.log('storage directory cleared.');
 }
 
-ResetServer().catch(err => {
-  console.log(err);
-});
+ResetServer()
+  .then(() => {
+    console.log('storage directory cleared.');
+  })
+  .catch(err => {
+    console.log('Error while clearing storage directory');
+    console.log(err);
+  });

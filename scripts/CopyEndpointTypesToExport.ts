@@ -48,4 +48,11 @@ async function RemovedJoiSchemasFromTypes(outputPathAbsolute: string) {
   }
 }
 
-copyFiles();
+copyFiles()
+  .then(() => {
+    console.log('Finished copying endpoint types');
+  })
+  .catch(err => {
+    console.log('Error while copying endpoint types');
+    console.log(err);
+  });

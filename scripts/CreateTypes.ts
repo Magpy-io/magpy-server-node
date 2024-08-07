@@ -143,4 +143,11 @@ async function verifyFileDeclarations(filePath: string) {
   }
 }
 
-types();
+types()
+  .then(() => {
+    console.log('Finished creating endpoint types');
+  })
+  .catch(err => {
+    console.log('Error while creating endpoint types');
+    console.log(err);
+  });
