@@ -33,14 +33,14 @@ if (process.env.NODE_ENV === 'test') {
   sqliteDbFileTmp = path.join('.', 'db', 'database.db');
   serverDataFileTmp = path.join('.', 'serverData', 'serverInfo.json');
   postPhotoPartTimeoutTmp = 60000;
-  portTmp = '37067';
+  portTmp = '31803';
 } else {
   // Bundled application
   const appDir = getAppDataPath('magpy');
   sqliteDbFileTmp = path.join(appDir, 'db', 'database.db');
   serverDataFileTmp = path.join(appDir, 'serverData', 'serverInfo.json');
   postPhotoPartTimeoutTmp = 60000;
-  portTmp = '37067';
+  portTmp = '31803';
 }
 
 const serverDataFile = serverDataFileTmp;
