@@ -1,11 +1,7 @@
 import * as os from 'os';
 import * as path from 'path';
 
-import { createWriteStream } from 'fs';
-import { format } from 'util';
-
 import { getAppDataPath } from 'appdata-path';
-import { createFolder } from '../modules/diskBasicFunctions';
 
 const hashLen = 32;
 const getPhotoPartSize = 100000; //char in base64
@@ -45,23 +41,6 @@ if (process.env.NODE_ENV === 'test') {
   serverDataFileTmp = path.join(appDir, 'serverData', 'serverInfo.json');
   postPhotoPartTimeoutTmp = 60000;
   portTmp = '8000';
-
-  const logsFilePath = path.join(appDir, 'logs', 'debug.log');
-  const logsFilePathParsed = path.parse(logsFilePath);
-  createFolder(logsFilePathParsed.dir).then(() => {
-    var log_file = createWriteStream(logsFilePath, {
-      flags: 'w',
-    });
-    var log_stdout = process.stdout;
-    console.log = function (d) {
-      log_file.write(format(d) + '\n');
-      log_stdout.write(format(d) + '\n');
-    };
-    console.error = function (d) {
-      log_file.write(format(d) + '\n');
-      log_stdout.write(format(d) + '\n');
-    };
-  });
 }
 
 const serverDataFile = serverDataFileTmp;
