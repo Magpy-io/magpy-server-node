@@ -12,6 +12,10 @@ export function SetupStdinEvents() {
       } else if (stdinEvent.name == 'ABOUT') {
         stdinEventEmitter.emit('notification-icon-clicked', 'about');
       }
+    } else if (stdinEvent.source == 'ACTION') {
+      if (stdinEvent.name == 'OPEN_WEB_INTERFACE') {
+        stdinEventEmitter.emit('action', 'open-interface');
+      }
     }
   });
 }

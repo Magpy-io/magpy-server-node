@@ -2,6 +2,7 @@ import EventEmitter from 'events';
 
 export type StdinEventEmitterTypes = {
   'notification-icon-clicked': [arg: 'exit' | 'about'];
+  action: [arg: 'open-interface'];
 };
 
 export class StdinEventEmitter {
