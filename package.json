@@ -26,7 +26,7 @@
     "clean:backendQueries": "rimraf ./src/modules/BackendQueries",
     "types": "yarn clean:types && yarn types:generate && yarn types:copy",
     "bundle": "yarn build:server && rimraf ./bundle && ts-node ./scripts/bundle.ts && yarn bundle:copy",
-    "bundle:copy": "ts-node ./scripts/CopyFolder.ts ./bundle ../MagpyServerWindows/MagpyServerWindows/bin/Debug/bundle"
+    "bundle:copy": "ts-node ./scripts/CopyFolder.ts ./bundle ../MagpyServerWindows/MagpyServerWindows/bin/Debug/bundle && ts-node ./scripts/CopyFolder.ts ./bundle ../MagpyServerWindows/MagpyServerWindows/bin/Release/bundle"
   },
   "dependencies": {
     "@moebius/http-graceful-shutdown": "^1.1.0",
