@@ -5,6 +5,7 @@ import { ClearServerDataFile } from '../modules/serverDataManager/serverDataFile
 import { ClearAllWarnings } from '../modules/warningsManager';
 import { clearFilesWaiting } from '../server/server';
 import * as config from './config';
+import { createPhotosDir } from '../modules/diskManager';
 
 export async function InitModules() {
   SetPath(config.backend_host + ':' + config.backend_port);
@@ -12,6 +13,7 @@ export async function InitModules() {
   await clearFilesWaiting();
   ClearAllWarnings();
   SetupStdinEvents();
+  await createPhotosDir();
 }
 
 export async function ClearModules() {

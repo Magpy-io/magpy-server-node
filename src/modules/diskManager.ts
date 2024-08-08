@@ -18,8 +18,12 @@ interface AddPhotoParamType {
   serverThumbnailPath: string;
 }
 
+export async function createPhotosDir() {
+  await createFolder(GetStorageFolderPath());
+}
+
 export async function addPhotoToDisk<T extends AddPhotoParamType>(photo: T, base64: string) {
-  await createFolder(path.parse(photo.serverPath).dir);
+  await createPhotosDir();
 
   const factorForThumbnail = Math.sqrt(
     (photo.width * photo.height) / config.MAX_PIXELS_IN_THUMBNAIL,
