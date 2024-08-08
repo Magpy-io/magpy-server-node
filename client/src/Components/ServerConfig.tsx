@@ -88,16 +88,26 @@ export default function ServerConfig() {
 
   const onSubmit = async (data: {
     name: string | undefined | false;
+    path: string | undefined | false;
   }) => {
     console.log(data);
-    if (data.name) {
+    if (data.name && data.path) {
       try {
         const updateNameRes = await UpdateServerName.Post({
           name: data.name,
         });
+        const updatePathRes = await UpdateServerPath.Post({
+          path: data.path,
+        });
         if (updateNameRes && !updateNameRes.ok) {
           setFailedRequests(prev => {
             prev.push(updateNameRes.errorCode);
+            return prev;
+          });
+        }
+        if (updatePathRes && !updatePathRes.ok) {
+          setFailedRequests(prev => {
+            prev.push(updatePathRes.errorCode);
             return prev;
           });
         }
@@ -115,6 +125,7 @@ export default function ServerConfig() {
       <FormProvider {...methods}>
         <Title />
         <ServerNameInput />
+        <ServerPathInput onClearPhotos={onClearPhotos} />
         <ServerOwner onClearOwner={onClearOwner} owner={owner}  />
         <SaveButton disabled={false} onSubmit={methods.handleSubmit(onSubmit)} />
       </FormProvider>
