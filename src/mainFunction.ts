@@ -8,7 +8,7 @@ import packageJson from '../package.json';
 import { setupExceptionsHandler } from './modules/ErrorHandler';
 
 export async function main() {
-  console.log('Running Magpy v' + packageJson.version);
+  console.log('Running Magpy Server v' + packageJson.version);
   setupExceptionsHandler();
   await InitModules();
   await openAndInitDB();
