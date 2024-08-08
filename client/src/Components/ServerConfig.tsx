@@ -17,19 +17,17 @@ import ServerPathInput from './ServerPathInput';
 
 export type Owner = {
   name: string;
-  email: string;
+  email?: string;
 };
-
-type ErrorTypes =
-  | UpdateServerPath.ResponseErrorTypes
-  | UpdateServerName.ResponseErrorTypes
-  | UnclaimServer.ResponseErrorTypes;
 
 export default function ServerConfig() {
   const [data, setData] = useState<GetServerInfo.ResponseType>();
   const [failedRequests, setFailedRequests] = useState<string[]>([]);
 
-  const owner = data?.ok ? data.data.owner : null;
+  const ownerRemote = data?.ok ? data.data.owner : null;
+  const ownerLocal = data?.ok ? data.data.ownerLocal : null;
+
+  const owner = ownerRemote ?? ownerLocal;
 
   console.log('failedRequests', failedRequests);
 
@@ -128,7 +126,7 @@ export default function ServerConfig() {
         <Title />
         <ServerNameInput />
         <ServerPathInput onClearPhotos={onClearPhotos} />
-        <ServerOwner onClearOwner={onClearOwner} owner={owner} />
+        <ServerOwner onClearOwner={onClearOwner} owner={owner}  />
         <SaveButton disabled={false} onSubmit={methods.handleSubmit(onSubmit)} />
       </FormProvider>
       {hasFailedRequests && (
