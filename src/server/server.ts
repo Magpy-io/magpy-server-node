@@ -12,6 +12,8 @@ import { GracefulShutdownManager } from '@moebius/http-graceful-shutdown';
 import { Server } from 'http';
 import { stdinEventEmitter } from '../modules/StdinEvents';
 
+import cors from 'cors';
+
 let app: Express;
 let server: Server | null;
 
@@ -22,6 +24,8 @@ export async function initServer() {
     console.log(e);
     throw e;
   });
+
+  app.use(cors());
 
   app.use(
     express.json({
