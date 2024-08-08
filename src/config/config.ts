@@ -15,7 +15,7 @@ const backend_port = 80;
 
 export const serverDefaultName = 'MyLocalServer';
 
-const rootPath = path.join(os.homedir(), 'OpenCloudPhotos');
+const rootPath = path.join(os.homedir(), 'Magpy Photos');
 
 export const serverDiscoveryPort = 38951;
 
