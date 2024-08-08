@@ -13,7 +13,7 @@ import {
 import SaveButton from './SaveButton';
 import ServerNameInput from './ServerNameInput';
 import ServerOwner from './ServerOwner';
-import ServerPathInput from './ServerPathInput';
+import ServerPath from './ServerPath';
 
 export type Owner = {
   name: string;
@@ -26,6 +26,7 @@ export default function ServerConfig() {
 
   const ownerRemote = data?.ok ? data.data.owner : null;
   const ownerLocal = data?.ok ? data.data.ownerLocal : null;
+  const serverPath = data?.ok ? data.data.storagePath : "Path not found";
 
   const owner = ownerRemote ?? ownerLocal;
 
@@ -88,26 +89,16 @@ export default function ServerConfig() {
 
   const onSubmit = async (data: {
     name: string | undefined | false;
-    path: string | undefined | false;
   }) => {
     console.log(data);
-    if (data.name && data.path) {
+    if (data.name) {
       try {
         const updateNameRes = await UpdateServerName.Post({
           name: data.name,
         });
-        const updatePathRes = await UpdateServerPath.Post({
-          path: data.path,
-        });
         if (updateNameRes && !updateNameRes.ok) {
           setFailedRequests(prev => {
             prev.push(updateNameRes.errorCode);
-            return prev;
-          });
-        }
-        if (updatePathRes && !updatePathRes.ok) {
-          setFailedRequests(prev => {
-            prev.push(updatePathRes.errorCode);
             return prev;
           });
         }
@@ -125,7 +116,7 @@ export default function ServerConfig() {
       <FormProvider {...methods}>
         <Title />
         <ServerNameInput />
-        <ServerPathInput onClearPhotos={onClearPhotos} />
+        <ServerPath path={serverPath} />
         <ServerOwner onClearOwner={onClearOwner} owner={owner}  />
         <SaveButton disabled={false} onSubmit={methods.handleSubmit(onSubmit)} />
       </FormProvider>
