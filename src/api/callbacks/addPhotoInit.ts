@@ -5,7 +5,7 @@ import { postPhotoPartTimeout } from '../../config/config';
 import assertUserToken from '../../middleware/userToken/assertUserToken';
 import { addServerImagePaths } from '../../modules/diskFilesNaming';
 import FilesWaiting from '../../modules/waitingFiles';
-import { AddPhotoInit } from '../Types';
+import { AddPhotoInit, APIPhoto } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 import { checkPhotoExistsAndDeleteMissing } from '../../modules/functions';
@@ -32,8 +32,14 @@ const callback = async (
 
     if (photoExists.exists) {
       console.log('Photo exists in db');
+
+      const jsonResponse = {
+        photo: responseFormatter.createPhotoObject(photoExists.exists, ''),
+        photoExistsBefore: true as true,
+      };
+
       console.log('Sending response message.');
-      return sendFailedMessage(res, `Photo already exists`, 'PHOTO_EXISTS');
+      return sendResponse(res, jsonResponse);
     }
 
     const photo = {
@@ -70,7 +76,7 @@ const callback = async (
       photo: photo,
     });
     console.log('Sending response message.');
-    return sendResponse(res, { id: id });
+    return sendResponse(res, { id: id, photoExistsBefore: false });
   } catch (err) {
     console.error(err);
     return responseFormatter.sendErrorMessage(res);

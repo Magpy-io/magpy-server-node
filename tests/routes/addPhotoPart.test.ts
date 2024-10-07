@@ -61,7 +61,12 @@ describe("Test 'addPhotoPart' endpoint", () => {
       throw 'Error starting photo transfer';
     }
 
-    const id = getDataFromRet(retInit).id;
+    const dataInit = getDataFromRet(retInit);
+    if (dataInit.photoExistsBefore) {
+      throw new Error('Unexpected value.');
+    }
+
+    const id = dataInit.id;
     expect(FilesWaiting.size).toBe(1);
 
     let ret = await AddPhotoPart.Post({
@@ -111,9 +116,12 @@ describe("Test 'addPhotoPart' endpoint", () => {
     expect(data.lenWaiting).toBe(imageBase64Parts.photoLen);
     expect(data.lenReceived).toBe(imageBase64Parts.photoLen);
 
+    expect(data.done).toBe(true);
     if (!data.done) {
       throw new Error();
     }
+
+    expect(data.photoExistsBefore).toBe(false);
 
     testPhotoMetaAndId(data.photo);
     await testPhotosExistInDbAndDisk(data.photo);
@@ -150,7 +158,12 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     expect(FilesWaiting.size).toBe(1);
 
-    const id = getDataFromRet(retInit).id;
+    const dataInit = getDataFromRet(retInit);
+    if (dataInit.photoExistsBefore) {
+      throw new Error('Unexpected value.');
+    }
+
+    const id = dataInit.id;
 
     await waitForPhotoTransferToFinish();
 
@@ -183,7 +196,12 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
     expect(FilesWaiting.size).toBe(1);
 
-    const id = getDataFromRet(retInit).id;
+    const dataInit = getDataFromRet(retInit);
+    if (dataInit.photoExistsBefore) {
+      throw new Error('Unexpected value.');
+    }
+
+    const id = dataInit.id;
 
     let ret = await AddPhotoPart.Post({
       id: id,
@@ -227,7 +245,12 @@ describe("Test 'addPhotoPart' endpoint", () => {
       throw 'Error starting photo transfer';
     }
 
-    const id = getDataFromRet(retInit).id;
+    const dataInit = getDataFromRet(retInit);
+    if (dataInit.photoExistsBefore) {
+      throw new Error('Unexpected value.');
+    }
+
+    const id = dataInit.id;
 
     const ret = await AddPhotoPart.Post({
       id: id,
@@ -251,7 +274,12 @@ describe("Test 'addPhotoPart' endpoint", () => {
       throw 'Error starting photo transfer';
     }
 
-    const id = getDataFromRet(retInit).id;
+    const dataInit = getDataFromRet(retInit);
+    if (dataInit.photoExistsBefore) {
+      throw new Error('Unexpected value.');
+    }
+
+    const id = dataInit.id;
 
     expect(FilesWaiting.size).toBe(1);
 
@@ -289,7 +317,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
     expect(FilesWaiting.size).toBe(0);
   });
 
-  it('Should return error PHOTO_EXISTS and not add photo if tried to add same mediaId and deviceUniqueId twice', async () => {
+  it('Should return photoExistsBefore true and not add photo if tried to add same mediaId and deviceUniqueId twice', async () => {
     const { image64: _, ...photo } = defaultPhoto;
 
     const requestPhoto = { ...photo, image64Len: imageBase64Parts.photoLen };
@@ -300,7 +328,12 @@ describe("Test 'addPhotoPart' endpoint", () => {
       throw 'Error starting photo transfer';
     }
 
-    const id = getDataFromRet(retInit).id;
+    const dataInit = getDataFromRet(retInit);
+    if (dataInit.photoExistsBefore) {
+      throw new Error('Unexpected value.');
+    }
+
+    const id = dataInit.id;
     expect(FilesWaiting.size).toBe(1);
 
     let ret = await AddPhotoPart.Post({
@@ -329,8 +362,20 @@ describe("Test 'addPhotoPart' endpoint", () => {
       photoPart: imageBase64Parts.photoImage64Part3,
     });
 
-    expectToNotBeOk(ret);
-    expectErrorCodeToBe(ret, 'PHOTO_EXISTS');
+    expectToBeOk(ret);
+    const data = getDataFromRet(ret);
+
+    expect(data.done).toBe(true);
+    if (!data.done) {
+      throw new Error();
+    }
+
+    expect(data.photoExistsBefore).toBe(true);
+    if (!data.photoExistsBefore) {
+      throw new Error('Unexpected value.');
+    }
+
+    testPhotoMetaAndId(data.photo);
 
     const retNumberPhotos = await GetNumberPhotos.Post();
 
@@ -364,7 +409,12 @@ describe("Test 'addPhotoPart' endpoint", () => {
         throw 'Error starting photo transfer';
       }
 
-      const id = getDataFromRet(retInit).id;
+      const dataInit = getDataFromRet(retInit);
+      if (dataInit.photoExistsBefore) {
+        throw new Error('Unexpected value.');
+      }
+
+      const id = dataInit.id;
       expect(FilesWaiting.size).toBe(1);
 
       let ret = await AddPhotoPart.Post({

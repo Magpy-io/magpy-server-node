@@ -20,6 +20,7 @@ import {
   addPhoto,
   expectToNotBeOk,
   expectErrorCodeToBe,
+  testPhotoMetaAndId,
 } from '@tests/helpers/functions';
 import * as imageBase64Parts from '@tests/helpers/imageBase64Parts';
 import FilesWaiting from '@src/modules/waitingFiles';
@@ -54,6 +55,12 @@ describe("Test 'addPhotoInit' endpoint", () => {
 
     const data = getDataFromRet(ret);
 
+    expect(data.photoExistsBefore).toBe(false);
+
+    if (data.photoExistsBefore) {
+      throw new Error('Unexpected value.');
+    }
+
     const validId = validate(data.id);
     expect(validId).toBe(true);
 
@@ -64,7 +71,7 @@ describe("Test 'addPhotoInit' endpoint", () => {
     expect(FilesWaiting.size).toBe(0);
   });
 
-  it('Should return error PHOTO_EXISTS if tried to add same mediaId and deviceUniqueId twice', async () => {
+  it('Should return photoExistsBefore true if tried to add same mediaId and deviceUniqueId twice', async () => {
     await addPhoto();
 
     const { image64: _, ...photo } = defaultPhoto;
@@ -72,7 +79,14 @@ describe("Test 'addPhotoInit' endpoint", () => {
 
     const ret = await AddPhotoInit.Post(requestPhoto);
 
-    expectToNotBeOk(ret);
-    expectErrorCodeToBe(ret, 'PHOTO_EXISTS');
+    expectToBeOk(ret);
+    const data = getDataFromRet(ret);
+    expect(data.photoExistsBefore).toBe(true);
+
+    if (!data.photoExistsBefore) {
+      throw new Error('Unexpected value.');
+    }
+
+    testPhotoMetaAndId(data.photo);
   });
 });
