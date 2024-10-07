@@ -72,9 +72,9 @@ export async function checkPhotoExistsAndDeleteMissing(
       }
     | { mediaId: string; deviceUniqueId: string },
 ): Promise<
-  | { exists: false; deleted: Photo; warning: true }
-  | { exists: false; deleted: null; warning: false }
-  | { exists: true; deleted: null; warning: false }
+  | { exists: null; deleted: Photo; warning: true }
+  | { exists: null; deleted: null; warning: false }
+  | { exists: Photo; deleted: null; warning: false }
 > {
   let photo: Photo | null;
 
@@ -85,7 +85,7 @@ export async function checkPhotoExistsAndDeleteMissing(
   }
 
   if (!photo) {
-    return { exists: false, deleted: null, warning: false };
+    return { exists: null, deleted: null, warning: false };
   }
 
   const existsDisk = await isPhotoOnDisk(photo);
@@ -96,10 +96,10 @@ export async function checkPhotoExistsAndDeleteMissing(
     );
     await removePhotoVariationsFromDisk(photo);
     await deletePhotoByIdFromDB(photo.id);
-    return { exists: false, deleted: photo, warning: true };
+    return { exists: null, deleted: photo, warning: true };
   }
 
-  return { exists: true, deleted: null, warning: false };
+  return { exists: photo, deleted: null, warning: false };
 }
 
 /**
