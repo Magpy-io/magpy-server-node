@@ -26,7 +26,7 @@ export default function ServerConfig() {
 
   const ownerRemote = data?.ok ? data.data.owner : null;
   const ownerLocal = data?.ok ? data.data.ownerLocal : null;
-  const serverPath = data?.ok ? data.data.storagePath : "Path not found";
+  const serverPath = data?.ok ? data.data.storagePath : 'Path not found';
 
   const owner = ownerRemote ?? ownerLocal;
 
@@ -87,9 +87,7 @@ export default function ServerConfig() {
     methods.reset(initialValues);
   }, [initialValues, methods]);
 
-  const onSubmit = async (data: {
-    name: string | undefined | false;
-  }) => {
+  const onSubmit = async (data: { name: string | undefined | false }) => {
     console.log(data);
     if (data.name) {
       try {
@@ -98,8 +96,7 @@ export default function ServerConfig() {
         });
         if (updateNameRes && !updateNameRes.ok) {
           setFailedRequests(prev => {
-            prev.push(updateNameRes.errorCode);
-            return prev;
+            return [...prev, updateNameRes.message];
           });
         }
       } catch {
@@ -117,7 +114,7 @@ export default function ServerConfig() {
         <Title />
         <ServerNameInput />
         <ServerPath path={serverPath} />
-        <ServerOwner onClearOwner={onClearOwner} owner={owner}  />
+        <ServerOwner onClearOwner={onClearOwner} owner={owner} />
         <SaveButton disabled={false} onSubmit={methods.handleSubmit(onSubmit)} />
       </FormProvider>
       {hasFailedRequests && (
