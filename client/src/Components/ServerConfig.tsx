@@ -4,12 +4,7 @@ import { Alert } from 'flowbite-react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { HiInformationCircle } from 'react-icons/hi';
 
-import {
-  GetServerInfo,
-  UnclaimServer,
-  UpdateServerName,
-  UpdateServerPath,
-} from '../ServerQueries';
+import { GetServerInfo, UnclaimServer, UpdateServerName } from '../ServerQueries';
 import SaveButton from './SaveButton';
 import ServerNameInput from './ServerNameInput';
 import ServerOwner from './ServerOwner';
@@ -52,10 +47,6 @@ export default function ServerConfig() {
   useEffect(() => {
     console.log('failedRequest useEffect', failedRequests);
   }, [failedRequests]);
-
-  const onClearPhotos = () => {
-    console.log('clear photos');
-  };
 
   const onClearOwner = async () => {
     console.log('clear owner');
