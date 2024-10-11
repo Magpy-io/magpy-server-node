@@ -7,6 +7,7 @@ import SaveButton from './SaveButton';
 import ServerNameInput from './ServerNameInput';
 import ServerOwner from './ServerOwner';
 import ServerPath from './ServerPath';
+import { ErrorServerUnreachable } from '../ServerQueries/ExceptionsManager';
 
 export type Owner = {
   name: string;
@@ -24,23 +25,52 @@ export default function ServerConfig() {
 
   useEffect(() => {
     async function fetchData() {
+      console.log('fetching data');
       try {
         const ret = await GetServerInfo.Post();
+
+        if (!ret.ok) {
+          console.log(ret);
+          return;
+        }
+
         setData(ret);
-      } catch {}
+      } catch (err) {
+        if (err instanceof ErrorServerUnreachable) {
+          console.log('server not responding');
+        } else {
+          console.log('unexpected error');
+        }
+      }
     }
     fetchData();
   }, []);
 
   const onClearOwner = async () => {
     console.log('clear owner');
-    const unclaimRes = await UnclaimServer.Post().catch(console.log);
-    if (unclaimRes && !unclaimRes.ok) {
-      console.log('error');
-    }
-    if (unclaimRes && unclaimRes.ok) {
-      const ret = await GetServerInfo.Post().catch(console.log);
-      if (ret) setData(ret);
+
+    try {
+      const retUnclaimServer = await UnclaimServer.Post();
+
+      if (!retUnclaimServer.ok) {
+        console.log(retUnclaimServer);
+        return;
+      }
+
+      const ret = await GetServerInfo.Post();
+
+      if (!ret.ok) {
+        console.log(ret);
+        return;
+      }
+
+      setData(ret);
+    } catch (err) {
+      if (err instanceof ErrorServerUnreachable) {
+        console.log('server not responding');
+      } else {
+        console.log('unexpected error');
+      }
     }
   };
 
@@ -60,16 +90,24 @@ export default function ServerConfig() {
   }, [initialValues, methods]);
 
   const onSubmit = async (data: { name: string | undefined | false }) => {
-    console.log(data);
+    console.log('onSubmit');
     if (data.name) {
       try {
-        const updateNameRes = await UpdateServerName.Post({
+        const updateNameRet = await UpdateServerName.Post({
           name: data.name,
         });
-        if (updateNameRes && !updateNameRes.ok) {
+
+        if (!updateNameRet.ok) {
           console.log('error');
+          return;
         }
-      } catch {}
+      } catch (err) {
+        if (err instanceof ErrorServerUnreachable) {
+          console.log('server not responding');
+        } else {
+          console.log('unexpected error');
+        }
+      }
     }
   };
 
