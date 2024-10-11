@@ -2,12 +2,18 @@ import { useEffect, useMemo, useState } from 'react';
 
 import { FormProvider, useForm } from 'react-hook-form';
 
+import { useThemeMode } from 'flowbite-react';
+
 import { GetServerInfo, UnclaimServer, UpdateServerName } from '../ServerQueries';
 import SaveButton from './SaveButton';
 import ServerNameInput from './ServerNameInput';
 import ServerOwner from './ServerOwner';
 import ServerPath from './ServerPath';
 import { ErrorServerUnreachable } from '../ServerQueries/ExceptionsManager';
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import '../toastOverride.css';
 
 export type Owner = {
   name: string;
@@ -23,6 +29,20 @@ export default function ServerConfig() {
 
   const owner = ownerRemote ?? ownerLocal;
 
+  const themeMode = useThemeMode();
+
+  const theme = themeMode.mode === 'auto' ? 'light' : themeMode.mode;
+
+  const onException = (err: unknown) => {
+    if (err instanceof ErrorServerUnreachable) {
+      console.log('Server unreachable');
+      toast.error('Cannot reach server, make sure it is running.');
+    } else {
+      console.log('Unexpected error');
+      toast.error('Unexpected error');
+    }
+  };
+
   useEffect(() => {
     async function fetchData() {
       console.log('fetching data');
@@ -31,16 +51,13 @@ export default function ServerConfig() {
 
         if (!ret.ok) {
           console.log(ret);
+          toast.error('Error fetching server info.');
           return;
         }
 
         setData(ret);
       } catch (err) {
-        if (err instanceof ErrorServerUnreachable) {
-          console.log('server not responding');
-        } else {
-          console.log('unexpected error');
-        }
+        onException(err);
       }
     }
     fetchData();
@@ -54,6 +71,7 @@ export default function ServerConfig() {
 
       if (!retUnclaimServer.ok) {
         console.log(retUnclaimServer);
+        toast.error('Error removing server owner.');
         return;
       }
 
@@ -61,16 +79,13 @@ export default function ServerConfig() {
 
       if (!ret.ok) {
         console.log(ret);
+        toast.error('Error fetching server info.');
         return;
       }
 
       setData(ret);
     } catch (err) {
-      if (err instanceof ErrorServerUnreachable) {
-        console.log('server not responding');
-      } else {
-        console.log('unexpected error');
-      }
+      onException(err);
     }
   };
 
@@ -91,6 +106,7 @@ export default function ServerConfig() {
 
   const onSubmit = async (data: { name: string | undefined | false }) => {
     console.log('onSubmit');
+
     if (data.name) {
       try {
         const updateNameRet = await UpdateServerName.Post({
@@ -99,14 +115,18 @@ export default function ServerConfig() {
 
         if (!updateNameRet.ok) {
           console.log('error');
+
+          if (updateNameRet.errorCode === 'INVALID_NAME') {
+            toast.error('Error updating server name. Name is not valid.');
+          } else {
+            toast.error('Error updating server name.');
+          }
           return;
         }
+
+        toast.success('Server info saved.');
       } catch (err) {
-        if (err instanceof ErrorServerUnreachable) {
-          console.log('server not responding');
-        } else {
-          console.log('unexpected error');
-        }
+        onException(err);
       }
     }
   };
@@ -120,6 +140,18 @@ export default function ServerConfig() {
         <ServerOwner onClearOwner={onClearOwner} owner={owner} />
         <SaveButton disabled={false} onSubmit={methods.handleSubmit(onSubmit)} />
       </FormProvider>
+      <ToastContainer
+        position="top-right"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme={theme}
+      />
     </div>
   );
 }
