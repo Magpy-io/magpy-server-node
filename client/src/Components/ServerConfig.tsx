@@ -117,7 +117,7 @@ export default function ServerConfig() {
           console.log('error');
 
           if (updateNameRet.errorCode === 'INVALID_NAME') {
-            toast.error('Error updating server name. Name is not valid.');
+            toast.error('Error updating server name. Name contains some invalid characters.');
           } else {
             toast.error('Error updating server name.');
           }
