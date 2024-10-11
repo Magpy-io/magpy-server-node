@@ -1,8 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 
-import { Alert } from 'flowbite-react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { HiInformationCircle } from 'react-icons/hi';
 
 import { GetServerInfo, UnclaimServer, UpdateServerName } from '../ServerQueries';
 import SaveButton from './SaveButton';
@@ -17,7 +15,6 @@ export type Owner = {
 
 export default function ServerConfig() {
   const [data, setData] = useState<GetServerInfo.ResponseType>();
-  const [failedRequests, setFailedRequests] = useState<string[]>([]);
 
   const ownerRemote = data?.ok ? data.data.owner : null;
   const ownerLocal = data?.ok ? data.data.ownerLocal : null;
@@ -25,37 +22,21 @@ export default function ServerConfig() {
 
   const owner = ownerRemote ?? ownerLocal;
 
-  console.log('failedRequests', failedRequests);
-
-  const setError = () =>
-    setFailedRequests(prev => {
-      return [...prev, 'Error'];
-    });
-
   useEffect(() => {
     async function fetchData() {
       try {
         const ret = await GetServerInfo.Post();
         setData(ret);
-      } catch {
-        setError();
-      }
+      } catch {}
     }
     fetchData();
   }, []);
-
-  useEffect(() => {
-    console.log('failedRequest useEffect', failedRequests);
-  }, [failedRequests]);
 
   const onClearOwner = async () => {
     console.log('clear owner');
     const unclaimRes = await UnclaimServer.Post().catch(console.log);
     if (unclaimRes && !unclaimRes.ok) {
-      setFailedRequests(prev => {
-        prev.push(unclaimRes.errorCode);
-        return prev;
-      });
+      console.log('error');
     }
     if (unclaimRes && unclaimRes.ok) {
       const ret = await GetServerInfo.Post().catch(console.log);
@@ -86,18 +67,11 @@ export default function ServerConfig() {
           name: data.name,
         });
         if (updateNameRes && !updateNameRes.ok) {
-          setFailedRequests(prev => {
-            return [...prev, updateNameRes.message];
-          });
+          console.log('error');
         }
-      } catch {
-        setError();
-      }
+      } catch {}
     }
   };
-
-  const hasFailedRequests = failedRequests.length > 0;
-  const errorMessage = failedRequests?.[0] + ` `;
 
   return (
     <div>
@@ -108,11 +82,6 @@ export default function ServerConfig() {
         <ServerOwner onClearOwner={onClearOwner} owner={owner} />
         <SaveButton disabled={false} onSubmit={methods.handleSubmit(onSubmit)} />
       </FormProvider>
-      {hasFailedRequests && (
-        <Alert color="failure" icon={HiInformationCircle} className="mt-10">
-          <span className="font-medium">Something went wrong : </span> {errorMessage}
-        </Alert>
-      )}
     </div>
   );
 }
