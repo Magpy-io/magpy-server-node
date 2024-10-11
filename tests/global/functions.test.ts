@@ -48,14 +48,16 @@ describe("Test 'checkPhotoExistsAndDeleteMissing' function", () => {
     await sac.afterEach();
   });
 
-  it('Should return true when photo exists in db and disk', async () => {
+  it('Should return found photo when photo exists in db and disk', async () => {
     const addedPhotoData = await addPhoto();
+
+    const dbPhoto = await getPhotoFromDb(addedPhotoData.id);
 
     const ret = await checkPhotoExistsAndDeleteMissing({
       id: addedPhotoData.id,
     });
 
-    expect(ret.exists).toBe(true);
+    expect(ret.exists).toEqual(dbPhoto);
     expect(ret.warning).toBe(false);
 
     const photo = await getPhotoById(addedPhotoData.id);
@@ -67,12 +69,12 @@ describe("Test 'checkPhotoExistsAndDeleteMissing' function", () => {
     await testPhotosExistInDbAndDisk(photo);
   });
 
-  it('Should return false if photo does not exist in db nor disk', async () => {
+  it('Should return null if photo does not exist in db nor disk', async () => {
     const ret = await checkPhotoExistsAndDeleteMissing({
       id: generateId(),
     });
 
-    expect(ret.exists).toBe(false);
+    expect(ret.exists).toBe(null);
     expect(ret.warning).toBe(false);
   });
 
@@ -93,7 +95,7 @@ describe("Test 'checkPhotoExistsAndDeleteMissing' function", () => {
         id: addedPhotoData.id,
       });
 
-      expect(ret.exists).toBe(false);
+      expect(ret.exists).toBe(null);
       expect(ret.deleted).toEqual(dbPhoto);
       expect(ret.warning).toBe(true);
 

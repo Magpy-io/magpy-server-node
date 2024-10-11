@@ -128,8 +128,17 @@ const callback = async (
 
     if (photoExists.exists) {
       console.log('Photo exists in db');
+
+      const jsonResponse = {
+        lenReceived: photoWaiting.received,
+        lenWaiting: photoWaiting.image64Len,
+        done: true,
+        photo: responseFormatter.createPhotoObject(photoExists.exists, ''),
+        photoExistsBefore: true,
+      };
+
       console.log('Sending response message.');
-      return sendFailedMessage(res, `Photo already exists`, 'PHOTO_EXISTS');
+      return sendResponse(res, jsonResponse);
     }
 
     const dbPhoto = await addPhotoToDB(photoWaiting.photo);
@@ -152,6 +161,7 @@ const callback = async (
       lenWaiting: photoWaiting.image64Len,
       done: true,
       photo: responseFormatter.createPhotoObject(dbPhoto, ''),
+      photoExistsBefore: false,
     };
     console.log('Sending response message.');
     return sendResponse(res, jsonResponse);

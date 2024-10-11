@@ -61,6 +61,8 @@ describe("Test 'addPhoto' endpoint", () => {
 
         const data = getDataFromRet(ret);
         testPhotoMetaAndId(data.photo, { mediaId: 'mediaId' + i });
+        expect(data.photoExistsBefore).toBe(false);
+
         await testPhotosExistInDbAndDisk(data.photo);
 
         const getPhoto = await getPhotoById(data.photo.id, 'original');
@@ -94,6 +96,8 @@ describe("Test 'addPhoto' endpoint", () => {
 
     const data = getDataFromRet(ret);
     testPhotoMetaAndId(data.photo, { deviceUniqueId: 'newDeviceUniqueId' });
+    expect(data.photoExistsBefore).toBe(false);
+
     await testPhotosExistInDbAndDisk(data.photo);
 
     const getPhoto = await getPhotoById(data.photo.id, 'original');
@@ -104,15 +108,20 @@ describe("Test 'addPhoto' endpoint", () => {
     });
   });
 
-  it('Should return error PHOTO_EXISTS and not add photo if tried to add same mediaId and deviceUniqueId twice', async () => {
+  it('Should return photoExistsBefore true and not add photo if tried to add same mediaId and deviceUniqueId twice', async () => {
     const ret1 = await AddPhoto.Post(defaultPhoto);
 
     const ret2 = await AddPhoto.Post(defaultPhoto);
 
     expectToBeOk(ret1);
+    const data1 = getDataFromRet(ret1);
+    testPhotoMetaAndId(data1.photo);
+    expect(data1.photoExistsBefore).toBe(false);
 
-    expectToNotBeOk(ret2);
-    expectErrorCodeToBe(ret2, 'PHOTO_EXISTS');
+    expectToBeOk(ret2);
+    const data2 = getDataFromRet(ret2);
+    testPhotoMetaAndId(data2.photo);
+    expect(data2.photoExistsBefore).toBe(true);
 
     const retNumberPhotos = await GetNumberPhotos.Post();
 

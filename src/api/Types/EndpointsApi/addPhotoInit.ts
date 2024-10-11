@@ -1,11 +1,17 @@
 import Joi from 'joi';
 
-import { ErrorPhotoExists, ErrorServerNotClaimed, ErrorsAuthorization } from '../ErrorTypes';
-import { TokenAuthentification } from '../Types';
+import { ErrorServerNotClaimed, ErrorsAuthorization } from '../ErrorTypes';
+import { APIPhoto, TokenAuthentification } from '../Types';
 
-export type ResponseData = {
-  id: string;
-};
+export type ResponseData =
+  | {
+      id: string;
+      photoExistsBefore: false;
+    }
+  | {
+      photo: APIPhoto;
+      photoExistsBefore: true;
+    };
 
 export const RequestSchema = Joi.object({
   name: Joi.string(),
@@ -20,10 +26,7 @@ export const RequestSchema = Joi.object({
   .options({ presence: 'required' })
   .meta({ className: 'RequestData' });
 
-export type ResponseErrorTypes =
-  | ErrorServerNotClaimed
-  | ErrorsAuthorization
-  | ErrorPhotoExists;
+export type ResponseErrorTypes = ErrorServerNotClaimed | ErrorsAuthorization;
 
 export const endpoint = 'addPhotoInit';
 

@@ -32,8 +32,14 @@ const callback = async (req: ExtendedRequest, res: Response, body: AddPhoto.Requ
 
     if (photoExists.exists) {
       console.log('Photo exists in db');
+
+      const jsonResponse = {
+        photo: responseFormatter.createPhotoObject(photoExists.exists, ''),
+        photoExistsBefore: true,
+      };
+
       console.log('Sending response message.');
-      return sendFailedMessage(res, `Photo already exists`, 'PHOTO_EXISTS');
+      return sendResponse(res, jsonResponse);
     }
 
     const photo = {
@@ -70,6 +76,7 @@ const callback = async (req: ExtendedRequest, res: Response, body: AddPhoto.Requ
     console.log('Photo added to disk.');
     const jsonResponse = {
       photo: responseFormatter.createPhotoObject(dbPhoto, ''),
+      photoExistsBefore: false,
     };
     console.log('Sending response message.');
     return sendResponse(res, jsonResponse);

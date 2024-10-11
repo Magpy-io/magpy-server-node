@@ -2,7 +2,6 @@ import Joi from 'joi';
 
 import {
   ErrorMissingParts,
-  ErrorPhotoExists,
   ErrorPhotoSizeExceeded,
   ErrorPhotoTransferNotFound,
   ErrorServerNotClaimed,
@@ -21,6 +20,7 @@ export type ResponseData =
       lenWaiting: number;
       done: true;
       photo: APIPhoto;
+      photoExistsBefore: boolean;
     };
 
 export const RequestSchema = Joi.object({
@@ -39,8 +39,7 @@ export type ResponseErrorTypes =
   | ErrorMissingParts
   | ErrorPhotoTransferNotFound
   | ErrorServerNotClaimed
-  | ErrorsAuthorization
-  | ErrorPhotoExists;
+  | ErrorsAuthorization;
 
 export const endpoint = 'addPhotoPart';
 

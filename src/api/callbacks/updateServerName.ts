@@ -31,11 +31,11 @@ const callback = async (
       return sendFailedMessage(res, 'Name too short or too long', 'INVALID_NAME');
     }
 
-    if (!/^[a-zA-Z0-9 \-_]+$/.test(name)) {
+    if (!/^[a-zA-Z0-9 \-_'\$\*=\+\,;\.\?/:!&]+$/.test(name)) {
       console.log('Invalid name');
       return sendFailedMessage(
         res,
-        'Name can only contain alphanumeric characters, whitespaces, -, and _',
+        "Name can only contain alphanumeric characters, whitespaces, and any of [-_'$*+=,;./:!&]",
         'INVALID_NAME',
       );
     }
