@@ -75,6 +75,11 @@ export function setupShutdownManager() {
         console.log('Server was gracefully terminated');
         process.exit(0);
       });
+
+      // Setup force close if it takes too long.
+      setTimeout(() => {
+        process.exit(0);
+      }, 2000);
     }
   });
 
@@ -83,6 +88,11 @@ export function setupShutdownManager() {
       console.log('Server is gracefully terminated');
       process.exit(0);
     });
+
+    // Setup force close if it takes too long.
+    setTimeout(() => {
+      process.exit(0);
+    }, 2000);
   });
 
   process.on('SIGTERM', () => {
@@ -90,6 +100,11 @@ export function setupShutdownManager() {
       console.log('Server is gracefully terminated');
       process.exit(0);
     });
+
+    // Setup force close if it takes too long.
+    setTimeout(() => {
+      process.exit(0);
+    }, 2000);
   });
 }
 
