@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { postPhotoPartTimeout } from '../../config/config';
 import { addPhotoToDB, deletePhotoByIdFromDB } from '../../db/sequelizeDb';
 import assertUserToken from '../../middleware/userToken/assertUserToken';
-import { addPhotoToDisk } from '../../modules/diskManager';
+import { addPhotoToDisk, PhotoParsingError } from '../../modules/diskManager';
 import { hashFile } from '../../modules/hashing';
 import FilesWaiting, { FilesWaitingType } from '../../modules/waitingFiles';
 import { AddPhotoPart } from '../Types';
@@ -151,6 +151,12 @@ const callback = async (
     } catch (err) {
       console.log('Could not add photo to disk, removing photo from db');
       await deletePhotoByIdFromDB(dbPhoto.id);
+
+      if (err instanceof PhotoParsingError) {
+        console.log('Format not supported.');
+        return sendFailedMessage(res, `Format not supported`, 'FORMAT_NOT_SUPPORTED');
+      }
+
       throw err;
     }
 

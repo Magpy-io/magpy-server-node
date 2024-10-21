@@ -41,18 +41,18 @@ export async function addPhotoToDisk<T extends AddPhotoParamType>(photo: T, base
     .resize({ width: widthThumbnail, withoutEnlargement: true })
     .jpeg({ quality: 70 })
     .toBuffer()
-    .catch(err => {
-      console.error(err);
-      throw err;
+    .catch(() => {
+      throw new PhotoParsingError();
     });
+
   const dataCompressed = await sharp(buff)
     .resize({ width: withCompressed, withoutEnlargement: true })
     .jpeg({ quality: 70 })
     .toBuffer()
-    .catch(err => {
-      console.error(err);
-      throw err;
+    .catch(() => {
+      throw new PhotoParsingError();
     });
+
   await fs.writeFile(photo.serverPath, buff, { flag: 'wx' });
   await fs.writeFile(photo.serverThumbnailPath, dataThumbnail, { flag: 'wx' });
   await fs.writeFile(photo.serverCompressedPath, dataCompressed, {
@@ -150,4 +150,11 @@ export async function isPhotoOnDisk<T extends AddPhotoParamType>(photo: T) {
   const compressedExists = await pathExists(photo.serverCompressedPath);
   const thumbnailExists = await pathExists(photo.serverThumbnailPath);
   return originalExists && compressedExists && thumbnailExists;
+}
+
+export class PhotoParsingError extends Error {
+  constructor() {
+    super();
+    this.message = 'Error parsing photo. Format not supported.';
+  }
 }

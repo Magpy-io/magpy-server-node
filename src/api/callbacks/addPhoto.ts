@@ -7,7 +7,7 @@ import {
 } from '../../db/sequelizeDb';
 import assertUserToken from '../../middleware/userToken/assertUserToken';
 import { addServerImagePaths } from '../../modules/diskFilesNaming';
-import { addPhotoToDisk } from '../../modules/diskManager';
+import { addPhotoToDisk, PhotoParsingError } from '../../modules/diskManager';
 import { hashFile } from '../../modules/hashing';
 import { AddPhoto } from '../Types';
 import responseFormatter from '../responseFormatter';
@@ -69,8 +69,13 @@ const callback = async (req: ExtendedRequest, res: Response, body: AddPhoto.Requ
       await addPhotoToDisk(dbPhoto, body.image64);
     } catch (err) {
       console.log('Could not add photo to disk, removing photo from db');
-      console.log(dbPhoto);
       await deletePhotoByIdFromDB(dbPhoto.id);
+
+      if (err instanceof PhotoParsingError) {
+        console.log('Format not supported.');
+        return sendFailedMessage(res, `Format not supported`, 'FORMAT_NOT_SUPPORTED');
+      }
+
       throw err;
     }
     console.log('Photo added to disk.');
