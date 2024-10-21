@@ -1,6 +1,10 @@
 import Joi from 'joi';
 
-import { ErrorServerNotClaimed, ErrorsAuthorization } from '../ErrorTypes';
+import {
+  ErrorFormatNotSupported,
+  ErrorServerNotClaimed,
+  ErrorsAuthorization,
+} from '../ErrorTypes';
 import { APIPhoto, TokenAuthentification } from '../Types';
 
 export type ResponseData = {
@@ -21,7 +25,10 @@ export const RequestSchema = Joi.object({
   .options({ presence: 'required' })
   .meta({ className: 'RequestData' });
 
-export type ResponseErrorTypes = ErrorServerNotClaimed | ErrorsAuthorization;
+export type ResponseErrorTypes =
+  | ErrorServerNotClaimed
+  | ErrorsAuthorization
+  | ErrorFormatNotSupported;
 
 export const endpoint = 'addPhoto';
 
