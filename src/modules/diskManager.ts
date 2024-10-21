@@ -40,19 +40,13 @@ export async function addPhotoToDisk<T extends AddPhotoParamType>(photo: T, base
   const dataThumbnail = await sharp(buff)
     .resize({ width: widthThumbnail, withoutEnlargement: true })
     .jpeg({ quality: 70 })
-    .toBuffer()
-    .catch(err => {
-      console.error(err);
-      throw err;
-    });
+    .toBuffer();
+
   const dataCompressed = await sharp(buff)
     .resize({ width: withCompressed, withoutEnlargement: true })
     .jpeg({ quality: 70 })
-    .toBuffer()
-    .catch(err => {
-      console.error(err);
-      throw err;
-    });
+    .toBuffer();
+
   await fs.writeFile(photo.serverPath, buff, { flag: 'wx' });
   await fs.writeFile(photo.serverThumbnailPath, dataThumbnail, { flag: 'wx' });
   await fs.writeFile(photo.serverCompressedPath, dataCompressed, {
