@@ -1,10 +1,16 @@
 import { useEffect, useMemo, useState } from 'react';
 
 import { FormProvider, useForm } from 'react-hook-form';
+import { HiInformationCircle } from 'react-icons/hi';
 
-import { useThemeMode } from 'flowbite-react';
+import { Alert, useThemeMode } from 'flowbite-react';
 
-import { GetServerInfo, UnclaimServer, UpdateServerName } from '../ServerQueries';
+import {
+  GetServerInfo,
+  UnclaimServer,
+  UpdateServerName,
+  UpdateServerPath,
+} from '../ServerQueries';
 import SaveButton from './SaveButton';
 import ServerNameInput from './ServerNameInput';
 import ServerOwner from './ServerOwner';
@@ -14,6 +20,7 @@ import { ErrorServerUnreachable } from '../ServerQueries/ExceptionsManager';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 import '../toastOverride.css';
+import ServerPathInput from './ServerPathInput';
 
 export type Owner = {
   name: string;
@@ -25,7 +32,6 @@ export default function ServerConfig() {
 
   const ownerRemote = data?.ok ? data.data.owner : null;
   const ownerLocal = data?.ok ? data.data.ownerLocal : null;
-  const serverPath = data?.ok ? data.data.storagePath : 'Path not found';
 
   const owner = ownerRemote ?? ownerLocal;
 
@@ -104,22 +110,44 @@ export default function ServerConfig() {
     methods.reset(initialValues);
   }, [initialValues, methods]);
 
-  const onSubmit = async (data: { name: string | undefined | false }) => {
+  const onSubmit = async (data: {
+    name: string | undefined | false;
+    path: string | undefined | false;
+  }) => {
     console.log('onSubmit');
 
-    if (data.name) {
+    if (data.name && data.path) {
       try {
         const updateNameRet = await UpdateServerName.Post({
           name: data.name,
         });
 
+        const updatePathRes = await UpdateServerPath.Post({
+          path: data.path,
+        });
+
         if (!updateNameRet.ok) {
           console.log('error');
 
-          if (updateNameRet.errorCode === 'INVALID_NAME') {
+          if (updateNameRet.errorCode == 'INVALID_NAME') {
             toast.error('Error updating server name. Name contains some invalid characters.');
           } else {
             toast.error('Error updating server name.');
+          }
+          return;
+        }
+
+        if (!updatePathRes.ok) {
+          console.log('error');
+
+          if (updatePathRes.errorCode == 'PATH_ACCESS_DENIED') {
+            toast.error('Error updating server path. Access denied to specified folder');
+          } else if (updatePathRes.errorCode == 'PATH_FOLDER_DOES_NOT_EXIST') {
+            toast.error('Error updating server path. Folder does not exist');
+          } else if (updatePathRes.errorCode == 'PATH_NOT_ABSOLUTE') {
+            toast.error('Error updating server path. Path needs to be absolute');
+          } else {
+            toast.error('Error updating server path.');
           }
           return;
         }
@@ -136,7 +164,18 @@ export default function ServerConfig() {
       <FormProvider {...methods}>
         <Title />
         <ServerNameInput />
-        <ServerPath path={serverPath} />
+        <ServerPathInput />
+        <Alert
+          color="gray"
+          icon={HiInformationCircle}
+          additionalContent={
+            <div>
+              Changing the server's folder won't move photos from the old one. To keep them,
+              you'll need to delete and re-upload them via the app.
+            </div>
+          }>
+          <span className="font-bold">Warning</span>
+        </Alert>
         <ServerOwner onClearOwner={onClearOwner} owner={owner} />
         <SaveButton disabled={false} onSubmit={methods.handleSubmit(onSubmit)} />
       </FormProvider>
