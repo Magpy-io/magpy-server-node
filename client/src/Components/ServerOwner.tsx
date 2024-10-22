@@ -11,7 +11,7 @@ export default function ServerOwner({
 }) {
   if (owner) {
     return (
-      <div className="mb-8">
+      <div className="mb-8 mt-8">
         <div className="flex flex-row justify-between items-center mb-3">
           <h1 className="text-md font-medium  text-l-fg dark:text-d-fg">Owner</h1>
           <Button
@@ -31,7 +31,7 @@ export default function ServerOwner({
     );
   } else {
     return (
-      <div className="mb-8">
+      <div className="mb-8 mt-8">
         <h1 className="text-md font-medium mb-3  text-l-fg dark:text-d-fg">Owner</h1>
         <div className="p-4 bg-l-bg-light dark:bg-d-bg-light rounded-lg">
           <h1 className="text-sm font-medium  text-l-fg dark:text-d-fg">No owner</h1>
