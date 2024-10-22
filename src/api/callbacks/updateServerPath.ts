@@ -35,7 +35,7 @@ const callback = async (
 
     if (!isAbsolutePath(path)) {
       console.log('Invalid path, not an absolute path');
-      return responseFormatter.sendFailedBadRequest(res, 'Invalid path');
+      return sendFailedMessage(res, 'Path is not absolute', 'PATH_NOT_ABSOLUTE');
     }
 
     if (!(await pathExists(path))) {
