@@ -154,6 +154,7 @@ const callback = async (
 
       if (err instanceof PhotoParsingError) {
         console.log('Format not supported.');
+        console.log(err);
         return sendFailedMessage(res, `Format not supported`, 'FORMAT_NOT_SUPPORTED');
       }
 
