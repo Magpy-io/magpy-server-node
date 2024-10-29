@@ -2,7 +2,7 @@
 import express, { Express } from 'express';
 import path from 'path';
 
-import loadEndpoints from '../api/endpointsLoader';
+import loadEndpoints, { ExtendedRequest } from '../api/endpointsLoader';
 import * as config from '../config/config';
 import jsonParsingErrorHandler from '../middleware/jsonParsingErrorHandler';
 import FilesWaiting from '../modules/waitingFiles';
@@ -13,6 +13,7 @@ import { Server } from 'http';
 import { stdinEventEmitter } from '../modules/StdinEvents';
 
 import cors from 'cors';
+import { NewRequestId } from 'src/modules/RequestIdGenerator';
 
 let app: Express;
 let server: Server | null;
@@ -34,6 +35,12 @@ export async function initServer() {
   );
 
   app.use(jsonParsingErrorHandler);
+
+  app.use((req: ExtendedRequest, res, next) => {
+    req.id = NewRequestId();
+    console.log(req.method, req.hostname, req.path, new Date(Date.now()).toJSON());
+    next();
+  });
 
   loadEndpoints(app);
   console.log('Endpoints loaded');

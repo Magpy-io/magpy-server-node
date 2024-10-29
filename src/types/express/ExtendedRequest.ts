@@ -9,4 +9,5 @@ export interface ExtendedRequest extends Request {
   token?: string;
   tokenError?: { message: string; code: ErrorCodes };
   isConnexionLocal?: boolean;
+  id?: string;
 }
