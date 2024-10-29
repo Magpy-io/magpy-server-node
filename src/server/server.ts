@@ -13,8 +13,8 @@ import { Server } from 'http';
 import { stdinEventEmitter } from '../modules/StdinEvents';
 
 import cors from 'cors';
-import { NewRequestId } from 'src/modules/RequestIdGenerator';
-import { requestID } from 'src/middleware/requestID';
+import { requestID } from '../middleware/requestID';
+import { addLogger } from '../middleware/addLogger';
 
 let app: Express;
 let server: Server | null;
@@ -38,6 +38,8 @@ export async function initServer() {
   app.use(jsonParsingErrorHandler);
 
   app.use(requestID);
+
+  app.use(addLogger);
 
   loadEndpoints(app);
   console.log('Endpoints loaded');
