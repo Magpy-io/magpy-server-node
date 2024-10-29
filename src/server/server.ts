@@ -14,6 +14,7 @@ import { stdinEventEmitter } from '../modules/StdinEvents';
 
 import cors from 'cors';
 import { NewRequestId } from 'src/modules/RequestIdGenerator';
+import { requestID } from 'src/middleware/requestID';
 
 let app: Express;
 let server: Server | null;
@@ -36,11 +37,7 @@ export async function initServer() {
 
   app.use(jsonParsingErrorHandler);
 
-  app.use((req: ExtendedRequest, res, next) => {
-    req.id = NewRequestId();
-    console.log(req.method, req.hostname, req.path, new Date(Date.now()).toJSON());
-    next();
-  });
+  app.use(requestID);
 
   loadEndpoints(app);
   console.log('Endpoints loaded');
