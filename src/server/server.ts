@@ -29,6 +29,10 @@ export async function initServer() {
 
   app.use(cors());
 
+  app.use(requestID);
+
+  app.use(addLogger);
+
   app.use(
     express.json({
       limit: '50mb',
@@ -36,10 +40,6 @@ export async function initServer() {
   );
 
   app.use(jsonParsingErrorHandler);
-
-  app.use(requestID);
-
-  app.use(addLogger);
 
   loadEndpoints(app);
   console.log('Endpoints loaded');

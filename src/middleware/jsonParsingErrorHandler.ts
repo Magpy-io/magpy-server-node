@@ -9,8 +9,7 @@ function JsonParsingErrorHandler(
   res: Response,
   next: NextFunction,
 ) {
-  console.log('Error parsing json body');
-  console.log('Sending response message');
+  req.logger?.error('Error parsing json body');
   responseFormatter.sendFailedBadRequest(res, 'Error parsing json body');
 }
 
