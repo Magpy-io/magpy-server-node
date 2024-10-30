@@ -20,25 +20,25 @@ async function checkServerHasValidCredentials(
   next: NextFunction,
 ) {
   try {
-    console.log('#CheckServerHasValidCredentials middleware');
+    req.logger?.middleware('checkServerHasValidCredentials');
 
     if (!IsServerClaimedRemote()) {
+      req.logger?.debug('Server not claimed');
       req.hasValidCredentials = false;
       next();
       return;
     }
 
     const serverToken = GetServerToken();
-    if (serverToken) {
-      console.log('server token found');
 
+    if (serverToken) {
       let ret: BackendQueries.GetServerInfo.ResponseType;
       try {
         BackendQueries.TokenManager.SetServerToken(serverToken);
         ret = await BackendQueries.GetServerInfo.Post();
       } catch (err) {
         if (err instanceof ErrorBackendUnreachable) {
-          console.log('Error requesting backend server');
+          req.logger?.error('Error requesting backend server unreachable');
           responseFormatter.sendErrorBackEndServerUnreachable(res);
         } else {
           throw err;
@@ -51,12 +51,12 @@ async function checkServerHasValidCredentials(
           ret.errorCode == 'AUTHORIZATION_FAILED' ||
           ret.errorCode == 'AUTHORIZATION_EXPIRED'
         ) {
-          console.log('Invalid server token');
+          req.logger?.debug('Invalid server token');
         } else {
           throw new Error('request to get server info failed. ' + JSON.stringify(ret));
         }
       } else {
-        console.log('server has valid credentials');
+        req.logger?.debug('Server has valid credentials');
         req.hasValidCredentials = true;
         next();
         return;
@@ -69,7 +69,7 @@ async function checkServerHasValidCredentials(
       throw new Error('Server is claimed but serverId or serverKey is missing.');
     }
 
-    console.log('Server credentials found');
+    req.logger?.debug('Server credentials found');
 
     let ret: BackendQueries.GetServerToken.ResponseType;
     try {
@@ -79,7 +79,7 @@ async function checkServerHasValidCredentials(
       });
     } catch (err) {
       if (err instanceof ErrorBackendUnreachable) {
-        console.log('Error requesting backend server');
+        req.logger?.error('Error requesting backend server unreachable');
         responseFormatter.sendErrorBackEndServerUnreachable(res);
       } else {
         throw err;
@@ -89,8 +89,8 @@ async function checkServerHasValidCredentials(
 
     if (!ret.ok) {
       if (ret.errorCode == 'INVALID_CREDENTIALS') {
-        console.log('invalid server credentials');
-        console.log('Deleting credentials');
+        req.logger?.debug('Invalid server credentials');
+        req.logger?.debug('Deleting credentials');
         await ClearServerCredentials();
         req.hasValidCredentials = false;
         next();
@@ -98,19 +98,19 @@ async function checkServerHasValidCredentials(
         throw new Error('request to verify server credentials failed. ' + JSON.stringify(ret));
       }
     } else {
-      console.log('server claimed, it has valid credentials');
+      req.logger?.debug('server claimed, it has valid credentials');
       const serverToken = BackendQueries.TokenManager.GetServerToken();
 
-      console.log('saving server token');
+      req.logger?.debug('saving server token');
       await SaveServerToken(serverToken);
 
-      console.log('server has valid credentials');
+      req.logger?.debug('server has valid credentials');
       req.hasValidCredentials = true;
       next();
       return;
     }
   } catch (err) {
-    console.error(err);
+    req.logger?.error(err);
     responseFormatter.sendErrorMessage(res);
   }
 }

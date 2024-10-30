@@ -12,9 +12,10 @@ async function checkServerIsClaimedRemote(
   next: NextFunction,
 ) {
   try {
-    console.log('#checkServerIsClaimedRemote middleware');
+    req.logger?.middleware('checkServerIsClaimedRemote');
+
     if (!req.hasValidCredentials) {
-      console.log('server is not claimed');
+      req.logger?.debug('server is not claimed');
       req.isClaimedRemote = false;
       next();
       return;
@@ -27,18 +28,18 @@ async function checkServerIsClaimedRemote(
     }
 
     if (ret.data.server.owner == null) {
-      console.log('server is not claimed');
+      req.logger?.debug('server is not claimed');
       req.isClaimedRemote = false;
       next();
       return;
     }
 
-    console.log('server is claimed');
+    req.logger?.debug('server is claimed');
     req.isClaimedRemote = true;
 
     next();
   } catch (err) {
-    console.error(err);
+    req.logger?.error(err);
     responseFormatter.sendErrorMessage(res);
   }
 }
