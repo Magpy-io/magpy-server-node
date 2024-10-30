@@ -9,7 +9,7 @@ import { GetServerSigningKey, IsServerClaimedAny } from '../../modules/serverDat
 
 async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFunction) {
   try {
-    console.log('#checkUserToken middleware');
+    req.logger?.middleware('checkUserToken');
 
     if (req.tokenError) {
       req.userIdError = req.tokenError;
@@ -24,7 +24,7 @@ async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFun
     }
 
     if (!IsServerClaimedAny()) {
-      console.log('server is not claimed');
+      req.logger?.debug('server is not claimed');
       req.userIdError = { message: 'Server not claimed', code: 'SERVER_NOT_CLAIMED' };
       next();
       return;
@@ -33,7 +33,9 @@ async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFun
     const serverSigningKey = GetServerSigningKey();
 
     if (!serverSigningKey) {
-      console.log('User token verification failed because to server signing key was found.');
+      req.logger?.debug(
+        'User token verification failed because to server signing key was found.',
+      );
       req.userIdError = {
         message: 'User token verification failed',
         code: 'AUTHORIZATION_FAILED',
@@ -46,8 +48,7 @@ async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFun
 
     if (!ret.ok) {
       if (ret.error == 'TOKEN_EXPIRED_ERROR') {
-        console.log('User Token expired');
-        console.log(ret);
+        req.logger?.debug('User Token expired: ' + JSON.stringify(ret));
         req.userIdError = {
           message: 'User token expired',
           code: 'AUTHORIZATION_EXPIRED',
@@ -55,8 +56,7 @@ async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFun
         next();
         return;
       } else {
-        console.log('Invalid user Token');
-        console.log(ret);
+        req.logger?.debug('Invalid user Token: ' + JSON.stringify(ret));
         req.userIdError = {
           message: 'User token verification failed',
           code: 'AUTHORIZATION_FAILED',
@@ -69,7 +69,7 @@ async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFun
     req.userId = ret.data.id;
     next();
   } catch (err) {
-    console.error(err);
+    req.logger?.error(err);
     responseFormatter.sendErrorMessage(res);
   }
 }

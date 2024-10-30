@@ -12,10 +12,9 @@ async function assertLocalOrValidUserToken(
   next: NextFunction,
 ) {
   try {
-    console.log('#assertLocalOrValidUserToken middleware');
-
+    req.logger?.middleware('assertLocalOrValidUserToken');
     if (!req.isConnexionLocal && !req.userId) {
-      console.log('Request not from loopback and no valid token');
+      req.logger?.debug('Request not from loopback and no valid token');
       return responseFormatter.sendFailedMessageMiddleware(
         res,
         'Request must be made using loopback address or with a valid token',
@@ -25,7 +24,7 @@ async function assertLocalOrValidUserToken(
 
     next();
   } catch (err) {
-    console.error(err);
+    req.logger?.error(err);
     responseFormatter.sendErrorMessage(res);
   }
 }

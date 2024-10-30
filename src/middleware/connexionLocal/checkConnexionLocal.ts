@@ -6,10 +6,10 @@ import { ExtendedRequest } from '../../api/endpointsLoader';
 
 async function checkConnexionLocal(req: ExtendedRequest, res: Response, next: NextFunction) {
   try {
-    console.log('#CheckConnexionLocal middleware');
+    req.logger?.middleware('CheckConnexionLocal');
 
     if (!req.ip) {
-      console.log('Could not get ip from request');
+      req.logger?.warn('Could not get ip from request');
       return responseFormatter.sendFailedMessageMiddleware(
         res,
         'Request must be made using loopback address',
@@ -23,9 +23,11 @@ async function checkConnexionLocal(req: ExtendedRequest, res: Response, next: Ne
       req.isConnexionLocal = true;
     }
 
+    req.logger?.debug(req.isConnexionLocal ? 'Request from local' : 'Request not from local');
+
     next();
   } catch (err) {
-    console.error(err);
+    req.logger?.error(err);
     responseFormatter.sendErrorMessage(res);
   }
 }

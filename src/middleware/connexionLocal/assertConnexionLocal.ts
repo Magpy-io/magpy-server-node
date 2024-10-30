@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from 'express';
-import { isLoopback } from 'ip';
 
 import responseFormatter from '../../api/responseFormatter';
 import { ExtendedRequest } from '../../api/endpointsLoader';
@@ -8,10 +7,10 @@ import checkConnexionLocal from './checkConnexionLocal';
 
 async function assertConnexionLocal(req: ExtendedRequest, res: Response, next: NextFunction) {
   try {
-    console.log('#assertConnexionLocal middleware');
+    req.logger?.middleware('assertConnexionLocal');
 
     if (!req.isConnexionLocal) {
-      console.log('Request not from loopback');
+      req.logger?.debug('Request not from loopback');
       responseFormatter.sendFailedMessageMiddleware(
         res,
         'Request must be made using loopback address',
@@ -22,7 +21,7 @@ async function assertConnexionLocal(req: ExtendedRequest, res: Response, next: N
 
     next();
   } catch (err) {
-    console.error(err);
+    req.logger?.error(err);
     responseFormatter.sendErrorMessage(res);
   }
 }

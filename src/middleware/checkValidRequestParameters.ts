@@ -14,7 +14,7 @@ function generateMiddlewareFromShema(shema: Joi.ObjectSchema) {
       req.logger?.middleware('checkValidRequestParameters');
       const { error } = shema.validate(req.body);
       if (error) {
-        req.logger?.error('Bad request parameters: ' + error.message);
+        req.logger?.debug('Bad request parameters: ' + error.message);
         return responseFormatter.sendFailedBadRequest(res, error.message);
       }
 

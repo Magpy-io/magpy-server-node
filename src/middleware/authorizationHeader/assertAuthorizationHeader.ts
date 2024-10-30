@@ -11,18 +11,20 @@ const assertAuthorizationHeader = async (
   next: NextFunction,
 ) => {
   try {
-    console.log('#assertAuthorizationHeader middleware');
+    req.logger?.middleware('assertAuthorizationHeader');
 
     if (req.tokenError) {
+      req.logger?.debug('Error invalid token');
       return responseFormatter.sendFailedMessageMiddleware(
         res,
         req.tokenError.message,
         req.tokenError.code,
       );
     }
+
     next();
   } catch (err) {
-    console.error(err);
+    req.logger?.error(err);
     responseFormatter.sendErrorMessage(res);
   }
 };

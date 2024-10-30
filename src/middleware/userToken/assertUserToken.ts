@@ -7,9 +7,10 @@ import checkUserToken from './checkUserToken';
 
 async function assertUserToken(req: ExtendedRequest, res: Response, next: NextFunction) {
   try {
-    console.log('#assertUserToken middleware');
+    req.logger?.middleware('assertUserToken');
 
     if (req.userIdError) {
+      req.logger?.debug('Error userId: ' + JSON.stringify(req.userIdError));
       return responseFormatter.sendFailedMessageMiddleware(
         res,
         req.userIdError.message,
@@ -18,7 +19,7 @@ async function assertUserToken(req: ExtendedRequest, res: Response, next: NextFu
     }
     next();
   } catch (err) {
-    console.error(err);
+    req.logger?.error(err);
     responseFormatter.sendErrorMessage(res);
   }
 }

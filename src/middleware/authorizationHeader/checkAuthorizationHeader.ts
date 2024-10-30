@@ -9,11 +9,12 @@ const checkAuthorizationHeader = async (
   next: NextFunction,
 ) => {
   try {
-    console.log('#checkAuthorizationHeader middleware');
+    req.logger?.middleware('checkAuthorizationHeader');
+
     const bearerHeader = req.headers['x-authorization'];
 
     if (!bearerHeader || typeof bearerHeader != 'string') {
-      console.log('Error : No authorization header');
+      req.logger?.debug('No authorization header');
       req.tokenError = { message: 'Invalid authorization', code: 'AUTHORIZATION_MISSING' };
       next();
       return;
@@ -21,7 +22,7 @@ const checkAuthorizationHeader = async (
     const [prefix, token] = bearerHeader.split(' ');
 
     if (!prefix || prefix != 'Bearer' || !token) {
-      console.log('Error : authorization header wrong format');
+      req.logger?.debug('Authorization header wrong format');
       req.tokenError = {
         message: 'Invalid authorization',
         code: 'AUTHORIZATION_WRONG_FORMAT',
@@ -33,7 +34,7 @@ const checkAuthorizationHeader = async (
     req.token = token;
     next();
   } catch (err) {
-    console.error(err);
+    req.logger?.error(err);
     responseFormatter.sendErrorMessage(res);
   }
 };
