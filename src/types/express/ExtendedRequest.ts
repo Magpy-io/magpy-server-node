@@ -1,6 +1,6 @@
 import { Request } from 'express';
-import { ErrorCodes } from 'src/api/Types/ErrorTypes';
-import winston from 'winston';
+import { ErrorCodes } from '../../api/Types/ErrorTypes';
+import { CustomLogger } from '../../modules/Logger';
 
 export interface ExtendedRequest extends Request {
   hasValidCredentials?: boolean;
@@ -11,5 +11,5 @@ export interface ExtendedRequest extends Request {
   tokenError?: { message: string; code: ErrorCodes };
   isConnexionLocal?: boolean;
   id?: string;
-  logger?: winston.Logger;
+  logger?: CustomLogger;
 }
