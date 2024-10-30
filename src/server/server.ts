@@ -15,6 +15,7 @@ import { stdinEventEmitter } from '../modules/StdinEvents';
 import cors from 'cors';
 import { requestID } from '../middleware/requestID';
 import { addLogger } from '../middleware/addLogger';
+import { unexpectedErrorHandler } from '../middleware/unexpectedErrorHandler';
 
 let app: Express;
 let server: Server | null;
@@ -42,7 +43,8 @@ export async function initServer() {
   app.use(jsonParsingErrorHandler);
 
   loadEndpoints(app);
-  console.log('Endpoints loaded');
+
+  app.use(unexpectedErrorHandler);
 
   if (process.env.NODE_ENV !== 'test') {
     const clientBuildPath = await findClientBuildPath();

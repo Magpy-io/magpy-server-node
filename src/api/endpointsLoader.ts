@@ -28,9 +28,9 @@ function loadEndpoints(app: Express) {
   const endpoints = getEndpoints();
   endpoints.forEach(({ endpoint, callback, method, middleWare, requestShema }) => {
     const reqParamValidationMiddleware = generateMiddlewareFromShema(requestShema);
-    const callbackFormated = (req: ExtendedRequest, res: Response) => {
+    const callbackFormated = (req: ExtendedRequest, res: Response, next: NextFunction) => {
       console.log(endpoint);
-      callback(req, res, req.body);
+      callback(req, res, req.body).catch(next);
     };
     const endpointFormatted = '/' + endpoint;
 
