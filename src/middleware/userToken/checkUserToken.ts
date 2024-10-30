@@ -70,7 +70,7 @@ async function checkUserToken(req: ExtendedRequest, res: Response, next: NextFun
     next();
   } catch (err) {
     req.logger?.error(err);
-    responseFormatter.sendErrorMessage(res);
+    responseFormatter.sendErrorMessage(req, res);
   }
 }
 

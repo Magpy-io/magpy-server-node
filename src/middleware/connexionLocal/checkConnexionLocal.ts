@@ -11,6 +11,7 @@ async function checkConnexionLocal(req: ExtendedRequest, res: Response, next: Ne
     if (!req.ip) {
       req.logger?.warn('Could not get ip from request');
       return responseFormatter.sendFailedMessageMiddleware(
+        req,
         res,
         'Request must be made using loopback address',
         'COULD_NOT_GET_REQUEST_ADDRESS',
@@ -28,7 +29,7 @@ async function checkConnexionLocal(req: ExtendedRequest, res: Response, next: Ne
     next();
   } catch (err) {
     req.logger?.error(err);
-    responseFormatter.sendErrorMessage(res);
+    responseFormatter.sendErrorMessage(req, res);
   }
 }
 

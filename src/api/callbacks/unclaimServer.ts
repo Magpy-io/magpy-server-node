@@ -41,7 +41,7 @@ const callback = async (
     return sendResponse(res, 'Server unclaimed');
   } catch (err) {
     console.error(err);
-    return responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(req, res);
   }
 };
 

@@ -39,7 +39,7 @@ async function checkServerHasValidCredentials(
       } catch (err) {
         if (err instanceof ErrorBackendUnreachable) {
           req.logger?.error('Error requesting backend server unreachable');
-          responseFormatter.sendErrorBackEndServerUnreachable(res);
+          responseFormatter.sendErrorBackEndServerUnreachable(req, res);
         } else {
           throw err;
         }
@@ -80,7 +80,7 @@ async function checkServerHasValidCredentials(
     } catch (err) {
       if (err instanceof ErrorBackendUnreachable) {
         req.logger?.error('Error requesting backend server unreachable');
-        responseFormatter.sendErrorBackEndServerUnreachable(res);
+        responseFormatter.sendErrorBackEndServerUnreachable(req, res);
       } else {
         throw err;
       }
@@ -111,7 +111,7 @@ async function checkServerHasValidCredentials(
     }
   } catch (err) {
     req.logger?.error(err);
-    responseFormatter.sendErrorMessage(res);
+    responseFormatter.sendErrorMessage(req, res);
   }
 }
 

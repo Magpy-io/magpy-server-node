@@ -79,7 +79,7 @@ const callback = async (
     return sendResponse(res, { id: id, photoExistsBefore: false });
   } catch (err) {
     console.error(err);
-    return responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(req, res);
   }
 };
 

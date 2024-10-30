@@ -28,12 +28,13 @@ const callback = async (
 
     if (name.length < 3 || name.length > 70) {
       console.log('Invalid name');
-      return sendFailedMessage(res, 'Name too short or too long', 'INVALID_NAME');
+      return sendFailedMessage(req, res, 'Name too short or too long', 'INVALID_NAME');
     }
 
     if (!/^[a-zA-Z0-9 \-_'\$\*=\+\,;\.\?/:!&]+$/.test(name)) {
       console.log('Invalid name');
       return sendFailedMessage(
+        req,
         res,
         "Name can only contain alphanumeric characters, whitespaces, and any of [-_'$*+=,;./:!&]",
         'INVALID_NAME',
@@ -52,7 +53,7 @@ const callback = async (
     return sendResponse(res, 'Server name changed');
   } catch (err) {
     console.error(err);
-    return responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(req, res);
   }
 };
 

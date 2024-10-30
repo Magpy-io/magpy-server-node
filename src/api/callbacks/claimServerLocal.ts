@@ -32,7 +32,7 @@ const callback = async (
 
     if (IsServerClaimedAny()) {
       console.log('server already claimed');
-      return sendFailedMessage(res, 'Server already claimed', 'SERVER_ALREADY_CLAIMED');
+      return sendFailedMessage(req, res, 'Server already claimed', 'SERVER_ALREADY_CLAIMED');
     }
 
     console.log('server not claimed, saving claiming user.');
@@ -49,7 +49,7 @@ const callback = async (
     return sendResponse(res, 'ok');
   } catch (err) {
     console.error(err);
-    return responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(req, res);
   }
 };
 

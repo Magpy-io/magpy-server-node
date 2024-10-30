@@ -34,7 +34,7 @@ const callback = async (
 
     if (req.isClaimedRemote || IsServerClaimedLocal()) {
       console.log('server already claimed');
-      return sendFailedMessage(res, 'Server already claimed', 'SERVER_ALREADY_CLAIMED');
+      return sendFailedMessage(req, res, 'Server already claimed', 'SERVER_ALREADY_CLAIMED');
     }
 
     console.log('server not claimed');
@@ -54,7 +54,7 @@ const callback = async (
     } catch (err) {
       if (err instanceof ErrorBackendUnreachable) {
         console.error('Error requesting backend server');
-        return responseFormatter.sendErrorBackEndServerUnreachable(res);
+        return responseFormatter.sendErrorBackEndServerUnreachable(req, res);
       } else {
         throw err;
       }
@@ -64,13 +64,19 @@ const callback = async (
       if (ret.errorCode == 'AUTHORIZATION_FAILED') {
         console.log('user token authorization error');
         return sendFailedMessage(
+          req,
           res,
           'User token verification failed',
           'AUTHORIZATION_BACKEND_FAILED',
         );
       } else if (ret.errorCode == 'AUTHORIZATION_EXPIRED') {
         console.log('user token expired');
-        return sendFailedMessage(res, 'User token expired', 'AUTHORIZATION_BACKEND_EXPIRED');
+        return sendFailedMessage(
+          req,
+          res,
+          'User token expired',
+          'AUTHORIZATION_BACKEND_EXPIRED',
+        );
       } else {
         throw new Error('request to verify user token failed. ' + JSON.stringify(ret));
       }
@@ -85,7 +91,7 @@ const callback = async (
     } catch (err) {
       if (err instanceof ErrorBackendUnreachable) {
         console.error('Error requesting backend server');
-        return responseFormatter.sendErrorBackEndServerUnreachable(res);
+        return responseFormatter.sendErrorBackEndServerUnreachable(req, res);
       } else {
         throw err;
       }
@@ -109,7 +115,7 @@ const callback = async (
     return sendResponse(res, 'ok');
   } catch (err) {
     console.error(err);
-    return responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(req, res);
   }
 };
 

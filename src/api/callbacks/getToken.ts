@@ -26,7 +26,7 @@ const callback = async (req: ExtendedRequest, res: Response, body: GetToken.Requ
 
     if (!req.isClaimedRemote) {
       console.log('server is not claimed');
-      return sendFailedMessage(res, 'Server not claimed', 'SERVER_NOT_CLAIMED');
+      return sendFailedMessage(req, res, 'Server not claimed', 'SERVER_NOT_CLAIMED');
     }
 
     let retUser: WhoAmI.ResponseType;
@@ -36,7 +36,7 @@ const callback = async (req: ExtendedRequest, res: Response, body: GetToken.Requ
     } catch (err) {
       if (err instanceof ErrorBackendUnreachable) {
         console.error('Error requesting backend server');
-        return responseFormatter.sendErrorBackEndServerUnreachable(res);
+        return responseFormatter.sendErrorBackEndServerUnreachable(req, res);
       } else {
         throw err;
       }
@@ -46,17 +46,23 @@ const callback = async (req: ExtendedRequest, res: Response, body: GetToken.Requ
       if (retUser.errorCode == 'AUTHORIZATION_FAILED') {
         console.log('user token authorization error');
         return sendFailedMessage(
+          req,
           res,
           'User token verification failed',
           'AUTHORIZATION_BACKEND_FAILED',
         );
       } else if (retUser.errorCode == 'AUTHORIZATION_EXPIRED') {
         console.log('user token expired');
-        return sendFailedMessage(res, 'User token expired', 'AUTHORIZATION_BACKEND_EXPIRED');
+        return sendFailedMessage(
+          req,
+          res,
+          'User token expired',
+          'AUTHORIZATION_BACKEND_EXPIRED',
+        );
       } else {
         console.error('Error requesting backend server');
         console.error(retUser);
-        return responseFormatter.sendErrorBackEndServerUnreachable(res);
+        return responseFormatter.sendErrorBackEndServerUnreachable(req, res);
       }
     }
 
@@ -73,7 +79,7 @@ const callback = async (req: ExtendedRequest, res: Response, body: GetToken.Requ
     } catch (err) {
       if (err instanceof ErrorBackendUnreachable) {
         console.error('Error requesting backend server');
-        return responseFormatter.sendErrorBackEndServerUnreachable(res);
+        return responseFormatter.sendErrorBackEndServerUnreachable(req, res);
       } else {
         throw err;
       }
@@ -86,6 +92,7 @@ const callback = async (req: ExtendedRequest, res: Response, body: GetToken.Requ
     if (retServer.data.server.owner?._id != retUser.data.user._id) {
       console.log('user not allowed to access this server');
       return sendFailedMessage(
+        req,
         res,
         'User not allowed to access this server',
         'USER_NOT_ALLOWED',
@@ -112,7 +119,7 @@ const callback = async (req: ExtendedRequest, res: Response, body: GetToken.Requ
     return sendResponse(res, 'Token generated successfully');
   } catch (err) {
     console.error(err);
-    return responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(req, res);
   }
 };
 

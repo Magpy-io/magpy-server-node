@@ -42,6 +42,7 @@ const callback = async (
       console.log('Photo does not exist in server.');
       console.log('Sending response message.');
       return sendFailedMessage(
+        req,
         res,
         `Photo with id ${id} not found in server`,
         'ID_NOT_FOUND',
@@ -60,7 +61,7 @@ const callback = async (
     }
   } catch (err) {
     console.error(err);
-    return responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(req, res);
   }
 };
 

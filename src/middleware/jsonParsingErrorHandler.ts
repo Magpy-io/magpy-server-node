@@ -10,7 +10,7 @@ function JsonParsingErrorHandler(
   next: NextFunction,
 ) {
   req.logger?.debug('Error parsing json body');
-  responseFormatter.sendFailedBadRequest(res, 'Error parsing json body');
+  responseFormatter.sendFailedBadRequest(req, res, 'Error parsing json body');
 }
 
 export default JsonParsingErrorHandler;

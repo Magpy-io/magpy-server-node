@@ -74,7 +74,7 @@ const callback = async (req: ExtendedRequest, res: Response, body: AddPhoto.Requ
       if (err instanceof PhotoParsingError) {
         console.log('Format not supported.');
         console.log(err);
-        return sendFailedMessage(res, `Format not supported`, 'FORMAT_NOT_SUPPORTED');
+        return sendFailedMessage(req, res, `Format not supported`, 'FORMAT_NOT_SUPPORTED');
       }
 
       throw err;
@@ -88,7 +88,7 @@ const callback = async (req: ExtendedRequest, res: Response, body: AddPhoto.Requ
     return sendResponse(res, jsonResponse);
   } catch (err) {
     console.error(err);
-    return responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(req, res);
   }
 };
 

@@ -69,7 +69,7 @@ const callback = async (req: ExtendedRequest, res: Response, body: GetPhotos.Req
     return sendResponse(res, jsonResponse, warning);
   } catch (err) {
     console.error(err);
-    return responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(req, res);
   }
 };
 

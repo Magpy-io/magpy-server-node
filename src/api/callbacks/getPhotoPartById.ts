@@ -42,7 +42,13 @@ const callback = async (
     if (!ret.exists) {
       console.log('Photo not found in db.');
       console.log('Sending response message.');
-      return sendFailedMessage(res, `Photo with id: ${id} not found`, 'ID_NOT_FOUND', warning);
+      return sendFailedMessage(
+        req,
+        res,
+        `Photo with id: ${id} not found`,
+        'ID_NOT_FOUND',
+        warning,
+      );
     } else {
       console.log('Photo found in db.');
       console.log(`Getting photo with id = ${id} from db.`);
@@ -73,6 +79,7 @@ const callback = async (
         );
         console.log('Sending response message.');
         return sendFailedMessage(
+          req,
           res,
           `Part number ${part} must be between 0 and ${totalNbOfParts - 1} included`,
           'INVALID_PART_NUMBER',
@@ -81,7 +88,7 @@ const callback = async (
     }
   } catch (err) {
     console.error(err);
-    return responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(req, res);
   }
 };
 

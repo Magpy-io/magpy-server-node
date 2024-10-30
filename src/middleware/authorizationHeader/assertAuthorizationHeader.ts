@@ -16,6 +16,7 @@ const assertAuthorizationHeader = async (
     if (req.tokenError) {
       req.logger?.debug('Error invalid token');
       return responseFormatter.sendFailedMessageMiddleware(
+        req,
         res,
         req.tokenError.message,
         req.tokenError.code,
@@ -25,7 +26,7 @@ const assertAuthorizationHeader = async (
     next();
   } catch (err) {
     req.logger?.error(err);
-    responseFormatter.sendErrorMessage(res);
+    responseFormatter.sendErrorMessage(req, res);
   }
 };
 

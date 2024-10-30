@@ -16,7 +16,7 @@ const callback = async (req: ExtendedRequest, res: Response, body: Status.Reques
     return sendResponse(res, 'Server ok');
   } catch (err) {
     console.error(err);
-    return responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(req, res);
   }
 };
 

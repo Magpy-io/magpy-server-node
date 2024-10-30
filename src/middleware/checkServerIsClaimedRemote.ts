@@ -40,7 +40,7 @@ async function checkServerIsClaimedRemote(
     next();
   } catch (err) {
     req.logger?.error(err);
-    responseFormatter.sendErrorMessage(res);
+    responseFormatter.sendErrorMessage(req, res);
   }
 }
 

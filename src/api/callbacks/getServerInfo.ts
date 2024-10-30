@@ -64,7 +64,7 @@ const callback = async (
     return sendResponse(res, responseJson);
   } catch (err) {
     console.error(err);
-    return responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(req, res);
   }
 };
 

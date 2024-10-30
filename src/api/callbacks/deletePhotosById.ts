@@ -35,7 +35,7 @@ const callback = async (
     return sendResponse(res, { deletedIds: removedIds });
   } catch (err) {
     console.error(err);
-    return responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(req, res);
   }
 };
 

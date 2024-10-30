@@ -16,6 +16,7 @@ async function assertLocalOrValidUserToken(
     if (!req.isConnexionLocal && !req.userId) {
       req.logger?.debug('Request not from loopback and no valid token');
       return responseFormatter.sendFailedMessageMiddleware(
+        req,
         res,
         'Request must be made using loopback address or with a valid token',
         'AUTHORIZATION_FAILED',
@@ -25,7 +26,7 @@ async function assertLocalOrValidUserToken(
     next();
   } catch (err) {
     req.logger?.error(err);
-    responseFormatter.sendErrorMessage(res);
+    responseFormatter.sendErrorMessage(req, res);
   }
 }
 

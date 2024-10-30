@@ -15,13 +15,13 @@ function generateMiddlewareFromShema(shema: Joi.ObjectSchema) {
       const { error } = shema.validate(req.body);
       if (error) {
         req.logger?.debug('Bad request parameters: ' + error.message);
-        return responseFormatter.sendFailedBadRequest(res, error.message);
+        return responseFormatter.sendFailedBadRequest(req, res, error.message);
       }
 
       next();
     } catch (err) {
       req.logger?.error(err);
-      responseFormatter.sendErrorMessage(res);
+      responseFormatter.sendErrorMessage(req, res);
     }
   };
 }

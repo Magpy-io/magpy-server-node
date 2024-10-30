@@ -12,6 +12,7 @@ async function assertUserToken(req: ExtendedRequest, res: Response, next: NextFu
     if (req.userIdError) {
       req.logger?.debug('Error userId: ' + JSON.stringify(req.userIdError));
       return responseFormatter.sendFailedMessageMiddleware(
+        req,
         res,
         req.userIdError.message,
         req.userIdError.code,
@@ -20,7 +21,7 @@ async function assertUserToken(req: ExtendedRequest, res: Response, next: NextFu
     next();
   } catch (err) {
     req.logger?.error(err);
-    responseFormatter.sendErrorMessage(res);
+    responseFormatter.sendErrorMessage(req, res);
   }
 }
 

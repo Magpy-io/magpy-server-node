@@ -30,6 +30,7 @@ const callback = async (
       console.log('Bad request parameters');
       console.log('Sending response message');
       return responseFormatter.sendFailedBadRequest(
+        req,
         res,
         'photoPart length and partSize do not match',
       );
@@ -39,6 +40,7 @@ const callback = async (
       console.log(`No photo transfer for id ${body.id} was found.`);
       console.log('Sending response message.');
       return sendFailedMessage(
+        req,
         res,
         `No photo transfer for id ${body.id} was found.`,
         'PHOTO_TRANSFER_NOT_FOUND',
@@ -87,6 +89,7 @@ const callback = async (
 
       console.log('Sending response message.');
       return sendFailedMessage(
+        req,
         res,
         `Transfered data (${photoWaiting.received}) exceeds initial image size (${photoWaiting.image64Len}).`,
         'PHOTO_SIZE_EXCEEDED',
@@ -110,7 +113,7 @@ const callback = async (
       FilesWaiting.delete(body.id);
 
       console.log('Sending response message.');
-      return sendFailedMessage(res, `Not all parts were found`, 'MISSING_PARTS');
+      return sendFailedMessage(req, res, `Not all parts were found`, 'MISSING_PARTS');
     }
 
     const image64 = joinParts(photoWaiting.dataParts);
@@ -155,7 +158,7 @@ const callback = async (
       if (err instanceof PhotoParsingError) {
         console.log('Format not supported.');
         console.log(err);
-        return sendFailedMessage(res, `Format not supported`, 'FORMAT_NOT_SUPPORTED');
+        return sendFailedMessage(req, res, `Format not supported`, 'FORMAT_NOT_SUPPORTED');
       }
 
       throw err;
@@ -174,7 +177,7 @@ const callback = async (
     return sendResponse(res, jsonResponse);
   } catch (err) {
     console.error(err);
-    return responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(req, res);
   }
 };
 

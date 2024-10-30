@@ -32,7 +32,7 @@ const callback = async (
 
     if (!IsServerClaimedLocal()) {
       console.log('server is not claimed');
-      return sendFailedMessage(res, 'Server not claimed', 'SERVER_NOT_CLAIMED');
+      return sendFailedMessage(req, res, 'Server not claimed', 'SERVER_NOT_CLAIMED');
     }
 
     const localCredentials = GetServerLocalClaimInfo();
@@ -45,7 +45,7 @@ const callback = async (
 
     if (localCredentials.username != username || !passwordValid) {
       console.log('Wrong username or password.');
-      return sendFailedMessage(res, 'Wrong username or password.', 'INVALID_CREDENTIALS');
+      return sendFailedMessage(req, res, 'Wrong username or password.', 'INVALID_CREDENTIALS');
     }
 
     console.log('user has access to server, generating token');
@@ -68,7 +68,7 @@ const callback = async (
     return sendResponse(res, 'Token generated successfully');
   } catch (err) {
     console.error(err);
-    return responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(req, res);
   }
 };
 

@@ -6,7 +6,7 @@ import { GetNumberPhotos } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
-const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendResponse<
+const { sendResponse } = responseFormatter.getCustomSendResponse<
   GetNumberPhotos.ResponseData,
   GetNumberPhotos.ResponseErrorTypes
 >();
@@ -27,7 +27,7 @@ const callback = async (
     return sendResponse(res, jsonResponse);
   } catch (err) {
     console.error(err);
-    return responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(req, res);
   }
 };
 

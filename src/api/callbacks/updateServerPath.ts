@@ -35,12 +35,13 @@ const callback = async (
 
     if (!isAbsolutePath(path)) {
       console.log('Invalid path, not an absolute path');
-      return sendFailedMessage(res, 'Path is not absolute', 'PATH_NOT_ABSOLUTE');
+      return sendFailedMessage(req, res, 'Path is not absolute', 'PATH_NOT_ABSOLUTE');
     }
 
     if (!(await pathExists(path))) {
       console.log('Invalid path, could not access the folder');
       return sendFailedMessage(
+        req,
         res,
         'Cannot reach the given path',
         'PATH_FOLDER_DOES_NOT_EXIST',
@@ -49,7 +50,7 @@ const callback = async (
 
     if (!(await folderHasRights(path))) {
       console.log('Invalid path, could not access the folder');
-      return sendFailedMessage(res, 'Cannot access the given path', 'PATH_ACCESS_DENIED');
+      return sendFailedMessage(req, res, 'Cannot access the given path', 'PATH_ACCESS_DENIED');
     }
 
     await SaveStorageFolderPath(path);
@@ -57,7 +58,7 @@ const callback = async (
     return sendResponse(res, 'Server path changed');
   } catch (err) {
     console.error(err);
-    return responseFormatter.sendErrorMessage(res);
+    return responseFormatter.sendErrorMessage(req, res);
   }
 };
 

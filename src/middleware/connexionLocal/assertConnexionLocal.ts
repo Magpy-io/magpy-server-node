@@ -12,6 +12,7 @@ async function assertConnexionLocal(req: ExtendedRequest, res: Response, next: N
     if (!req.isConnexionLocal) {
       req.logger?.debug('Request not from loopback');
       responseFormatter.sendFailedMessageMiddleware(
+        req,
         res,
         'Request must be made using loopback address',
         'REQUEST_NOT_FROM_LOOPBACK',
@@ -22,7 +23,7 @@ async function assertConnexionLocal(req: ExtendedRequest, res: Response, next: N
     next();
   } catch (err) {
     req.logger?.error(err);
-    responseFormatter.sendErrorMessage(res);
+    responseFormatter.sendErrorMessage(req, res);
   }
 }
 
