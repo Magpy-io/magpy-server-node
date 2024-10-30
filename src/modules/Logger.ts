@@ -21,14 +21,12 @@ function createLogger() {
     level: 'debug',
     format: combine(errors(), timestamp(), winston.format.json()),
     transports: [new winston.transports.Console()],
-  });
+  }) as CustomLogger;
 
-  return {
-    ...logger,
-    middleware: (message: string) => {
-      logger.log('middleware', message);
-    },
-  } as CustomLogger;
+  logger.middleware = (message: string) => {
+    logger.log('middleware', message);
+  };
+  return logger;
 }
 
 export const Logger = createLogger();
