@@ -19,7 +19,7 @@ const callback = async (req: ExtendedRequest, res: Response, body: WhoAmI.Reques
   const jsonResponse = {
     user: { id: userId },
   };
-  throw new Error('EEE');
+
   console.log('Token verified, sending confirmation');
   return sendResponse(res, jsonResponse);
 };
