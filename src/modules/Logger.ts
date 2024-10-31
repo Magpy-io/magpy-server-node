@@ -19,7 +19,7 @@ function createLogger() {
   const logger = winston.createLogger({
     levels: logLevels,
     level: 'debug',
-    format: combine(errors(), timestamp(), winston.format.json()),
+    format: combine(errors({ stack: true }), timestamp(), winston.format.json()),
     transports: [new winston.transports.Console()],
   }) as CustomLogger;
 

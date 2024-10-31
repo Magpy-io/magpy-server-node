@@ -11,6 +11,8 @@ import {
 import { Photo } from '../db/sequelizeDb';
 import { isPhotoOnDisk, removePhotoVariationsFromDisk } from './diskManager';
 import { SetLastWarningForUser } from './warningsManager';
+import { ExtendedRequest, MiddleWareType } from '../api/endpointsLoader';
+import { NextFunction, Response } from 'express';
 
 function notNull<T>(value: T): value is NonNullable<T> {
   return value !== null;
@@ -24,14 +26,14 @@ export function timeout(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));
 }
 
-export function combineMiddleware(mids: any) {
-  return mids.reduce(function (a: any, b: any) {
-    return function (req: any, res: any, next: any) {
-      a(req, res, function (err: any) {
+export function combineMiddleware(mids: MiddleWareType[]) {
+  return mids.reduce(function (a: MiddleWareType, b: MiddleWareType) {
+    return async function (req: ExtendedRequest, res: Response, next: NextFunction) {
+      return await a(req, res, async function (err: any) {
         if (err) {
-          return next(err);
+          next(err);
         }
-        b(req, res, next);
+        return await b(req, res, next).catch(next);
       });
     };
   });

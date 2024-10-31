@@ -18,7 +18,11 @@ export type EndpointType = {
   requestShema: Joi.ObjectSchema;
 };
 
-export type MiddleWareType = (req: ExtendedRequest, res: Response, next: NextFunction) => {};
+export type MiddleWareType = (
+  req: ExtendedRequest,
+  res: Response,
+  next: NextFunction,
+) => Promise<Response<any, Record<string, any>> | void>;
 
 function getEndpoints(): EndpointType[] {
   return Object.values(callbacks).map(callback => callback.default);
@@ -28,13 +32,18 @@ function loadEndpoints(app: Express) {
   const endpoints = getEndpoints();
   endpoints.forEach(({ endpoint, callback, method, middleWare, requestShema }) => {
     const reqParamValidationMiddleware = generateMiddlewareFromShema(requestShema);
-    const callbackFormated = (req: ExtendedRequest, res: Response, next: NextFunction) => {
-      console.log(endpoint);
+    const callbackCatched = (req: ExtendedRequest, res: Response, next: NextFunction) => {
       callback(req, res, req.body).catch(next);
     };
     const endpointFormatted = '/' + endpoint;
 
     let middleWareArray: MiddleWareType[];
+
+    function convertMiddelware(middelware: MiddleWareType) {
+      return (req: ExtendedRequest, res: Response, next: NextFunction) => {
+        return middelware(req, res, next).catch(next);
+      };
+    }
 
     if (middleWare) {
       if (middleWare instanceof Array) {
@@ -49,7 +58,9 @@ function loadEndpoints(app: Express) {
     // execute parameter validation just before endpoint callback
     middleWareArray.push(reqParamValidationMiddleware);
 
-    app[method](endpointFormatted, ...middleWareArray, callbackFormated);
+    const middlewareArrayCatched = middleWareArray.map(convertMiddelware);
+
+    app[method](endpointFormatted, ...middlewareArrayCatched, callbackCatched);
   });
 }
 
