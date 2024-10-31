@@ -71,7 +71,7 @@ const callback = async (
         part: part,
         totalNbOfParts: totalNbOfParts,
       };
-      return sendResponse(res, jsonResponse);
+      return sendResponse(req, res, jsonResponse);
     } else {
       console.log(`Part number ${part} must be between 0 and ${totalNbOfParts - 1} included`);
       console.log('Sending response message.');

@@ -64,7 +64,7 @@ const callback = async (
   res.set('x-authorization', 'Bearer ' + userToken);
 
   console.log('sending response');
-  return sendResponse(res, 'Token generated successfully');
+  return sendResponse(req, res, 'Token generated successfully');
 };
 
 export default {

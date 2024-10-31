@@ -60,7 +60,7 @@ const callback = async (
     responseJson.ownerLocal = { name: serverLocalClaimInfo.username };
   }
 
-  return sendResponse(res, responseJson);
+  return sendResponse(req, res, responseJson);
 };
 
 export default {

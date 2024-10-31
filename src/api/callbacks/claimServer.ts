@@ -111,7 +111,7 @@ const callback = async (
 
   await SaveServerToken(serverToken);
 
-  return sendResponse(res, 'ok');
+  return sendResponse(req, res, 'ok');
 };
 
 export default {

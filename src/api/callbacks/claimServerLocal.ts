@@ -45,7 +45,7 @@ const callback = async (
     userId: uuid(),
   });
 
-  return sendResponse(res, 'ok');
+  return sendResponse(req, res, 'ok');
 };
 
 export default {

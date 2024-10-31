@@ -22,7 +22,7 @@ const callback = async (
 
   if (!name) {
     console.log('Nothing to update, sending response');
-    return sendResponse(res, 'Nothing to update');
+    return sendResponse(req, res, 'Nothing to update');
   }
 
   if (name.length < 3 || name.length > 70) {
@@ -49,7 +49,7 @@ const callback = async (
       throw new Error('Error saving server name. ' + JSON.stringify(ret));
     }
   }
-  return sendResponse(res, 'Server name changed');
+  return sendResponse(req, res, 'Server name changed');
 };
 
 export default {

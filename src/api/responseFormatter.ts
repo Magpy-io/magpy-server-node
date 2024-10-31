@@ -9,11 +9,12 @@ import { ExtendedRequest } from './endpointsLoader';
 
 function getCustomSendResponse<T, E extends ErrorCodes | null>() {
   const sendResponseCustom = async function (
+    req: ExtendedRequest,
     res: Response,
     data: T,
     warning: boolean = false,
   ) {
-    return await sendResponse(res, data, warning);
+    return await sendResponse(req, res, data, warning);
   };
 
   const sendFailedMessageCustom = async function (
@@ -29,12 +30,23 @@ function getCustomSendResponse<T, E extends ErrorCodes | null>() {
   return { sendResponse: sendResponseCustom, sendFailedMessage: sendFailedMessageCustom };
 }
 
-async function sendResponse<T>(res: Response, data: T, warning: boolean = false) {
+async function sendResponse<T>(
+  req: ExtendedRequest,
+  res: Response,
+  data: T,
+  warning: boolean = false,
+) {
   let jsonResponse: ResponseTypeFrom<T, any> = {
     ok: true,
     data,
     warning,
   };
+
+  req.logger?.http('Sending response', {
+    ok: true,
+    type: 'response',
+    code: 200,
+  });
 
   return await res.status(200).json(jsonResponse);
 }
@@ -62,6 +74,7 @@ async function sendFailedMessage(
   let jsonResponse = formatError(msg, code ?? 'SERVER_ERROR', warning);
 
   req.logger?.http('Sending response', {
+    ok: false,
     type: 'response',
     code: 400,
     errorCode: code ?? 'SERVER_ERROR',
@@ -74,6 +87,7 @@ async function sendFailedBadRequest(req: ExtendedRequest, res: Response, message
   let jsonResponse = formatError(message, 'BAD_REQUEST', false);
 
   req.logger?.http('Sending response', {
+    ok: false,
     type: 'response',
     code: 400,
     errorCode: 'BAD_REQUEST',
@@ -86,6 +100,7 @@ async function sendErrorMessage(req: ExtendedRequest, res: Response) {
   let jsonResponse = formatError('Server internal error', 'SERVER_ERROR', false);
 
   req.logger?.http('Sending response', {
+    ok: false,
     type: 'response',
     code: 500,
     errorCode: 'SERVER_ERROR',
@@ -102,6 +117,7 @@ async function sendErrorBackEndServerUnreachable(req: ExtendedRequest, res: Resp
   );
 
   req.logger?.http('Sending response', {
+    ok: false,
     type: 'response',
     code: 500,
     errorCode: 'BACKEND_SERVER_UNREACHABLE',

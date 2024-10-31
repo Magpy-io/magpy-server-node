@@ -37,7 +37,7 @@ const callback = async (
 
   await ClearServerCredentials();
 
-  return sendResponse(res, 'Server unclaimed');
+  return sendResponse(req, res, 'Server unclaimed');
 };
 
 export default {

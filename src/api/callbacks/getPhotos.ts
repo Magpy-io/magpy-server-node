@@ -65,7 +65,7 @@ const callback = async (req: ExtendedRequest, res: Response, body: GetPhotos.Req
   };
 
   console.log('Sending response data.');
-  return sendResponse(res, jsonResponse, warning);
+  return sendResponse(req, res, jsonResponse, warning);
 };
 
 export default {

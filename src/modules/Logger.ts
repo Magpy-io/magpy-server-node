@@ -12,7 +12,7 @@ const logLevels = {
 };
 
 export interface CustomLogger extends winston.Logger {
-  middleware: (message: string) => void;
+  middleware: winston.LeveledLogMethod;
 }
 
 function createLogger() {
@@ -23,9 +23,6 @@ function createLogger() {
     transports: [new winston.transports.Console()],
   }) as CustomLogger;
 
-  logger.middleware = (message: string) => {
-    logger.log('middleware', message);
-  };
   return logger;
 }
 

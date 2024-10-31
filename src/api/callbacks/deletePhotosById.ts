@@ -31,7 +31,7 @@ const callback = async (
 
   console.log('Photos removed from db and disk.');
   console.log('Sending response message.');
-  return sendResponse(res, { deletedIds: removedIds });
+  return sendResponse(req, res, { deletedIds: removedIds });
 };
 
 export default {

@@ -56,7 +56,7 @@ const callback = async (
 
     console.log('Photo updated successfully.');
     console.log('Sending response message.');
-    return sendResponse(res, `Photo with id ${id} successfully updated with new mediaId`);
+    return sendResponse(req, res, `Photo with id ${id} successfully updated with new mediaId`);
   }
 };
 

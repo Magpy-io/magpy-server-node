@@ -21,7 +21,7 @@ const callback = async (req: ExtendedRequest, res: Response, body: WhoAmI.Reques
   };
 
   console.log('Token verified, sending confirmation');
-  return sendResponse(res, jsonResponse);
+  return sendResponse(req, res, jsonResponse);
 };
 
 export default {

@@ -20,7 +20,7 @@ const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendRespo
 
 const callback = async (req: ExtendedRequest, res: Response, body: IsClaimed.RequestData) => {
   if (IsServerClaimedLocal()) {
-    return sendResponse(res, { claimed: 'Locally' });
+    return sendResponse(req, res, { claimed: 'Locally' });
   }
 
   if (IsServerClaimedRemote()) {
@@ -51,19 +51,19 @@ const callback = async (req: ExtendedRequest, res: Response, body: IsClaimed.Req
     }
 
     if (ret.ok) {
-      return sendResponse(res, { claimed: 'Remotely' });
+      return sendResponse(req, res, { claimed: 'Remotely' });
     } else {
       if (ret.errorCode == 'INVALID_CREDENTIALS') {
         console.log('invalid server credentials');
         console.log('Deleting credentials');
         await ClearServerCredentials();
-        return sendResponse(res, { claimed: 'None' });
+        return sendResponse(req, res, { claimed: 'None' });
       } else {
         throw new Error('request to verify server credentials failed. ' + JSON.stringify(ret));
       }
     }
   }
-  return sendResponse(res, { claimed: 'None' });
+  return sendResponse(req, res, { claimed: 'None' });
 };
 
 export default {

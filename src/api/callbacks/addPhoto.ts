@@ -38,7 +38,7 @@ const callback = async (req: ExtendedRequest, res: Response, body: AddPhoto.Requ
     };
 
     console.log('Sending response message.');
-    return sendResponse(res, jsonResponse);
+    return sendResponse(req, res, jsonResponse);
   }
 
   const photo = {
@@ -84,7 +84,7 @@ const callback = async (req: ExtendedRequest, res: Response, body: AddPhoto.Requ
     photoExistsBefore: false,
   };
   console.log('Sending response message.');
-  return sendResponse(res, jsonResponse);
+  return sendResponse(req, res, jsonResponse);
 };
 
 export default {

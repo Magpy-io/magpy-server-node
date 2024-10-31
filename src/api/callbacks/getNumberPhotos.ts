@@ -23,7 +23,7 @@ const callback = async (
     number: nb,
   };
   console.log('Sending response data.');
-  return sendResponse(res, jsonResponse);
+  return sendResponse(req, res, jsonResponse);
 };
 
 export default {

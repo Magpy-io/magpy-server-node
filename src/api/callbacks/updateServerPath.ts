@@ -22,14 +22,14 @@ const callback = async (
 
   if (!path) {
     console.log('Nothing to update, sending response');
-    return sendResponse(res, 'Nothing to update');
+    return sendResponse(req, res, 'Nothing to update');
   }
 
   const currentPath = await GetStorageFolderPath();
 
   if (path == currentPath) {
     console.log('Path is already set, sending response');
-    return sendResponse(res, 'Path is already set');
+    return sendResponse(req, res, 'Path is already set');
   }
 
   if (!isAbsolutePath(path)) {
@@ -54,7 +54,7 @@ const callback = async (
 
   await SaveStorageFolderPath(path);
 
-  return sendResponse(res, 'Server path changed');
+  return sendResponse(req, res, 'Server path changed');
 };
 
 export default {

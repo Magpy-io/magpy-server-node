@@ -70,7 +70,7 @@ const callback = async (
     }, postPhotoPartTimeout);
 
     console.log('Sending response message.');
-    return sendResponse(res, {
+    return sendResponse(req, res, {
       lenReceived: photoWaiting.received,
       lenWaiting: photoWaiting.image64Len,
       done: false,
@@ -140,7 +140,7 @@ const callback = async (
     };
 
     console.log('Sending response message.');
-    return sendResponse(res, jsonResponse);
+    return sendResponse(req, res, jsonResponse);
   }
 
   const dbPhoto = await addPhotoToDB(photoWaiting.photo);
@@ -173,7 +173,7 @@ const callback = async (
     photoExistsBefore: false,
   };
   console.log('Sending response message.');
-  return sendResponse(res, jsonResponse);
+  return sendResponse(req, res, jsonResponse);
 };
 
 function arePartsValid(parts: Map<number, string>) {

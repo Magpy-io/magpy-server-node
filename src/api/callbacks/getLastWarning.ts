@@ -28,7 +28,7 @@ const callback = async (
     warning: warning ? warning : null,
   };
   console.log('Warning found, sending response');
-  return sendResponse(res, jsonResponse);
+  return sendResponse(req, res, jsonResponse);
 };
 
 export default {

@@ -38,7 +38,7 @@ const callback = async (
     };
 
     console.log('Sending response message.');
-    return sendResponse(res, jsonResponse);
+    return sendResponse(req, res, jsonResponse);
   }
 
   const photo = {
@@ -75,7 +75,7 @@ const callback = async (
     photo: photo,
   });
   console.log('Sending response message.');
-  return sendResponse(res, { id: id, photoExistsBefore: false });
+  return sendResponse(req, res, { id: id, photoExistsBefore: false });
 };
 
 export default {
