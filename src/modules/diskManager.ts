@@ -62,28 +62,13 @@ export async function addPhotoToDisk<T extends AddPhotoParamType>(photo: T, base
 }
 
 export async function removePhotoFromDisk<T extends AddPhotoParamType>(photo: T) {
-  try {
-    await fs.rm(photo.serverPath, { force: true });
-  } catch (err: any) {
-    console.error(err);
-    throw err;
-  }
+  await fs.rm(photo.serverPath, { force: true });
   await removePhotoVariationsFromDisk(photo);
 }
 
 export async function removePhotoVariationsFromDisk<T extends AddPhotoParamType>(photo: T) {
-  try {
-    await fs.rm(photo.serverThumbnailPath, { force: true });
-  } catch (err: any) {
-    console.error(err);
-    throw err;
-  }
-  try {
-    await fs.rm(photo.serverCompressedPath, { force: true });
-  } catch (err: any) {
-    console.error(err);
-    throw err;
-  }
+  await fs.rm(photo.serverThumbnailPath, { force: true });
+  await fs.rm(photo.serverCompressedPath, { force: true });
 }
 
 export async function getPhotoFromDisk<T extends AddPhotoParamType>(
@@ -116,33 +101,18 @@ export async function getPhotoFromDisk<T extends AddPhotoParamType>(
       break;
   }
 
-  try {
-    const result = await fs.readFile(photoPath, { encoding: 'base64' });
-    return Buffer.from(result).toString();
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
+  const result = await fs.readFile(photoPath, { encoding: 'base64' });
+  return Buffer.from(result).toString();
 }
 
 export async function clearImagesDisk() {
-  try {
-    const pathDir = GetStorageFolderPath();
-    await fs.rm(pathDir, { force: true, recursive: true });
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
+  const pathDir = GetStorageFolderPath();
+  await fs.rm(pathDir, { force: true, recursive: true });
 }
 
 export async function clearDbFile() {
-  try {
-    const pathDir = config.sqliteDbFile;
-    await fs.rm(pathDir, { force: true, recursive: true });
-  } catch (err) {
-    console.error(err);
-    throw err;
-  }
+  const pathDir = config.sqliteDbFile;
+  await fs.rm(pathDir, { force: true, recursive: true });
 }
 
 export async function isPhotoOnDisk<T extends AddPhotoParamType>(photo: T) {

@@ -23,10 +23,10 @@ const callback = async (req: ExtendedRequest, res: Response, body: GetPhotos.Req
 
   const { number, offset, photoType } = body;
 
-  console.log(`Getting ${number} photos with offset ${offset} from db.`);
+  req.logger?.debug(`Getting ${number} photos with offset ${offset} from db.`);
   const { photos, endReached } = await getPhotosFromDB(number, offset);
 
-  console.log(`Got ${photos?.length} photos.`);
+  req.logger?.debug(`Got ${photos?.length} photos.`);
 
   const ret = await filterPhotosAndDeleteMissing(photos);
   const warning = ret.warning;
@@ -34,7 +34,7 @@ const callback = async (req: ExtendedRequest, res: Response, body: GetPhotos.Req
     AddWarningPhotosDeleted(ret.photosDeleted, req.userId);
   }
 
-  console.log(
+  req.logger?.debug(
     `${ret.photosThatExist?.length} photos exist in disk, ${
       photos?.length - ret.photosThatExist?.length
     } photos were missing.`,
@@ -45,7 +45,7 @@ const callback = async (req: ExtendedRequest, res: Response, body: GetPhotos.Req
   if (photoType == 'data') {
     images64Promises = new Array(ret.photosThatExist.length).fill('');
   } else {
-    console.log(`Retrieving ${photoType} photos from disk.`);
+    req.logger?.debug(`Retrieving ${photoType} photos from disk.`);
     images64Promises = ret.photosThatExist.map(photo => {
       return getPhotoFromDisk(photo, photoType);
     });
@@ -57,14 +57,13 @@ const callback = async (req: ExtendedRequest, res: Response, body: GetPhotos.Req
     return responseFormatter.createPhotoObject(photo, images64[index]);
   });
 
-  console.log('Photos retrieved from disk if needed.');
+  req.logger?.debug('Photos retrieved from disk if needed.');
   const jsonResponse = {
     endReached: endReached,
     number: photosWithImage64.length,
     photos: photosWithImage64,
   };
 
-  console.log('Sending response data.');
   return sendResponse(req, res, jsonResponse, warning);
 };
 

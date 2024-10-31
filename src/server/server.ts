@@ -16,6 +16,7 @@ import cors from 'cors';
 import { requestID } from '../middleware/requestID';
 import { addLogger } from '../middleware/addLogger';
 import { unexpectedErrorHandler } from '../middleware/unexpectedErrorHandler';
+import { Logger } from '../modules/Logger';
 
 let app: Express;
 let server: Server | null;
@@ -66,14 +67,14 @@ export async function initServer() {
 
   return new Promise<Express>(resolve => {
     server = app.listen(config.port, () => {
-      console.log(`Server is listening on port ${config.port}`);
+      Logger.info(`Server is listening on port ${config.port}`);
       resolve(app);
     });
   });
 }
 
 export function setupShutdownManager() {
-  console.log('Setting up gracefull termination of server');
+  Logger.info('Setting up gracefull termination of server');
   if (!server) {
     throw new Error('setupShutdownManager: server not yet initialized');
   }
@@ -82,7 +83,7 @@ export function setupShutdownManager() {
   stdinEventEmitter.on('notification-icon-clicked', e => {
     if (e == 'exit') {
       shutdownManager.terminate(() => {
-        console.log('Server was gracefully terminated');
+        Logger.info('Exit received on stdin: Server was gracefully terminated');
         process.exit(0);
       });
 
@@ -95,7 +96,7 @@ export function setupShutdownManager() {
 
   process.on('SIGINT', () => {
     shutdownManager.terminate(() => {
-      console.log('Server is gracefully terminated');
+      Logger.info('SIGINT: Server is gracefully terminated');
       process.exit(0);
     });
 
@@ -107,7 +108,7 @@ export function setupShutdownManager() {
 
   process.on('SIGTERM', () => {
     shutdownManager.terminate(() => {
-      console.log('Server is gracefully terminated');
+      Logger.info('SIGTERM: Server is gracefully terminated');
       process.exit(0);
     });
 

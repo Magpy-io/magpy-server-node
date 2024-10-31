@@ -33,6 +33,7 @@ function loadEndpoints(app: Express) {
   endpoints.forEach(({ endpoint, callback, method, middleWare, requestShema }) => {
     const reqParamValidationMiddleware = generateMiddlewareFromShema(requestShema);
     const callbackCatched = (req: ExtendedRequest, res: Response, next: NextFunction) => {
+      req.logger?.middleware(endpoint);
       callback(req, res, req.body).catch(next);
     };
     const endpointFormatted = '/' + endpoint;

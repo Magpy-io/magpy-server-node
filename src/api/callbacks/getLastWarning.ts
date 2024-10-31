@@ -27,7 +27,7 @@ const callback = async (
   const jsonResponse = {
     warning: warning ? warning : null,
   };
-  console.log('Warning found, sending response');
+  req.logger?.debug('Warning found, sending response');
   return sendResponse(req, res, jsonResponse);
 };
 

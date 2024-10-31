@@ -1,3 +1,4 @@
+import { Logger } from '../modules/Logger';
 import { pathExists } from '../modules/diskBasicFunctions';
 import { join } from 'path';
 
@@ -5,29 +6,29 @@ const BASE_PATH = './client/build';
 const FILE_NAME_TO_CHECK = 'index.html';
 
 export async function findClientBuildPath(): Promise<string | null> {
-  console.log('Looking for client build.');
+  Logger.info('Looking for client build.');
 
   const pathLevel0 = await checkPath('.');
   if (pathLevel0) {
-    console.log('client build found at ' + pathLevel0);
+    Logger.info('client build found at ' + pathLevel0);
     return pathLevel0;
   }
 
   const pathLevel1 = await checkPath('..');
   if (pathLevel1) {
-    console.log('client build found at ' + pathLevel1);
+    Logger.info('client build found at ' + pathLevel1);
     return pathLevel1;
   }
 
   const pathLevel2 = await checkPath('../..');
   if (pathLevel2) {
-    console.log('client build found at ' + pathLevel2);
+    Logger.info('client build found at ' + pathLevel2);
     return pathLevel2;
   }
 
   const pathLevel3 = await checkPath('../../..');
   if (pathLevel3) {
-    console.log('client build found at ' + pathLevel3);
+    Logger.info('client build found at ' + pathLevel3);
     return pathLevel3;
   }
   return null;

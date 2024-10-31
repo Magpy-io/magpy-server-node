@@ -38,13 +38,10 @@ const callback = async (req: ExtendedRequest, res: Response, body: IsClaimed.Req
       });
     } catch (err) {
       if (err instanceof ErrorBackendUnreachable) {
-        console.log('Error requesting backend server');
-        return sendFailedMessage(
-          req,
-          res,
-          'Backend server unreachable, could not confirm server claim status.',
-          'BACKEND_SERVER_UNREACHABLE',
+        req.logger?.error(
+          'Error requesting backend server, could not confirm server claim status.',
         );
+        return responseFormatter.sendErrorBackEndServerUnreachable(req, res);
       } else {
         throw err;
       }
@@ -54,8 +51,8 @@ const callback = async (req: ExtendedRequest, res: Response, body: IsClaimed.Req
       return sendResponse(req, res, { claimed: 'Remotely' });
     } else {
       if (ret.errorCode == 'INVALID_CREDENTIALS') {
-        console.log('invalid server credentials');
-        console.log('Deleting credentials');
+        req.logger?.debug('invalid server credentials');
+        req.logger?.debug('Deleting credentials');
         await ClearServerCredentials();
         return sendResponse(req, res, { claimed: 'None' });
       } else {

@@ -23,15 +23,13 @@ const callback = async (
     try {
       ret = await DeleteServer.Post();
     } catch (err) {
-      console.error('error deleting server from backend');
-      console.error(err);
+      req.logger?.error('error deleting server from backend', err);
     }
 
     if (!ret?.ok) {
-      console.error('error deleting server from backend');
-      console.error(ret);
+      req.logger?.error('error deleting server from backend: ', { ret });
     } else {
-      console.log('Server deleted from backend');
+      req.logger?.debug('Server deleted from backend');
     }
   }
 

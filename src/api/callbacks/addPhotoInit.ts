@@ -30,14 +30,13 @@ const callback = async (
   });
 
   if (photoExists.exists) {
-    console.log('Photo exists in db');
+    req.logger?.debug('Photo exists in db');
 
     const jsonResponse = {
       photo: responseFormatter.createPhotoObject(photoExists.exists, ''),
       photoExistsBefore: true as true,
     };
 
-    console.log('Sending response message.');
     return sendResponse(req, res, jsonResponse);
   }
 
@@ -56,8 +55,8 @@ const callback = async (
     hash: '',
   };
 
-  console.log('Photo does not exist in server.');
-  console.log('Creating syncDate and photoPath.');
+  req.logger?.debug('Photo does not exist in server.');
+  req.logger?.debug('Creating syncDate and photoPath.');
   const image64Len = body.image64Len;
   photo.syncDate = new Date(Date.now()).toISOString();
   await addServerImagePaths(photo);
@@ -68,13 +67,12 @@ const callback = async (
     image64Len: image64Len,
     dataParts: new Map<number, string>(),
     timeout: setTimeout(() => {
-      console.log(`Photo transfer for id ${id} timed out.`);
-      console.log(`Deleting pending transfer for id ${id}`);
+      req.logger?.debug(`Photo transfer for id ${id} timed out.`);
+      req.logger?.debug(`Deleting pending transfer for id ${id}`);
       FilesWaiting.delete(id);
     }, postPhotoPartTimeout),
     photo: photo,
   });
-  console.log('Sending response message.');
   return sendResponse(req, res, { id: id, photoExistsBefore: false });
 };
 

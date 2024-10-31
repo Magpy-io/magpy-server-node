@@ -32,11 +32,11 @@ const callback = async (
   const { userToken } = body;
 
   if (req.isClaimedRemote || IsServerClaimedLocal()) {
-    console.log('server already claimed');
+    req.logger?.debug('server already claimed');
     return sendFailedMessage(req, res, 'Server already claimed', 'SERVER_ALREADY_CLAIMED');
   }
 
-  console.log('server not claimed');
+  req.logger?.debug('server not claimed');
 
   const keyGenerated = randomBytes(32).toString('hex');
 
@@ -52,7 +52,7 @@ const callback = async (
     });
   } catch (err) {
     if (err instanceof ErrorBackendUnreachable) {
-      console.error('Error requesting backend server');
+      req.logger?.error('Error requesting backend server');
       return responseFormatter.sendErrorBackEndServerUnreachable(req, res);
     } else {
       throw err;
@@ -61,7 +61,7 @@ const callback = async (
 
   if (!ret.ok) {
     if (ret.errorCode == 'AUTHORIZATION_FAILED') {
-      console.log('user token authorization error');
+      req.logger?.debug('user token authorization error');
       return sendFailedMessage(
         req,
         res,
@@ -69,7 +69,7 @@ const callback = async (
         'AUTHORIZATION_BACKEND_FAILED',
       );
     } else if (ret.errorCode == 'AUTHORIZATION_EXPIRED') {
-      console.log('user token expired');
+      req.logger?.debug('user token expired');
       return sendFailedMessage(
         req,
         res,
@@ -82,14 +82,14 @@ const callback = async (
   }
 
   const id = ret.data.server._id;
-  console.log('server registered, got id: ' + id);
+  req.logger?.debug('server registered, got id: ' + id);
 
   let ret1: GetServerToken.ResponseType;
   try {
     ret1 = await GetServerToken.Post({ id: id, key: keyGenerated });
   } catch (err) {
     if (err instanceof ErrorBackendUnreachable) {
-      console.error('Error requesting backend server');
+      req.logger?.error('Error requesting backend server');
       return responseFormatter.sendErrorBackEndServerUnreachable(req, res);
     } else {
       throw err;
@@ -100,7 +100,7 @@ const callback = async (
     throw new Error('request to verify server credentials failed. ' + JSON.stringify(ret1));
   }
 
-  console.log('got server token, saving to local');
+  req.logger?.debug('got server token, saving to local');
 
   const serverToken = TokenManager.GetServerToken();
 

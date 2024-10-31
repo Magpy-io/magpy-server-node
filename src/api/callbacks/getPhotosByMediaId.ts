@@ -27,9 +27,9 @@ const callback = async (
 
   const { photosData, photoType, deviceUniqueId } = body;
 
-  console.log('Getting photos from db with mediaId from request.');
+  req.logger?.debug('Getting photos from db with mediaId from request.');
   const photos = await getPhotosByMediaIdFromDB(photosData, deviceUniqueId);
-  console.log('Received response from db.');
+  req.logger?.debug('Received response from db.');
 
   const ret = await filterPhotosExistAndDeleteMissing(photos);
   const warning = ret.warning;
@@ -41,7 +41,7 @@ const callback = async (
   if (photoType == 'data') {
     images64Promises = new Array(ret.photosThatExist.length).fill('');
   } else {
-    console.log(`Retrieving ${photoType} photos from disk.`);
+    req.logger?.debug(`Retrieving ${photoType} photos from disk.`);
     images64Promises = ret.photosThatExist.map(photo => {
       if (!photo) return '';
       return getPhotoFromDisk(photo, photoType);
@@ -49,7 +49,7 @@ const callback = async (
   }
   const images64 = await Promise.all(images64Promises);
 
-  console.log('Photos retrieved from disk if needed');
+  req.logger?.debug('Photos retrieved from disk if needed');
 
   const photosResponse = ret.photosThatExist.map((photo, index) => {
     if (!photo)
@@ -71,7 +71,6 @@ const callback = async (
     photos: photosResponse,
   };
 
-  console.log('Sending response data.');
   return sendResponse(req, res, jsonResponse, warning);
 };
 

@@ -21,17 +21,17 @@ const callback = async (
   const { name } = body;
 
   if (!name) {
-    console.log('Nothing to update, sending response');
+    req.logger?.debug('Nothing to update, sending response');
     return sendResponse(req, res, 'Nothing to update');
   }
 
   if (name.length < 3 || name.length > 70) {
-    console.log('Invalid name');
+    req.logger?.debug('Invalid name');
     return sendFailedMessage(req, res, 'Name too short or too long', 'INVALID_NAME');
   }
 
   if (!/^[a-zA-Z0-9 \-_'\$\*=\+\,;\.\?/:!&]+$/.test(name)) {
-    console.log('Invalid name');
+    req.logger?.debug('Invalid name');
     return sendFailedMessage(
       req,
       res,

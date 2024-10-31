@@ -16,13 +16,12 @@ const callback = async (
   res: Response,
   body: GetNumberPhotos.RequestData,
 ) => {
-  console.log('Getting number of photos in db.');
+  req.logger?.debug('Getting number of photos in db.');
   const nb = await countPhotosInDB();
-  console.log(`Number of photos found in db: ${nb}.`);
+  req.logger?.debug(`Number of photos found in db: ${nb}.`);
   const jsonResponse = {
     number: nb,
   };
-  console.log('Sending response data.');
   return sendResponse(req, res, jsonResponse);
 };
 

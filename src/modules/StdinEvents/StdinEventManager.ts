@@ -1,4 +1,5 @@
 import Joi from 'joi';
+import { Logger } from '../Logger';
 
 const mainAppEventSchema = Joi.object({
   source: Joi.string().required(),
@@ -32,14 +33,14 @@ export class StdinEventManager {
       const e = tryParseJSON(data.toString());
 
       if (!e) {
-        console.log('Invalid data received on stdin: ' + data.toString());
+        Logger.warn('Invalid data received on stdin: ' + data.toString());
         return;
       }
 
       const { error, value } = mainAppEventSchema.validate(e);
 
       if (error) {
-        console.log('Invalid data received on stdin: ' + data.toString());
+        Logger.warn('Invalid data received on stdin: ' + data.toString());
         return;
       }
 

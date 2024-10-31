@@ -30,11 +30,11 @@ const callback = async (
   const { username, password } = body;
 
   if (IsServerClaimedAny()) {
-    console.log('server already claimed');
+    req.logger?.debug('server already claimed');
     return sendFailedMessage(req, res, 'Server already claimed', 'SERVER_ALREADY_CLAIMED');
   }
 
-  console.log('server not claimed, saving claiming user.');
+  req.logger?.debug('server not claimed, saving claiming user.');
 
   const salt = await bcrypt.genSalt(10);
   const hashedPassword = await bcrypt.hash(password, salt);

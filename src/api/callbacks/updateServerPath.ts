@@ -21,24 +21,24 @@ const callback = async (
   const { path } = body;
 
   if (!path) {
-    console.log('Nothing to update, sending response');
+    req.logger?.debug('Nothing to update, sending response');
     return sendResponse(req, res, 'Nothing to update');
   }
 
   const currentPath = await GetStorageFolderPath();
 
   if (path == currentPath) {
-    console.log('Path is already set, sending response');
+    req.logger?.debug('Path is already set, sending response');
     return sendResponse(req, res, 'Path is already set');
   }
 
   if (!isAbsolutePath(path)) {
-    console.log('Invalid path, not an absolute path');
+    req.logger?.debug('Invalid path, not an absolute path');
     return sendFailedMessage(req, res, 'Path is not absolute', 'PATH_NOT_ABSOLUTE');
   }
 
   if (!(await pathExists(path))) {
-    console.log('Invalid path, could not access the folder');
+    req.logger?.debug('Invalid path, could not access the folder');
     return sendFailedMessage(
       req,
       res,
@@ -48,7 +48,7 @@ const callback = async (
   }
 
   if (!(await folderHasRights(path))) {
-    console.log('Invalid path, could not access the folder');
+    req.logger?.debug('Invalid path, could not access the folder');
     return sendFailedMessage(req, res, 'Cannot access the given path', 'PATH_ACCESS_DENIED');
   }
 

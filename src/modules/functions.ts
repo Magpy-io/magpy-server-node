@@ -13,6 +13,7 @@ import { isPhotoOnDisk, removePhotoVariationsFromDisk } from './diskManager';
 import { SetLastWarningForUser } from './warningsManager';
 import { ExtendedRequest, MiddleWareType } from '../api/endpointsLoader';
 import { NextFunction, Response } from 'express';
+import { Logger } from './Logger';
 
 function notNull<T>(value: T): value is NonNullable<T> {
   return value !== null;
@@ -93,7 +94,7 @@ export async function checkPhotoExistsAndDeleteMissing(
   const existsDisk = await isPhotoOnDisk(photo);
 
   if (!existsDisk) {
-    console.error(
+    Logger.warn(
       `Some variation of photo ${photo.serverPath} not found on disk, deleting the photo variations and removing it from db.`,
     );
     await removePhotoVariationsFromDisk(photo);
@@ -155,7 +156,7 @@ export async function filterPhotosExistAndDeleteMissing(photos: Array<Photo | nu
 }
 
 export function AddWarningPhotosDeleted(photosDeleted: Photo[], userid: string) {
-  console.log('Photos missing deleted, adding warning');
+  Logger.info('Photos missing deleted, adding warning');
   SetLastWarningForUser(userid, {
     code: 'PHOTOS_NOT_ON_DISK_DELETED',
     data: {

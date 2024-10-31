@@ -29,8 +29,8 @@ const callback = async (
     }
   }
 
-  console.log('Photos removed from db and disk.');
-  console.log('Sending response message.');
+  req.logger?.debug('Photos removed from db and disk.');
+
   return sendResponse(req, res, { deletedIds: removedIds });
 };
 

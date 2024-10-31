@@ -30,7 +30,7 @@ const callback = async (
   const { username, password } = body;
 
   if (!IsServerClaimedLocal()) {
-    console.log('server is not claimed');
+    req.logger?.debug('server is not claimed');
     return sendFailedMessage(req, res, 'Server not claimed', 'SERVER_NOT_CLAIMED');
   }
 
@@ -43,16 +43,16 @@ const callback = async (
   const passwordValid = await bcrypt.compare(password, localCredentials.passwordHash);
 
   if (localCredentials.username != username || !passwordValid) {
-    console.log('Wrong username or password.');
+    req.logger?.debug('Wrong username or password.');
     return sendFailedMessage(req, res, 'Wrong username or password.', 'INVALID_CREDENTIALS');
   }
 
-  console.log('user has access to server, generating token');
+  req.logger?.debug('user has access to server, generating token');
 
   let serverSigningKey = GetServerSigningKey();
 
   if (!serverSigningKey) {
-    console.log(
+    req.logger?.debug(
       'First time generating token, generating signing key and saving it to server config.',
     );
     const keyGenerated = randomBytes(32).toString('hex');
@@ -63,7 +63,6 @@ const callback = async (
   const userToken = generateUserToken(localCredentials.userId, serverSigningKey);
   res.set('x-authorization', 'Bearer ' + userToken);
 
-  console.log('sending response');
   return sendResponse(req, res, 'Token generated successfully');
 };
 

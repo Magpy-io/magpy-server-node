@@ -28,7 +28,7 @@ const callback = async (
 
   const { id, part } = body;
 
-  console.log('Checking photo exists');
+  req.logger?.debug('Checking photo exists');
 
   const ret = await checkPhotoExistsAndDeleteMissing({
     id: id,
@@ -39,8 +39,8 @@ const callback = async (
   }
 
   if (!ret.exists) {
-    console.log('Photo not found in db.');
-    console.log('Sending response message.');
+    req.logger?.debug('Photo not found in db.');
+
     return sendFailedMessage(
       req,
       res,
@@ -49,18 +49,17 @@ const callback = async (
       warning,
     );
   } else {
-    console.log('Photo found in db.');
-    console.log(`Getting photo with id = ${id} from db.`);
+    req.logger?.debug('Photo found in db.');
+    req.logger?.debug(`Getting photo with id = ${id} from db.`);
     const dbPhoto = await getPhotoByIdFromDB(id);
 
     if (!dbPhoto) {
       throw new Error('getPhotoPartById: photo exists but cannot retrieve from db');
     }
 
-    console.log('Retrieving photo from disk.');
+    req.logger?.debug('Retrieving photo from disk.');
     const image64 = await getPhotoFromDisk(dbPhoto, 'original');
-    console.log('Photo retrieved.');
-    console.log('Sending response data.');
+    req.logger?.debug('Photo retrieved.');
 
     const totalNbOfParts = getNumberOfParts(image64);
 
@@ -73,8 +72,10 @@ const callback = async (
       };
       return sendResponse(req, res, jsonResponse);
     } else {
-      console.log(`Part number ${part} must be between 0 and ${totalNbOfParts - 1} included`);
-      console.log('Sending response message.');
+      req.logger?.debug(
+        `Part number ${part} must be between 0 and ${totalNbOfParts - 1} included`,
+      );
+
       return sendFailedMessage(
         req,
         res,

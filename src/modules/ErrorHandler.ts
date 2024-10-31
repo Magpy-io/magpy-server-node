@@ -1,6 +1,8 @@
+import { Logger } from './Logger';
+
 export function setupExceptionsHandler() {
   process.on('uncaughtException', function (err) {
-    console.log(err);
+    Logger.error('on uncaughtException', err);
     process.exit(1);
   });
 }
