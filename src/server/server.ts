@@ -24,17 +24,11 @@ let server: Server | null;
 export async function initServer() {
   app = express();
 
-  app.on('error', e => {
-    console.log(e);
-    throw e;
-  });
-
   app.use(cors());
-
   app.use(requestID);
   app.use(addLogger);
 
-  // To catch errors in requestID and addLogger middlewares
+  // To catch errors in requestID, addLogger and cors middlewares
   app.use(unexpectedErrorHandler);
 
   app.use(
