@@ -20,76 +20,71 @@ const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendRespo
 >();
 
 const callback = async (req: ExtendedRequest, res: Response, body: AddPhoto.RequestData) => {
-  try {
-    if (!req.userId) {
-      throw new Error('UserId is not defined.');
-    }
+  if (!req.userId) {
+    throw new Error('UserId is not defined.');
+  }
 
-    const photoExists = await checkPhotoExistsAndDeleteMissing({
-      mediaId: body.mediaId,
-      deviceUniqueId: body.deviceUniqueId,
-    });
+  const photoExists = await checkPhotoExistsAndDeleteMissing({
+    mediaId: body.mediaId,
+    deviceUniqueId: body.deviceUniqueId,
+  });
 
-    if (photoExists.exists) {
-      console.log('Photo exists in db');
+  if (photoExists.exists) {
+    console.log('Photo exists in db');
 
-      const jsonResponse = {
-        photo: responseFormatter.createPhotoObject(photoExists.exists, ''),
-        photoExistsBefore: true,
-      };
-
-      console.log('Sending response message.');
-      return sendResponse(res, jsonResponse);
-    }
-
-    const photo = {
-      name: body.name,
-      fileSize: body.fileSize,
-      width: body.width,
-      height: body.height,
-      date: body.date,
-      syncDate: new Date(Date.now()).toISOString(),
-      mediaId: body.mediaId,
-      deviceUniqueId: body.deviceUniqueId,
-      serverPath: '',
-      serverCompressedPath: '',
-      serverThumbnailPath: '',
-      hash: '',
-    };
-
-    await addServerImagePaths(photo);
-    photo.hash = hashFile(body.image64);
-    console.log('Adding photo to db.');
-
-    const dbPhoto = await addPhotoToDB(photo);
-
-    console.log('Photo added successfully to db.');
-    try {
-      console.log('Adding photo to disk.');
-      await addPhotoToDisk(dbPhoto, body.image64);
-    } catch (err) {
-      console.log('Could not add photo to disk, removing photo from db');
-      await deletePhotoByIdFromDB(dbPhoto.id);
-
-      if (err instanceof PhotoParsingError) {
-        console.log('Format not supported.');
-        console.log(err);
-        return sendFailedMessage(req, res, `Format not supported`, 'FORMAT_NOT_SUPPORTED');
-      }
-
-      throw err;
-    }
-    console.log('Photo added to disk.');
     const jsonResponse = {
-      photo: responseFormatter.createPhotoObject(dbPhoto, ''),
-      photoExistsBefore: false,
+      photo: responseFormatter.createPhotoObject(photoExists.exists, ''),
+      photoExistsBefore: true,
     };
+
     console.log('Sending response message.');
     return sendResponse(res, jsonResponse);
-  } catch (err) {
-    console.error(err);
-    return responseFormatter.sendErrorMessage(req, res);
   }
+
+  const photo = {
+    name: body.name,
+    fileSize: body.fileSize,
+    width: body.width,
+    height: body.height,
+    date: body.date,
+    syncDate: new Date(Date.now()).toISOString(),
+    mediaId: body.mediaId,
+    deviceUniqueId: body.deviceUniqueId,
+    serverPath: '',
+    serverCompressedPath: '',
+    serverThumbnailPath: '',
+    hash: '',
+  };
+
+  await addServerImagePaths(photo);
+  photo.hash = hashFile(body.image64);
+  console.log('Adding photo to db.');
+
+  const dbPhoto = await addPhotoToDB(photo);
+
+  console.log('Photo added successfully to db.');
+  try {
+    console.log('Adding photo to disk.');
+    await addPhotoToDisk(dbPhoto, body.image64);
+  } catch (err) {
+    console.log('Could not add photo to disk, removing photo from db');
+    await deletePhotoByIdFromDB(dbPhoto.id);
+
+    if (err instanceof PhotoParsingError) {
+      console.log('Format not supported.');
+      console.log(err);
+      return sendFailedMessage(req, res, `Format not supported`, 'FORMAT_NOT_SUPPORTED');
+    }
+
+    throw err;
+  }
+  console.log('Photo added to disk.');
+  const jsonResponse = {
+    photo: responseFormatter.createPhotoObject(dbPhoto, ''),
+    photoExistsBefore: false,
+  };
+  console.log('Sending response message.');
+  return sendResponse(res, jsonResponse);
 };
 
 export default {

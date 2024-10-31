@@ -18,31 +18,26 @@ const callback = async (
   res: Response,
   body: UnclaimServer.RequestData,
 ) => {
-  try {
-    if (req.hasValidCredentials) {
-      let ret: DeleteServer.ResponseType | undefined;
-      try {
-        ret = await DeleteServer.Post();
-      } catch (err) {
-        console.error('error deleting server from backend');
-        console.error(err);
-      }
-
-      if (!ret?.ok) {
-        console.error('error deleting server from backend');
-        console.error(ret);
-      } else {
-        console.log('Server deleted from backend');
-      }
+  if (req.hasValidCredentials) {
+    let ret: DeleteServer.ResponseType | undefined;
+    try {
+      ret = await DeleteServer.Post();
+    } catch (err) {
+      console.error('error deleting server from backend');
+      console.error(err);
     }
 
-    await ClearServerCredentials();
-
-    return sendResponse(res, 'Server unclaimed');
-  } catch (err) {
-    console.error(err);
-    return responseFormatter.sendErrorMessage(req, res);
+    if (!ret?.ok) {
+      console.error('error deleting server from backend');
+      console.error(ret);
+    } else {
+      console.log('Server deleted from backend');
+    }
   }
+
+  await ClearServerCredentials();
+
+  return sendResponse(res, 'Server unclaimed');
 };
 
 export default {

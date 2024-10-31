@@ -12,12 +12,7 @@ const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendRespo
 >();
 
 const callback = async (req: ExtendedRequest, res: Response, body: Status.RequestData) => {
-  try {
-    return sendResponse(res, 'Server ok');
-  } catch (err) {
-    console.error(err);
-    return responseFormatter.sendErrorMessage(req, res);
-  }
+  return sendResponse(res, 'Server ok');
 };
 
 export default {

@@ -26,42 +26,37 @@ const callback = async (
 
   const { id, mediaId, deviceUniqueId } = body;
 
-  try {
-    console.log(`Searching in db for photo with id: ${id}`);
+  console.log(`Searching in db for photo with id: ${id}`);
 
-    const ret = await checkPhotoExistsAndDeleteMissing({
-      id: id,
-    });
+  const ret = await checkPhotoExistsAndDeleteMissing({
+    id: id,
+  });
 
-    const warning = ret.warning;
-    if (warning) {
-      AddWarningPhotosDeleted([ret.deleted], req.userId);
-    }
+  const warning = ret.warning;
+  if (warning) {
+    AddWarningPhotosDeleted([ret.deleted], req.userId);
+  }
 
-    if (!ret.exists) {
-      console.log('Photo does not exist in server.');
-      console.log('Sending response message.');
-      return sendFailedMessage(
-        req,
-        res,
-        `Photo with id ${id} not found in server`,
-        'ID_NOT_FOUND',
-        warning,
-      );
-    } else {
-      console.log('Photo found');
+  if (!ret.exists) {
+    console.log('Photo does not exist in server.');
+    console.log('Sending response message.');
+    return sendFailedMessage(
+      req,
+      res,
+      `Photo with id ${id} not found in server`,
+      'ID_NOT_FOUND',
+      warning,
+    );
+  } else {
+    console.log('Photo found');
 
-      console.log('Photo mediaId does not exist in db');
-      console.log('Updating mediaId in db');
-      await updatePhotoMediaIdById(id, mediaId, deviceUniqueId);
+    console.log('Photo mediaId does not exist in db');
+    console.log('Updating mediaId in db');
+    await updatePhotoMediaIdById(id, mediaId, deviceUniqueId);
 
-      console.log('Photo updated successfully.');
-      console.log('Sending response message.');
-      return sendResponse(res, `Photo with id ${id} successfully updated with new mediaId`);
-    }
-  } catch (err) {
-    console.error(err);
-    return responseFormatter.sendErrorMessage(req, res);
+    console.log('Photo updated successfully.');
+    console.log('Sending response message.');
+    return sendResponse(res, `Photo with id ${id} successfully updated with new mediaId`);
   }
 };
 

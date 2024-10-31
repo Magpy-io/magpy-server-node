@@ -27,30 +27,25 @@ const callback = async (
   res: Response,
   body: ClaimServerLocal.RequestData,
 ) => {
-  try {
-    const { username, password } = body;
+  const { username, password } = body;
 
-    if (IsServerClaimedAny()) {
-      console.log('server already claimed');
-      return sendFailedMessage(req, res, 'Server already claimed', 'SERVER_ALREADY_CLAIMED');
-    }
-
-    console.log('server not claimed, saving claiming user.');
-
-    const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(password, salt);
-
-    await SaveServerLocalClaimInfo({
-      username: username,
-      passwordHash: hashedPassword,
-      userId: uuid(),
-    });
-
-    return sendResponse(res, 'ok');
-  } catch (err) {
-    console.error(err);
-    return responseFormatter.sendErrorMessage(req, res);
+  if (IsServerClaimedAny()) {
+    console.log('server already claimed');
+    return sendFailedMessage(req, res, 'Server already claimed', 'SERVER_ALREADY_CLAIMED');
   }
+
+  console.log('server not claimed, saving claiming user.');
+
+  const salt = await bcrypt.genSalt(10);
+  const hashedPassword = await bcrypt.hash(password, salt);
+
+  await SaveServerLocalClaimInfo({
+    username: username,
+    passwordHash: hashedPassword,
+    userId: uuid(),
+  });
+
+  return sendResponse(res, 'ok');
 };
 
 export default {

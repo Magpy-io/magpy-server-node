@@ -17,26 +17,21 @@ const callback = async (
   res: Response,
   body: DeletePhotosById.RequestData,
 ) => {
-  try {
-    const ids: string[] = body.ids;
+  const ids: string[] = body.ids;
 
-    const removedIds = [];
-    for (const id of ids) {
-      const dbPhoto = await getPhotoByIdFromDB(id);
-      if (dbPhoto) {
-        await deletePhotoByIdFromDB(id);
-        await removePhotoFromDisk(dbPhoto);
-        removedIds.push(id);
-      }
+  const removedIds = [];
+  for (const id of ids) {
+    const dbPhoto = await getPhotoByIdFromDB(id);
+    if (dbPhoto) {
+      await deletePhotoByIdFromDB(id);
+      await removePhotoFromDisk(dbPhoto);
+      removedIds.push(id);
     }
-
-    console.log('Photos removed from db and disk.');
-    console.log('Sending response message.');
-    return sendResponse(res, { deletedIds: removedIds });
-  } catch (err) {
-    console.error(err);
-    return responseFormatter.sendErrorMessage(req, res);
   }
+
+  console.log('Photos removed from db and disk.');
+  console.log('Sending response message.');
+  return sendResponse(res, { deletedIds: removedIds });
 };
 
 export default {
