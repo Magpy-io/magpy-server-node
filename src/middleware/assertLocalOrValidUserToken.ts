@@ -11,23 +11,18 @@ async function assertLocalOrValidUserToken(
   res: Response,
   next: NextFunction,
 ) {
-  try {
-    req.logger?.middleware('assertLocalOrValidUserToken');
-    if (!req.isConnexionLocal && !req.userId) {
-      req.logger?.debug('Request not from loopback and no valid token');
-      return responseFormatter.sendFailedMessageMiddleware(
-        req,
-        res,
-        'Request must be made using loopback address or with a valid token',
-        'AUTHORIZATION_FAILED',
-      );
-    }
-
-    next();
-  } catch (err) {
-    req.logger?.error(err);
-    responseFormatter.sendErrorMessage(req, res);
+  req.logger?.middleware('assertLocalOrValidUserToken');
+  if (!req.isConnexionLocal && !req.userId) {
+    req.logger?.debug('Request not from loopback and no valid token');
+    return responseFormatter.sendFailedMessageMiddleware(
+      req,
+      res,
+      'Request must be made using loopback address or with a valid token',
+      'AUTHORIZATION_FAILED',
+    );
   }
+
+  next();
 }
 
 export default combineMiddleware([

@@ -31,8 +31,10 @@ export async function initServer() {
   app.use(cors());
 
   app.use(requestID);
-
   app.use(addLogger);
+
+  // To catch errors in requestID and addLogger middlewares
+  app.use(unexpectedErrorHandler);
 
   app.use(
     express.json({

@@ -11,37 +11,32 @@ async function checkServerIsClaimedRemote(
   res: Response,
   next: NextFunction,
 ) {
-  try {
-    req.logger?.middleware('checkServerIsClaimedRemote');
+  req.logger?.middleware('checkServerIsClaimedRemote');
 
-    if (!req.hasValidCredentials) {
-      req.logger?.debug('server is not claimed');
-      req.isClaimedRemote = false;
-      next();
-      return;
-    }
-
-    const ret = await GetServerInfo.Post();
-
-    if (!ret.ok) {
-      throw new Error('Error retrieving server info. ' + JSON.stringify(ret));
-    }
-
-    if (ret.data.server.owner == null) {
-      req.logger?.debug('server is not claimed');
-      req.isClaimedRemote = false;
-      next();
-      return;
-    }
-
-    req.logger?.debug('server is claimed');
-    req.isClaimedRemote = true;
-
+  if (!req.hasValidCredentials) {
+    req.logger?.debug('server is not claimed');
+    req.isClaimedRemote = false;
     next();
-  } catch (err) {
-    req.logger?.error(err);
-    responseFormatter.sendErrorMessage(req, res);
+    return;
   }
+
+  const ret = await GetServerInfo.Post();
+
+  if (!ret.ok) {
+    throw new Error('Error retrieving server info. ' + JSON.stringify(ret));
+  }
+
+  if (ret.data.server.owner == null) {
+    req.logger?.debug('server is not claimed');
+    req.isClaimedRemote = false;
+    next();
+    return;
+  }
+
+  req.logger?.debug('server is claimed');
+  req.isClaimedRemote = true;
+
+  next();
 }
 
 export default combineMiddleware([checkServerHasValidCredentials, checkServerIsClaimedRemote]);
