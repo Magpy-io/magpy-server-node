@@ -5,13 +5,11 @@ import { initServer, setupShutdownManager } from './server/server';
 import { setupOpenInterfaceEvent } from './modules/LaunchWebBrowserInterface';
 
 import packageJson from '../package.json';
-import { setupExceptionsHandler } from './modules/ErrorHandler';
 import { Logger } from './modules/Logger';
 
 export async function main() {
   Logger.info('Running Magpy Server v' + packageJson.version);
 
-  setupExceptionsHandler();
   await InitModules();
   await openAndInitDB();
   await initServer();
