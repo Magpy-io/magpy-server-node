@@ -1,3 +1,5 @@
+import './modules/initNodeEnv';
+
 import { InitModules } from './config/configModules';
 import { openAndInitDB } from './db/sequelizeDb';
 import { startServerDiscovery } from './server/serverDiscovery';
