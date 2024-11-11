@@ -147,7 +147,7 @@ describe("Test 'getPhotos' endpoint", () => {
   ];
 
   it.each(testDataArrayPhotoType)(
-    'Should return empty image64 if a photo exists on db but its $photoType is not on disk',
+    'Should return empty image64 and a warning if a photo exists on db but its $photoType is not on disk',
     async (testData: { photoType: PhotoTypes }) => {
       const addedPhotoData = await addPhoto();
 
