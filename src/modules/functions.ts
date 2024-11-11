@@ -106,28 +106,6 @@ export async function checkPhotoExistsAndDeleteMissing(
 }
 
 /**
- * Returns an array of photos containing only the photos present in both the db and disk.
- *
- * If any variation of a photo is missing from disk the photo entry from db is removed.
- */
-export async function filterPhotosAndDeleteMissing(photos: Photo[]) {
-  const photosThatExist = [];
-  const photosDeleted = [];
-
-  for (let photo of photos) {
-    const ret = await checkPhotoExistsAndDeleteMissing({ id: photo.id });
-    if (ret.exists) {
-      photosThatExist.push(photo);
-    }
-
-    if (ret.deleted) {
-      photosDeleted.push(photo);
-    }
-  }
-  return { photosThatExist, photosDeleted, warning: photosDeleted.length != 0 };
-}
-
-/**
  * Returns an array of photos containing the photos present in both the db and disk, and null for any missing photo.
  *
  * If any variation of a photo is missing from disk the photo entry from db is removed, and null is returned for that photo.
