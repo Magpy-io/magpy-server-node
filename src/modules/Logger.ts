@@ -20,7 +20,13 @@ function createLogger() {
     levels: logLevels,
     level: 'debug',
     format: combine(errors({ stack: true }), timestamp(), winston.format.json()),
-    transports: [new winston.transports.Console()],
+    transports: [
+      new winston.transports.Console(),
+      new winston.transports.File({
+        filename: 'output.log',
+        options: { flags: 'w' },
+      }),
+    ],
   }) as CustomLogger;
 
   return logger;
