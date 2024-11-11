@@ -23,7 +23,7 @@ import * as dbFunction from '@src/db/sequelizeDb';
 import { pathExists } from '@src/modules/diskBasicFunctions';
 
 import {
-  AddWarningPhotosDeleted,
+  AddWarningPhotosMissing,
   checkPhotoExistsAndDeleteMissing,
 } from '@src/modules/functions';
 import { GetLastWarningForUser, HasWarningForUser } from '@src/modules/warningsManager';
@@ -146,7 +146,7 @@ describe('Test "SaveWarningPhotosDeleted" function', () => {
     const warningThrown = ret.warning;
 
     if (warningThrown) {
-      AddWarningPhotosDeleted(ret.deleted ? [ret.deleted] : [], getUserId());
+      AddWarningPhotosMissing(ret.deleted ? [ret.deleted] : [], getUserId());
     }
 
     expect(warningThrown).toBe(true);
@@ -159,10 +159,10 @@ describe('Test "SaveWarningPhotosDeleted" function', () => {
       throw new Error('warning should be defined');
     }
 
-    expect(warning.code).toBe('PHOTOS_NOT_ON_DISK_DELETED');
-    expect(warning.data).toHaveProperty('photosDeleted');
-    expect(warning.data.photosDeleted.length).toBe(1);
+    expect(warning.code).toBe('PHOTOS_MISSING_FROM_DISK');
+    expect(warning.data).toHaveProperty('photosMissing');
+    expect(warning.data.photosMissing.length).toBe(1);
 
-    expect(warning.data.photosDeleted[0].id).toBe(dbPhoto.id);
+    expect(warning.data.photosMissing[0].id).toBe(dbPhoto.id);
   });
 });

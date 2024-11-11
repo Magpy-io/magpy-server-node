@@ -155,12 +155,12 @@ export async function filterPhotosExistAndDeleteMissing(photos: Array<Photo | nu
   return { photosThatExist, photosDeleted, warning: photosDeleted.length != 0 };
 }
 
-export function AddWarningPhotosDeleted(photosDeleted: Photo[], userid: string) {
+export function AddWarningPhotosMissing(photosDeleted: Photo[], userid: string) {
   Logger.info('Photos missing deleted, adding warning');
   SetLastWarningForUser(userid, {
-    code: 'PHOTOS_NOT_ON_DISK_DELETED',
+    code: 'PHOTOS_MISSING_FROM_DISK',
     data: {
-      photosDeleted: photosDeleted.map(p => responseFormatter.createPhotoObject(p)),
+      photosMissing: photosDeleted.map(p => responseFormatter.createPhotoObject(p)),
     },
   });
 }

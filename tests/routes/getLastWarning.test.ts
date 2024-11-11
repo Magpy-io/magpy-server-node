@@ -4,7 +4,7 @@ mockModules();
 
 import { describe, expect, it } from '@jest/globals';
 import { GetLastWarning } from '@src/api/export';
-import { WarningPhotosNotOnDiskDeletedType } from '@src/api/export/Types/WarningTypes';
+import { WarningPhotosMissingFromDiskType } from '@src/api/export/Types/WarningTypes';
 import { SetLastWarningForUser } from '@src/modules/warningsManager';
 import { initServer, stopServer } from '@src/server/server';
 import { expectToBeOk, getDataFromRet, getUserId } from '@tests/helpers/functions';
@@ -57,10 +57,10 @@ describe("Test 'getLastWarning' endpoint", () => {
       },
       image64: '',
     };
-    const warning: WarningPhotosNotOnDiskDeletedType = {
-      code: 'PHOTOS_NOT_ON_DISK_DELETED',
+    const warning: WarningPhotosMissingFromDiskType = {
+      code: 'PHOTOS_MISSING_FROM_DISK',
       data: {
-        photosDeleted: [photoMissing],
+        photosMissing: [photoMissing],
       },
     };
     SetLastWarningForUser(getUserId(), warning);
