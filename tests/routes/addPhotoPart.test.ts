@@ -329,6 +329,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
     }
 
     const dataInit = getDataFromRet(retInit);
+
     if (dataInit.photoExistsBefore) {
       throw new Error('Unexpected value.');
     }
@@ -393,7 +394,7 @@ describe("Test 'addPhotoPart' endpoint", () => {
   ];
 
   it.each(testDataArray)(
-    'Should add 1 photo when called with an existing photo in db but $photoType missing on disk, and generate a warning',
+    'Should return photoExistsBefore true and not add photo if mediaId exists but $photoType is missing on disk',
     async testData => {
       const { image64: _, ...photo } = defaultPhoto;
 
@@ -449,13 +450,15 @@ describe("Test 'addPhotoPart' endpoint", () => {
       expectToBeOk(ret);
 
       const data = getDataFromRet(ret);
+      expect(data.done).toBe(true);
 
       if (!data.done) {
         throw new Error('Photo transfer should be done');
       }
 
-      testPhotoMetaAndId(data.photo, { name: 'imageNewName.jpg' });
-      await testPhotosExistInDbAndDisk(data.photo);
+      expect(ret.warning).toBe(false);
+      testPhotoMetaAndId(data.photo);
+      expect(data.photoExistsBefore).toBe(true);
 
       const getPhoto = await getPhotoById(data.photo.id, 'data');
       expect(getPhoto).toBeTruthy();
@@ -466,7 +469,6 @@ describe("Test 'addPhotoPart' endpoint", () => {
 
       testPhotoMetaAndId(getPhoto, {
         id: data.photo.id,
-        name: 'imageNewName.jpg',
       });
     },
   );

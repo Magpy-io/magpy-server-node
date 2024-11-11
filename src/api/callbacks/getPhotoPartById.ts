@@ -3,10 +3,7 @@ import { Request, Response } from 'express';
 import { getPhotoByIdFromDB } from '../../db/sequelizeDb';
 import assertUserToken from '../../middleware/userToken/assertUserToken';
 import { getPhotoFromDisk } from '../../modules/diskManager';
-import {
-  AddWarningPhotosMissing,
-  checkPhotoExistsAndDeleteMissing,
-} from '../../modules/functions';
+import { AddWarningPhotosMissing } from '../../modules/functions';
 import { getNumberOfParts, getPartN } from '../../modules/stringHelper';
 import { GetPhotoPartById } from '../Types';
 import responseFormatter from '../responseFormatter';

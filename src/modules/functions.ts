@@ -63,48 +63,6 @@ export function isAbsolutePath(path: string) {
   return absolute;
 }
 
-/**
- * Returns if a photo exists on the database and on the disk.
- *
- * If any variation of the photo is missing from disk returns false and deletes the photo entry from db.
- */
-export async function checkPhotoExistsAndDeleteMissing(
-  data:
-    | {
-        id: string;
-      }
-    | { mediaId: string; deviceUniqueId: string },
-): Promise<
-  | { exists: null; deleted: Photo; warning: true }
-  | { exists: null; deleted: null; warning: false }
-  | { exists: Photo; deleted: null; warning: false }
-> {
-  let photo: Photo | null;
-
-  if ('id' in data) {
-    photo = await getPhotoByIdFromDB(data.id);
-  } else {
-    photo = await getPhotoByMediaIdFromDB({ mediaId: data.mediaId }, data.deviceUniqueId);
-  }
-
-  if (!photo) {
-    return { exists: null, deleted: null, warning: false };
-  }
-
-  const existsDisk = await isPhotoOnDisk(photo);
-
-  if (!existsDisk) {
-    Logger.warn(
-      `Some variation of photo ${photo.serverPath} not found on disk, deleting the photo variations and removing it from db.`,
-    );
-    await removePhotoVariationsFromDisk(photo);
-    await deletePhotoByIdFromDB(photo.id);
-    return { exists: null, deleted: photo, warning: true };
-  }
-
-  return { exists: photo, deleted: null, warning: false };
-}
-
 export function AddWarningPhotosMissing(photosDeleted: Photo[], userid: string) {
   Logger.info('Photos missing deleted, adding warning');
   SetLastWarningForUser(userid, {
