@@ -18,6 +18,7 @@ import {
   generateId,
   getDataFromRet,
   getPhotoFromDb,
+  testPhotoData,
   testPhotoMetaAndId,
   testPhotoMetaAndIdWithAdditionalMediaIds,
   testWarning,
@@ -106,32 +107,30 @@ describe("Test 'getPhotoPartById' endpoint", () => {
     },
   );
 
-  const testDataArray: Array<{ photoType: PhotoTypes }> = [
-    { photoType: 'thumbnail' },
-    { photoType: 'compressed' },
-    { photoType: 'original' },
-  ];
+  it('Should return empty image64, part 0, nbParts 0 and generate a warning if requesting a photo that exists in db but original is not on disk', async () => {
+    const addedPhotoData = await addPhoto();
 
-  it.each(testDataArray)(
-    'Should return ID_NOT_FOUND error and generate a warning if requesting a photo that exists in db but $photoType is not on disk',
-    async (testData: { photoType: PhotoTypes }) => {
-      const addedPhotoData = await addPhoto();
+    const photo = await getPhotoFromDb(addedPhotoData.id);
+    await deletePhotoFromDisk(photo, 'original');
 
-      const photo = await getPhotoFromDb(addedPhotoData.id);
-      await deletePhotoFromDisk(photo, testData.photoType);
+    const ret = await GetPhotoPartById.Post({
+      id: addedPhotoData.id,
+      part: 0,
+    });
 
-      const ret = await GetPhotoPartById.Post({
-        id: addedPhotoData.id,
-        part: 0,
-      });
+    expectToBeOk(ret);
+    expect(ret.warning).toBe(true);
 
-      expectToNotBeOk(ret);
-      expectErrorCodeToBe(ret, 'ID_NOT_FOUND');
-      expect(ret.warning).toBe(true);
+    const data = getDataFromRet(ret);
 
-      testWarning(photo);
-    },
-  );
+    expect(data.part).toBe(0);
+    expect(data.totalNbOfParts).toBe(0);
+
+    testPhotoData(data.photo);
+    expect(data.photo.image64).toBe('');
+
+    testWarning(photo);
+  });
 
   it('Should return a photo with multiple media ids when requested photo has multiple mediaIds', async () => {
     const addedPhotoData = await addPhotoWithMultipleMediaIds();

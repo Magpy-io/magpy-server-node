@@ -30,45 +30,31 @@ const callback = async (
 
   req.logger?.debug('Checking photo exists');
 
-  const ret = await checkPhotoExistsAndDeleteMissing({
-    id: id,
-  });
-  const warning = ret.warning;
-  if (warning) {
-    AddWarningPhotosMissing([ret.deleted], req.userId);
-  }
+  const dbPhoto = await getPhotoByIdFromDB(id);
 
-  if (!ret.exists) {
+  if (!dbPhoto) {
     req.logger?.debug('Photo not found in db.');
 
-    return sendFailedMessage(
-      req,
-      res,
-      `Photo with id: ${id} not found`,
-      'ID_NOT_FOUND',
-      warning,
-    );
+    return sendFailedMessage(req, res, `Photo with id: ${id} not found`, 'ID_NOT_FOUND');
   } else {
-    req.logger?.debug('Photo found in db.');
-    req.logger?.debug(`Getting photo with id = ${id} from db.`);
-    const dbPhoto = await getPhotoByIdFromDB(id);
+    req.logger?.debug('Photo found in db, retrieving photo from disk.');
 
-    if (!dbPhoto) {
-      throw new Error('getPhotoPartById: photo exists but cannot retrieve from db');
-    }
-
-    req.logger?.debug('Retrieving photo from disk.');
     const image64 = await getPhotoFromDisk(dbPhoto, 'original');
-    req.logger?.debug('Photo retrieved.');
 
     if (image64 == null) {
+      req.logger?.debug('Photo not found in disk');
+
+      AddWarningPhotosMissing([dbPhoto], req.userId);
+
       const jsonResponse = {
         photo: responseFormatter.createPhotoObject(dbPhoto, ''),
         part: 0,
         totalNbOfParts: 0,
       };
-      return sendResponse(req, res, jsonResponse);
+      return sendResponse(req, res, jsonResponse, true);
     }
+
+    req.logger?.debug('Photo retrieved.');
 
     const totalNbOfParts = getNumberOfParts(image64);
 
