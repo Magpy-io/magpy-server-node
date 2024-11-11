@@ -55,7 +55,7 @@ const modelDefinition = {
 };
 
 const modelOptions = {
-  indexes: [{ fields: ['date'] }, { fields: ['syncDate'] }],
+  indexes: [{ fields: ['date'] }],
 };
 
 export function createImageModel(sequelize: Sequelize) {

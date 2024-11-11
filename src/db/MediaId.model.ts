@@ -10,14 +10,22 @@ const modelDefinition = {
     unique: true,
     primaryKey: true,
   },
+  imageId: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
   mediaId: {
+    type: DataTypes.STRING,
+    allowNull: false,
+  },
+  deviceUniqueId: {
     type: DataTypes.STRING,
     allowNull: false,
   },
 };
 
 const modelOptions = {
-  indexes: [{ fields: ['mediaId'] }],
+  indexes: [{ fields: ['imageId'] }],
 };
 
 export function createMediaIdModel(sequelize: Sequelize) {
@@ -26,7 +34,7 @@ export function createMediaIdModel(sequelize: Sequelize) {
 
 export interface MediaIdDB {
   id: string;
-  mediaId: string;
-  deviceId: string;
   imageId: string;
+  mediaId: string;
+  deviceUniqueId: string;
 }
