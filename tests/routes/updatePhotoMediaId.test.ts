@@ -75,7 +75,7 @@ describe("Test 'updatePhotoMediaId' endpoint", () => {
     expectErrorCodeToBe(ret, 'ID_NOT_FOUND');
   });
 
-  it('Should return error ID_NOT_FOUND when id is in db but compressed photo is missing from disk', async () => {
+  it('Should return ok when id is in db but compressed photo is missing from disk', async () => {
     const addedPhotoData = await addPhoto();
 
     const photo = await getPhotoFromDb(addedPhotoData.id);
@@ -83,15 +83,20 @@ describe("Test 'updatePhotoMediaId' endpoint", () => {
 
     const ret = await UpdatePhotoMediaId.Post({
       id: addedPhotoData.id,
-      mediaId: addedPhotoData.mediaId,
+      mediaId: 'newMediaId',
       deviceUniqueId: defaultPhoto.deviceUniqueId,
     });
 
-    expectToNotBeOk(ret);
-    expect(ret.warning).toBe(true);
-    expectErrorCodeToBe(ret, 'ID_NOT_FOUND');
+    expectToBeOk(ret);
+    expect(ret.warning).toBe(false);
 
-    testWarning(photo);
+    const photoServer = await getPhotoById(addedPhotoData.id);
+
+    if (!photoServer) {
+      throw new Error();
+    }
+
+    testPhotoMetaAndId(photoServer, { mediaId: 'newMediaId' });
   });
 
   it('Should change the mediaId of an existing photo if new mediaId is for new device', async () => {

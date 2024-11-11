@@ -139,7 +139,7 @@ describe("Test 'addPhoto' endpoint", () => {
   ];
 
   it.each(testDataArray)(
-    'Should add 1 photo when called with an existing photo in db but $photoType missing on disk, and generate a warning',
+    'Should return photoExistsBefore true and not add photo if mediaId exists but $photoType is missing on disk',
     async testData => {
       const addedPhotoData = await addPhoto();
 
@@ -149,10 +149,10 @@ describe("Test 'addPhoto' endpoint", () => {
       const ret = await AddPhoto.Post({ ...defaultPhoto, name: 'imageNewName.jpg' });
 
       expectToBeOk(ret);
-
+      expect(ret.warning).toBe(false);
       const data = getDataFromRet(ret);
-      testPhotoMetaAndId(data.photo, { name: 'imageNewName.jpg' });
-      await testPhotosExistInDbAndDisk(data.photo);
+      testPhotoMetaAndId(data.photo);
+      expect(data.photoExistsBefore).toBe(true);
 
       const getPhoto = await getPhotoById(data.photo.id, 'data');
       expect(getPhoto).toBeTruthy();
@@ -163,7 +163,6 @@ describe("Test 'addPhoto' endpoint", () => {
 
       testPhotoMetaAndId(getPhoto, {
         id: data.photo.id,
-        name: 'imageNewName.jpg',
       });
     },
   );

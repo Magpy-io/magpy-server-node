@@ -101,8 +101,16 @@ export async function getPhotoFromDisk<T extends AddPhotoParamType>(
       break;
   }
 
-  const result = await fs.readFile(photoPath, { encoding: 'base64' });
-  return Buffer.from(result).toString();
+  try {
+    const result = await fs.readFile(photoPath, { encoding: 'base64' });
+    return Buffer.from(result).toString();
+  } catch (err: any) {
+    if (err.code === 'ENOENT') {
+      return null;
+    } else {
+      throw err;
+    }
+  }
 }
 
 export async function clearImagesDisk() {

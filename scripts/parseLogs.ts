@@ -2,8 +2,8 @@ import es from 'event-stream';
 import { Duplex } from 'stream';
 import fs from 'fs';
 
-//const filepath = '.tmp/output.log'
-const filepath = '.tmp/Log20241111.txt';
+const filepath = '.tmp/output.log';
+//const filepath = '.tmp/Log20241111.txt';
 
 class CustomDuplexStream extends Duplex {
   constructor() {
