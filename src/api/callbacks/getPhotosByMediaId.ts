@@ -4,7 +4,7 @@ import { getPhotosByMediaIdFromDB } from '../../db/sequelizeDb';
 import assertUserToken from '../../middleware/userToken/assertUserToken';
 import { getPhotoFromDisk } from '../../modules/diskManager';
 import {
-  AddWarningPhotosDeleted,
+  AddWarningPhotosMissing,
   filterPhotosExistAndDeleteMissing,
 } from '../../modules/functions';
 import { APIPhoto, GetPhotosByMediaId } from '../Types';
@@ -34,16 +34,19 @@ const callback = async (
   const ret = await filterPhotosExistAndDeleteMissing(photos);
   const warning = ret.warning;
   if (warning) {
-    AddWarningPhotosDeleted(ret.photosDeleted, req.userId);
+    AddWarningPhotosMissing(ret.photosDeleted, req.userId);
   }
 
-  let images64Promises;
+  let images64Promises: Promise<string | null>[];
+
   if (photoType == 'data') {
     images64Promises = new Array(ret.photosThatExist.length).fill('');
   } else {
     req.logger?.debug(`Retrieving ${photoType} photos from disk.`);
     images64Promises = ret.photosThatExist.map(photo => {
-      if (!photo) return '';
+      if (!photo) {
+        return Promise.resolve('');
+      }
       return getPhotoFromDisk(photo, photoType);
     });
   }
@@ -58,7 +61,7 @@ const callback = async (
         exists: false;
       };
 
-    const photoWithImage64 = responseFormatter.createPhotoObject(photo, images64[index]);
+    const photoWithImage64 = responseFormatter.createPhotoObject(photo, images64[index] || '');
     return {
       mediaId: photosData[index].mediaId,
       exists: true,

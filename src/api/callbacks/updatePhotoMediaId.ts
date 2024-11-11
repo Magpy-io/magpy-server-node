@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { updatePhotoMediaIdById } from '../../db/sequelizeDb';
 import assertUserToken from '../../middleware/userToken/assertUserToken';
 import {
-  AddWarningPhotosDeleted,
+  AddWarningPhotosMissing,
   checkPhotoExistsAndDeleteMissing,
 } from '../../modules/functions';
 import { UpdatePhotoMediaId } from '../Types';
@@ -34,7 +34,7 @@ const callback = async (
 
   const warning = ret.warning;
   if (warning) {
-    AddWarningPhotosDeleted([ret.deleted], req.userId);
+    AddWarningPhotosMissing([ret.deleted], req.userId);
   }
 
   if (!ret.exists) {

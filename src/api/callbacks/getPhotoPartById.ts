@@ -4,7 +4,7 @@ import { getPhotoByIdFromDB } from '../../db/sequelizeDb';
 import assertUserToken from '../../middleware/userToken/assertUserToken';
 import { getPhotoFromDisk } from '../../modules/diskManager';
 import {
-  AddWarningPhotosDeleted,
+  AddWarningPhotosMissing,
   checkPhotoExistsAndDeleteMissing,
 } from '../../modules/functions';
 import { getNumberOfParts, getPartN } from '../../modules/stringHelper';
@@ -35,7 +35,7 @@ const callback = async (
   });
   const warning = ret.warning;
   if (warning) {
-    AddWarningPhotosDeleted([ret.deleted], req.userId);
+    AddWarningPhotosMissing([ret.deleted], req.userId);
   }
 
   if (!ret.exists) {
@@ -60,6 +60,15 @@ const callback = async (
     req.logger?.debug('Retrieving photo from disk.');
     const image64 = await getPhotoFromDisk(dbPhoto, 'original');
     req.logger?.debug('Photo retrieved.');
+
+    if (image64 == null) {
+      const jsonResponse = {
+        photo: responseFormatter.createPhotoObject(dbPhoto, ''),
+        part: 0,
+        totalNbOfParts: 0,
+      };
+      return sendResponse(req, res, jsonResponse);
+    }
 
     const totalNbOfParts = getNumberOfParts(image64);
 
