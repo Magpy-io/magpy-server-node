@@ -27,49 +27,43 @@ const callback = async (
   res: Response,
   body: GetTokenLocal.RequestData,
 ) => {
-  try {
-    const { username, password } = body;
+  const { username, password } = body;
 
-    if (!IsServerClaimedLocal()) {
-      console.log('server is not claimed');
-      return sendFailedMessage(res, 'Server not claimed', 'SERVER_NOT_CLAIMED');
-    }
-
-    const localCredentials = GetServerLocalClaimInfo();
-
-    if (!localCredentials) {
-      throw new Error('Sever is claimed locally but localCredentials is empty.');
-    }
-
-    const passwordValid = await bcrypt.compare(password, localCredentials.passwordHash);
-
-    if (localCredentials.username != username || !passwordValid) {
-      console.log('Wrong username or password.');
-      return sendFailedMessage(res, 'Wrong username or password.', 'INVALID_CREDENTIALS');
-    }
-
-    console.log('user has access to server, generating token');
-
-    let serverSigningKey = GetServerSigningKey();
-
-    if (!serverSigningKey) {
-      console.log(
-        'First time generating token, generating signing key and saving it to server config.',
-      );
-      const keyGenerated = randomBytes(32).toString('hex');
-      serverSigningKey = keyGenerated;
-      await SaveServerSigningKey(keyGenerated);
-    }
-
-    const userToken = generateUserToken(localCredentials.userId, serverSigningKey);
-    res.set('x-authorization', 'Bearer ' + userToken);
-
-    console.log('sending response');
-    return sendResponse(res, 'Token generated successfully');
-  } catch (err) {
-    console.error(err);
-    return responseFormatter.sendErrorMessage(res);
+  if (!IsServerClaimedLocal()) {
+    req.logger?.debug('server is not claimed');
+    return sendFailedMessage(req, res, 'Server not claimed', 'SERVER_NOT_CLAIMED');
   }
+
+  const localCredentials = GetServerLocalClaimInfo();
+
+  if (!localCredentials) {
+    throw new Error('Sever is claimed locally but localCredentials is empty.');
+  }
+
+  const passwordValid = await bcrypt.compare(password, localCredentials.passwordHash);
+
+  if (localCredentials.username != username || !passwordValid) {
+    req.logger?.debug('Wrong username or password.');
+    return sendFailedMessage(req, res, 'Wrong username or password.', 'INVALID_CREDENTIALS');
+  }
+
+  req.logger?.debug('user has access to server, generating token');
+
+  let serverSigningKey = GetServerSigningKey();
+
+  if (!serverSigningKey) {
+    req.logger?.debug(
+      'First time generating token, generating signing key and saving it to server config.',
+    );
+    const keyGenerated = randomBytes(32).toString('hex');
+    serverSigningKey = keyGenerated;
+    await SaveServerSigningKey(keyGenerated);
+  }
+
+  const userToken = generateUserToken(localCredentials.userId, serverSigningKey);
+  res.set('x-authorization', 'Bearer ' + userToken);
+
+  return sendResponse(req, res, 'Token generated successfully');
 };
 
 export default {

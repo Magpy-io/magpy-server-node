@@ -16,24 +16,19 @@ const callback = async (
   res: Response,
   body: GetLastWarning.RequestData,
 ) => {
-  try {
-    if (!req.userId) {
-      throw new Error('UserId is not defined.');
-    }
-
-    const userId = req.userId;
-
-    const warning = GetLastWarningForUser(userId);
-
-    const jsonResponse = {
-      warning: warning ? warning : null,
-    };
-    console.log('Warning found, sending response');
-    return sendResponse(res, jsonResponse);
-  } catch (err) {
-    console.error(err);
-    return responseFormatter.sendErrorMessage(res);
+  if (!req.userId) {
+    throw new Error('UserId is not defined.');
   }
+
+  const userId = req.userId;
+
+  const warning = GetLastWarningForUser(userId);
+
+  const jsonResponse = {
+    warning: warning ? warning : null,
+  };
+  req.logger?.debug('Warning found, sending response');
+  return sendResponse(req, res, jsonResponse);
 };
 
 export default {

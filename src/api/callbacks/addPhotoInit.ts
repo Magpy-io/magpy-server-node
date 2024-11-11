@@ -20,67 +20,60 @@ const callback = async (
   res: Response,
   body: AddPhotoInit.RequestData,
 ) => {
-  try {
-    if (!req.userId) {
-      throw new Error('UserId is not defined.');
-    }
+  if (!req.userId) {
+    throw new Error('UserId is not defined.');
+  }
 
-    const photoExists = await checkPhotoExistsAndDeleteMissing({
-      mediaId: body.mediaId,
-      deviceUniqueId: body.deviceUniqueId,
-    });
+  const photoExists = await checkPhotoExistsAndDeleteMissing({
+    mediaId: body.mediaId,
+    deviceUniqueId: body.deviceUniqueId,
+  });
 
-    if (photoExists.exists) {
-      console.log('Photo exists in db');
+  if (photoExists.exists) {
+    req.logger?.debug('Photo exists in db');
 
-      const jsonResponse = {
-        photo: responseFormatter.createPhotoObject(photoExists.exists, ''),
-        photoExistsBefore: true as true,
-      };
-
-      console.log('Sending response message.');
-      return sendResponse(res, jsonResponse);
-    }
-
-    const photo = {
-      name: body.name,
-      fileSize: body.fileSize,
-      width: body.width,
-      height: body.height,
-      date: body.date,
-      syncDate: '',
-      mediaId: body.mediaId,
-      deviceUniqueId: body.deviceUniqueId,
-      serverPath: '',
-      serverCompressedPath: '',
-      serverThumbnailPath: '',
-      hash: '',
+    const jsonResponse = {
+      photo: responseFormatter.createPhotoObject(photoExists.exists, ''),
+      photoExistsBefore: true as true,
     };
 
-    console.log('Photo does not exist in server.');
-    console.log('Creating syncDate and photoPath.');
-    const image64Len = body.image64Len;
-    photo.syncDate = new Date(Date.now()).toISOString();
-    await addServerImagePaths(photo);
-    const id = uuid();
-
-    FilesWaiting.set(id, {
-      received: 0,
-      image64Len: image64Len,
-      dataParts: new Map<number, string>(),
-      timeout: setTimeout(() => {
-        console.log(`Photo transfer for id ${id} timed out.`);
-        console.log(`Deleting pending transfer for id ${id}`);
-        FilesWaiting.delete(id);
-      }, postPhotoPartTimeout),
-      photo: photo,
-    });
-    console.log('Sending response message.');
-    return sendResponse(res, { id: id, photoExistsBefore: false });
-  } catch (err) {
-    console.error(err);
-    return responseFormatter.sendErrorMessage(res);
+    return sendResponse(req, res, jsonResponse);
   }
+
+  const photo = {
+    name: body.name,
+    fileSize: body.fileSize,
+    width: body.width,
+    height: body.height,
+    date: body.date,
+    syncDate: '',
+    mediaId: body.mediaId,
+    deviceUniqueId: body.deviceUniqueId,
+    serverPath: '',
+    serverCompressedPath: '',
+    serverThumbnailPath: '',
+    hash: '',
+  };
+
+  req.logger?.debug('Photo does not exist in server.');
+  req.logger?.debug('Creating syncDate and photoPath.');
+  const image64Len = body.image64Len;
+  photo.syncDate = new Date(Date.now()).toISOString();
+  await addServerImagePaths(photo);
+  const id = uuid();
+
+  FilesWaiting.set(id, {
+    received: 0,
+    image64Len: image64Len,
+    dataParts: new Map<number, string>(),
+    timeout: setTimeout(() => {
+      req.logger?.debug(`Photo transfer for id ${id} timed out.`);
+      req.logger?.debug(`Deleting pending transfer for id ${id}`);
+      FilesWaiting.delete(id);
+    }, postPhotoPartTimeout),
+    photo: photo,
+  });
+  return sendResponse(req, res, { id: id, photoExistsBefore: false });
 };
 
 export default {

@@ -21,63 +21,57 @@ const callback = async (
   res: Response,
   body: GetPhotosByMediaId.RequestData,
 ) => {
-  try {
-    if (!req.userId) {
-      throw new Error('UserId is not defined.');
-    }
-
-    const { photosData, photoType, deviceUniqueId } = body;
-
-    console.log('Getting photos from db with mediaId from request.');
-    const photos = await getPhotosByMediaIdFromDB(photosData, deviceUniqueId);
-    console.log('Received response from db.');
-
-    const ret = await filterPhotosExistAndDeleteMissing(photos);
-    const warning = ret.warning;
-    if (warning) {
-      AddWarningPhotosDeleted(ret.photosDeleted, req.userId);
-    }
-
-    let images64Promises;
-    if (photoType == 'data') {
-      images64Promises = new Array(ret.photosThatExist.length).fill('');
-    } else {
-      console.log(`Retrieving ${photoType} photos from disk.`);
-      images64Promises = ret.photosThatExist.map(photo => {
-        if (!photo) return '';
-        return getPhotoFromDisk(photo, photoType);
-      });
-    }
-    const images64 = await Promise.all(images64Promises);
-
-    console.log('Photos retrieved from disk if needed');
-
-    const photosResponse = ret.photosThatExist.map((photo, index) => {
-      if (!photo)
-        return { mediaId: photosData[index].mediaId, exists: false } as {
-          mediaId: string;
-          exists: false;
-        };
-
-      const photoWithImage64 = responseFormatter.createPhotoObject(photo, images64[index]);
-      return {
-        mediaId: photosData[index].mediaId,
-        exists: true,
-        photo: photoWithImage64,
-      } as { mediaId: string; exists: true; photo: APIPhoto };
-    });
-
-    const jsonResponse = {
-      number: photosResponse.length,
-      photos: photosResponse,
-    };
-
-    console.log('Sending response data.');
-    return sendResponse(res, jsonResponse, warning);
-  } catch (err) {
-    console.error(err);
-    return responseFormatter.sendErrorMessage(res);
+  if (!req.userId) {
+    throw new Error('UserId is not defined.');
   }
+
+  const { photosData, photoType, deviceUniqueId } = body;
+
+  req.logger?.debug('Getting photos from db with mediaId from request.');
+  const photos = await getPhotosByMediaIdFromDB(photosData, deviceUniqueId);
+  req.logger?.debug('Received response from db.');
+
+  const ret = await filterPhotosExistAndDeleteMissing(photos);
+  const warning = ret.warning;
+  if (warning) {
+    AddWarningPhotosDeleted(ret.photosDeleted, req.userId);
+  }
+
+  let images64Promises;
+  if (photoType == 'data') {
+    images64Promises = new Array(ret.photosThatExist.length).fill('');
+  } else {
+    req.logger?.debug(`Retrieving ${photoType} photos from disk.`);
+    images64Promises = ret.photosThatExist.map(photo => {
+      if (!photo) return '';
+      return getPhotoFromDisk(photo, photoType);
+    });
+  }
+  const images64 = await Promise.all(images64Promises);
+
+  req.logger?.debug('Photos retrieved from disk if needed');
+
+  const photosResponse = ret.photosThatExist.map((photo, index) => {
+    if (!photo)
+      return { mediaId: photosData[index].mediaId, exists: false } as {
+        mediaId: string;
+        exists: false;
+      };
+
+    const photoWithImage64 = responseFormatter.createPhotoObject(photo, images64[index]);
+    return {
+      mediaId: photosData[index].mediaId,
+      exists: true,
+      photo: photoWithImage64,
+    } as { mediaId: string; exists: true; photo: APIPhoto };
+  });
+
+  const jsonResponse = {
+    number: photosResponse.length,
+    photos: photosResponse,
+  };
+
+  return sendResponse(req, res, jsonResponse, warning);
 };
 
 export default {

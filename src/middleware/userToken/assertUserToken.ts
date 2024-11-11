@@ -6,21 +6,18 @@ import { ExtendedRequest } from '../../api/endpointsLoader';
 import checkUserToken from './checkUserToken';
 
 async function assertUserToken(req: ExtendedRequest, res: Response, next: NextFunction) {
-  try {
-    console.log('#assertUserToken middleware');
+  req.logger?.middleware('assertUserToken');
 
-    if (req.userIdError) {
-      return responseFormatter.sendFailedMessageMiddleware(
-        res,
-        req.userIdError.message,
-        req.userIdError.code,
-      );
-    }
-    next();
-  } catch (err) {
-    console.error(err);
-    responseFormatter.sendErrorMessage(res);
+  if (req.userIdError) {
+    req.logger?.debug('Error userId: ' + JSON.stringify(req.userIdError));
+    return responseFormatter.sendFailedMessageMiddleware(
+      req,
+      res,
+      req.userIdError.message,
+      req.userIdError.code,
+    );
   }
+  next();
 }
 
 export default combineMiddleware([checkUserToken, assertUserToken]);

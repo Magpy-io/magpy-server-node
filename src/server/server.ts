@@ -2,7 +2,7 @@
 import express, { Express } from 'express';
 import path from 'path';
 
-import loadEndpoints from '../api/endpointsLoader';
+import loadEndpoints, { ExtendedRequest } from '../api/endpointsLoader';
 import * as config from '../config/config';
 import jsonParsingErrorHandler from '../middleware/jsonParsingErrorHandler';
 import FilesWaiting from '../modules/waitingFiles';
@@ -13,6 +13,10 @@ import { Server } from 'http';
 import { stdinEventEmitter } from '../modules/StdinEvents';
 
 import cors from 'cors';
+import { requestID } from '../middleware/requestID';
+import { addLogger } from '../middleware/addLogger';
+import { unexpectedErrorHandler } from '../middleware/unexpectedErrorHandler';
+import { Logger } from '../modules/Logger';
 
 let app: Express;
 let server: Server | null;
@@ -20,12 +24,12 @@ let server: Server | null;
 export async function initServer() {
   app = express();
 
-  app.on('error', e => {
-    console.log(e);
-    throw e;
-  });
-
   app.use(cors());
+  app.use(requestID);
+  app.use(addLogger);
+
+  // To catch errors in requestID, addLogger and cors middlewares
+  app.use(unexpectedErrorHandler);
 
   app.use(
     express.json({
@@ -36,7 +40,8 @@ export async function initServer() {
   app.use(jsonParsingErrorHandler);
 
   loadEndpoints(app);
-  console.log('Endpoints loaded');
+
+  app.use(unexpectedErrorHandler);
 
   if (process.env.NODE_ENV !== 'test') {
     const clientBuildPath = await findClientBuildPath();
@@ -56,14 +61,14 @@ export async function initServer() {
 
   return new Promise<Express>(resolve => {
     server = app.listen(config.port, () => {
-      console.log(`Server is listening on port ${config.port}`);
+      Logger.info(`Server is listening on port ${config.port}`);
       resolve(app);
     });
   });
 }
 
 export function setupShutdownManager() {
-  console.log('Setting up gracefull termination of server');
+  Logger.info('Setting up gracefull termination of server');
   if (!server) {
     throw new Error('setupShutdownManager: server not yet initialized');
   }
@@ -72,7 +77,7 @@ export function setupShutdownManager() {
   stdinEventEmitter.on('notification-icon-clicked', e => {
     if (e == 'exit') {
       shutdownManager.terminate(() => {
-        console.log('Server was gracefully terminated');
+        Logger.info('Exit received on stdin: Server was gracefully terminated');
         process.exit(0);
       });
 
@@ -85,7 +90,7 @@ export function setupShutdownManager() {
 
   process.on('SIGINT', () => {
     shutdownManager.terminate(() => {
-      console.log('Server is gracefully terminated');
+      Logger.info('SIGINT: Server is gracefully terminated');
       process.exit(0);
     });
 
@@ -97,7 +102,7 @@ export function setupShutdownManager() {
 
   process.on('SIGTERM', () => {
     shutdownManager.terminate(() => {
-      console.log('Server is gracefully terminated');
+      Logger.info('SIGTERM: Server is gracefully terminated');
       process.exit(0);
     });
 

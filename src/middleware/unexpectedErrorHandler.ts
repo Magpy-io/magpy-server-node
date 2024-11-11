@@ -3,14 +3,12 @@ import { NextFunction, Request, Response } from 'express';
 import responseFormatter from '../api/responseFormatter';
 import { ExtendedRequest } from '../api/endpointsLoader';
 
-function JsonParsingErrorHandler(
+export function unexpectedErrorHandler(
   err: any,
   req: ExtendedRequest,
   res: Response,
   next: NextFunction,
 ) {
-  req.logger?.debug('Error parsing json body');
-  responseFormatter.sendFailedBadRequest(req, res, 'Error parsing json body');
+  req.logger?.error(err);
+  responseFormatter.sendErrorMessage(req, res);
 }
-
-export default JsonParsingErrorHandler;

@@ -6,6 +6,7 @@ import * as config from '../../config/config';
 import { createFolder, pathExists } from '../diskBasicFunctions';
 import { ServerDataSchema, ServerDataType } from './ServerDataType';
 import { SaveServerDataToCache, ServerDataDefault } from './serverDataCached';
+import { Logger } from '../Logger';
 
 let configLoadedFromFile = false;
 
@@ -43,7 +44,7 @@ async function getServerDataFromFile(): Promise<unknown> {
 
     return JSON.parse(buffer.toString());
   } catch (err) {
-    console.error('Error reading ServerData, overwriting server data');
+    Logger.warn('Error reading ServerData, overwriting server data');
     return {};
   }
 }
@@ -55,9 +56,8 @@ function AddServerDataIfMissing(data: unknown): ServerDataType {
     return value;
   }
 
-  console.log('Error while loading config file.');
-  console.log(error);
-  console.log('Loading default');
+  Logger.info('Error while loading config file.', { error });
+  Logger.info('Loading default');
 
   return JSON.parse(JSON.stringify(ServerDataDefault));
 }

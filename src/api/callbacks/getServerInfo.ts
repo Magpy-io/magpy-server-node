@@ -24,48 +24,43 @@ const callback = async (
   res: Response,
   body: GetServerInfo.RequestData,
 ) => {
-  try {
-    const storageFolderPath = GetStorageFolderPath();
-    const serverName = GetServerName();
+  const storageFolderPath = GetStorageFolderPath();
+  const serverName = GetServerName();
 
-    const responseJson: GetServerInfo.ResponseData = {
-      storagePath: storageFolderPath,
-      serverName: serverName,
-      owner: null,
-      ownerLocal: null,
-    };
+  const responseJson: GetServerInfo.ResponseData = {
+    storagePath: storageFolderPath,
+    serverName: serverName,
+    owner: null,
+    ownerLocal: null,
+  };
 
-    if (req.hasValidCredentials) {
-      const ret = await BackendGetServerInfo.Post();
+  if (req.hasValidCredentials) {
+    const ret = await BackendGetServerInfo.Post();
 
-      if (!ret.ok) {
-        throw new Error('Error retrieving server info. ' + JSON.stringify(ret));
-      }
-
-      if (ret.data.server.owner != null) {
-        const owner = ret.data.server.owner;
-        responseJson.owner = {
-          name: owner.name,
-          email: owner.email,
-        };
-      }
+    if (!ret.ok) {
+      throw new Error('Error retrieving server info. ' + JSON.stringify(ret));
     }
 
-    if (IsServerClaimedLocal()) {
-      const serverLocalClaimInfo = GetServerLocalClaimInfo();
-
-      if (!serverLocalClaimInfo) {
-        throw new Error('Server is claimed locally but serverLocalClaimInfo is null.');
-      }
-
-      responseJson.ownerLocal = { name: serverLocalClaimInfo.username };
+    if (ret.data.server.owner != null) {
+      const owner = ret.data.server.owner;
+      responseJson.owner = {
+        name: owner.name,
+        email: owner.email,
+      };
     }
-
-    return sendResponse(res, responseJson);
-  } catch (err) {
-    console.error(err);
-    return responseFormatter.sendErrorMessage(res);
   }
+
+  if (IsServerClaimedLocal()) {
+    const serverLocalClaimInfo = GetServerLocalClaimInfo();
+
+    if (!serverLocalClaimInfo) {
+      throw new Error('Server is claimed locally but serverLocalClaimInfo is null.');
+    }
+
+    responseJson.ownerLocal = { name: serverLocalClaimInfo.username };
+  }
+
+  return sendResponse(req, res, responseJson);
 };
 
 export default {

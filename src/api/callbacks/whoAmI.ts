@@ -11,21 +11,17 @@ const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendRespo
 >();
 
 const callback = async (req: ExtendedRequest, res: Response, body: WhoAmI.RequestData) => {
-  try {
-    if (!req.userId) {
-      throw new Error('UserId is not defined.');
-    }
-
-    const userId = req.userId;
-    const jsonResponse = {
-      user: { id: userId },
-    };
-    console.log('Token verified, sending confirmation');
-    return sendResponse(res, jsonResponse);
-  } catch (err) {
-    console.error(err);
-    return responseFormatter.sendErrorMessage(res);
+  if (!req.userId) {
+    throw new Error('UserId is not defined.');
   }
+
+  const userId = req.userId;
+  const jsonResponse = {
+    user: { id: userId },
+  };
+
+  req.logger?.debug('Token verified, sending confirmation');
+  return sendResponse(req, res, jsonResponse);
 };
 
 export default {

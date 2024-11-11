@@ -10,20 +10,14 @@ function generateMiddlewareFromShema(shema: Joi.ObjectSchema) {
     res: Response,
     next: NextFunction,
   ) {
-    try {
-      console.log('#checkValidRequestParameters middleware');
-
-      const { error } = shema.validate(req.body);
-      if (error) {
-        console.log('Bad request parameters');
-        return responseFormatter.sendFailedBadRequest(res, error.message);
-      }
-
-      next();
-    } catch (err) {
-      console.error(err);
-      responseFormatter.sendErrorMessage(res);
+    req.logger?.middleware('checkValidRequestParameters');
+    const { error } = shema.validate(req.body);
+    if (error) {
+      req.logger?.debug('Bad request parameters: ' + error.message);
+      return responseFormatter.sendFailedBadRequest(req, res, error.message);
     }
+
+    next();
   };
 }
 

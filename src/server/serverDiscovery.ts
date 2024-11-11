@@ -2,6 +2,7 @@ import { getMyPrivateIp } from '../modules/NetworkManager';
 import { port, serverDiscoveryPort } from '../config/config';
 import { GetServerName } from '../modules/serverDataManager';
 import dgram from 'dgram';
+import { Logger } from '../modules/Logger';
 
 export type DiscoveryResponse = {
   domain: 'magpy-discovery';
@@ -24,12 +25,12 @@ export async function startServerDiscovery(): Promise<void> {
 
     socket.on('listening', function () {
       const address = socket!.address();
-      console.log('Discovery service listening on ' + address.address + ':' + address.port);
+      Logger.info('Discovery service listening on ' + address.address + ':' + address.port);
       res();
     });
 
     socket.on('message', function (message, remote) {
-      console.log(
+      Logger.info(
         'Received discovery message from ',
         remote.address + ':' + remote.port + ' - ' + message,
       );
@@ -39,14 +40,14 @@ export async function startServerDiscovery(): Promise<void> {
       try {
         request = JSON.parse(message.toString());
       } catch (e) {
-        console.log('invalid discovery message.');
+        Logger.warn('invalid discovery message.');
         return;
       }
 
       const expectedRequest: DiscoveryRequest = { domain: 'magpy-discovery', type: 'request' };
 
       if (JSON.stringify(request) != JSON.stringify(expectedRequest)) {
-        console.log('invalid discovery message.');
+        Logger.warn('invalid discovery message.');
         return;
       }
 

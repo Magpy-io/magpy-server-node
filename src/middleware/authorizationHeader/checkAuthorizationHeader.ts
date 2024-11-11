@@ -8,34 +8,30 @@ const checkAuthorizationHeader = async (
   res: Response,
   next: NextFunction,
 ) => {
-  try {
-    console.log('#checkAuthorizationHeader middleware');
-    const bearerHeader = req.headers['x-authorization'];
+  req.logger?.middleware('checkAuthorizationHeader');
 
-    if (!bearerHeader || typeof bearerHeader != 'string') {
-      console.log('Error : No authorization header');
-      req.tokenError = { message: 'Invalid authorization', code: 'AUTHORIZATION_MISSING' };
-      next();
-      return;
-    }
-    const [prefix, token] = bearerHeader.split(' ');
+  const bearerHeader = req.headers['x-authorization'];
 
-    if (!prefix || prefix != 'Bearer' || !token) {
-      console.log('Error : authorization header wrong format');
-      req.tokenError = {
-        message: 'Invalid authorization',
-        code: 'AUTHORIZATION_WRONG_FORMAT',
-      };
-      next();
-      return;
-    }
-
-    req.token = token;
+  if (!bearerHeader || typeof bearerHeader != 'string') {
+    req.logger?.debug('No authorization header');
+    req.tokenError = { message: 'Invalid authorization', code: 'AUTHORIZATION_MISSING' };
     next();
-  } catch (err) {
-    console.error(err);
-    responseFormatter.sendErrorMessage(res);
+    return;
   }
+  const [prefix, token] = bearerHeader.split(' ');
+
+  if (!prefix || prefix != 'Bearer' || !token) {
+    req.logger?.debug('Authorization header wrong format');
+    req.tokenError = {
+      message: 'Invalid authorization',
+      code: 'AUTHORIZATION_WRONG_FORMAT',
+    };
+    next();
+    return;
+  }
+
+  req.token = token;
+  next();
 };
 
 export default checkAuthorizationHeader;

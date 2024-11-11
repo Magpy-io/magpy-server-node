@@ -54,7 +54,8 @@ describe("Test 'updateServerName' endpoint", () => {
     {
       name: '12345678901234567890123456789012345678901234567890123456789012345678901',
     },
-    { name: 'abc!' },
+    { name: 'abc{' },
+    { name: 'abc[' },
   ])('Should return error INVALID_NAME when using the name : $name', async testData => {
     const serverNameBefore = GetServerName();
     const ret = await UpdateServerName.Post({

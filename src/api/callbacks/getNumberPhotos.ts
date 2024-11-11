@@ -6,7 +6,7 @@ import { GetNumberPhotos } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
 
-const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendResponse<
+const { sendResponse } = responseFormatter.getCustomSendResponse<
   GetNumberPhotos.ResponseData,
   GetNumberPhotos.ResponseErrorTypes
 >();
@@ -16,19 +16,13 @@ const callback = async (
   res: Response,
   body: GetNumberPhotos.RequestData,
 ) => {
-  try {
-    console.log('Getting number of photos in db.');
-    const nb = await countPhotosInDB();
-    console.log(`Number of photos found in db: ${nb}.`);
-    const jsonResponse = {
-      number: nb,
-    };
-    console.log('Sending response data.');
-    return sendResponse(res, jsonResponse);
-  } catch (err) {
-    console.error(err);
-    return responseFormatter.sendErrorMessage(res);
-  }
+  req.logger?.debug('Getting number of photos in db.');
+  const nb = await countPhotosInDB();
+  req.logger?.debug(`Number of photos found in db: ${nb}.`);
+  const jsonResponse = {
+    number: nb,
+  };
+  return sendResponse(req, res, jsonResponse);
 };
 
 export default {
