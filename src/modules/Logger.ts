@@ -25,7 +25,7 @@ function createLogger() {
         ? [
             new winston.transports.Console(),
             new winston.transports.File({
-              filename: 'output.log',
+              filename: '.tmp/output.log',
               options: { flags: 'w' },
             }),
           ]

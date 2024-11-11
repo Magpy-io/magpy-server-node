@@ -23,7 +23,7 @@ const myDuplexStream = new CustomDuplexStream();
 function tailFile(curr: fs.Stats, prev?: fs.Stats) {
   // If the file has grown since the last read, process new content
   if (curr.size > (prev?.size || 0)) {
-    const readStream = fs.createReadStream('output.log', {
+    const readStream = fs.createReadStream('.tmp/output.log', {
       start: prev?.size || 0,
       end: curr.size,
       encoding: 'utf8',
@@ -36,7 +36,7 @@ function tailFile(curr: fs.Stats, prev?: fs.Stats) {
   }
 }
 
-fs.stat('output.log', (err, stats) => {
+fs.stat('.tmp/output.log', (err, stats) => {
   if (err) {
     console.error('Error getting file stats:', err);
     return;
@@ -46,7 +46,7 @@ fs.stat('output.log', (err, stats) => {
 
 // Watch the file for changes (new content added)
 fs.watchFile(
-  'output.log',
+  '.tmp/output.log',
   { persistent: true, interval: 500 },
   (curr: fs.Stats, prev: fs.Stats) => {
     tailFile(curr, prev); // Read new data when the file changes
