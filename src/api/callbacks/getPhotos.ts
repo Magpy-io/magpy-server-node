@@ -24,11 +24,17 @@ const callback = async (req: ExtendedRequest, res: Response, body: GetPhotos.Req
   const { number, offset, photoType } = body;
 
   req.logger?.debug(`Getting ${number} photos with offset ${offset} from db.`);
+
+  let profiler = req.logger?.startTimer();
   const { photos, endReached } = await getPhotosFromDB(number, offset);
+  profiler?.done({ message: 'Getting photos from db', level: 'info' });
 
   req.logger?.debug(`Got ${photos?.length} photos.`);
 
+  profiler = req.logger?.startTimer();
   const ret = await filterPhotosAndDeleteMissing(photos);
+  profiler?.done({ message: 'Filtering photos in disk', level: 'info' });
+
   const warning = ret.warning;
   if (warning) {
     AddWarningPhotosDeleted(ret.photosDeleted, req.userId);
