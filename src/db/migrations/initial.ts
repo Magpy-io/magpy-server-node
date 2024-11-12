@@ -2,7 +2,7 @@ import { DataTypes, QueryInterface } from 'sequelize';
 import { hashLen } from '../../config/config';
 
 async function up({ queryInterface }: { queryInterface: QueryInterface }) {
-  await queryInterface.createTable('image', {
+  await queryInterface.createTable('images', {
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
@@ -60,10 +60,10 @@ async function up({ queryInterface }: { queryInterface: QueryInterface }) {
     },
   });
 
-  queryInterface.addIndex('image', ['date']);
-  queryInterface.addIndex('image', ['syncDate']);
+  queryInterface.addIndex('images', ['date']);
+  queryInterface.addIndex('images', ['syncDate']);
 
-  await queryInterface.createTable('mediaId', {
+  await queryInterface.createTable('mediaIds', {
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
@@ -77,19 +77,21 @@ async function up({ queryInterface }: { queryInterface: QueryInterface }) {
     },
     deviceId: {
       type: DataTypes.UUID,
-      allowNull: false,
       references: {
-        model: 'device',
+        model: 'devices',
         key: 'id',
       },
+      onUpdate: 'CASCADE',
+      onDelete: 'SET NULL',
     },
     imageId: {
       type: DataTypes.UUID,
-      allowNull: false,
       references: {
-        model: 'image',
+        model: 'images',
         key: 'id',
       },
+      onUpdate: 'CASCADE',
+      onDelete: 'CASCADE',
     },
     createdAt: {
       type: DataTypes.DATE,
@@ -100,9 +102,9 @@ async function up({ queryInterface }: { queryInterface: QueryInterface }) {
       allowNull: false,
     },
   });
-  queryInterface.addIndex('mediaId', ['mediaId']);
+  queryInterface.addIndex('mediaIds', ['mediaId']);
 
-  await queryInterface.createTable('device', {
+  await queryInterface.createTable('devices', {
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
@@ -127,8 +129,9 @@ async function up({ queryInterface }: { queryInterface: QueryInterface }) {
 }
 
 async function down({ queryInterface }: { queryInterface: QueryInterface }) {
-  await queryInterface.dropTable('image');
-  await queryInterface.dropTable('device');
+  await queryInterface.dropTable('images');
+  await queryInterface.dropTable('devices');
+  await queryInterface.dropTable('mediaIds');
 }
 
 export default { up, down };
