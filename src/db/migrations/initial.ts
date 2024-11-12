@@ -50,6 +50,14 @@ async function up({ queryInterface }: { queryInterface: QueryInterface }) {
       type: DataTypes.STRING(hashLen),
       allowNull: false,
     },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
   });
 
   queryInterface.addIndex('image', ['date']);
@@ -98,6 +106,14 @@ async function up({ queryInterface }: { queryInterface: QueryInterface }) {
       type: DataTypes.STRING,
       allowNull: false,
       unique: true,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
     },
   });
 }
