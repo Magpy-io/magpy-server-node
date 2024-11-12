@@ -45,6 +45,11 @@ async function openAndInitDB() {
   ImageModel = createImageModel(sequelize!) as unknown as modelFunctions<PhotoDB>;
   MediaIdModel = createMediaIdModel(sequelize!) as unknown as modelFunctions<MediaIdDB>;
 
+  ImageModel.hasMany(MediaIdModel, {
+    foreignKey: 'imageId',
+  });
+  MediaIdModel.belongsTo(ImageModel, { foreignKey: 'imageId' });
+
   await migrateDb(sequelize!);
 }
 
