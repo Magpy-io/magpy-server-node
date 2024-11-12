@@ -18,9 +18,55 @@ async function up({ context: queryInterface }: { context: QueryInterface }) {
 }
 
 async function down({ context: queryInterface }: { context: QueryInterface }) {
-  await queryInterface.dropTable('images');
-  await queryInterface.dropTable('devices');
-  await queryInterface.dropTable('mediaIds');
+  await queryInterface.createTable('devices', {
+    id: {
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      allowNull: false,
+      unique: true,
+      primaryKey: true,
+    },
+    deviceUniqueId: {
+      type: DataTypes.STRING,
+      allowNull: false,
+      unique: true,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
+      allowNull: false,
+    },
+  });
+
+  await queryInterface.addIndex('devices', ['deviceUniqueId']);
+
+  await queryInterface.removeIndex('mediaIds', ['imageId']);
+  await queryInterface.addIndex('mediaIds', ['mediaId']);
+
+  await queryInterface.removeColumn('mediaIds', 'deviceUniqueId');
+
+  await queryInterface.addColumn('mediaIds', 'updatedAt', {
+    type: DataTypes.DATE,
+    allowNull: false,
+  });
+  await queryInterface.addColumn('mediaIds', 'createdAt', {
+    type: DataTypes.DATE,
+    allowNull: false,
+  });
+  await queryInterface.addColumn('mediaIds', 'deviceId', {
+    type: DataTypes.UUID,
+    references: {
+      model: 'devices',
+      key: 'id',
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'SET NULL',
+  });
+
+  await queryInterface.addIndex('images', ['syncDate']);
 }
 
 const name = '20241112193500_01_drop_devices_table';
