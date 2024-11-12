@@ -8,6 +8,7 @@ import { filterNull } from '../modules/functions';
 import { PhotoDB, createImageModel } from './Image.model';
 import { MediaIdDB, createMediaIdModel } from './MediaId.model';
 import { Logger } from '../modules/Logger';
+import { migrateDb } from './migrateDb';
 
 let sequelize: Sequelize | null = null;
 
@@ -50,8 +51,7 @@ async function openAndInitDB() {
   });
   MediaIdModel.belongsTo(ImageModel, { foreignKey: 'imageId' });
 
-  await ImageModel.sync();
-  await MediaIdModel.sync();
+  await migrateDb(sequelize!);
 }
 
 async function openDb() {
@@ -77,7 +77,7 @@ async function openDb() {
     await sequelize.authenticate();
     Logger.info('Connection to DB has been established successfully.');
   } catch (error) {
-    Logger.error('Unable to connect to the database', error);
+    Logger.error('Failed to connect to the database', error);
     throw error;
   }
 }

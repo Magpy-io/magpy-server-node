@@ -71,7 +71,7 @@ myDuplexStream
       }
     }),
   )
-  .pipe(es.filterSync((obj: any) => obj && obj.durationMs)) // Filter by 'level'
+  .pipe(es.filterSync((obj: any) => obj && obj.source == 'umzug')) // Filter by 'level'
   .pipe(es.mapSync((obj: any) => JSON.stringify(obj) + '\n')) // Convert back to JSON string
   .pipe(process.stdout)
   .on('error', err => {

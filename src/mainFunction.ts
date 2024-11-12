@@ -11,11 +11,14 @@ import { Logger } from './modules/Logger';
 
 export async function main() {
   Logger.info('Running Magpy Server v' + packageJson.version);
-
-  await InitModules();
-  await openAndInitDB();
-  await initServer();
-  setupShutdownManager();
-  await startServerDiscovery();
-  setupOpenInterfaceEvent();
+  try {
+    await InitModules();
+    await openAndInitDB();
+    await initServer();
+    setupShutdownManager();
+    await startServerDiscovery();
+    setupOpenInterfaceEvent();
+  } catch (e) {
+    Logger.error('Error starting app', e);
+  }
 }
