@@ -18,6 +18,7 @@ type modelFunctions<T> = {
   destroy: <S>(options: { where: T extends S ? S : never }) => Promise<void>;
   findOne: <S>(options: {
     where: T extends S ? S : never;
+    include?: any;
   }) => Promise<{ dataValues: T } | null>;
   findAll: <S>(options: {
     where?: T extends S ? S : never;
@@ -25,6 +26,7 @@ type modelFunctions<T> = {
     limit?: number;
     order?: any[];
     attributes?: string[];
+    include?: any;
   }) => Promise<Array<{ dataValues: T }>>;
   create: (data: T) => Promise<{ dataValues: T } | null>;
   count: () => Promise<number>;
@@ -197,27 +199,23 @@ async function getPhotosFromDB(
   assertDbOpen();
   const nbPhotos = await countPhotosInDB();
 
-  const imagesIds = await ImageModel.findAll({
+  const images = await ImageModel.findAll({
     offset: offset,
     limit: number,
     order: [['date', 'DESC']],
-    attributes: ['id'],
+    include: MediaIdModel,
   });
 
-  const imagesPromises = imagesIds.map(imageId => {
-    return getPhotoByIdFromDB(imageId.dataValues.id);
+  const parsedImages = images.map(({ dataValues }) => {
+    const mediaIdsObjects = (dataValues as any as { mediaIds: MediaIdDB[] }).mediaIds;
+    const mediaIds = mediaIdsObjects.map(mediaId => {
+      return { deviceUniqueId: mediaId.deviceUniqueId, mediaId: mediaId.mediaId };
+    });
+    return { ...dataValues, mediaIds };
   });
-
-  const images = await Promise.all(imagesPromises);
-
-  if (images.some(e => e == null)) {
-    Logger.warn(
-      'getPhotosFromDB: Got at least one photo from db but when getting the same photo by id was not found',
-    );
-  }
 
   return {
-    photos: filterNull(images),
+    photos: parsedImages,
     endReached: nbPhotos <= number + offset,
   };
 }

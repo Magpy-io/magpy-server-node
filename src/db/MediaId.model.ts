@@ -26,6 +26,7 @@ const modelDefinition = {
 
 const modelOptions = {
   indexes: [{ fields: ['imageId'] }],
+  timestamps: false,
 };
 
 export function createMediaIdModel(sequelize: Sequelize) {
