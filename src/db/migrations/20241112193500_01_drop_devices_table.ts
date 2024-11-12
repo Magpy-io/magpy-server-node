@@ -6,6 +6,7 @@ async function up({ context: queryInterface }: { context: QueryInterface }) {
   await queryInterface.addColumn('mediaIds', 'deviceUniqueId', {
     type: DataTypes.STRING,
     allowNull: false,
+    defaultValue: '',
   });
 
   await queryInterface.sequelize.query(`
