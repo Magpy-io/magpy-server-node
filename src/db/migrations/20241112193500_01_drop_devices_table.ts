@@ -3,14 +3,22 @@ import { DataTypes, QueryInterface } from 'sequelize';
 async function up({ context: queryInterface }: { context: QueryInterface }) {
   await queryInterface.removeIndex('images', ['syncDate']);
 
-  await queryInterface.removeColumn('mediaIds', 'deviceId');
-  await queryInterface.removeColumn('mediaIds', 'createdAt');
-  await queryInterface.removeColumn('mediaIds', 'updatedAt');
-
   await queryInterface.addColumn('mediaIds', 'deviceUniqueId', {
     type: DataTypes.STRING,
     allowNull: false,
   });
+
+  await queryInterface.sequelize.query(`
+    UPDATE "mediaIds" 
+    SET "deviceUniqueId" = "devices"."deviceUniqueId"
+    FROM "devices"
+    WHERE "mediaIds"."deviceId" = "devices"."id";
+  `);
+
+  await queryInterface.removeColumn('mediaIds', 'deviceId');
+  await queryInterface.removeColumn('mediaIds', 'createdAt');
+  await queryInterface.removeColumn('mediaIds', 'updatedAt');
+
   await queryInterface.removeIndex('mediaIds', ['mediaId']);
   await queryInterface.addIndex('mediaIds', ['imageId']);
 
