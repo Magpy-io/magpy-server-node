@@ -126,6 +126,8 @@ async function up({ queryInterface }: { queryInterface: QueryInterface }) {
       allowNull: false,
     },
   });
+
+  queryInterface.addIndex('devices', ['deviceUniqueId']);
 }
 
 async function down({ queryInterface }: { queryInterface: QueryInterface }) {
