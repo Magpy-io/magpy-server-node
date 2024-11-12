@@ -1,7 +1,14 @@
 import { DataTypes, QueryInterface } from 'sequelize';
 import { hashLen } from '../../config/config';
 
-async function up({ queryInterface }: { queryInterface: QueryInterface }) {
+async function up({ context: queryInterface }: { context: QueryInterface }) {
+  const tableExists = await queryInterface.tableExists('images');
+
+  if (tableExists) {
+    // This is the initial state of the app before migrations were added
+    return;
+  }
+
   await queryInterface.createTable('images', {
     id: {
       type: DataTypes.UUID,
@@ -60,8 +67,8 @@ async function up({ queryInterface }: { queryInterface: QueryInterface }) {
     },
   });
 
-  queryInterface.addIndex('images', ['date']);
-  queryInterface.addIndex('images', ['syncDate']);
+  await queryInterface.addIndex('images', ['date']);
+  await queryInterface.addIndex('images', ['syncDate']);
 
   await queryInterface.createTable('mediaIds', {
     id: {
@@ -102,7 +109,8 @@ async function up({ queryInterface }: { queryInterface: QueryInterface }) {
       allowNull: false,
     },
   });
-  queryInterface.addIndex('mediaIds', ['mediaId']);
+
+  await queryInterface.addIndex('mediaIds', ['mediaId']);
 
   await queryInterface.createTable('devices', {
     id: {
@@ -127,13 +135,15 @@ async function up({ queryInterface }: { queryInterface: QueryInterface }) {
     },
   });
 
-  queryInterface.addIndex('devices', ['deviceUniqueId']);
+  await queryInterface.addIndex('devices', ['deviceUniqueId']);
 }
 
-async function down({ queryInterface }: { queryInterface: QueryInterface }) {
+async function down({ context: queryInterface }: { context: QueryInterface }) {
   await queryInterface.dropTable('images');
   await queryInterface.dropTable('devices');
   await queryInterface.dropTable('mediaIds');
 }
 
-export default { up, down };
+const name = '20241112183000_00_initial';
+
+export default { up, down, name };
