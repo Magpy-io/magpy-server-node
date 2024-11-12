@@ -76,12 +76,20 @@ async function up({ queryInterface }: { queryInterface: QueryInterface }) {
       allowNull: false,
     },
     deviceId: {
-      type: DataTypes.STRING,
+      type: DataTypes.UUID,
       allowNull: false,
+      references: {
+        model: 'device',
+        key: 'id',
+      },
     },
     imageId: {
-      type: DataTypes.STRING,
+      type: DataTypes.UUID,
       allowNull: false,
+      references: {
+        model: 'image',
+        key: 'id',
+      },
     },
     createdAt: {
       type: DataTypes.DATE,
