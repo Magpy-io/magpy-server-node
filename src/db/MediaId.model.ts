@@ -11,8 +11,14 @@ const modelDefinition = {
     primaryKey: true,
   },
   imageId: {
-    type: DataTypes.STRING,
+    type: DataTypes.UUID,
     allowNull: false,
+    references: {
+      model: 'images',
+      key: 'id',
+    },
+    onDelete: 'CASCADE',
+    onUpdate: 'CASCADE',
   },
   mediaId: {
     type: DataTypes.STRING,
