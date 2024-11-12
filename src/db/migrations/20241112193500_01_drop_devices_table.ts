@@ -23,6 +23,16 @@ async function up({ context: queryInterface }: { context: QueryInterface }) {
   await queryInterface.removeIndex('mediaIds', ['mediaId']);
   await queryInterface.addIndex('mediaIds', ['imageId']);
 
+  await queryInterface.changeColumn('mediaIds', 'imageId', {
+    type: DataTypes.UUID,
+    references: {
+      model: 'images',
+      key: 'id',
+    },
+    onUpdate: 'CASCADE',
+    onDelete: 'CASCADE',
+  });
+
   await queryInterface.dropTable('devices');
 }
 
