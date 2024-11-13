@@ -273,16 +273,6 @@ async function getPhotosByMediaIdFromDB(
   return await Promise.all(photosFoundPromise);
 }
 
-async function checkPhotoExistsByMediaIdInDB(
-  mediaId: string,
-  deviceUniqueId: string,
-): Promise<boolean> {
-  assertDbOpen();
-
-  const photo = await getPhotoByMediaIdFromDB({ mediaId }, deviceUniqueId);
-  return !!photo;
-}
-
 async function getPhotosByIdFromDB(ids: string[]): Promise<Array<Photo | null>> {
   assertDbOpen();
 
@@ -367,7 +357,6 @@ export {
   addPhotoToDB,
   getPhotosFromDB,
   getPhotoByIdFromDB,
-  checkPhotoExistsByMediaIdInDB,
   getPhotosByIdFromDB,
   getPhotoByMediaIdFromDB,
   getPhotosByMediaIdFromDB,
