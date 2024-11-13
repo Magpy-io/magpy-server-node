@@ -3,7 +3,7 @@
   "author": "Magpy",
   "description": "Magpy's Server Project",
   "license": "MIT",
-  "version": "0.6.2",
+  "version": "0.6.3",
   "main": "dist/src/index.js",
   "scripts": {
     "format": "prettier --write ./src ./tests",
@@ -27,7 +27,8 @@
     "types": "yarn clean:types && yarn types:generate && yarn types:copy",
     "bundle": "yarn build:all && rimraf ./bundle && ts-node ./scripts/bundle.ts && yarn bundle:copy",
     "bundle:server": "yarn build:server && rimraf ./bundle && ts-node ./scripts/bundle.ts && yarn bundle:copy",
-    "bundle:copy": "ts-node ./scripts/CopyFolder.ts ./bundle ../MagpyServerWindows/MagpyServerWindows/bin/Debug/bundle && ts-node ./scripts/CopyFolder.ts ./bundle ../MagpyServerWindows/MagpyServerWindows/bin/Release/bundle"
+    "bundle:copy": "ts-node ./scripts/CopyFolder.ts ./bundle ../MagpyServerWindows/MagpyServerWindows/bin/Debug/bundle && ts-node ./scripts/CopyFolder.ts ./bundle ../MagpyServerWindows/MagpyServerWindows/bin/Release/bundle",
+    "parseLogs": "ts-node ./scripts/parseLogs.ts"
   },
   "dependencies": {
     "@moebius/http-graceful-shutdown": "^1.1.0",
@@ -62,6 +63,7 @@
     "tsc": "^2.0.4",
     "typescript": "^5.3.3",
     "typesync": "^0.11.1",
+    "umzug": "^3.8.2",
     "uuid": "^9.0.0",
     "winston": "^3.15.0"
   },

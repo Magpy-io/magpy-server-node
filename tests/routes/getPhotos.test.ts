@@ -147,7 +147,7 @@ describe("Test 'getPhotos' endpoint", () => {
   ];
 
   it.each(testDataArrayPhotoType)(
-    'Should return no photos if a photo exists on db but its $photoType is not on disk',
+    'Should return empty image64 and a warning if a photo exists on db but its $photoType is not on disk',
     async (testData: { photoType: PhotoTypes }) => {
       const addedPhotoData = await addPhoto();
 
@@ -157,15 +157,18 @@ describe("Test 'getPhotos' endpoint", () => {
       const ret = await GetPhotos.Post({
         number: 1,
         offset: 0,
-        photoType: 'data',
+        photoType: testData.photoType,
       });
 
       expectToBeOk(ret);
       expect(ret.warning).toBe(true);
       const data = getDataFromRet(ret);
 
-      expect(data.number).toBe(0);
+      expect(data.number).toBe(1);
       expect(data.endReached).toBe(true);
+
+      testPhotoData(data.photos[0]);
+      expect(data.photos[0].image64).toBe('');
 
       testWarning(photo);
     },

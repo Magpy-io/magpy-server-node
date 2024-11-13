@@ -5,10 +5,10 @@ import { v4 as uuid } from 'uuid';
 import { sqliteDbFile } from '../config/config';
 import { createFolder } from '../modules/diskBasicFunctions';
 import { filterNull } from '../modules/functions';
-import { DeviceDB, createDevicesModel } from './Devices.model';
 import { PhotoDB, createImageModel } from './Image.model';
 import { MediaIdDB, createMediaIdModel } from './MediaId.model';
 import { Logger } from '../modules/Logger';
+import { migrateDb } from './migrateDb';
 
 let sequelize: Sequelize | null = null;
 
@@ -19,6 +19,7 @@ type modelFunctions<T> = {
   destroy: <S>(options: { where: T extends S ? S : never }) => Promise<void>;
   findOne: <S>(options: {
     where: T extends S ? S : never;
+    include?: any;
   }) => Promise<{ dataValues: T } | null>;
   findAll: <S>(options: {
     where?: T extends S ? S : never;
@@ -26,6 +27,7 @@ type modelFunctions<T> = {
     limit?: number;
     order?: any[];
     attributes?: string[];
+    include?: any;
   }) => Promise<Array<{ dataValues: T }>>;
   create: (data: T) => Promise<{ dataValues: T } | null>;
   count: () => Promise<number>;
@@ -37,25 +39,18 @@ type modelFunctions<T> = {
 
 let ImageModel: modelFunctions<PhotoDB>;
 let MediaIdModel: modelFunctions<MediaIdDB>;
-let DeviceModel: modelFunctions<DeviceDB>;
 
 async function openAndInitDB() {
   await openDb();
   ImageModel = createImageModel(sequelize!) as unknown as modelFunctions<PhotoDB>;
   MediaIdModel = createMediaIdModel(sequelize!) as unknown as modelFunctions<MediaIdDB>;
-  DeviceModel = createDevicesModel(sequelize!) as unknown as modelFunctions<DeviceDB>;
 
   ImageModel.hasMany(MediaIdModel, {
-    onDelete: 'CASCADE',
+    foreignKey: 'imageId',
   });
-  MediaIdModel.belongsTo(ImageModel);
+  MediaIdModel.belongsTo(ImageModel, { foreignKey: 'imageId' });
 
-  DeviceModel.hasMany(MediaIdModel);
-  MediaIdModel.belongsTo(DeviceModel);
-
-  await ImageModel.sync();
-  await MediaIdModel.sync();
-  await DeviceModel.sync();
+  await migrateDb(sequelize!);
 }
 
 async function openDb() {
@@ -81,7 +76,7 @@ async function openDb() {
     await sequelize.authenticate();
     Logger.info('Connection to DB has been established successfully.');
   } catch (error) {
-    Logger.error('Unable to connect to the database', error);
+    Logger.error('Failed to connect to the database', error);
     throw error;
   }
 }
@@ -96,37 +91,15 @@ async function closeDb() {
   Logger.info('Connection to DB closed');
 }
 
-async function getDeviceFromDB(deviceUniqueId: string) {
-  const device = await DeviceModel.findOne({
-    where: { deviceUniqueId: deviceUniqueId },
-  });
-
-  return device;
-}
-
-async function countDevicesInDB() {
-  const count = await DeviceModel.count();
-
-  return count;
-}
-
 async function getPhotoByMediaIdAll(
   photoMediaId: string,
   deviceUniqueId: string,
 ): Promise<Array<Photo>> {
   assertDbOpen();
 
-  const device = await DeviceModel.findOne({
-    where: { deviceUniqueId: deviceUniqueId },
-  });
-
-  if (!device) {
-    return [];
-  }
-
   // Possibly same mediaId present for multiple photos on the same device
   const mediaIds = await MediaIdModel.findAll({
-    where: { mediaId: photoMediaId, deviceId: device.dataValues.id },
+    where: { mediaId: photoMediaId, deviceUniqueId },
   });
 
   if (mediaIds.length == 0) {
@@ -195,24 +168,11 @@ async function addPhotoToDB(photo: AddPhotoType): Promise<Photo> {
     throw new Error('Error adding photo to db');
   }
 
-  let device = await getDeviceFromDB(photo.deviceUniqueId);
-
-  if (!device) {
-    device = await DeviceModel.create({
-      id: uuid(),
-      deviceUniqueId: photo.deviceUniqueId,
-    });
-  }
-
-  if (!device) {
-    throw new Error('Error adding device to db');
-  }
-
   const mediaId = await MediaIdModel.create({
     id: uuid(),
     mediaId: photo.mediaId,
     imageId: dbPhoto.id,
-    deviceId: device.dataValues.id,
+    deviceUniqueId: photo.deviceUniqueId,
   });
 
   if (!mediaId) {
@@ -238,27 +198,23 @@ async function getPhotosFromDB(
   assertDbOpen();
   const nbPhotos = await countPhotosInDB();
 
-  const imagesIds = await ImageModel.findAll({
+  const images = await ImageModel.findAll({
     offset: offset,
     limit: number,
     order: [['date', 'DESC']],
-    attributes: ['id'],
+    include: MediaIdModel,
   });
 
-  const imagesPromises = imagesIds.map(imageId => {
-    return getPhotoByIdFromDB(imageId.dataValues.id);
+  const parsedImages = images.map(({ dataValues }) => {
+    const mediaIdsObjects = (dataValues as unknown as { mediaIds: MediaIdDB[] }).mediaIds;
+    const mediaIds = mediaIdsObjects.map(mediaId => {
+      return { deviceUniqueId: mediaId.deviceUniqueId, mediaId: mediaId.mediaId };
+    });
+    return { ...dataValues, mediaIds };
   });
-
-  const images = await Promise.all(imagesPromises);
-
-  if (images.some(e => e == null)) {
-    Logger.warn(
-      'getPhotosFromDB: Got at least one photo from db but when getting the same photo by id was not found',
-    );
-  }
 
   return {
-    photos: filterNull(images),
+    photos: parsedImages,
     endReached: nbPhotos <= number + offset,
   };
 }
@@ -279,23 +235,8 @@ async function getPhotoByIdFromDB(id: string): Promise<Photo | null> {
   });
 
   const devicesPromises = mediaIds.map(async mediaId => {
-    const device = await DeviceModel.findOne({
-      where: { id: mediaId.dataValues.deviceId },
-    });
-
-    if (!device) {
-      Logger.warn(
-        'Found some mediaIds where the deviceId does not exist in db\nClearning the mediaIds.',
-      );
-
-      await MediaIdModel.destroy({
-        where: { id: mediaId.dataValues.id },
-      });
-      return null;
-    }
-
     return {
-      deviceUniqueId: device.dataValues.deviceUniqueId,
+      deviceUniqueId: mediaId.dataValues.deviceUniqueId,
       mediaId: mediaId.dataValues.mediaId,
     };
   });
@@ -332,16 +273,6 @@ async function getPhotosByMediaIdFromDB(
   return await Promise.all(photosFoundPromise);
 }
 
-async function checkPhotoExistsByMediaIdInDB(
-  mediaId: string,
-  deviceUniqueId: string,
-): Promise<boolean> {
-  assertDbOpen();
-
-  const photo = await getPhotoByMediaIdFromDB({ mediaId }, deviceUniqueId);
-  return !!photo;
-}
-
 async function getPhotosByIdFromDB(ids: string[]): Promise<Array<Photo | null>> {
   assertDbOpen();
 
@@ -354,21 +285,8 @@ async function getPhotosByIdFromDB(ids: string[]): Promise<Array<Photo | null>> 
 async function updatePhotoMediaIdById(id: string, mediaId: string, deviceUniqueId: string) {
   assertDbOpen();
 
-  let device = await getDeviceFromDB(deviceUniqueId);
-
-  if (!device) {
-    device = await DeviceModel.create({
-      id: uuid(),
-      deviceUniqueId: deviceUniqueId,
-    });
-  }
-
-  if (!device) {
-    throw new Error('Error adding photo to db');
-  }
-
   const dbMediaId = await MediaIdModel.findOne({
-    where: { imageId: id, deviceId: device.dataValues.id },
+    where: { imageId: id, deviceUniqueId },
   });
 
   if (!dbMediaId) {
@@ -376,7 +294,7 @@ async function updatePhotoMediaIdById(id: string, mediaId: string, deviceUniqueI
       id: uuid(),
       mediaId: mediaId,
       imageId: id,
-      deviceId: device.dataValues.id,
+      deviceUniqueId,
     });
 
     if (!mediaIdCreated) {
@@ -387,6 +305,27 @@ async function updatePhotoMediaIdById(id: string, mediaId: string, deviceUniqueI
       { mediaId: mediaId },
       { where: { id: dbMediaId.dataValues.id } },
     );
+  }
+}
+
+async function addMediaIdToImage({
+  imageId,
+  mediaId,
+  deviceUniqueId,
+}: {
+  imageId: string;
+  mediaId: string;
+  deviceUniqueId: string;
+}) {
+  const mediaIdCreated = await MediaIdModel.create({
+    id: uuid(),
+    mediaId,
+    imageId,
+    deviceUniqueId,
+  });
+
+  if (!mediaIdCreated) {
+    throw new Error('addMediaIdToImage: Error adding new mediaId to photo');
   }
 }
 
@@ -435,16 +374,14 @@ export {
   openDb,
   closeDb,
   clearDB,
-  getDeviceFromDB,
-  countDevicesInDB,
   countPhotosInDB,
   addPhotoToDB,
   getPhotosFromDB,
   getPhotoByIdFromDB,
-  checkPhotoExistsByMediaIdInDB,
   getPhotosByIdFromDB,
   getPhotoByMediaIdFromDB,
   getPhotosByMediaIdFromDB,
+  addMediaIdToImage,
   getAllMediaIdsByImageIdFromDB,
   deletePhotoByIdFromDB,
   updatePhotoMediaIdById,

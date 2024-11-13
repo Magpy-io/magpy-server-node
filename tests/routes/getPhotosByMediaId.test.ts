@@ -196,12 +196,11 @@ describe("Test 'getPhotosByMediaId' endpoint", () => {
   ];
 
   it.each(testDataArrayPhotoType)(
-    'Should return photo does not exist if a photo exists on db but its $photoType is not on disk',
+    'Should return empty image64 and a warning if a photo exists on db but its $photoType is not on disk',
     async (testData: { photoType: PhotoTypes }) => {
       const addedPhotoData = await addPhoto();
 
       const photo = await getPhotoFromDb(addedPhotoData.id);
-
       await deletePhotoFromDisk(photo, testData.photoType);
 
       const photosData = [
@@ -212,7 +211,7 @@ describe("Test 'getPhotosByMediaId' endpoint", () => {
 
       const ret = await GetPhotosByMediaId.Post({
         photosData: photosData,
-        photoType: 'data',
+        photoType: testData.photoType,
         deviceUniqueId: defaultPhoto.deviceUniqueId,
       });
 
@@ -224,7 +223,14 @@ describe("Test 'getPhotosByMediaId' endpoint", () => {
       expect(data.photos.length).toBe(1);
 
       expect(data.photos[0].mediaId).toBe(addedPhotoData.mediaId);
-      expect(data.photos[0].exists).toBe(false);
+      expect(data.photos[0].exists).toBe(true);
+
+      if (!data.photos[0].exists) {
+        throw new Error('Photo should exist');
+      }
+
+      testPhotoData(data.photos[0].photo);
+      expect(data.photos[0].photo.image64).toBe('');
 
       testWarning(photo);
     },

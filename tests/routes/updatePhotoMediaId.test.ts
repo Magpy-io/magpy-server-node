@@ -4,7 +4,6 @@ mockModules();
 
 import { describe, expect, it } from '@jest/globals';
 import { UpdatePhotoMediaId } from '@src/api/export';
-import { countDevicesInDB } from '@src/db/sequelizeDb';
 import { initServer, stopServer } from '@src/server/server';
 import {
   addPhoto,
@@ -75,7 +74,7 @@ describe("Test 'updatePhotoMediaId' endpoint", () => {
     expectErrorCodeToBe(ret, 'ID_NOT_FOUND');
   });
 
-  it('Should return error ID_NOT_FOUND when id is in db but compressed photo is missing from disk', async () => {
+  it('Should return ok when id is in db but compressed photo is missing from disk', async () => {
     const addedPhotoData = await addPhoto();
 
     const photo = await getPhotoFromDb(addedPhotoData.id);
@@ -83,15 +82,20 @@ describe("Test 'updatePhotoMediaId' endpoint", () => {
 
     const ret = await UpdatePhotoMediaId.Post({
       id: addedPhotoData.id,
-      mediaId: addedPhotoData.mediaId,
+      mediaId: 'newMediaId',
       deviceUniqueId: defaultPhoto.deviceUniqueId,
     });
 
-    expectToNotBeOk(ret);
-    expect(ret.warning).toBe(true);
-    expectErrorCodeToBe(ret, 'ID_NOT_FOUND');
+    expectToBeOk(ret);
+    expect(ret.warning).toBe(false);
 
-    testWarning(photo);
+    const photoServer = await getPhotoById(addedPhotoData.id);
+
+    if (!photoServer) {
+      throw new Error();
+    }
+
+    testPhotoMetaAndId(photoServer, { mediaId: 'newMediaId' });
   });
 
   it('Should change the mediaId of an existing photo if new mediaId is for new device', async () => {
@@ -111,34 +115,6 @@ describe("Test 'updatePhotoMediaId' endpoint", () => {
       throw new Error();
     }
 
-    testPhotoMetaAndIdWithAdditionalMediaIds(photo, [defaultPhotoSecondMediaId]);
-  });
-
-  it('Should change the mediaId of an existing photo and not create a new device if the device exists already', async () => {
-    expect(await countDevicesInDB()).toBe(0);
-
-    const addedPhotoData = await addPhoto();
-
-    expect(await countDevicesInDB()).toBe(1);
-
-    await addPhoto({
-      deviceUniqueId: defaultPhotoSecondMediaId.deviceUniqueId,
-    });
-
-    expect(await countDevicesInDB()).toBe(2);
-
-    const ret = await UpdatePhotoMediaId.Post({
-      id: addedPhotoData.id,
-      mediaId: defaultPhotoSecondMediaId.mediaId,
-      deviceUniqueId: defaultPhotoSecondMediaId.deviceUniqueId,
-    });
-
-    const photo = await getPhotoById(addedPhotoData.id);
-
-    if (!photo) {
-      throw new Error();
-    }
-    expect(await countDevicesInDB()).toBe(2);
     testPhotoMetaAndIdWithAdditionalMediaIds(photo, [defaultPhotoSecondMediaId]);
   });
 });

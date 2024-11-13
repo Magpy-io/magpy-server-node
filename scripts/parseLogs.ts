@@ -2,8 +2,11 @@ import es from 'event-stream';
 import { Duplex } from 'stream';
 import fs from 'fs';
 
-//const filepath = '.tmp/output.log'
-const filepath = '.tmp/Log20241111.txt';
+let filepath = '.tmp/output.log';
+
+if (process.argv.length == 3) {
+  filepath = process.argv[2];
+}
 
 class CustomDuplexStream extends Duplex {
   constructor() {
@@ -68,7 +71,7 @@ myDuplexStream
       }
     }),
   )
-  .pipe(es.filterSync((obj: any) => obj && obj.durationMs)) // Filter by 'level'
+  .pipe(es.filterSync((obj: any) => obj && obj.source == 'umzug')) // Filter by 'level'
   .pipe(es.mapSync((obj: any) => JSON.stringify(obj) + '\n')) // Convert back to JSON string
   .pipe(process.stdout)
   .on('error', err => {

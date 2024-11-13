@@ -4,12 +4,13 @@ mockModules();
 
 import { describe, expect, it } from '@jest/globals';
 import { DeletePhotosById } from '@src/api/export';
-import { getAllMediaIdsByImageIdFromDB } from '@src/db/sequelizeDb';
+import { addMediaIdToImage, getAllMediaIdsByImageIdFromDB } from '@src/db/sequelizeDb';
 import { initServer, stopServer } from '@src/server/server';
 import {
   addNPhotos,
   addPhoto,
   checkPhotoExists,
+  defaultPhoto,
   deletePhotoFromDisk,
   expectToBeOk,
   generateId,
@@ -150,11 +151,30 @@ describe("Test 'deletePhotosById' endpoint", () => {
   it('Should delete all mediaIds associated with photo when deleted', async () => {
     const addedPhotoData = await addPhoto();
 
+    await addMediaIdToImage({
+      imageId: addedPhotoData.id,
+      mediaId: defaultPhoto.mediaId,
+      deviceUniqueId: 'newDeviceUniqueId',
+    });
+
     await DeletePhotosById.Post({
       ids: [addedPhotoData.id],
     });
 
     const mediaIds = await getAllMediaIdsByImageIdFromDB(addedPhotoData.id);
     expect(mediaIds.length).toBe(0);
+  });
+
+  it('Should fail when adding the same mediaId and deviceUniqueId', async () => {
+    expect.assertions(1);
+    const addedPhotoData = await addPhoto();
+
+    await addMediaIdToImage({
+      imageId: addedPhotoData.id,
+      mediaId: defaultPhoto.mediaId,
+      deviceUniqueId: defaultPhoto.deviceUniqueId,
+    }).catch(err => {
+      expect(err).toBeDefined();
+    });
   });
 });

@@ -1,12 +1,9 @@
 import { Request, Response } from 'express';
 
-import { getPhotosFromDB } from '../../db/sequelizeDb';
+import { getPhotosFromDB, Photo } from '../../db/sequelizeDb';
 import assertUserToken from '../../middleware/userToken/assertUserToken';
 import { getPhotoFromDisk } from '../../modules/diskManager';
-import {
-  AddWarningPhotosDeleted,
-  filterPhotosAndDeleteMissing,
-} from '../../modules/functions';
+import { AddWarningPhotosMissing } from '../../modules/functions';
 import { GetPhotos } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
@@ -25,45 +22,40 @@ const callback = async (req: ExtendedRequest, res: Response, body: GetPhotos.Req
 
   req.logger?.debug(`Getting ${number} photos with offset ${offset} from db.`);
 
-  let profiler = req.logger?.startTimer();
+  const profiler = req.logger?.startTimer();
   const { photos, endReached } = await getPhotosFromDB(number, offset);
   profiler?.done({ message: 'Getting photos from db', level: 'info' });
 
   req.logger?.debug(`Got ${photos?.length} photos.`);
 
-  profiler = req.logger?.startTimer();
-  const ret = await filterPhotosAndDeleteMissing(photos);
-  profiler?.done({ message: 'Filtering photos in disk', level: 'info' });
-
-  const warning = ret.warning;
-  if (warning) {
-    AddWarningPhotosDeleted(ret.photosDeleted, req.userId);
-  }
-
-  req.logger?.debug(
-    `${ret.photosThatExist?.length} photos exist in disk, ${
-      photos?.length - ret.photosThatExist?.length
-    } photos were missing.`,
-  );
-
-  let images64Promises: Promise<string>[] = [];
+  let images64Promises: Promise<string | null>[];
 
   if (photoType == 'data') {
-    images64Promises = new Array(ret.photosThatExist.length).fill('');
+    images64Promises = new Array(photos.length).fill('');
   } else {
     req.logger?.debug(`Retrieving ${photoType} photos from disk.`);
-    images64Promises = ret.photosThatExist.map(photo => {
+    images64Promises = photos.map(photo => {
       return getPhotoFromDisk(photo, photoType);
     });
   }
 
   const images64 = await Promise.all(images64Promises);
+  req.logger?.debug('Photos retrieved from disk if needed.');
 
-  const photosWithImage64 = ret.photosThatExist.map((photo, index) => {
-    return responseFormatter.createPhotoObject(photo, images64[index]);
+  const photosMissing: Photo[] = [];
+
+  const photosWithImage64 = photos.map((photo, index) => {
+    if (images64[index] == null) {
+      photosMissing.push(photo);
+    }
+    return responseFormatter.createPhotoObject(photo, images64[index] || '');
   });
 
-  req.logger?.debug('Photos retrieved from disk if needed.');
+  const warning = photosMissing.length != 0;
+  if (warning) {
+    AddWarningPhotosMissing(photosMissing, req.userId);
+  }
+
   const jsonResponse = {
     endReached: endReached,
     number: photosWithImage64.length,

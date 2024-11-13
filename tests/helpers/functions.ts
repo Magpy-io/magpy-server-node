@@ -400,11 +400,16 @@ function testWarning(dbPhoto: Photo) {
     throw new Error('warning should be defined');
   }
 
-  expect(warning.code).toBe('PHOTOS_NOT_ON_DISK_DELETED');
-  expect(warning.data).toHaveProperty('photosDeleted');
-  expect(warning.data.photosDeleted.length).toBe(1);
+  expect(warning.code).toBe('PHOTOS_MISSING_FROM_DISK');
 
-  expect(warning.data.photosDeleted[0].id).toBe(dbPhoto.id);
+  if (warning.code != 'PHOTOS_MISSING_FROM_DISK') {
+    throw new Error('unexpected warning code');
+  }
+
+  expect(warning.data).toHaveProperty('photosMissing');
+  expect(warning.data.photosMissing.length).toBe(1);
+
+  expect(warning.data.photosMissing[0].id).toBe(dbPhoto.id);
 }
 
 function getDataFromRet<T extends { ok: boolean; data?: any }>(o: T) {

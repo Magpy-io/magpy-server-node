@@ -1,12 +1,9 @@
 import { Request, Response } from 'express';
 
-import { getPhotosByIdFromDB } from '../../db/sequelizeDb';
+import { getPhotosByIdFromDB, Photo } from '../../db/sequelizeDb';
 import assertUserToken from '../../middleware/userToken/assertUserToken';
 import { getPhotoFromDisk } from '../../modules/diskManager';
-import {
-  AddWarningPhotosDeleted,
-  filterPhotosExistAndDeleteMissing,
-} from '../../modules/functions';
+import { AddWarningPhotosMissing } from '../../modules/functions';
 import { APIPhoto, GetPhotosById } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
@@ -31,42 +28,49 @@ const callback = async (
   const photos = await getPhotosByIdFromDB(ids);
   req.logger?.debug('Received response from db.');
 
-  const ret = await filterPhotosExistAndDeleteMissing(photos);
-  const warning = ret.warning;
-  if (warning) {
-    AddWarningPhotosDeleted(ret.photosDeleted, req.userId);
-  }
-
-  let images64Promises;
+  let images64Promises: Promise<string | null>[];
 
   if (photoType == 'data') {
-    images64Promises = new Array(ret.photosThatExist.length).fill('');
+    images64Promises = new Array(photos.length).fill('');
   } else {
     req.logger?.debug(`Retrieving ${photoType} photos from disk.`);
-    images64Promises = ret.photosThatExist.map(photo => {
-      if (!photo) return '';
+    images64Promises = photos.map(photo => {
+      if (!photo) {
+        return Promise.resolve('');
+      }
       return getPhotoFromDisk(photo, photoType);
     });
   }
 
   const images64 = await Promise.all(images64Promises);
-
   req.logger?.debug('Photos retrieved from disk if needed');
 
-  const photosResponse = ret.photosThatExist.map((photo, index) => {
-    if (!photo)
+  const photosMissing: Photo[] = [];
+
+  const photosResponse = photos.map((photo, index) => {
+    if (!photo) {
       return { id: ids[index], exists: false } as {
         id: string;
         exists: false;
       };
+    }
 
-    const photoWithImage64 = responseFormatter.createPhotoObject(photo, images64[index]);
+    if (images64[index] == null) {
+      photosMissing.push(photo);
+    }
+
+    const photoWithImage64 = responseFormatter.createPhotoObject(photo, images64[index] || '');
     return { id: ids[index], exists: true, photo: photoWithImage64 } as {
       id: string;
       exists: true;
       photo: APIPhoto;
     };
   });
+
+  const warning = photosMissing.length != 0;
+  if (warning) {
+    AddWarningPhotosMissing(photosMissing, req.userId);
+  }
 
   const jsonResponse = {
     number: photosResponse.length,

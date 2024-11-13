@@ -1,7 +1,11 @@
 import { Request, Response } from 'express';
 
 import { postPhotoPartTimeout } from '../../config/config';
-import { addPhotoToDB, deletePhotoByIdFromDB } from '../../db/sequelizeDb';
+import {
+  addPhotoToDB,
+  deletePhotoByIdFromDB,
+  getPhotoByMediaIdFromDB,
+} from '../../db/sequelizeDb';
 import assertUserToken from '../../middleware/userToken/assertUserToken';
 import { addPhotoToDisk, PhotoParsingError } from '../../modules/diskManager';
 import { hashFile } from '../../modules/hashing';
@@ -9,7 +13,6 @@ import FilesWaiting, { FilesWaitingType } from '../../modules/waitingFiles';
 import { AddPhotoPart } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
-import { checkPhotoExistsAndDeleteMissing } from '../../modules/functions';
 
 const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendResponse<
   AddPhotoPart.ResponseData,
@@ -118,19 +121,19 @@ const callback = async (
   req.logger?.debug(`Deleting pending transfer for id ${body.id}`);
   FilesWaiting.delete(body.id);
 
-  const photoExists = await checkPhotoExistsAndDeleteMissing({
-    mediaId: photoWaiting.photo.mediaId,
-    deviceUniqueId: photoWaiting.photo.deviceUniqueId,
-  });
+  const photoExists = await getPhotoByMediaIdFromDB(
+    { mediaId: photoWaiting.photo.mediaId },
+    photoWaiting.photo.deviceUniqueId,
+  );
 
-  if (photoExists.exists) {
+  if (photoExists) {
     req.logger?.debug('Photo exists in db');
 
     const jsonResponse = {
       lenReceived: photoWaiting.received,
       lenWaiting: photoWaiting.image64Len,
       done: true,
-      photo: responseFormatter.createPhotoObject(photoExists.exists, ''),
+      photo: responseFormatter.createPhotoObject(photoExists, ''),
       photoExistsBefore: true,
     };
 

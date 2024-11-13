@@ -5,12 +5,12 @@ import { postPhotoPartTimeout } from '../../config/config';
 import assertUserToken from '../../middleware/userToken/assertUserToken';
 import { addServerImagePaths } from '../../modules/diskFilesNaming';
 import FilesWaiting from '../../modules/waitingFiles';
-import { AddPhotoInit, APIPhoto } from '../Types';
+import { AddPhotoInit } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
-import { checkPhotoExistsAndDeleteMissing } from '../../modules/functions';
+import { getPhotoByMediaIdFromDB } from '../../db/sequelizeDb';
 
-const { sendResponse, sendFailedMessage } = responseFormatter.getCustomSendResponse<
+const { sendResponse } = responseFormatter.getCustomSendResponse<
   AddPhotoInit.ResponseData,
   AddPhotoInit.ResponseErrorTypes
 >();
@@ -24,16 +24,16 @@ const callback = async (
     throw new Error('UserId is not defined.');
   }
 
-  const photoExists = await checkPhotoExistsAndDeleteMissing({
-    mediaId: body.mediaId,
-    deviceUniqueId: body.deviceUniqueId,
-  });
+  const photoExists = await getPhotoByMediaIdFromDB(
+    { mediaId: body.mediaId },
+    body.deviceUniqueId,
+  );
 
-  if (photoExists.exists) {
+  if (photoExists) {
     req.logger?.debug('Photo exists in db');
 
     const jsonResponse = {
-      photo: responseFormatter.createPhotoObject(photoExists.exists, ''),
+      photo: responseFormatter.createPhotoObject(photoExists, ''),
       photoExistsBefore: true as true,
     };
 

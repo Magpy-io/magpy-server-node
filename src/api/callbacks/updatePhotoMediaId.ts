@@ -1,11 +1,8 @@
 import { Request, Response } from 'express';
 
-import { updatePhotoMediaIdById } from '../../db/sequelizeDb';
+import { getPhotoByIdFromDB, updatePhotoMediaIdById } from '../../db/sequelizeDb';
 import assertUserToken from '../../middleware/userToken/assertUserToken';
-import {
-  AddWarningPhotosDeleted,
-  checkPhotoExistsAndDeleteMissing,
-} from '../../modules/functions';
+import { AddWarningPhotosMissing } from '../../modules/functions';
 import { UpdatePhotoMediaId } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
@@ -28,16 +25,9 @@ const callback = async (
 
   req.logger?.debug(`Searching in db for photo with id: ${id}`);
 
-  const ret = await checkPhotoExistsAndDeleteMissing({
-    id: id,
-  });
+  const photo = await getPhotoByIdFromDB(id);
 
-  const warning = ret.warning;
-  if (warning) {
-    AddWarningPhotosDeleted([ret.deleted], req.userId);
-  }
-
-  if (!ret.exists) {
+  if (!photo) {
     req.logger?.debug('Photo does not exist in server.');
 
     return sendFailedMessage(
@@ -45,11 +35,11 @@ const callback = async (
       res,
       `Photo with id ${id} not found in server`,
       'ID_NOT_FOUND',
-      warning,
+      false,
     );
   } else {
-    req.logger?.debug('Photo found and mediaId does not exist in db');
-    req.logger?.debug('Updating mediaId in db');
+    req.logger?.debug('Photo found in db, updating mediaId');
+
     await updatePhotoMediaIdById(id, mediaId, deviceUniqueId);
 
     req.logger?.debug('Photo updated successfully.');
