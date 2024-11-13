@@ -206,7 +206,7 @@ async function getPhotosFromDB(
   });
 
   const parsedImages = images.map(({ dataValues }) => {
-    const mediaIdsObjects = (dataValues as any as { mediaIds: MediaIdDB[] }).mediaIds;
+    const mediaIdsObjects = (dataValues as unknown as { mediaIds: MediaIdDB[] }).mediaIds;
     const mediaIds = mediaIdsObjects.map(mediaId => {
       return { deviceUniqueId: mediaId.deviceUniqueId, mediaId: mediaId.mediaId };
     });
