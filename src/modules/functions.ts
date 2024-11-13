@@ -3,11 +3,7 @@ import { platform } from 'os';
 import { isAbsolute } from 'path';
 
 import responseFormatter from '../api/responseFormatter';
-import {
-  deletePhotoByIdFromDB,
-  getPhotoByIdFromDB,
-  getPhotoByMediaIdFromDB,
-} from '../db/sequelizeDb';
+
 import { Photo } from '../db/sequelizeDb';
 import { isPhotoOnDisk, removePhotoVariationsFromDisk } from './diskManager';
 import { SetLastWarningForUser } from './warningsManager';

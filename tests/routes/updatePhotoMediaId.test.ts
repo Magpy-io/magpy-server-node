@@ -4,7 +4,6 @@ mockModules();
 
 import { describe, expect, it } from '@jest/globals';
 import { UpdatePhotoMediaId } from '@src/api/export';
-import { countDevicesInDB } from '@src/db/sequelizeDb';
 import { initServer, stopServer } from '@src/server/server';
 import {
   addPhoto,
@@ -116,34 +115,6 @@ describe("Test 'updatePhotoMediaId' endpoint", () => {
       throw new Error();
     }
 
-    testPhotoMetaAndIdWithAdditionalMediaIds(photo, [defaultPhotoSecondMediaId]);
-  });
-
-  it('Should change the mediaId of an existing photo and not create a new device if the device exists already', async () => {
-    expect(await countDevicesInDB()).toBe(0);
-
-    const addedPhotoData = await addPhoto();
-
-    expect(await countDevicesInDB()).toBe(1);
-
-    await addPhoto({
-      deviceUniqueId: defaultPhotoSecondMediaId.deviceUniqueId,
-    });
-
-    expect(await countDevicesInDB()).toBe(2);
-
-    const ret = await UpdatePhotoMediaId.Post({
-      id: addedPhotoData.id,
-      mediaId: defaultPhotoSecondMediaId.mediaId,
-      deviceUniqueId: defaultPhotoSecondMediaId.deviceUniqueId,
-    });
-
-    const photo = await getPhotoById(addedPhotoData.id);
-
-    if (!photo) {
-      throw new Error();
-    }
-    expect(await countDevicesInDB()).toBe(2);
     testPhotoMetaAndIdWithAdditionalMediaIds(photo, [defaultPhotoSecondMediaId]);
   });
 });

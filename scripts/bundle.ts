@@ -3,7 +3,7 @@ import { copy } from 'esbuild-plugin-copy';
 import fs from 'fs/promises';
 
 async function bundle() {
-  const res = await build({
+  await build({
     entryPoints: ['./dist/src/index.js'],
     bundle: true,
     minify: true,

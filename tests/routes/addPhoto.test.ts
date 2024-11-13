@@ -19,12 +19,9 @@ import {
   testPhotoOriginal,
   getDataFromRet,
   expectToBeOk,
-  expectToNotBeOk,
-  expectErrorCodeToBe,
   addPhoto,
   deletePhotoFromDisk,
   getPhotoFromDb,
-  testWarning,
 } from '@tests/helpers/functions';
 import { PhotoTypes } from '@src/api/Types';
 
