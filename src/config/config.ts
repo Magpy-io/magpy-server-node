@@ -19,34 +19,50 @@ const rootPath = path.join(os.homedir(), 'Magpy Photos');
 
 export const serverDiscoveryPort = 38951;
 
+export const logLevels = {
+  error: 0,
+  warn: 1,
+  http: 2,
+  middleware: 3,
+  info: 4,
+  debug: 5,
+};
+
+export type LogLevel = keyof typeof logLevels;
+
 let serverDataFileTmp = '';
 let sqliteDbFileTmp = '';
 let postPhotoPartTimeoutTmp = 0;
 let portTmp = '';
+let logLevelTmp: LogLevel;
 
 if (process.env.NODE_ENV === 'test') {
   sqliteDbFileTmp = ':memory:';
   serverDataFileTmp = path.join('.', 'serverData', 'serverInfo.json');
   postPhotoPartTimeoutTmp = 1000;
   portTmp = '0';
+  logLevelTmp = 'debug';
 } else if (process.env.NODE_ENV === 'dev') {
   sqliteDbFileTmp = path.join('.', 'db', 'database.db');
   serverDataFileTmp = path.join('.', 'serverData', 'serverInfo.json');
   postPhotoPartTimeoutTmp = 60000;
   portTmp = '31803';
+  logLevelTmp = 'debug';
 } else {
-  // Bundled application
+  // Bundled production application
   const appDir = getAppDataPath('Magpy');
   sqliteDbFileTmp = path.join(appDir, 'db', 'database.db');
   serverDataFileTmp = path.join(appDir, 'serverData', 'serverInfo.json');
   postPhotoPartTimeoutTmp = 60000;
   portTmp = '31803';
+  logLevelTmp = 'debug';
 }
 
 const serverDataFile = serverDataFileTmp;
 const sqliteDbFile = sqliteDbFileTmp;
 const postPhotoPartTimeout = postPhotoPartTimeoutTmp;
 const port = portTmp;
+const logLevel: LogLevel = logLevelTmp;
 
 export {
   rootPath,
@@ -61,4 +77,5 @@ export {
   port,
   backend_host,
   backend_port,
+  logLevel,
 };
