@@ -33,6 +33,12 @@ async function up({ context: queryInterface }: { context: QueryInterface }) {
     onDelete: 'CASCADE',
   });
 
+  await queryInterface.addConstraint('mediaIds', {
+    fields: ['mediaId', 'deviceUniqueId'],
+    type: 'unique',
+    name: 'unique_mediaId_deviceUniqueId',
+  });
+
   await queryInterface.dropTable('devices');
 }
 
