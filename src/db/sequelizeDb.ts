@@ -308,6 +308,27 @@ async function updatePhotoMediaIdById(id: string, mediaId: string, deviceUniqueI
   }
 }
 
+async function addMediaIdToImage({
+  imageId,
+  mediaId,
+  deviceUniqueId,
+}: {
+  imageId: string;
+  mediaId: string;
+  deviceUniqueId: string;
+}) {
+  const mediaIdCreated = await MediaIdModel.create({
+    id: uuid(),
+    mediaId,
+    imageId,
+    deviceUniqueId,
+  });
+
+  if (!mediaIdCreated) {
+    throw new Error('addMediaIdToImage: Error adding new mediaId to photo');
+  }
+}
+
 async function getAllMediaIdsByImageIdFromDB(imageId: string) {
   const mediaIds = (
     await MediaIdModel.findAll({
@@ -360,6 +381,7 @@ export {
   getPhotosByIdFromDB,
   getPhotoByMediaIdFromDB,
   getPhotosByMediaIdFromDB,
+  addMediaIdToImage,
   getAllMediaIdsByImageIdFromDB,
   deletePhotoByIdFromDB,
   updatePhotoMediaIdById,
