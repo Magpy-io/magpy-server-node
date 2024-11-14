@@ -91,65 +91,34 @@ async function closeDb() {
   Logger.info('Connection to DB closed');
 }
 
-async function getPhotoByMediaIdAll(
-  photoMediaId: string,
-  deviceUniqueId: string,
-): Promise<Array<Photo>> {
-  assertDbOpen();
-
-  // Possibly same mediaId present for multiple photos on the same device
-  const mediaIds = await MediaIdModel.findAll({
-    where: { mediaId: photoMediaId, deviceUniqueId },
-  });
-
-  if (mediaIds.length == 0) {
-    return [];
-  }
-
-  const imagesPromises = mediaIds.map(mediaId => {
-    return getPhotoByIdFromDB(mediaId.dataValues.imageId);
-  });
-
-  const images = await Promise.all(imagesPromises);
-
-  if (images.some(e => e == null)) {
-    Logger.warn(
-      'Found some mediaIds where the imageId does not exist in db\nClearning the mediaIds.',
-    );
-
-    const deleteMediaIdsWithNoPhoto = images.map((e, index) => {
-      if (e == null) {
-        return MediaIdModel.destroy({
-          where: { id: mediaIds[index].dataValues.id },
-        });
-      }
-    });
-
-    await Promise.all(deleteMediaIdsWithNoPhoto);
-  }
-
-  return filterNull(images);
-}
-
 async function getPhotoByMediaIdFromDB(
-  data: {
-    mediaId: string;
-  },
+  mediaId: string,
   deviceUniqueId: string,
 ): Promise<Photo | null> {
   assertDbOpen();
 
-  const images = await getPhotoByMediaIdAll(data.mediaId, deviceUniqueId);
+  // Possibly same mediaId present for multiple photos on the same device
+  const mediaIdEntry = await MediaIdModel.findOne({
+    where: { mediaId, deviceUniqueId },
+  });
 
-  if (images.length > 1) {
-    Logger.warn('Got more than one item from database with the same mediaId');
-  }
-
-  if (images.length >= 1) {
-    return images[0];
-  } else {
+  if (!mediaIdEntry) {
     return null;
   }
+
+  const image = await getPhotoByIdFromDB(mediaIdEntry.dataValues.imageId);
+
+  if (!image) {
+    Logger.warn(
+      'Found a mediaId where the imageId does not exist in db\nClearning the mediaId.',
+    );
+
+    await MediaIdModel.destroy({
+      where: { id: mediaIdEntry.dataValues.id },
+    });
+  }
+
+  return image;
 }
 
 async function addPhotoToDB(photo: AddPhotoType): Promise<Photo> {
@@ -268,7 +237,7 @@ async function getPhotosByMediaIdFromDB(
   assertDbOpen();
 
   const photosFoundPromise = photosData.map(photoData => {
-    return getPhotoByMediaIdFromDB(photoData, deviceUniqueId);
+    return getPhotoByMediaIdFromDB(photoData.mediaId, deviceUniqueId);
   });
   return await Promise.all(photosFoundPromise);
 }

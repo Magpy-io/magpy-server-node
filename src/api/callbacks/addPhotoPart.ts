@@ -122,7 +122,7 @@ const callback = async (
   FilesWaiting.delete(body.id);
 
   const photoExists = await getPhotoByMediaIdFromDB(
-    { mediaId: photoWaiting.photo.mediaId },
+    photoWaiting.photo.mediaId,
     photoWaiting.photo.deviceUniqueId,
   );
 
