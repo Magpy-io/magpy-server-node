@@ -7,26 +7,27 @@ export interface CustomLogger extends winston.Logger {
   middleware: winston.LeveledLogMethod;
 }
 
+const transports: winston.transport[] = [new winston.transports.Console()];
+
+if (process.env.NODE_ENV == 'dev') {
+  transports.push(
+    new winston.transports.File({
+      filename: '.tmp/output.log',
+      options: { flags: 'w' },
+    }),
+  );
+}
+
 function createLogger() {
   const logger = winston.createLogger({
     levels: logLevels,
     level: logLevel,
     format: combine(errors({ stack: true }), timestamp(), winston.format.json()),
-    transports: process.env.NODE_ENV == 'dev' ? transportsDev : transportsProd,
+    transports,
   }) as CustomLogger;
 
   return logger;
 }
-
-const transportsDev = [
-  new winston.transports.Console(),
-  new winston.transports.File({
-    filename: '.tmp/output.log',
-    options: { flags: 'w' },
-  }),
-];
-
-const transportsProd = [new winston.transports.Console()];
 
 export const Logger = createLogger();
 
