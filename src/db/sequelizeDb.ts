@@ -229,15 +229,13 @@ async function deletePhotoByIdFromDB(id: string) {
 }
 
 async function getPhotosByMediaIdFromDB(
-  photosData: Array<{
-    mediaId: string;
-  }>,
+  mediaIds: string[],
   deviceUniqueId: string,
 ): Promise<Array<Photo | null>> {
   assertDbOpen();
 
-  const photosFoundPromise = photosData.map(photoData => {
-    return getPhotoByMediaIdFromDB(photoData.mediaId, deviceUniqueId);
+  const photosFoundPromise = mediaIds.map(mediaId => {
+    return getPhotoByMediaIdFromDB(mediaId, deviceUniqueId);
   });
   return await Promise.all(photosFoundPromise);
 }
