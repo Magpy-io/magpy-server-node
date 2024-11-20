@@ -30,7 +30,3 @@ function createLogger() {
 }
 
 export const Logger = createLogger();
-
-if (process.env.NODE_ENV == 'test') {
-  Logger.silent = true;
-}
