@@ -99,9 +99,12 @@ export async function addNPhotosToDb(n: number) {
   const photo = {
     ...defaultPhoto,
     syncDate: new Date(Date.now()).toISOString(),
-    serverPath: '',
-    serverThumbnailPath: '',
-    serverCompressedPath: '',
+    serverPath:
+      'C:\\Users\\issam\\Magpy Photos\\Originals\\Ants_image_2024-11-21T12-22-43.672Z.jpg',
+    serverThumbnailPath:
+      'C:\\Users\\issam\\Magpy Photos\\Originals\\Ants_image_2024-11-21T12-22-43.672Z.jpg',
+    serverCompressedPath:
+      'C:\\Users\\issam\\Magpy Photos\\Originals\\Ants_image_2024-11-21T12-22-43.672Z.jpg',
     hash: '',
   };
 

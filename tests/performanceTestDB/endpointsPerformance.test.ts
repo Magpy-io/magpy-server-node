@@ -3,7 +3,12 @@ import { mockModules } from '@tests/helpers/mockModules';
 mockModules();
 
 import { describe, expect, it } from '@jest/globals';
-import { GetPhotos, GetPhotosById, GetPhotosByMediaId } from '@src/api/export';
+import {
+  DeletePhotosById,
+  GetPhotos,
+  GetPhotosById,
+  GetPhotosByMediaId,
+} from '@src/api/export';
 import { initServer, stopServer } from '@src/server/server';
 import {
   addNPhotosToDb,
@@ -22,6 +27,7 @@ describe('Test endpoints performance', () => {
   let getPhotosTime = 0;
   let getPhotosByIdTime = 0;
   let getPhotosByMediaIdTime = 0;
+  let deletePhotosTime = 0;
 
   beforeAll(async () => {
     app = await initServer();
@@ -37,6 +43,7 @@ describe('Test endpoints performance', () => {
       getPhotosTime: ${getPhotosTime} ms
       getPhotosByIdTime: ${getPhotosByIdTime} ms
       getPhotosByMediaIdTime: ${getPhotosByMediaIdTime} ms
+      deletePhotosTime: ${deletePhotosTime} ms
     `;
 
     console.log(result);
@@ -157,6 +164,42 @@ describe('Test endpoints performance', () => {
 
     console.log('getPhotosByMediaId elapsed: ', elapsed);
     getPhotosByMediaIdTime = elapsed;
+    expect(elapsed).toBeLessThan(200);
+  });
+
+  it("Test 'deletePhotos' endpoint performance", async () => {
+    const perf = new Perf();
+
+    const retGetPhotos = await GetPhotos.Post({
+      number: 1000,
+      offset: 0,
+      photoType: 'data',
+    });
+    if (!retGetPhotos.ok) {
+      throw new Error('Expected ok response');
+    }
+
+    const ids = retGetPhotos.data.photos.map(photo => photo.id);
+
+    perf.start();
+    const ret = await DeletePhotosById.Post({
+      ids,
+    });
+    const elapsed = perf.end();
+
+    expectToBeOk(ret);
+    expect(ret.warning).toBe(false);
+    const data = getDataFromRet(ret);
+
+    expect(data.deletedIds.length).toBe(1000);
+
+    const allDeleted = data.deletedIds.every((id, index) => {
+      return id == ids[index];
+    });
+    expect(allDeleted).toBe(true);
+
+    console.log('deletePhotos elapsed: ', elapsed);
+    deletePhotosTime = elapsed;
     expect(elapsed).toBeLessThan(200);
   });
 });
