@@ -4,13 +4,7 @@ mockModules();
 
 import { describe, expect, it } from '@jest/globals';
 import { initServer, stopServer } from '@src/server/server';
-import {
-  addNPhotos,
-  addNPhotosToDb,
-  expectToBeOk,
-  generateId,
-  getDataFromRet,
-} from '@tests/helpers/functions';
+import { addNPhotos, generateId } from '@tests/helpers/functions';
 import * as sac from '@tests/helpers/setupAndCleanup';
 import { Express } from 'express';
 import { photosExistByIdInDB } from '@src/db/sequelizeDb';
