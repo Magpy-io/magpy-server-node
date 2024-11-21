@@ -4,7 +4,6 @@ import { v4 as uuid } from 'uuid';
 
 import { sqliteDbFile } from '../config/config';
 import { createFolder } from '../modules/diskBasicFunctions';
-import { filterNull } from '../modules/functions';
 import { PhotoDB, createImageModel } from './Image.model';
 import { MediaIdDB, createMediaIdModel } from './MediaId.model';
 import { Logger } from '../modules/Logger';
@@ -16,7 +15,7 @@ type modelFunctions<T> = {
   hasMany: (...args: any[]) => void;
   belongsTo: (...args: any[]) => void;
   sync: () => Promise<void>;
-  destroy: <S>(options: { where: T extends S ? S : never }) => Promise<void>;
+  destroy: <S>(options: { where: any }) => Promise<void>;
   findOne: <S>(options: {
     where: T extends S ? S : never;
     include?: any;
@@ -258,12 +257,26 @@ async function getPhotoByIdFromDB(id: string): Promise<Photo | null> {
   return photos[0];
 }
 
-async function deletePhotoByIdFromDB(id: string) {
+async function photosExistByIdInDB(ids: string[]): Promise<boolean[]> {
+  assertDbOpen();
+
+  const images = await ImageModel.findAll({
+    where: { id: ids },
+  });
+
+  const photosFoundIds: Set<string> = new Set(images.map(({ dataValues }) => dataValues.id));
+
+  return ids.map(id => {
+    return photosFoundIds.has(id);
+  });
+}
+
+async function deletePhotosByIdFromDB(ids: string[]) {
   assertDbOpen();
 
   await ImageModel.destroy({
     where: {
-      id: id,
+      id: ids,
     },
   });
 }
@@ -362,6 +375,7 @@ export {
   clearDB,
   getPhotoByIdFromDB,
   getPhotosByIdFromDB,
+  photosExistByIdInDB,
   getPhotoByMediaIdFromDB,
   getPhotosByMediaIdFromDB,
   getPhotosFromDB,
@@ -369,6 +383,6 @@ export {
   addPhotoToDB,
   addMediaIdToImage,
   getAllMediaIdsByImageIdFromDB,
-  deletePhotoByIdFromDB,
+  deletePhotosByIdFromDB,
   updatePhotoMediaIdById,
 };
