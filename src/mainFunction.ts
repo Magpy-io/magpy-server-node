@@ -8,9 +8,11 @@ import { setupOpenInterfaceEvent } from './modules/LaunchWebBrowserInterface';
 
 import packageJson from '../package.json';
 import { Logger } from './modules/Logger';
+import { setupExceptionsLogger } from './modules/ErrorLogging';
 
 export async function main() {
   Logger.info('Running Magpy Server v' + packageJson.version);
+  setupExceptionsLogger();
   await InitModules();
   await openAndInitDB();
   await initServer();
