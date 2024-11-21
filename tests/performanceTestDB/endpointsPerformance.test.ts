@@ -19,6 +19,10 @@ import { Perf } from '@tests/helpers/Perf';
 describe('Test endpoints performance', () => {
   let app: Express;
 
+  let getPhotosTime = 0;
+  let getPhotosByIdTime = 0;
+  let getPhotosByMediaIdTime = 0;
+
   beforeAll(async () => {
     app = await initServer();
     await sac.beforeEach(app);
@@ -28,6 +32,14 @@ describe('Test endpoints performance', () => {
   afterAll(async () => {
     await sac.afterEach();
     await stopServer();
+
+    const result = `Results: 
+      getPhotosTime: ${getPhotosTime} ms
+      getPhotosByIdTime: ${getPhotosByIdTime} ms
+      getPhotosByMediaIdTime: ${getPhotosByMediaIdTime} ms
+    `;
+
+    console.log(result);
   });
 
   it("Test 'getPhotos' endpoint performance", async () => {
@@ -51,6 +63,7 @@ describe('Test endpoints performance', () => {
     expect(data.photos.length).toBe(1000);
 
     console.log('getPhotos elapsed: ', elapsed);
+    getPhotosTime = elapsed;
     expect(elapsed).toBeLessThan(200);
   });
 
@@ -95,6 +108,7 @@ describe('Test endpoints performance', () => {
     expect(data.photos[data.photos.length - 1].exists).toBe(false);
 
     console.log('getPhotosById elapsed: ', elapsed);
+    getPhotosByIdTime = elapsed;
     expect(elapsed).toBeLessThan(200);
   });
 
@@ -142,6 +156,7 @@ describe('Test endpoints performance', () => {
     expect(data.photos[data.photos.length - 1].exists).toBe(false);
 
     console.log('getPhotosByMediaId elapsed: ', elapsed);
+    getPhotosByMediaIdTime = elapsed;
     expect(elapsed).toBeLessThan(200);
   });
 });
