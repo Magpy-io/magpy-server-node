@@ -31,21 +31,19 @@ const callback = async (
   );
   req.logger?.debug('Received response from db.');
 
-  let images64Promises: Promise<string | null>[];
+  let images64: (string | null)[] = new Array(photos.length).fill('');
 
-  if (photoType == 'data') {
-    images64Promises = new Array(photos.length).fill('');
-  } else {
+  if (photoType != 'data') {
     req.logger?.debug(`Retrieving ${photoType} photos from disk.`);
-    images64Promises = photos.map(photo => {
-      if (!photo) {
-        return Promise.resolve('');
+
+    for (let i = 0; i < photos.length; i++) {
+      const photo = photos[i];
+      if (photo) {
+        images64[i] = await getPhotoFromDisk(photo, photoType);
       }
-      return getPhotoFromDisk(photo, photoType);
-    });
+    }
   }
 
-  const images64 = await Promise.all(images64Promises);
   req.logger?.debug('Photos retrieved from disk if needed');
 
   const photosMissing: Photo[] = [];

@@ -23,13 +23,23 @@ const callback = async (
 
   await deletePhotosByIdFromDB(ids);
 
-  const deletePhotosFromDiskPromises = photosDb.map(dbPhoto => {
-    if (dbPhoto != null) {
-      return removePhotoFromDisk(dbPhoto);
-    }
-  });
+  let firstError: any = null;
 
-  await Promise.all(deletePhotosFromDiskPromises);
+  for (const dbPhoto of photosDb) {
+    if (dbPhoto != null) {
+      try {
+        await removePhotoFromDisk(dbPhoto);
+      } catch (e) {
+        if (firstError == null) {
+          firstError = e;
+        }
+      }
+    }
+  }
+
+  if (firstError) {
+    throw firstError;
+  }
 
   const removedIds = photosDb
     .map(photoDb => {
