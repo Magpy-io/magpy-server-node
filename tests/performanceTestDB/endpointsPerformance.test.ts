@@ -9,6 +9,7 @@ import {
   addNPhotosToDb,
   defaultPhoto,
   expectToBeOk,
+  generateId,
   getDataFromRet,
 } from '@tests/helpers/functions';
 import * as sac from '@tests/helpers/setupAndCleanup';
@@ -67,6 +68,7 @@ describe('Test endpoints performance', () => {
     }
 
     const ids = retGetPhotos.data.photos.map(photo => photo.id);
+    ids.push(generateId());
 
     perf.start();
     const ret = await GetPhotosById.Post({
@@ -80,11 +82,18 @@ describe('Test endpoints performance', () => {
     expect(ret.warning).toBe(false);
     const data = getDataFromRet(ret);
 
-    expect(data.number).toBe(1000);
-    expect(data.photos.length).toBe(1000);
+    expect(data.number).toBe(1001);
+    expect(data.photos.length).toBe(1001);
 
-    const allExist = data.photos.every(entry => entry.exists);
+    const allExist = data.photos.every((entry, index) => {
+      if (index == data.photos.length - 1) {
+        return true;
+      }
+      return entry.exists;
+    });
     expect(allExist).toBe(true);
+    expect(data.photos[data.photos.length - 1].exists).toBe(false);
+
     console.log('getPhotosById elapsed: ', elapsed);
     expect(elapsed).toBeLessThan(200);
   });
@@ -105,12 +114,13 @@ describe('Test endpoints performance', () => {
     const photosData = retGetPhotos.data.photos.map(photo => {
       return { mediaId: photo.meta.mediaIds[0].mediaId };
     });
+    photosData.push({ mediaId: 'newMediaIdNotExists' });
 
     perf.start();
     const ret = await GetPhotosByMediaId.Post({
+      photosData,
       deviceUniqueId: defaultPhoto.deviceUniqueId,
       photoType: 'data',
-      photosData,
     });
 
     const elapsed = perf.end();
@@ -119,11 +129,18 @@ describe('Test endpoints performance', () => {
     expect(ret.warning).toBe(false);
     const data = getDataFromRet(ret);
 
-    expect(data.number).toBe(1000);
-    expect(data.photos.length).toBe(1000);
+    expect(data.number).toBe(1001);
+    expect(data.photos.length).toBe(1001);
 
-    const allExist = data.photos.every(entry => entry.exists);
+    const allExist = data.photos.every((entry, index) => {
+      if (index == data.photos.length - 1) {
+        return true;
+      }
+      return entry.exists;
+    });
     expect(allExist).toBe(true);
+    expect(data.photos[data.photos.length - 1].exists).toBe(false);
+
     console.log('getPhotosByMediaId elapsed: ', elapsed);
     expect(elapsed).toBeLessThan(200);
   });
