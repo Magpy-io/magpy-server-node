@@ -3,7 +3,7 @@ import { Request, Response } from 'express';
 import { postPhotoPartTimeout } from '../../config/config';
 import {
   addPhotoToDB,
-  deletePhotoByIdFromDB,
+  deletePhotosByIdFromDB,
   getPhotoByMediaIdFromDB,
 } from '../../db/sequelizeDb';
 import assertUserToken from '../../middleware/userToken/assertUserToken';
@@ -149,7 +149,7 @@ const callback = async (
     await addPhotoToDisk(dbPhoto, image64);
   } catch (err) {
     req.logger?.debug('Could not add photo to disk, removing photo from db');
-    await deletePhotoByIdFromDB(dbPhoto.id);
+    await deletePhotosByIdFromDB([dbPhoto.id]);
 
     if (err instanceof PhotoParsingError) {
       req.logger?.error('Format not supported.', err);
