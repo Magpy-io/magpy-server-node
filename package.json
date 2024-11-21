@@ -19,7 +19,7 @@
     "build:all": "yarn build:client && yarn build:server",
     "test:base": "yarn test:base:v --silent",
     "test:base:v": "cross-env NODE_ENV=test jest --verbose=true --collect-coverage --testTimeout=100000",
-    "test": "yarn test:base ./tests/global ./tests/routes",
+    "test": "yarn test:base ./tests/global ./tests/routes ./tests/dbTests",
     "test:perf": "yarn test:base:v ./tests/performanceTestDB",
     "types:generate": "ts-node ./scripts/CreateTypes.ts",
     "types:copy": "ts-node ./scripts/CopyEndpointTypesToExport.ts",
