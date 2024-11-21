@@ -1,5 +1,5 @@
-import * as path from 'path';
-import { Sequelize } from 'sequelize';
+import { parse } from 'path';
+import { Model, ModelStatic, Sequelize } from 'sequelize';
 import { v4 as uuid } from 'uuid';
 
 import { sqliteDbFile } from '../config/config';
@@ -11,38 +11,13 @@ import { migrateDb } from './migrateDb';
 
 let sequelize: Sequelize | null = null;
 
-type modelFunctions<T> = {
-  hasMany: (...args: any[]) => void;
-  belongsTo: (...args: any[]) => void;
-  sync: () => Promise<void>;
-  destroy: <S>(options: { where: any }) => Promise<void>;
-  findOne: <S>(options: {
-    where: T extends S ? S : never;
-    include?: any;
-  }) => Promise<{ dataValues: T } | null>;
-  findAll: <S>(options: {
-    where?: any;
-    offset?: number;
-    limit?: number;
-    order?: any[];
-    attributes?: string[];
-    include?: any;
-  }) => Promise<Array<{ dataValues: T }>>;
-  create: (data: T) => Promise<{ dataValues: T } | null>;
-  count: () => Promise<number>;
-  update: <S, U>(
-    newFields: T extends U ? U : never,
-    options: { where: T extends S ? S : never },
-  ) => Promise<void>;
-};
-
-let ImageModel: modelFunctions<PhotoDB>;
-let MediaIdModel: modelFunctions<MediaIdDB>;
+let ImageModel: ModelStatic<Model<any, any>>;
+let MediaIdModel: ModelStatic<Model<any, any>>;
 
 async function openAndInitDB() {
   await openDb();
-  ImageModel = createImageModel(sequelize!) as unknown as modelFunctions<PhotoDB>;
-  MediaIdModel = createMediaIdModel(sequelize!) as unknown as modelFunctions<MediaIdDB>;
+  ImageModel = createImageModel(sequelize!);
+  MediaIdModel = createMediaIdModel(sequelize!);
 
   ImageModel.hasMany(MediaIdModel, {
     foreignKey: 'imageId',
@@ -60,7 +35,7 @@ async function openDb() {
   }
 
   if (sqliteDbFile != ':memory:') {
-    const parsed = path.parse(sqliteDbFile);
+    const parsed = parse(sqliteDbFile);
     await createFolder(parsed.dir);
   }
 
@@ -144,9 +119,7 @@ async function getPhotosFromDB(
   });
 
   const parsedImages = images.map(({ dataValues }) => {
-    const mediaIdsObjects = (
-      dataValues as unknown as { mediaIds: { dataValues: MediaIdDB }[] }
-    ).mediaIds;
+    const mediaIdsObjects = (dataValues as { mediaIds: { dataValues: MediaIdDB }[] }).mediaIds;
     const mediaIds = mediaIdsObjects.map(mediaId => {
       return {
         deviceUniqueId: mediaId.dataValues.deviceUniqueId,
@@ -238,6 +211,7 @@ async function getPhotosByIdFromDB(ids: string[]): Promise<Array<Photo | null>> 
 
     const mediaIdsObjects = (imageDb as unknown as { mediaIds: { dataValues: MediaIdDB }[] })
       .mediaIds;
+
     const mediaIds = mediaIdsObjects.map(mediaId => {
       return {
         deviceUniqueId: mediaId.dataValues.deviceUniqueId,
@@ -340,7 +314,7 @@ async function getAllMediaIdsByImageIdFromDB(imageId: string) {
 
 async function clearDB() {
   assertDbOpen();
-  await (sequelize as Sequelize).drop();
+  await sequelize?.drop();
 }
 
 function assertDbOpen() {
