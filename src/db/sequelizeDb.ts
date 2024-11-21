@@ -97,7 +97,6 @@ async function getPhotoByMediaIdFromDB(
 ): Promise<Photo | null> {
   assertDbOpen();
 
-  // Possibly same mediaId present for multiple photos on the same device
   const mediaIdEntry = await MediaIdModel.findOne({
     where: { mediaId, deviceUniqueId },
   });
@@ -229,15 +228,46 @@ async function deletePhotoByIdFromDB(id: string) {
 }
 
 async function getPhotosByMediaIdFromDB(
-  mediaIds: string[],
+  mediaIdsN: string[],
   deviceUniqueId: string,
 ): Promise<Array<Photo | null>> {
   assertDbOpen();
-
-  const photosFoundPromise = mediaIds.map(mediaId => {
-    return getPhotoByMediaIdFromDB(mediaId, deviceUniqueId);
+  const mediaIdEntriesK = await MediaIdModel.findAll({
+    where: { mediaId: mediaIdsN, deviceUniqueId },
   });
-  return await Promise.all(photosFoundPromise);
+
+  const mediaIdEntriesMapK: Map<string, number> = new Map(
+    mediaIdEntriesK.map(({ dataValues }, i) => [dataValues.mediaId, i]),
+  );
+
+  const photosIdsK = mediaIdEntriesK.map(({ dataValues }) => {
+    return dataValues.imageId;
+  });
+
+  const imagesK = await getPhotosByIdFromDB(photosIdsK);
+
+  for (let i = 0; i < imagesK.length; i++) {
+    const image = imagesK[i];
+    if (image == null) {
+      Logger.warn(
+        'Found a mediaId where the imageId does not exist in db\nClearning the mediaId.',
+      );
+
+      await MediaIdModel.destroy({
+        where: { id: mediaIdEntriesK[i].dataValues.id },
+      });
+    }
+  }
+
+  return mediaIdsN.map(mediaId => {
+    const mediaIdEntryIndex = mediaIdEntriesMapK.get(mediaId);
+
+    if (mediaIdEntryIndex == null) {
+      return null;
+    }
+
+    return imagesK[mediaIdEntryIndex];
+  });
 }
 
 async function getPhotosByIdFromDB(ids: string[]): Promise<Array<Photo | null>> {
@@ -248,24 +278,13 @@ async function getPhotosByIdFromDB(ids: string[]): Promise<Array<Photo | null>> 
     include: MediaIdModel,
   });
 
-  let imagesAll: Array<PhotoDB | null> = [];
+  const photosFoundIds: Map<string, PhotoDB> = new Map(
+    images.map(({ dataValues }, i) => [dataValues.id, dataValues]),
+  );
 
-  if (images.length == ids.length) {
-    imagesAll = images.map(e => e.dataValues);
-  } else {
-    const photosFoundIds: Map<string, number> = new Map(
-      images.map(({ dataValues }, i) => [dataValues.id, i]),
-    );
-
-    imagesAll = ids.map(id => {
-      const photoIndex = photosFoundIds.get(id);
-      if (photoIndex != null) {
-        return images[photoIndex].dataValues;
-      } else {
-        return null;
-      }
-    });
-  }
+  const imagesAll = ids.map(id => {
+    return photosFoundIds.get(id) ?? null;
+  });
 
   const parsedImages: Array<Photo | null> = imagesAll.map(imageDb => {
     if (!imageDb) {
