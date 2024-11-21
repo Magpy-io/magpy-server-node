@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 
 import {
   addPhotoToDB,
-  deletePhotoByIdFromDB,
+  deletePhotosByIdFromDB,
   getPhotoByMediaIdFromDB,
 } from '../../db/sequelizeDb';
 import assertUserToken from '../../middleware/userToken/assertUserToken';
@@ -23,10 +23,7 @@ const callback = async (req: ExtendedRequest, res: Response, body: AddPhoto.Requ
     throw new Error('UserId is not defined.');
   }
 
-  const photoExists = await getPhotoByMediaIdFromDB(
-    { mediaId: body.mediaId },
-    body.deviceUniqueId,
-  );
+  const photoExists = await getPhotoByMediaIdFromDB(body.mediaId, body.deviceUniqueId);
 
   if (photoExists) {
     req.logger?.debug('Photo exists in db');
@@ -66,7 +63,7 @@ const callback = async (req: ExtendedRequest, res: Response, body: AddPhoto.Requ
     await addPhotoToDisk(dbPhoto, body.image64);
   } catch (err) {
     req.logger?.debug('Could not add photo to disk, removing photo from db');
-    await deletePhotoByIdFromDB(dbPhoto.id);
+    await deletePhotosByIdFromDB([dbPhoto.id]);
 
     if (err instanceof PhotoParsingError) {
       req.logger?.error('Format not supported.', err);

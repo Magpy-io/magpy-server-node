@@ -4,7 +4,6 @@ import { v4 as uuid } from 'uuid';
 
 import { sqliteDbFile } from '../config/config';
 import { createFolder } from '../modules/diskBasicFunctions';
-import { filterNull } from '../modules/functions';
 import { PhotoDB, createImageModel } from './Image.model';
 import { MediaIdDB, createMediaIdModel } from './MediaId.model';
 import { Logger } from '../modules/Logger';
@@ -16,13 +15,13 @@ type modelFunctions<T> = {
   hasMany: (...args: any[]) => void;
   belongsTo: (...args: any[]) => void;
   sync: () => Promise<void>;
-  destroy: <S>(options: { where: T extends S ? S : never }) => Promise<void>;
+  destroy: <S>(options: { where: any }) => Promise<void>;
   findOne: <S>(options: {
     where: T extends S ? S : never;
     include?: any;
   }) => Promise<{ dataValues: T } | null>;
   findAll: <S>(options: {
-    where?: T extends S ? S : never;
+    where?: any;
     offset?: number;
     limit?: number;
     order?: any[];
@@ -91,67 +90,6 @@ async function closeDb() {
   Logger.info('Connection to DB closed');
 }
 
-async function getPhotoByMediaIdAll(
-  photoMediaId: string,
-  deviceUniqueId: string,
-): Promise<Array<Photo>> {
-  assertDbOpen();
-
-  // Possibly same mediaId present for multiple photos on the same device
-  const mediaIds = await MediaIdModel.findAll({
-    where: { mediaId: photoMediaId, deviceUniqueId },
-  });
-
-  if (mediaIds.length == 0) {
-    return [];
-  }
-
-  const imagesPromises = mediaIds.map(mediaId => {
-    return getPhotoByIdFromDB(mediaId.dataValues.imageId);
-  });
-
-  const images = await Promise.all(imagesPromises);
-
-  if (images.some(e => e == null)) {
-    Logger.warn(
-      'Found some mediaIds where the imageId does not exist in db\nClearning the mediaIds.',
-    );
-
-    const deleteMediaIdsWithNoPhoto = images.map((e, index) => {
-      if (e == null) {
-        return MediaIdModel.destroy({
-          where: { id: mediaIds[index].dataValues.id },
-        });
-      }
-    });
-
-    await Promise.all(deleteMediaIdsWithNoPhoto);
-  }
-
-  return filterNull(images);
-}
-
-async function getPhotoByMediaIdFromDB(
-  data: {
-    mediaId: string;
-  },
-  deviceUniqueId: string,
-): Promise<Photo | null> {
-  assertDbOpen();
-
-  const images = await getPhotoByMediaIdAll(data.mediaId, deviceUniqueId);
-
-  if (images.length > 1) {
-    Logger.warn('Got more than one item from database with the same mediaId');
-  }
-
-  if (images.length >= 1) {
-    return images[0];
-  } else {
-    return null;
-  }
-}
-
 async function addPhotoToDB(photo: AddPhotoType): Promise<Photo> {
   assertDbOpen();
 
@@ -206,9 +144,14 @@ async function getPhotosFromDB(
   });
 
   const parsedImages = images.map(({ dataValues }) => {
-    const mediaIdsObjects = (dataValues as unknown as { mediaIds: MediaIdDB[] }).mediaIds;
+    const mediaIdsObjects = (
+      dataValues as unknown as { mediaIds: { dataValues: MediaIdDB }[] }
+    ).mediaIds;
     const mediaIds = mediaIdsObjects.map(mediaId => {
-      return { deviceUniqueId: mediaId.deviceUniqueId, mediaId: mediaId.mediaId };
+      return {
+        deviceUniqueId: mediaId.dataValues.deviceUniqueId,
+        mediaId: mediaId.dataValues.mediaId,
+      };
     });
     return { ...dataValues, mediaIds };
   });
@@ -219,67 +162,123 @@ async function getPhotosFromDB(
   };
 }
 
-async function getPhotoByIdFromDB(id: string): Promise<Photo | null> {
-  assertDbOpen();
-
-  const image = await ImageModel.findOne({
-    where: { id: id },
-  });
-
-  if (!image) {
-    return null;
-  }
-
-  const mediaIds = await MediaIdModel.findAll({
-    where: { imageId: id },
-  });
-
-  const devicesPromises = mediaIds.map(async mediaId => {
-    return {
-      deviceUniqueId: mediaId.dataValues.deviceUniqueId,
-      mediaId: mediaId.dataValues.mediaId,
-    };
-  });
-
-  const mediaIdsWithDevices = await Promise.all(devicesPromises);
-
-  return {
-    ...image.dataValues,
-    mediaIds: filterNull(mediaIdsWithDevices),
-  };
-}
-
-async function deletePhotoByIdFromDB(id: string) {
-  assertDbOpen();
-
-  await ImageModel.destroy({
-    where: {
-      id: id,
-    },
-  });
-}
-
 async function getPhotosByMediaIdFromDB(
-  photosData: Array<{
-    mediaId: string;
-  }>,
+  mediaIds: string[],
   deviceUniqueId: string,
 ): Promise<Array<Photo | null>> {
   assertDbOpen();
-
-  const photosFoundPromise = photosData.map(photoData => {
-    return getPhotoByMediaIdFromDB(photoData, deviceUniqueId);
+  const mediaIdEntries = await MediaIdModel.findAll({
+    where: { mediaId: mediaIds, deviceUniqueId },
   });
-  return await Promise.all(photosFoundPromise);
+
+  const mediaIdEntriesMap: Map<string, number> = new Map(
+    mediaIdEntries.map(({ dataValues }, i) => [dataValues.mediaId, i]),
+  );
+
+  const photosIds = mediaIdEntries.map(({ dataValues }) => {
+    return dataValues.imageId;
+  });
+
+  const images = await getPhotosByIdFromDB(photosIds);
+
+  for (let i = 0; i < images.length; i++) {
+    const image = images[i];
+    if (image == null) {
+      Logger.warn(
+        'Found a mediaId where the imageId does not exist in db\nClearning the mediaId.',
+      );
+
+      await MediaIdModel.destroy({
+        where: { id: mediaIdEntries[i].dataValues.id },
+      });
+    }
+  }
+
+  return mediaIds.map(mediaId => {
+    const mediaIdEntryIndex = mediaIdEntriesMap.get(mediaId);
+
+    if (mediaIdEntryIndex == null) {
+      return null;
+    }
+
+    return images[mediaIdEntryIndex];
+  });
+}
+
+async function getPhotoByMediaIdFromDB(
+  mediaId: string,
+  deviceUniqueId: string,
+): Promise<Photo | null> {
+  assertDbOpen();
+
+  const photos = await getPhotosByMediaIdFromDB([mediaId], deviceUniqueId);
+  return photos[0];
 }
 
 async function getPhotosByIdFromDB(ids: string[]): Promise<Array<Photo | null>> {
   assertDbOpen();
 
-  const photosFoundPromise = ids.map(id => {
-    return getPhotoByIdFromDB(id);
+  const images = await ImageModel.findAll({
+    where: { id: ids },
+    include: MediaIdModel,
   });
-  return await Promise.all(photosFoundPromise);
+
+  const photosFoundIds: Map<string, PhotoDB> = new Map(
+    images.map(({ dataValues }) => [dataValues.id, dataValues]),
+  );
+
+  const imagesAll = ids.map(id => {
+    return photosFoundIds.get(id) ?? null;
+  });
+
+  const parsedImages: Array<Photo | null> = imagesAll.map(imageDb => {
+    if (imageDb == null) {
+      return null;
+    }
+
+    const mediaIdsObjects = (imageDb as unknown as { mediaIds: { dataValues: MediaIdDB }[] })
+      .mediaIds;
+    const mediaIds = mediaIdsObjects.map(mediaId => {
+      return {
+        deviceUniqueId: mediaId.dataValues.deviceUniqueId,
+        mediaId: mediaId.dataValues.mediaId,
+      };
+    });
+    return { ...imageDb, mediaIds };
+  });
+
+  return parsedImages;
+}
+
+async function getPhotoByIdFromDB(id: string): Promise<Photo | null> {
+  assertDbOpen();
+
+  const photos = await getPhotosByIdFromDB([id]);
+  return photos[0];
+}
+
+async function photosExistByIdInDB(ids: string[]): Promise<boolean[]> {
+  assertDbOpen();
+
+  const images = await ImageModel.findAll({
+    where: { id: ids },
+  });
+
+  const photosFoundIds: Set<string> = new Set(images.map(({ dataValues }) => dataValues.id));
+
+  return ids.map(id => {
+    return photosFoundIds.has(id);
+  });
+}
+
+async function deletePhotosByIdFromDB(ids: string[]) {
+  assertDbOpen();
+
+  await ImageModel.destroy({
+    where: {
+      id: ids,
+    },
+  });
 }
 
 async function updatePhotoMediaIdById(id: string, mediaId: string, deviceUniqueId: string) {
@@ -374,15 +373,16 @@ export {
   openDb,
   closeDb,
   clearDB,
-  countPhotosInDB,
-  addPhotoToDB,
-  getPhotosFromDB,
   getPhotoByIdFromDB,
   getPhotosByIdFromDB,
+  photosExistByIdInDB,
   getPhotoByMediaIdFromDB,
   getPhotosByMediaIdFromDB,
+  getPhotosFromDB,
+  countPhotosInDB,
+  addPhotoToDB,
   addMediaIdToImage,
   getAllMediaIdsByImageIdFromDB,
-  deletePhotoByIdFromDB,
+  deletePhotosByIdFromDB,
   updatePhotoMediaIdById,
 };

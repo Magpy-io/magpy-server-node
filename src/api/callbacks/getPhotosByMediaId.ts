@@ -25,7 +25,10 @@ const callback = async (
   const { photosData, photoType, deviceUniqueId } = body;
 
   req.logger?.debug('Getting photos from db with mediaId from request.');
-  const photos = await getPhotosByMediaIdFromDB(photosData, deviceUniqueId);
+  const photos = await getPhotosByMediaIdFromDB(
+    photosData.map(d => d.mediaId),
+    deviceUniqueId,
+  );
   req.logger?.debug('Received response from db.');
 
   let images64Promises: Promise<string | null>[];

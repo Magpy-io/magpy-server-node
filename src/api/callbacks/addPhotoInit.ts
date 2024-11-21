@@ -24,10 +24,7 @@ const callback = async (
     throw new Error('UserId is not defined.');
   }
 
-  const photoExists = await getPhotoByMediaIdFromDB(
-    { mediaId: body.mediaId },
-    body.deviceUniqueId,
-  );
+  const photoExists = await getPhotoByMediaIdFromDB(body.mediaId, body.deviceUniqueId);
 
   if (photoExists) {
     req.logger?.debug('Photo exists in db');
