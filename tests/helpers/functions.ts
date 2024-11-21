@@ -95,6 +95,22 @@ async function addNPhotos(n: number) {
   return ret;
 }
 
+export async function addNPhotosToDb(n: number) {
+  const photo = {
+    ...defaultPhoto,
+    syncDate: new Date(Date.now()).toISOString(),
+    serverPath: '',
+    serverThumbnailPath: '',
+    serverCompressedPath: '',
+    hash: '',
+  };
+
+  for (let i = 0; i < n; i++) {
+    photo.mediaId = 'mediaId' + i.toString();
+    await dbFunction.addPhotoToDB(photo);
+  }
+}
+
 async function deletePhotoFromDisk(photo: Photo, photoType: PhotoTypes) {
   if (photoType == 'thumbnail') {
     await fs.rm(photo.serverThumbnailPath, { force: true });
