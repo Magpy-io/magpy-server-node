@@ -5,19 +5,10 @@ import { isAbsolute } from 'path';
 import responseFormatter from '../api/responseFormatter';
 
 import { Photo } from '../db/sequelizeDb';
-import { isPhotoOnDisk, removePhotoVariationsFromDisk } from './diskManager';
 import { SetLastWarningForUser } from './warningsManager';
 import { ExtendedRequest, MiddleWareType } from '../api/endpointsLoader';
 import { NextFunction, Response } from 'express';
 import { Logger } from './Logger';
-
-function notNull<T>(value: T): value is NonNullable<T> {
-  return value !== null;
-}
-
-export function filterNull<T>(arr: T[]) {
-  return arr.filter(notNull);
-}
 
 export function timeout(ms: number) {
   return new Promise(resolve => setTimeout(resolve, ms));

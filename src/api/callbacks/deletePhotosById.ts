@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 
-import { deletePhotoByIdFromDB, getPhotoByIdFromDB } from '../../db/sequelizeDb';
+import { deletePhotosByIdFromDB, getPhotosByIdFromDB } from '../../db/sequelizeDb';
 import assertUserToken from '../../middleware/userToken/assertUserToken';
 import { removePhotoFromDisk } from '../../modules/diskManager';
 import { DeletePhotosById } from '../Types';
@@ -19,15 +19,35 @@ const callback = async (
 ) => {
   const ids: string[] = body.ids;
 
-  const removedIds = [];
-  for (const id of ids) {
-    const dbPhoto = await getPhotoByIdFromDB(id);
-    if (dbPhoto) {
-      await deletePhotoByIdFromDB(id);
-      await removePhotoFromDisk(dbPhoto);
-      removedIds.push(id);
+  const photosDb = await getPhotosByIdFromDB(ids);
+
+  await deletePhotosByIdFromDB(ids);
+
+  let firstError: any = null;
+
+  for (const dbPhoto of photosDb) {
+    if (dbPhoto != null) {
+      try {
+        await removePhotoFromDisk(dbPhoto);
+      } catch (e) {
+        if (firstError == null) {
+          firstError = e;
+        }
+      }
     }
   }
+
+  if (firstError) {
+    throw firstError;
+  }
+
+  const removedIds = photosDb
+    .map(photoDb => {
+      return photoDb?.id;
+    })
+    .filter(id => {
+      return id != null;
+    });
 
   req.logger?.debug('Photos removed from db and disk.');
 

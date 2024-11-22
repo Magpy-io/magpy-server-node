@@ -23,12 +23,17 @@ export function verifyUserToken(
   | {
       ok: false;
       error: ErrorTypes;
+      message?: String;
     } {
   const ret = verifyToken(token, key);
 
   if (ret.ok) {
     if (!ret.data.id) {
-      return { ok: false, error: 'TOKEN_NOT_A_USER_TOKEN' };
+      return {
+        ok: false,
+        error: 'TOKEN_NOT_A_USER_TOKEN',
+        message: 'Token invalid format for a user token',
+      };
     }
   }
 
@@ -46,22 +51,23 @@ export function verifyToken(
   | {
       ok: false;
       error: ErrorTypes;
+      message?: String;
     } {
   try {
     const decoded = jwt.verify(token, key);
     return { ok: true, data: decoded };
   } catch (err: any) {
     if (err.name == 'TokenExpiredError') {
-      return { ok: false, error: 'TOKEN_EXPIRED_ERROR' };
+      return { ok: false, error: 'TOKEN_EXPIRED_ERROR', message: err.message };
     }
     if (err.name == 'JsonWebTokenError') {
-      return { ok: false, error: 'TOKEN_VERIFICATION_ERROR' };
+      return { ok: false, error: 'TOKEN_VERIFICATION_ERROR', message: err.message };
     }
     if (err.name == 'SyntaxError') {
-      return { ok: false, error: 'TOKEN_SYNTAX_ERROR' };
+      return { ok: false, error: 'TOKEN_SYNTAX_ERROR', message: err.message };
     }
 
-    return { ok: false, error: 'UKNOWN_ERROR' };
+    return { ok: false, error: 'UKNOWN_ERROR', message: err.message };
   }
 }
 

@@ -11,7 +11,7 @@ import {
   IsServerClaimedLocal,
   SaveServerSigningKey,
 } from '../../modules/serverDataManager';
-import { generateUserToken, verifyToken } from '../../modules/tokenManagement';
+import { generateUserToken } from '../../modules/tokenManagement';
 import { GetTokenLocal } from '../Types';
 import responseFormatter from '../responseFormatter';
 import { EndpointType, ExtendedRequest } from '../endpointsLoader';
