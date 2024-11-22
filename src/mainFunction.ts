@@ -11,7 +11,7 @@ import { Logger } from './modules/Logger';
 import { setupExceptionsLogger } from './modules/ErrorLogging';
 
 export async function main() {
-  Logger.info('Running Magpy Server v' + packageJson.version);
+  Logger.info('Running Magpy Server v' + packageJson.version, { type: 'startup' });
   setupExceptionsLogger();
   await InitModules();
   await openAndInitDB();
