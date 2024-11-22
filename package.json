@@ -3,7 +3,7 @@
   "author": "Magpy",
   "description": "Magpy's Server Project",
   "license": "MIT",
-  "version": "0.6.4",
+  "version": "0.6.7",
   "main": "dist/src/index.js",
   "scripts": {
     "format": "prettier --write ./src ./tests",
