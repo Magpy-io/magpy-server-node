@@ -20,9 +20,9 @@ async function main() {
   await copyFiles(process.env.BUNDLE_OUTPUT_FOLDER, process.env.COPY_BUNDLE_TO);
   console.log('Bundle copied successfully to', process.env.COPY_BUNDLE_TO);
 
-  if (process.env.COPY_BUNDLE_TO_OPTIONAL) {
-    await copyFiles(process.env.BUNDLE_OUTPUT_FOLDER, process.env.COPY_BUNDLE_TO_OPTIONAL);
-    console.log('Bundle copied successfully to', process.env.COPY_BUNDLE_TO_OPTIONAL);
+  if (process.env.COPY_BUNDLE_TO_ADDITIONAL) {
+    await copyFiles(process.env.BUNDLE_OUTPUT_FOLDER, process.env.COPY_BUNDLE_TO_ADDITIONAL);
+    console.log('Bundle copied successfully to', process.env.COPY_BUNDLE_TO_ADDITIONAL);
   }
 }
 
