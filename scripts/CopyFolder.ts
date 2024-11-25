@@ -1,5 +1,4 @@
 import fs from 'fs/promises';
-import { join } from 'path';
 
 async function copyFiles(inputPath: string, outputPath: string): Promise<void> {
   await fs.rm(outputPath, { force: true, recursive: true });

@@ -1,6 +1,28 @@
 import { build } from 'esbuild';
 import { copy } from 'esbuild-plugin-copy';
 import fs from 'fs/promises';
+import { join } from 'path';
+
+require('dotenv').config();
+
+if (!process.env.BUNDLE_OUTPUT_FOLDER) {
+  console.log('BUNDLE_OUTPUT_FOLDER env var not defined.');
+  process.exit(1);
+}
+
+const outputPath = process.env.BUNDLE_OUTPUT_FOLDER;
+
+fs.rm(outputPath, { force: true, recursive: true })
+  .then(() => {
+    return bundle();
+  })
+  .then(() => {
+    console.log('Finished bundling project.');
+  })
+  .catch(err => {
+    console.log('Error while bundling project.');
+    console.log(err);
+  });
 
 async function bundle() {
   await build({
@@ -9,7 +31,7 @@ async function bundle() {
     minify: true,
     external: ['*.node'],
     platform: 'node',
-    outfile: './bundle/js/bundle.js',
+    outfile: join(outputPath, 'js/bundle.js'),
     plugins: [
       copy({
         assets: [
@@ -35,14 +57,5 @@ async function bundle() {
   });
 
   const p = require('../package.json');
-  await fs.writeFile('./bundle/.version_' + p.version, '', 'utf-8');
+  await fs.writeFile(join(outputPath, '.version_' + p.version), '', 'utf-8');
 }
-
-bundle()
-  .then(() => {
-    console.log('Finished bundling project.');
-  })
-  .catch(err => {
-    console.log('Error while bundling project.');
-    console.log(err);
-  });
