@@ -170,7 +170,7 @@ export default function ServerConfig() {
           icon={HiInformationCircle}
           additionalContent={
             <div>
-              Changing the server's folder won't move photos from the old one. To keep them,
+              Changing the server's folder won't move photos from the old one. To move them,
               you'll need to delete and re-upload them via the app.
             </div>
           }>
