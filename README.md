@@ -1,49 +1,10 @@
-# OpenCloud-server
+# magpy-server-node
+This project represents the server of the Magpy app. It is a node server and it is the common part of the projects magpy-server-windows and magpy-server-linux. \
+\
+You can find [here](https://github.com/Magpy-io/magpy-app) the main documentation of Magpy.
 
-## Installation
 
-### Install node
 
-```
-Sudo apt install nodejs
-```
+## Building
 
-### Install net-tools (to use ifconfig)
-
-```
-Sudo apt install net-tools
-```
-
-### Install yarn and run yarn install
-
-```
-sudo npm install --global yarn
-sudo npm install
-yarn install
-```
-
-## Configuration
-
-Configure the path of your photos. Edit these lines in the file Config/config.js
-
-```
-const rootPath = "PATH";
-```
-
-## Running the server
-
-```
-yarn start
-```
-
-## Clearing all images from server
-
-```
-yarn clean
-```
-
-## Testing the server
-
-```
-yarn test
-```
+Instructions for building will be added soon.
