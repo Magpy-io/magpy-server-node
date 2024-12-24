@@ -2,7 +2,7 @@
   "name": "opencloud-server",
   "author": "Magpy",
   "description": "Magpy's Server Project",
-  "license": "MIT",
+  "license": "AGPL-3.0-only",
   "version": "0.6.7",
   "main": "dist/src/index.js",
   "scripts": {
